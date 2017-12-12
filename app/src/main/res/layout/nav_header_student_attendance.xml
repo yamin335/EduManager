@@ -7,15 +7,16 @@
     android:gravity="bottom"
     android:orientation="vertical"
     android:id="@+id/student_nav_head"
+    android:paddingBottom="16dp"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingBottom="8dp"
-      android:theme="@style/ThemeOverlay.AppCompat.Dark">
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:theme="@style/ThemeOverlay.AppCompat.Dark">
     <ImageView
         android:id="@+id/profile"
         android:layout_width="80dp"
         android:layout_height="80dp"
-        android:layout_marginTop="15dp"
+        android:layout_marginTop="10dp"
         android:src="@drawable/album1"
         android:layout_gravity="center_horizontal"
         />
@@ -25,8 +26,8 @@
         android:layout_height="wrap_content"
         android:text="Md. Bony Israil"
         android:id="@+id/name"
-        android:paddingTop="8dp"
-        android:paddingBottom="4dp"
+        android:paddingTop="6dp"
+        android:paddingBottom="2dp"
         android:textColor="#ffffff"
         android:layout_gravity="center_horizontal"
         />
@@ -37,6 +38,7 @@
         android:layout_height="wrap_content"
         android:textColor="#ffffff"
         android:layout_gravity="center_horizontal"
+        android:paddingBottom="2dp"
         android:text="Monihar Jessore,Bangladesh " />
 
 </LinearLayout>
