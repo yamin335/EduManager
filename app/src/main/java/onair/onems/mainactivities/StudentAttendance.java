@@ -18,7 +18,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ExpandableListView;
+import android.widget.ImageView;
 import android.widget.Spinner;
+
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -66,7 +70,11 @@ public class StudentAttendance extends AppCompatActivity implements NavigationVi
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         expandableList = (ExpandableListView) findViewById(R.id.navigationmenu);
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-
+        View view = getLayoutInflater().inflate(R.layout.nav_header_student_attendance,null);
+        ImageView profilePicture = (ImageView)view.findViewById(R.id.profile);
+        Glide.with(this).load(R.drawable.student1).apply(RequestOptions.circleCropTransform()).into(profilePicture);
+        // profilePicture.setImageDrawable(getResources().getDrawable(R.drawable.album1));
+        navigationView.addHeaderView(view);
         if (navigationView != null) {
             setupDrawerContent(navigationView);
         }

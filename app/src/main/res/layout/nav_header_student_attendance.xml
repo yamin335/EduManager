@@ -10,14 +10,14 @@
 
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingBottom="16dp"
+    android:paddingBottom="8dp"
       android:theme="@style/ThemeOverlay.AppCompat.Dark">
-    <de.hdodenhof.circleimageview.CircleImageView
+    <ImageView
         android:id="@+id/profile"
         android:layout_width="80dp"
         android:layout_height="80dp"
         android:layout_marginTop="15dp"
-        android:src="@drawable/student1"
+        android:src="@drawable/album1"
         android:layout_gravity="center_horizontal"
         />
 
