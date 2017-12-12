@@ -4,15 +4,13 @@
     android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
-    android:background="#AB47BC"
+    android:background="#0277BD"
     xmlns:table="http://schemas.android.com/apk/res-auto">
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-
-
         >
 
 
@@ -20,9 +18,10 @@
             android:id="@+id/circleView"
             android:layout_width="70dp"
             android:layout_height="70dp"
-            android:layout_marginLeft="5dp"
+            android:layout_marginLeft="25dp"
             android:layout_marginTop="5dp"
-            android:src="@drawable/student"
+            android:src="@drawable/student1"
+
             tools:ignore="RtlHardcoded" />
 
         <TextView
@@ -57,15 +56,16 @@
             android:id="@+id/Id"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="100dp"
-            android:layout_marginStart="10dp"
-            android:layout_toEndOf="@+id/circleView"
-            android:layout_toRightOf="@+id/circleView"
+            android:layout_alignBaseline="@+id/roll"
+            android:layout_alignBottom="@+id/roll"
+            android:layout_marginLeft="18dp"
+            android:layout_marginStart="18dp"
+            android:layout_toEndOf="@+id/roll"
+            android:layout_toRightOf="@+id/roll"
             android:text="@string/id_124"
             android:textColor="#ffffff"
             android:textSize="12dp"
-            tools:ignore="HardcodedText,RtlHardcoded,SpUsage"
-            android:layout_alignTop="@+id/roll" />
+            tools:ignore="HardcodedText,RtlHardcoded,SpUsage" />
         <TextView
             android:id="@+id/percent"
             android:layout_width="match_parent"
@@ -91,7 +91,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:tooltipText="12"
-            table:tableView_headerColor="#9C27B0"
+            table:tableView_headerColor="#01579B"
             android:divider="#ECEFF1"
             android:dividerHeight="1dip"
             table:tableView_headerElevation="10" />

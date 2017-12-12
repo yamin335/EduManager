@@ -6,13 +6,14 @@
     tools:context=".mainactivities.SubjectWiseAttendance"
 
     android:layout_height="match_parent">
+
     <de.codecrafters.tableview.TableView
         android:id="@+id/tableView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:tooltipText="12"
-        table:tableView_headerColor="#9C27B0"
         android:divider="#ECEFF1"
         android:dividerHeight="1dip"
+        android:tooltipText="12"
+        table:tableView_headerColor="#01579B"
         table:tableView_headerElevation="10" />
 </LinearLayout>
