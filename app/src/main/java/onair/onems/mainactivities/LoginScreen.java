@@ -29,6 +29,7 @@ public class LoginScreen extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         //SERVER Test...
+        //YAMIN Test...
 
         loginButton = (Button)findViewById(R.id.login_button);
         takeId = (EditText)findViewById(R.id.id);
