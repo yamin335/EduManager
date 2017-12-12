@@ -101,45 +101,71 @@ public class StudentAttendance extends AppCompatActivity implements NavigationVi
         listDataHeader = new ArrayList<ExpandedMenuModel>();
         listDataChild = new HashMap<ExpandedMenuModel, List<String>>();
 
-        ExpandedMenuModel item1 = new ExpandedMenuModel();
-        item1.setIconName("heading1");
-        item1.setIconImg(android.R.drawable.ic_delete);
+        ExpandedMenuModel menuNotice = new ExpandedMenuModel();
+        menuNotice.setIconName("Notice");
+        menuNotice.setIconImg(R.drawable.nav_notice);
         // Adding data header
-        listDataHeader.add(item1);
+        listDataHeader.add(menuNotice);
 
-        ExpandedMenuModel item2 = new ExpandedMenuModel();
-        item2.setIconName("heading2");
-        item2.setIconImg(android.R.drawable.ic_delete);
-        listDataHeader.add(item2);
+        ExpandedMenuModel menuRoutine = new ExpandedMenuModel();
+        menuRoutine.setIconName("Routine");
+        menuRoutine.setIconImg(R.drawable.nav_routine);
+        listDataHeader.add(menuRoutine);
 
-        ExpandedMenuModel item3 = new ExpandedMenuModel();
-        item3.setIconName("heading3");
-        item3.setIconImg(android.R.drawable.ic_delete);
-        listDataHeader.add(item3);
+        ExpandedMenuModel menuAttendance = new ExpandedMenuModel();
+        menuAttendance.setIconName("Atendance");
+        menuAttendance.setIconImg(R.drawable.nav_attendance);
+        listDataHeader.add(menuAttendance);
+
+        ExpandedMenuModel menuSyllabus = new ExpandedMenuModel();
+        menuSyllabus.setIconName("Syllabus");
+        menuSyllabus.setIconImg(R.drawable.nav_syllabus);
+        listDataHeader.add(menuSyllabus);
+
+        ExpandedMenuModel menuExam = new ExpandedMenuModel();
+        menuExam.setIconName("Exam");
+        menuExam.setIconImg(R.drawable.nav_exam);
+        listDataHeader.add(menuExam);
+
+        ExpandedMenuModel menuResult = new ExpandedMenuModel();
+        menuResult.setIconName("Result");
+        menuResult.setIconImg(R.drawable.nav_result);
+        listDataHeader.add(menuResult);
+
+        ExpandedMenuModel menuFee = new ExpandedMenuModel();
+        menuFee.setIconName("Fee");
+        menuFee.setIconImg(R.drawable.nav_fee);
+        listDataHeader.add(menuFee);
+
+        ExpandedMenuModel menuContact = new ExpandedMenuModel();
+        menuContact.setIconName("Contact");
+        menuContact.setIconImg(R.drawable.nav_contact);
+        listDataHeader.add(menuContact);
 
         // Adding child data
-        List<String> heading1 = new ArrayList<String>();
-        heading1.add("Submenu of item 1");
+        List<String> headingNotice = new ArrayList<String>();
+        headingNotice.add("New Notice");
+        headingNotice.add("Old Notice");
 
-        List<String> heading2 = new ArrayList<String>();
-        heading2.add("Submenu of item 2");
-        heading2.add("Submenu of item 2");
-        heading2.add("Submenu of item 2");
-        heading2.add("Submenu of item 2");
-        heading2.add("Submenu of item 2");
-        heading2.add("Submenu of item 2");
-        heading2.add("Submenu of item 2");
-        heading2.add("Submenu of item 2");
-        heading2.add("Submenu of item 2");
-        heading2.add("Submenu of item 2");
-        heading2.add("Submenu of item 2");
-        heading2.add("Submenu of item 2");
-        heading2.add("Submenu of item 2");
-        heading2.add("Submenu of item 2");
-        heading2.add("Submenu of item 2");
+        List<String> headingRoutine = new ArrayList<String>();
+        headingRoutine.add("Mid Term Exam");
+        headingRoutine.add("Final Exam");
 
-        listDataChild.put(listDataHeader.get(0), heading1);// Header, Child data
-        listDataChild.put(listDataHeader.get(1), heading2);
+        List<String> headingAttendance = new ArrayList<String>();
+        List<String> headingSyllabus = new ArrayList<String>();
+        List<String> headingExam = new ArrayList<String>();
+        List<String> headingResult = new ArrayList<String>();
+        List<String> headingFee = new ArrayList<String>();
+        List<String> headingContact = new ArrayList<String>();
+
+        listDataChild.put(listDataHeader.get(0), headingNotice);// Header, Child data
+        listDataChild.put(listDataHeader.get(1), headingRoutine);
+        listDataChild.put(listDataHeader.get(2), headingAttendance);
+        listDataChild.put(listDataHeader.get(3), headingSyllabus);
+        listDataChild.put(listDataHeader.get(4), headingExam);
+        listDataChild.put(listDataHeader.get(5), headingResult);
+        listDataChild.put(listDataHeader.get(6), headingFee);
+        listDataChild.put(listDataHeader.get(7), headingContact);
 
     }
 

@@ -192,7 +192,7 @@
         android:elevation="100dp"
         android:fontFamily="sans-serif-condensed"
         android:padding="10dp"
-        android:text="Syllebus"
+        android:text="Syllabus"
         android:textAllCaps="false"
         android:textColor="@android:color/white"
         android:textSize="20sp"

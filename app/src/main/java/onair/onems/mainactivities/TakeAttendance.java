@@ -170,18 +170,18 @@ public class TakeAttendance extends AppCompatActivity
 
         ExpandedMenuModel item1 = new ExpandedMenuModel();
         item1.setIconName("heading1");
-        item1.setIconImg(R.drawable.notices);
+        item1.setIconImg(R.drawable.nav_notice);
         // Adding data header
         listDataHeader.add(item1);
 
         ExpandedMenuModel item2 = new ExpandedMenuModel();
         item2.setIconName("heading2");
-        item2.setIconImg(android.R.drawable.ic_delete);
+        item2.setIconImg(R.drawable.nav_routine);
         listDataHeader.add(item2);
 
         ExpandedMenuModel item3 = new ExpandedMenuModel();
         item3.setIconName("heading3");
-        item3.setIconImg(android.R.drawable.ic_delete);
+        item3.setIconImg(R.drawable.nav_attendance);
         listDataHeader.add(item3);
 
         // Adding child data
