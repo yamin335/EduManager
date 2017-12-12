@@ -26,7 +26,7 @@
         android:layout_height="wrap_content"
         android:text="Md. Bony Israil"
         android:id="@+id/name"
-        android:paddingTop="8dp"
+        android:paddingTop="6dp"
         android:paddingBottom="2dp"
         android:textColor="#ffffff"
         android:layout_gravity="center_horizontal"
