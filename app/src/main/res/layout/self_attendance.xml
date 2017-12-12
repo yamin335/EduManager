@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:table="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+
+    android:orientation="vertical"
+    android:background="#AB47BC">
+
+    <com.jaredrummler.materialspinner.MaterialSpinner
+        android:id="@+id/spinner"
+        android:layout_width="180dp"
+        android:layout_height="wrap_content"
+         android:layout_marginRight="10dp"
+        android:layout_gravity="right"
+        table:ms_background_color="#AB47BC"
+        android:textAlignment="center"
+
+        table:ms_dropdown_max_height="250dp"
+        table:ms_text_color="#ffffff" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="#FFFFFF"
+
+        android:layout_weight="1">
+
+        <de.codecrafters.tableview.TableView
+            android:id="@+id/tableView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:tooltipText="12"
+            table:tableView_headerColor="#9C27B0"
+            android:divider="#ECEFF1"
+            android:dividerHeight="1dip"
+            table:tableView_headerElevation="10" />
+    </LinearLayout>
+</LinearLayout>

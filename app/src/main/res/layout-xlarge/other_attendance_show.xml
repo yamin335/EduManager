@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:background="#AB47BC"
+    xmlns:table="http://schemas.android.com/apk/res-auto">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+
+
+        >
+
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/circleView"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginTop="5dp"
+            android:src="@drawable/student"
+            tools:ignore="RtlHardcoded" />
+
+        <TextView
+            android:id="@+id/name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/roll"
+            android:layout_alignStart="@+id/roll"
+            android:text="Md.Bony Israil"
+            android:textColor="#ffffff"
+            android:textSize="14dp"
+            android:textStyle="bold"
+            android:layout_marginTop="10dp"
+            tools:ignore="HardcodedText,RtlHardcoded,SpUsage" />
+
+        <TextView
+            android:id="@+id/roll"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/name"
+            android:layout_marginLeft="26dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="5dp"
+            android:layout_toEndOf="@+id/circleView"
+            android:layout_toRightOf="@+id/circleView"
+            android:text="Roll : 12 "
+            android:textColor="#ffffff"
+            android:textSize="12dp"
+            tools:ignore="HardcodedText,RtlHardcoded,SpUsage" />
+
+        <TextView
+            android:id="@+id/Id"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="100dp"
+            android:layout_marginStart="10dp"
+            android:layout_toEndOf="@+id/circleView"
+            android:layout_toRightOf="@+id/circleView"
+            android:text="@string/id_124"
+            android:textColor="#ffffff"
+            android:textSize="12dp"
+            tools:ignore="HardcodedText,RtlHardcoded,SpUsage"
+            android:layout_alignTop="@+id/roll" />
+        <TextView
+            android:id="@+id/percent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/circleView"
+            android:layout_alignLeft="@+id/roll"
+            android:layout_alignStart="@+id/roll"
+            android:text="Total Attandance : 85.2%"
+            android:layout_marginBottom="5dp"
+            android:textColor="#ffffff"
+            android:textSize="12dp"
+            tools:ignore="HardcodedText,RtlHardcoded,SpUsage" />
+    </RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_marginTop="5dp"
+        android:layout_height="0dp"
+        android:background="#FFFFFF"
+        android:layout_weight="1">
+        <de.codecrafters.tableview.TableView
+            android:id="@+id/tableView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:tooltipText="12"
+            table:tableView_headerColor="#9C27B0"
+            android:divider="#ECEFF1"
+            android:dividerHeight="1dip"
+            table:tableView_headerElevation="10" />
+    </LinearLayout>
+</LinearLayout>
