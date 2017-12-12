@@ -4,7 +4,9 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://E:\Projects\MyAndroidApps\SERVERonEMS\onEMS\app\app.iml" filepath="E:\Projects\MyAndroidApps\SERVERonEMS\onEMS\app\app.iml" />
+      <module fileurl="file://E:\project\SERVERonEMS\onEMS\app\app.iml" filepath="E:\project\SERVERonEMS\onEMS\app\app.iml" />
       <module fileurl="file://$PROJECT_DIR$/onEMS.iml" filepath="$PROJECT_DIR$/onEMS.iml" />
+      <module fileurl="file://E:\project\SERVERonEMS\onEMS\onEMS.iml" filepath="E:\project\SERVERonEMS\onEMS\onEMS.iml" />
       <module fileurl="file://E:\Projects\MyAndroidApps\SERVERonEMS\onEMS\onEMS.iml" filepath="E:\Projects\MyAndroidApps\SERVERonEMS\onEMS\onEMS.iml" />
     </modules>
   </component>
