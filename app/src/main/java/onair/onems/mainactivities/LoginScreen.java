@@ -28,6 +28,8 @@ public class LoginScreen extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+        //SERVER Test...
+
         loginButton = (Button)findViewById(R.id.login_button);
         takeId = (EditText)findViewById(R.id.id);
         takePassword = (EditText) findViewById(R.id.password);
