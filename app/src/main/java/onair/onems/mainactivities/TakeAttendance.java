@@ -13,6 +13,7 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -24,7 +25,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.ExpandableListView;
+import android.widget.ImageView;
 import android.widget.Spinner;
+
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -38,7 +43,6 @@ public class TakeAttendance extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private DrawerLayout mDrawerLayout;
-
     ExpandableListAdapter mMenuAdapter;
     ExpandableListView expandableList;
     List<ExpandedMenuModel> listDataHeader;
@@ -85,7 +89,11 @@ public class TakeAttendance extends AppCompatActivity
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         expandableList = (ExpandableListView) findViewById(R.id.navigationmenu);
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-
+        View view = getLayoutInflater().inflate(R.layout.nav_header_main,null);
+        ImageView profilePicture = (ImageView)view.findViewById(R.id.profilePicture);
+        Glide.with(this).load(R.drawable.album1).apply(RequestOptions.circleCropTransform()).into(profilePicture);
+       // profilePicture.setImageDrawable(getResources().getDrawable(R.drawable.album1));
+        navigationView.addHeaderView(view);
         if (navigationView != null) {
             setupDrawerContent(navigationView);
         }
