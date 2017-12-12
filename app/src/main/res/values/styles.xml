@@ -6,14 +6,14 @@
         <!-- Customize your theme here. -->
         <item name="colorPrimary">#174b92</item>
         <item name="colorPrimaryDark">#123c75</item>
-        <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorAccent">#FF0A2EF5</item>
     </style>
 
-    <style name="SplashScreen" parent="Theme.AppCompat.NoActionBar">
+    <style name="SplashScreen" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorAccent">#FF0A2EF5</item>
         <item name="android:windowFullscreen">true</item>
         <item name="android:windowContentOverlay">@null</item>
     </style>

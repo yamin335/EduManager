@@ -38,6 +38,7 @@ public class TakeAttendance extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private DrawerLayout mDrawerLayout;
+
     ExpandableListAdapter mMenuAdapter;
     ExpandableListView expandableList;
     List<ExpandedMenuModel> listDataHeader;
