@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import de.hdodenhof.circleimageview.CircleImageView;
 import onair.onems.R;
 import onair.onems.customadapters.ExpandableListAdapter;
 import onair.onems.fragment.OneFragment;
@@ -39,6 +40,7 @@ public class StudentAttendance extends AppCompatActivity implements NavigationVi
     private DrawerLayout mDrawerLayout;
     ExpandableListAdapter mMenuAdapter;
     ExpandableListView expandableList;
+    CircleImageView circleImageView;
     List<ExpandedMenuModel> listDataHeader;
     HashMap<ExpandedMenuModel, List<String>> listDataChild;
     private TabLayout tabLayout;
@@ -50,11 +52,12 @@ public class StudentAttendance extends AppCompatActivity implements NavigationVi
         setContentView(R.layout.activity_student_attendance);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
         viewPager = (ViewPager) findViewById(R.id.pager);
         setupViewPager(viewPager);
-
         tabLayout = (TabLayout) findViewById(R.id.tabLayout);
         tabLayout.setupWithViewPager(viewPager);
+
 
         final ActionBar ab = getSupportActionBar();
         /* to set the menu icon image*/

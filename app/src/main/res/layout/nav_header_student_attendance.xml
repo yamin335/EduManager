@@ -6,28 +6,38 @@
     android:background="@drawable/side_nav_bar"
     android:gravity="bottom"
     android:orientation="vertical"
-    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:id="@+id/student_nav_head"
+
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    android:theme="@style/ThemeOverlay.AppCompat.Dark">
-
-    <ImageView
-        android:id="@+id/imageView"
+    android:paddingBottom="16dp"
+      android:theme="@style/ThemeOverlay.AppCompat.Dark">
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/profile"
         android:layout_width="80dp"
-        android:layout_height="80dp" />
+        android:layout_height="80dp"
+        android:layout_marginTop="15dp"
+        android:src="@drawable/student1"
+        android:layout_gravity="center_horizontal"
+        />
 
     <TextView
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingTop="@dimen/nav_header_vertical_spacing"
-        android:text="Android Studio"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
+        android:text="Md. Bony Israil"
+        android:id="@+id/name"
+        android:paddingTop="8dp"
+        android:paddingBottom="4dp"
+        android:textColor="#ffffff"
+        android:layout_gravity="center_horizontal"
+        />
 
     <TextView
         android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="student mail" />
+        android:textColor="#ffffff"
+        android:layout_gravity="center_horizontal"
+        android:text="Monihar Jessore,Bangladesh " />
 
 </LinearLayout>
