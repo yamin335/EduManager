@@ -48,7 +48,7 @@ public class TakeAttendance extends AppCompatActivity
     List<ExpandedMenuModel> listDataHeader;
     HashMap<ExpandedMenuModel, List<String>> listDataChild;
     AppCompatSpinner spinnerClass,spinnerShift,spinnerSection,spinnerMedium,spinnerSubject;
-    String classArray[] = {"Morning", "two", "three", "four", "five", "six", "seven", "eight"};
+    String classArray[] = {"Morning", "two", "three", "four", "five", "six", "seven", "eight","Morning", "two", "three", "four", "five", "six", "seven", "eight","Morning", "two", "three", "four", "five", "six", "seven", "eight"};
 
     private RecyclerView recyclerView;
     private AlbumsAdapter adapter;
@@ -73,11 +73,35 @@ public class TakeAttendance extends AppCompatActivity
         prepareAlbums();
 
         spinnerClass = (AppCompatSpinner)findViewById(R.id.spinnerClass);
-        spinnerShift = (AppCompatSpinner)findViewById(R.id.spinner_Shift);
+        spinnerShift = (AppCompatSpinner)findViewById(R.id.spinnerShift);
+        spinnerSection = (AppCompatSpinner)findViewById(R.id.spinnerSection);
+        spinnerMedium =(AppCompatSpinner)findViewById(R.id.spinnerMedium);
+        spinnerSubject = (AppCompatSpinner)findViewById(R.id.spinnerSubject);
 
-        ArrayAdapter<String> sex_spinner_adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, classArray);
-        sex_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerClass.setAdapter(sex_spinner_adapter);
+        spinnerClass.setPrompt("ONEMS");
+
+        ArrayAdapter<String> class_spinner_adapter = new ArrayAdapter<String>(this, R.layout.spinner_item, classArray);
+        class_spinner_adapter.setDropDownViewResource(R.layout.spinner_drop_down_item);
+        spinnerClass.setAdapter(class_spinner_adapter);
+
+        ArrayAdapter<String> shift_spinner_adapter = new ArrayAdapter<String>(this,R.layout.spinner_item, classArray);
+        shift_spinner_adapter.setDropDownViewResource(R.layout.spinner_drop_down_item);
+        spinnerShift.setAdapter(shift_spinner_adapter);
+
+        ArrayAdapter<String> section_spinner_adapter = new ArrayAdapter<String>(this,R.layout.spinner_item, classArray);
+        section_spinner_adapter.setDropDownViewResource(R.layout.spinner_drop_down_item);
+        spinnerShift.setAdapter(section_spinner_adapter);
+
+        ArrayAdapter<String> medium_spinner_adapter = new ArrayAdapter<String>(this,R.layout.spinner_item, classArray);
+        medium_spinner_adapter.setDropDownViewResource(R.layout.spinner_drop_down_item);
+        spinnerShift.setAdapter(medium_spinner_adapter);
+
+        ArrayAdapter<String> subject_spinner_adapter = new ArrayAdapter<String>(this,R.layout.spinner_item, classArray);
+        subject_spinner_adapter.setDropDownViewResource(R.layout.spinner_drop_down_item);
+        spinnerShift.setAdapter(subject_spinner_adapter);
+
+
+
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
