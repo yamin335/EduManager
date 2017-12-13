@@ -1,6 +1,7 @@
 package onair.onems.fragment;
 
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -9,8 +10,23 @@ import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.jaredrummler.materialspinner.MaterialSpinner;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
 
 import de.codecrafters.tableview.TableView;
 import de.codecrafters.tableview.listeners.TableDataClickListener;
@@ -27,6 +43,10 @@ public class OneFragment extends Fragment {
     private View rootView;
     TableView tableView;
     MaterialSpinner spinner;
+    ListView monthList;
+    String baseurl = "http://192.168.1.82:4000/api/onEms/getMonth";
+    ProgressDialog dialog;
+    JSONArray monthJsonArray;
     private static final String[][] DATA_TO_SHOW = {{ "01", "1/10/10", "Yes", "" },{ "02", "2/10/10", "Yes", "20" } ,{ "01", "12/10/10(weekend)", "", "" },{ "02", "13/10/10", "No", " " },{ "03", "14/10/10", "Yes", "20" },{ "04", "15/11/10", "Yes", "" },{ "05", "15/10/11", "Yes", "5" },{ "01", "12/10/10(weekend)", "Yes", "" },{ "02", "13/10/10", "No", " " },{ "03", "14/10/10", "Yes", "20" },{ "04", "15/11/10", "Yes", "" },{ "05", "15/10/11(Holiday)", "", "" },{ "01", "12/10/10(weekend)", "Yes", "" },{ "02", "13/10/10", "No", " " },{ "03", "14/10/10", "Yes", "20" },{ "04", "15/11/10", "Yes", "" },{ "05", "15/10/11", "Yes", "5" },{ "01", "12/10/10(weekend)", "Yes", "" },{ "02", "13/10/10", "No", " " },{ "03", "14/10/10", "Yes", "20" },{ "04", "15/11/10", "Yes", "" },{ "05", "15/10/11", "Yes", "5" },{ "01", "12/10/10(weekend)", "Yes", "" },{ "02", "13/10/10", "No", " " },
             { "03", "14/10/10", "Yes", "20" },{ "04", "15/11/10", "Yes", "" },{ "05", "15/10/11", "Yes", "5" },{ "01", "12/10/10(weekend)", "", "" },{ "02", "13/10/10", "No", " " },{ "03", "14/10/10", "Yes", "20" },{ "04", "15/11/10", "Yes", "" },{ "05", "15/10/11", "Yes", "5" }};
     public OneFragment() {
@@ -46,6 +66,10 @@ public class OneFragment extends Fragment {
         rootView = inflater.inflate(R.layout.self_attendance, container, false);
         tableView = (TableView)rootView.findViewById(R.id.tableView);
         tableView.setColumnCount(4);
+       // monthList = (ListView)rootView.findViewById(R.id.fruitsList);
+        dialog = new ProgressDialog(getActivity());
+        dialog.setMessage("Loading....");
+        dialog.show();
         final SimpleTableHeaderAdapter simpleTableHeaderAdapter = new SimpleTableHeaderAdapter(getActivity(),"SI","Date","Present", "Late(m)");
         simpleTableHeaderAdapter.setTextColor(ContextCompat.getColor(getActivity(), R.color.table_header_text ));
         tableView.setHeaderAdapter(simpleTableHeaderAdapter);
@@ -74,9 +98,27 @@ public class OneFragment extends Fragment {
             simpleTableHeaderAdapter.setTextSize(10);
             simpleTabledataAdapter.setTextSize(10);
         }
+        RequestQueue queue = Volley.newRequestQueue(getActivity());
+        // String url ="http://192.168.1.105:4000";
+        // Request a string response from the provided URL.
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, baseurl,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        // Display the first 500 characters of the response string.
+                        parseJsonData(response);
+                        //mTextView.setText("Response is: "+ response);
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
 
+                dialog.dismiss();
+            }
+        });
+
+        queue.add(stringRequest);
         spinner = (MaterialSpinner) rootView.findViewById(R.id.spinner);
-        spinner.setItems("January", "February", "March", "April", "May","June","July","August","September","October","November","December");
         spinner.setOnItemSelectedListener(new MaterialSpinner.OnItemSelectedListener<String>() {
 
             @Override public void onItemSelected(MaterialSpinner view, int position, long id, String item) {
@@ -86,5 +128,22 @@ public class OneFragment extends Fragment {
 
         return rootView;
     }
+    void parseJsonData(String jsonString) {
+        try {
+            JSONArray jsonArray = new JSONArray(jsonString);
+            ArrayList al = new ArrayList();
+            for(int i = 0; i < jsonArray.length(); ++i) {
+                JSONObject jsonObject=jsonArray.getJSONObject(i);
+                String name=jsonObject.getString("MonthName");
+                al.add(name);
+            }
 
+            ArrayAdapter adapter = new ArrayAdapter(getActivity(), android.R.layout.simple_list_item_1, al);
+          spinner.setAdapter(adapter);
+        } catch (JSONException e) {
+            Toast.makeText(getActivity(),""+e,Toast.LENGTH_LONG).show();
+        }
+
+        dialog.dismiss();
+    }
 }
