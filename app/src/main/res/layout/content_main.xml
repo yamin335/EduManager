@@ -12,7 +12,7 @@
         android:id="@+id/upperConstraint"
         android:layout_width="match_parent"
         android:layout_height="70dp"
-        android:background="#2d8eca"
+        android:background="#0277bd"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -22,6 +22,7 @@
             android:layout_width="100dp"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
             android:layout_marginTop="8dp"
             android:backgroundTint="@android:color/white"
             app:layout_constraintEnd_toEndOf="parent"
@@ -44,6 +45,7 @@
             android:layout_width="100dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
+            android:layout_marginLeft="8dp"
             android:layout_marginTop="8dp"
             android:backgroundTint="@android:color/white"
             android:popupBackground="@drawable/drop_down_menu"
@@ -55,6 +57,7 @@
             android:layout_width="100dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
+            android:layout_marginLeft="8dp"
             android:layout_marginTop="8dp"
             android:backgroundTint="@android:color/white"
             app:layout_constraintStart_toStartOf="parent"
@@ -94,15 +97,14 @@
             android:id="@+id/relativeLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#e62468">
-
+            android:background="#123c75">
             <TextView
                 android:id="@+id/name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
-                android:background="#e62468"
+                android:background="#123c75"
                 android:padding="5dp"
                 android:text="Name and Roll"
                 android:textColor="#ffffff"
@@ -114,7 +116,7 @@
                 android:layout_height="wrap_content"
                 android:layout_toLeftOf="@+id/absent"
                 android:layout_toStartOf="@id/absent"
-                android:background="#e62468"
+                android:background="#123c75"
                 android:padding="5dp"
                 android:text="Present"
                 android:textColor="#ffffff"
@@ -126,7 +128,7 @@
                 android:layout_height="wrap_content"
                 android:layout_toLeftOf="@+id/late"
                 android:layout_toStartOf="@id/late"
-                android:background="#e62468"
+                android:background="#123c75"
                 android:padding="5dp"
                 android:text="Absent"
                 android:textColor="#ffffff"
@@ -138,9 +140,8 @@
                 android:layout_height="wrap_content"
                 android:layout_toLeftOf="@+id/leave"
                 android:layout_toStartOf="@id/leave"
-                android:background="#e62468"
+                android:background="#123c75"
                 android:padding="5dp"
-
                 android:text="Late"
                 android:textColor="#ffffff"
                 android:textSize="16sp" />
@@ -152,12 +153,11 @@
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentRight="true"
                 android:layout_marginRight="5dp"
-                android:background="#e62468"
+                android:background="#123c75"
                 android:padding="5dp"
                 android:text="Leave"
                 android:textColor="#ffffff"
                 android:textSize="16sp" />
-
         </RelativeLayout>
 
         <android.support.v7.widget.RecyclerView
@@ -166,7 +166,6 @@
             android:layout_height="wrap_content"
             android:clipToPadding="false"
             android:scrollbars="vertical" />
-
     </LinearLayout>
 
 </android.support.constraint.ConstraintLayout>

@@ -94,11 +94,23 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
         ImageView headerIcon = (ImageView) convertView.findViewById(R.id.iconimage);
         ImageView indicator = (ImageView) convertView.findViewById(R.id.arrow);
         switch (groupPosition) {
-            case 4:
+            case 0:
+                indicator.setVisibility(View.VISIBLE);
+                break;
+            case 1:
+                indicator.setVisibility(View.VISIBLE);
+                break;
+            default:
                 indicator.setVisibility(View.INVISIBLE);
         }
 
-       // lblListHeader.setTypeface(null, Typeface.BOLD);
+        if (isExpanded) {
+            indicator.setImageDrawable(mContext.getResources().getDrawable(R.drawable.ic_expand_less));
+        } else {
+            indicator.setImageDrawable(mContext.getResources().getDrawable(R.drawable.ic_expand_more));
+        }
+
+        // lblListHeader.setTypeface(null, Typeface.BOLD);
         lblListHeader.setText(headerTitle.getIconName());
         headerIcon.setImageResource(headerTitle.getIconImg());
         return convertView;
