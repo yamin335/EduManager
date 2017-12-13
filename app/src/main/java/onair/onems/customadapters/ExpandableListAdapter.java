@@ -33,6 +33,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
         this.mListDataHeader = listDataHeader;
         this.mListDataChild = listChildData;
         this.expandList = mView;
+//        expandList.setGroupIndicator(null);
     }
 
     @Override
@@ -91,6 +92,11 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
         TextView lblListHeader = (TextView) convertView
                 .findViewById(R.id.submenu);
         ImageView headerIcon = (ImageView) convertView.findViewById(R.id.iconimage);
+//        switch (groupPosition) {
+//            case 0:
+//                convertView.setEnabled(false);
+//        }
+
        // lblListHeader.setTypeface(null, Typeface.BOLD);
         lblListHeader.setText(headerTitle.getIconName());
         headerIcon.setImageResource(headerTitle.getIconImg());

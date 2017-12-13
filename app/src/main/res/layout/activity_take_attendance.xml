@@ -22,10 +22,11 @@
         >
         <ExpandableListView
             android:id="@+id/navigationmenu"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="156dp"
-            android:background="@android:color/white">
+            android:background="@android:color/white"
+            android:groupIndicator="@null">
         </ExpandableListView>
     </android.support.design.widget.NavigationView>
 </android.support.v4.widget.DrawerLayout>
