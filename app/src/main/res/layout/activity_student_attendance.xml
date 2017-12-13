@@ -18,15 +18,16 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        android:background="@android:color/white"
+        android:background="#F5F5F5"
         >
 
         <ExpandableListView
             android:id="@+id/navigationmenu"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginTop="156dp"
-            android:background="@android:color/white">
+            android:background="#F5F5F5"
+            android:groupIndicator="@null">
         </ExpandableListView>
 
     </android.support.design.widget.NavigationView>
