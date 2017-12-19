@@ -29,9 +29,6 @@ import java.util.ArrayList;
 
 import onair.onems.R;
 
-/**
- * Created by User on 12/5/2017.
- */
 
 public class LoginScreen extends AppCompatActivity {
 
@@ -39,72 +36,68 @@ public class LoginScreen extends AppCompatActivity {
     private EditText takeId;
     private EditText takePassword;
     private String UserID = "",LoginId="",LoginPassword="",Password = "",UserFullName="",ImageUrl="",InstituteName="",DepartmentName="",DesignationName="",BrunchName="",RFID="",RollNo="",StudentNo="";
-    int UserTypeID=0,InstituteID=0,DepartmentID,DesignationID,BrunchID,SBrunchID=0,BoardID,SDepartmentID,MediumID=0,
-            SectionID=0,SessionID=0,ShiftID=0,ClassID=0;
-
-    String loginurl = "http://192.168.1.82:4000/api/onEms/getLoginInformation/1/1";
+    int UserTypeID=0,InstituteID=0,DepartmentID,DesignationID,BrunchID,SBrunchID=0,BoardID,SDepartmentID,MediumID=0, SectionID=0,SessionID=0,ShiftID=0,ClassID=0;
+    String loginurl = "";
     ProgressDialog dialog;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_login);
         loginButton = (Button)findViewById(R.id.login_button);
         takeId = (EditText)findViewById(R.id.id);
-        takePassword = (EditText) findViewById(R.id.password);
         dialog = new ProgressDialog(this);
-        dialog.setMessage("Loading....");
-        dialog.show();
-        RequestQueue queue = Volley.newRequestQueue(this);
-        // String url ="http://192.168.1.105:4000";
-        // Request a string response from the provided URL.
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, loginurl,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        // Display the first 500 characters of the response string.
-                        parseJsonData(response);
-                        //mTextView.setText("Response is: "+ response);
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Toast.makeText(getApplicationContext(),"error:"+error,Toast.LENGTH_LONG).show();
-                dialog.dismiss();
-            }
-        });
+        takePassword = (EditText) findViewById(R.id.password);
 
-        queue.add(stringRequest);
+
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+               loginurl=loginurl+getString(R.string.baseUrl)+"getLoginInformation"+"/"+takeId.getText().toString()+"/"+takePassword.getText().toString();
 
-                LoginId = takeId.getText().toString();
-                LoginPassword = takePassword.getText().toString();
-                if((LoginId.equals(UserID))&&(LoginPassword.equals(Password)))
-                {
-                    Intent mainIntent = new Intent(LoginScreen.this,StudentMainScreen.class);
-                    LoginScreen.this.startActivity(mainIntent);
-                    LoginScreen.this.finish();
-                }
-                else if((LoginId.equals("22"))&&(LoginPassword.equals("22")))
-                {
-                    Intent mainIntent = new Intent(LoginScreen.this,TeacherMainScreen.class);
-                    LoginScreen.this.startActivity(mainIntent);
-                    LoginScreen.this.finish();
-                }
-                else
-                {
-                    Toast.makeText(LoginScreen.this,"Please enter valid id",Toast.LENGTH_LONG).show();
-                }
+                dialog.show();
 
-//                Intent mainIntent = new Intent(LoginScreen.this,TeacherMainScreen.class);
-//                LoginScreen.this.startActivity(mainIntent);
-//                LoginScreen.this.finish();
+                RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
+                StringRequest stringRequest = new StringRequest(Request.Method.GET, loginurl,
+                        new Response.Listener<String>() {
+                            @Override
+                            public void onResponse(String response) {
+
+                                parseJsonData(response);
+                                LoginId = takeId.getText().toString();
+                                LoginPassword = takePassword.getText().toString();
+
+                                if(Integer.parseInt(UserID)>0 )
+                                {
+                                    Intent mainIntent = new Intent(LoginScreen.this,StudentMainScreen.class);
+                                    LoginScreen.this.startActivity(mainIntent);
+                                    LoginScreen.this.finish();
+                                }
+                                else if((LoginId.equals("22"))&&(LoginPassword.equals("22")))
+                                {
+                                    Intent mainIntent = new Intent(LoginScreen.this,TeacherMainScreen.class);
+                                    LoginScreen.this.startActivity(mainIntent);
+                                    LoginScreen.this.finish();
+                                }
+                                else
+                                {
+                                    Toast.makeText(LoginScreen.this,"Please enter valid id",Toast.LENGTH_LONG).show();
+                                }
+
+                            }
+                        }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Toast.makeText(getApplicationContext(),"error:"+error,Toast.LENGTH_LONG).show();
+                        dialog.dismiss();
+                    }
+                });
+
+                queue.add(stringRequest);
+
+
             }
         });
-
-
-
     }
 
     void parseJsonData(String jsonString) {
@@ -166,6 +159,6 @@ public class LoginScreen extends AppCompatActivity {
             Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
         }
 
-        dialog.dismiss();
+       dialog.dismiss();
     }
 }

@@ -44,7 +44,7 @@ public class OneFragment extends Fragment {
     TableView tableView;
     MaterialSpinner spinner;
     ListView monthList;
-    String baseurl = "http://192.168.1.82:4000/api/onEms/getMonth";
+    String monthUrl = "";
     ProgressDialog dialog;
     JSONArray monthJsonArray;
     private static final String[][] DATA_TO_SHOW = {{ "01", "1/10/10", "Yes", "" },{ "02", "2/10/10", "Yes", "20" } ,{ "01", "12/10/10(weekend)", "", "" },{ "02", "13/10/10", "No", " " },{ "03", "14/10/10", "Yes", "20" },{ "04", "15/11/10", "Yes", "" },{ "05", "15/10/11", "Yes", "5" },{ "01", "12/10/10(weekend)", "Yes", "" },{ "02", "13/10/10", "No", " " },{ "03", "14/10/10", "Yes", "20" },{ "04", "15/11/10", "Yes", "" },{ "05", "15/10/11(Holiday)", "", "" },{ "01", "12/10/10(weekend)", "Yes", "" },{ "02", "13/10/10", "No", " " },{ "03", "14/10/10", "Yes", "20" },{ "04", "15/11/10", "Yes", "" },{ "05", "15/10/11", "Yes", "5" },{ "01", "12/10/10(weekend)", "Yes", "" },{ "02", "13/10/10", "No", " " },{ "03", "14/10/10", "Yes", "20" },{ "04", "15/11/10", "Yes", "" },{ "05", "15/10/11", "Yes", "5" },{ "01", "12/10/10(weekend)", "Yes", "" },{ "02", "13/10/10", "No", " " },
@@ -66,7 +66,8 @@ public class OneFragment extends Fragment {
         rootView = inflater.inflate(R.layout.self_attendance, container, false);
         tableView = (TableView)rootView.findViewById(R.id.tableView);
         tableView.setColumnCount(4);
-       // monthList = (ListView)rootView.findViewById(R.id.fruitsList);
+        monthUrl=monthUrl+getString(R.string.baseUrl)+"getMonth";
+
         dialog = new ProgressDialog(getActivity());
         dialog.setMessage("Loading....");
         dialog.show();
@@ -99,15 +100,14 @@ public class OneFragment extends Fragment {
             simpleTabledataAdapter.setTextSize(10);
         }
         RequestQueue queue = Volley.newRequestQueue(getActivity());
-        // String url ="http://192.168.1.105:4000";
-        // Request a string response from the provided URL.
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, baseurl,
+
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, monthUrl,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        // Display the first 500 characters of the response string.
+
                         parseJsonData(response);
-                        //mTextView.setText("Response is: "+ response);
+
                     }
                 }, new Response.ErrorListener() {
             @Override
@@ -137,9 +137,9 @@ public class OneFragment extends Fragment {
                 String name=jsonObject.getString("MonthName");
                 al.add(name);
             }
-
             ArrayAdapter adapter = new ArrayAdapter(getActivity(), android.R.layout.simple_list_item_1, al);
-          spinner.setAdapter(adapter);
+            spinner.setAdapter(adapter);
+            spinner.setSelectedIndex(1);
         } catch (JSONException e) {
             Toast.makeText(getActivity(),""+e,Toast.LENGTH_LONG).show();
         }
