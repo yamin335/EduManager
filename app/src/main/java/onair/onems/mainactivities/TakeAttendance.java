@@ -4,6 +4,7 @@ package onair.onems.mainactivities;
  * Created by User on 12/3/2017.
  */
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -23,10 +24,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.ExpandableListView;
 import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
@@ -47,17 +51,34 @@ public class TakeAttendance extends AppCompatActivity
     ExpandableListView expandableList;
     List<ExpandedMenuModel> listDataHeader;
     HashMap<ExpandedMenuModel, List<String>> listDataChild;
-    AppCompatSpinner spinnerClass,spinnerShift,spinnerSection,spinnerMedium,spinnerSubject;
-    String classArray[] = {"Morning", "two", "three", "four", "five", "six", "seven", "eight"};
+    Spinner spinnerClass,spinnerShift,spinnerSection,spinnerMedium,spinnerSubject;
+    String classArray[] = {"five", "six", "seven", "eight","Nine", "Ten","Class"};
+    String shiftArray[] = {"Morning","Day","Shift"};
+    String sectionArray[] = {"A","B","Section"};
+    String mediumArray[] = {"English","Bangla","Medium"};
+    String subjectArray[] = {"Bangla","English","Mathematics","Subject"};
 
     private RecyclerView recyclerView;
     private AlbumsAdapter adapter;
     private List<Album> albumList;
 
     @Override
+    public void onResume() {
+        this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+        super.onResume();
+    }
+
+    @Override
+    public void onStart() {
+        this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+        super.onStart();
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_take_attendance);
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
 
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
 
@@ -72,12 +93,135 @@ public class TakeAttendance extends AppCompatActivity
 
         prepareAlbums();
 
-        spinnerClass = (AppCompatSpinner)findViewById(R.id.spinnerClass);
-        spinnerShift = (AppCompatSpinner)findViewById(R.id.spinner_Shift);
+        spinnerClass = (Spinner)findViewById(R.id.spinnerClass);
+        spinnerShift = (Spinner)findViewById(R.id.spinnerShift);
+        spinnerSection = (Spinner)findViewById(R.id.spinnerSection);
+        spinnerMedium =(Spinner)findViewById(R.id.spinnerMedium);
+        spinnerSubject = (Spinner)findViewById(R.id.spinnerSubject);
 
-        ArrayAdapter<String> sex_spinner_adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, classArray);
-        sex_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerClass.setAdapter(sex_spinner_adapter);
+
+        ArrayAdapter<String> class_spinner_adapter = new ArrayAdapter<String>(this, R.layout.spinner_item, classArray){
+
+            @Override
+            public View getView(int position, View convertView, ViewGroup parent) {
+
+                View v = super.getView(position, convertView, parent);
+                if (position == getCount()) {
+                    ((TextView)v.findViewById(android.R.id.text1)).setText("");
+                    ((TextView)v.findViewById(android.R.id.text1)).setHint(getItem(getCount())); //"Hint to be displayed"
+                }
+
+                return v;
+            }
+
+            @Override
+            public int getCount() {
+                return super.getCount()-1; // you dont display last item. It is used as hint.
+            }
+
+        };
+        class_spinner_adapter.setDropDownViewResource(R.layout.spinner_drop_down_item);
+        spinnerClass.setAdapter(class_spinner_adapter);
+        spinnerClass.setSelection(class_spinner_adapter.getCount());
+
+        ArrayAdapter<String> shift_spinner_adapter = new ArrayAdapter<String>(this,R.layout.spinner_item, shiftArray){
+
+            @Override
+            public View getView(int position, View convertView, ViewGroup parent) {
+
+                View v = super.getView(position, convertView, parent);
+                if (position == getCount()) {
+                    ((TextView)v.findViewById(android.R.id.text1)).setText("");
+                    ((TextView)v.findViewById(android.R.id.text1)).setHint(getItem(getCount())); //"Hint to be displayed"
+                }
+
+                return v;
+            }
+
+            @Override
+            public int getCount() {
+                return super.getCount()-1; // you dont display last item. It is used as hint.
+            }
+
+        };
+        shift_spinner_adapter.setDropDownViewResource(R.layout.spinner_drop_down_item);
+        spinnerShift.setAdapter(shift_spinner_adapter);
+        spinnerShift.setSelection(shift_spinner_adapter.getCount());
+
+        ArrayAdapter<String> section_spinner_adapter = new ArrayAdapter<String>(this,R.layout.spinner_item, sectionArray){
+
+            @Override
+            public View getView(int position, View convertView, ViewGroup parent) {
+
+                View v = super.getView(position, convertView, parent);
+                if (position == getCount()) {
+                    ((TextView)v.findViewById(android.R.id.text1)).setText("");
+                    ((TextView)v.findViewById(android.R.id.text1)).setHint(getItem(getCount())); //"Hint to be displayed"
+                }
+
+                return v;
+            }
+
+            @Override
+            public int getCount() {
+                return super.getCount()-1; // you dont display last item. It is used as hint.
+            }
+
+        };
+        section_spinner_adapter.setDropDownViewResource(R.layout.spinner_drop_down_item);
+        spinnerSection.setAdapter(section_spinner_adapter);
+        spinnerSection.setSelection(section_spinner_adapter.getCount());
+
+        ArrayAdapter<String> medium_spinner_adapter = new ArrayAdapter<String>(this,R.layout.spinner_item, mediumArray){
+
+            @Override
+            public View getView(int position, View convertView, ViewGroup parent) {
+
+                View v = super.getView(position, convertView, parent);
+                if (position == getCount()) {
+                    ((TextView)v.findViewById(android.R.id.text1)).setText("");
+                    ((TextView)v.findViewById(android.R.id.text1)).setHint(getItem(getCount())); //"Hint to be displayed"
+                }
+
+                return v;
+            }
+
+            @Override
+            public int getCount() {
+                return super.getCount()-1; // you dont display last item. It is used as hint.
+            }
+
+        };
+        medium_spinner_adapter.setDropDownViewResource(R.layout.spinner_drop_down_item);
+        spinnerMedium.setAdapter(medium_spinner_adapter);
+        spinnerMedium.setSelection(medium_spinner_adapter.getCount());
+
+        ArrayAdapter<String> subject_spinner_adapter = new ArrayAdapter<String>(this,R.layout.spinner_item, subjectArray){
+
+            @Override
+            public View getView(int position, View convertView, ViewGroup parent) {
+
+                View v = super.getView(position, convertView, parent);
+                if (position == getCount()) {
+                    ((TextView)v.findViewById(android.R.id.text1)).setText("");
+                    ((TextView)v.findViewById(android.R.id.text1)).setHint(getItem(getCount())); //"Hint to be displayed"
+                }
+
+                return v;
+            }
+
+            @Override
+            public int getCount() {
+                return super.getCount()-1; // you dont display last item. It is used as hint.
+            }
+
+        };
+        subject_spinner_adapter.setDropDownViewResource(R.layout.spinner_drop_down_item);
+        spinnerSubject.setAdapter(subject_spinner_adapter);
+        spinnerSubject.setSelection(subject_spinner_adapter.getCount());
+
+
+
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
