@@ -17,7 +17,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <android.support.v7.widget.AppCompatSpinner
+        <Spinner
             android:id="@+id/spinnerSection"
             android:layout_width="100dp"
             android:layout_height="wrap_content"
@@ -26,9 +26,10 @@
             android:backgroundTint="@android:color/white"
             android:popupBackground="@drawable/drop_down_menu"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginRight="8dp" />
 
-        <android.support.v7.widget.AppCompatSpinner
+        <Spinner
             android:id="@+id/spinnerShift"
             android:layout_width="100dp"
             android:layout_height="wrap_content"
@@ -41,7 +42,7 @@
             app:layout_constraintStart_toEndOf="@+id/spinnerClass"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <android.support.v7.widget.AppCompatSpinner
+        <Spinner
             android:id="@+id/spinnerClass"
             android:layout_width="100dp"
             android:layout_height="wrap_content"
@@ -52,7 +53,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <android.support.v7.widget.AppCompatSpinner
+        <Spinner
             android:id="@+id/spinnerMedium"
             android:layout_width="100dp"
             android:layout_height="wrap_content"
@@ -63,9 +64,9 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/spinnerClass">
 
-        </android.support.v7.widget.AppCompatSpinner>
+        </Spinner>
 
-        <android.support.v7.widget.AppCompatSpinner
+        <Spinner
             android:id="@+id/spinnerSubject"
             android:layout_width="100dp"
             android:layout_height="wrap_content"
@@ -78,7 +79,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/spinnerShift">
 
-        </android.support.v7.widget.AppCompatSpinner>
+        </Spinner>
     </android.support.constraint.ConstraintLayout>
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
