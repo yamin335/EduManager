@@ -1,6 +1,8 @@
 package onair.onems.mainactivities;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
@@ -20,6 +22,7 @@ import android.view.View;
 import android.widget.ExpandableListView;
 import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
@@ -61,10 +64,7 @@ public class StudentAttendance extends AppCompatActivity implements NavigationVi
         setupViewPager(viewPager);
         tabLayout = (TabLayout) findViewById(R.id.tabLayout);
         tabLayout.setupWithViewPager(viewPager);
-
-
         final ActionBar ab = getSupportActionBar();
-        /* to set the menu icon image*/
         ab.setHomeAsUpIndicator(android.R.drawable.ic_menu_add);
         ab.setDisplayHomeAsUpEnabled(true);
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -72,8 +72,11 @@ public class StudentAttendance extends AppCompatActivity implements NavigationVi
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         View view = getLayoutInflater().inflate(R.layout.nav_header_student_attendance,null);
         ImageView profilePicture = (ImageView)view.findViewById(R.id.profile);
+        TextView  studentName=(TextView) view.findViewById(R.id.name);
+        SharedPreferences sharedPre = PreferenceManager.getDefaultSharedPreferences(this);
+        String name=sharedPre.getString("UserFullName","");
+        studentName.setText(name);
         Glide.with(this).load(R.drawable.student1).apply(RequestOptions.circleCropTransform()).into(profilePicture);
-        // profilePicture.setImageDrawable(getResources().getDrawable(R.drawable.album1));
         navigationView.addHeaderView(view);
         if (navigationView != null) {
             setupDrawerContent(navigationView);
