@@ -1,5 +1,6 @@
 package onair.onems.mainactivities;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -222,6 +223,9 @@ public class StudentAttendance extends AppCompatActivity implements NavigationVi
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            Intent intent = new Intent(StudentAttendance.this, LoginScreen.class);
+            startActivity(intent);
+            finish();
             return true;
         }
 
