@@ -67,7 +67,6 @@ public class OneFragment extends Fragment {
         tableView = (TableView)rootView.findViewById(R.id.tableView);
         tableView.setColumnCount(4);
         monthUrl=monthUrl+getString(R.string.baseUrl)+"getMonth";
-
         dialog = new ProgressDialog(getActivity());
         dialog.setMessage("Loading....");
         dialog.show();
