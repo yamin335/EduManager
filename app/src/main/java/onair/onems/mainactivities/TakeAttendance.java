@@ -107,8 +107,8 @@ public class TakeAttendance extends AppCompatActivity
 
                 View v = super.getView(position, convertView, parent);
                 if (position == getCount()) {
-                    ((TextView)v.findViewById(android.R.id.text1)).setText("");
-                    ((TextView)v.findViewById(android.R.id.text1)).setHint(getItem(getCount())); //"Hint to be displayed"
+//                    ((TextView)v.findViewById(android.R.id.text1)).setText("");
+//                    ((TextView)v.findViewById(android.R.id.text1)).setHint(getItem(getCount())); //"Hint to be displayed"
                 }
 
                 return v;
@@ -131,8 +131,8 @@ public class TakeAttendance extends AppCompatActivity
 
                 View v = super.getView(position, convertView, parent);
                 if (position == getCount()) {
-                    ((TextView)v.findViewById(android.R.id.text1)).setText("");
-                    ((TextView)v.findViewById(android.R.id.text1)).setHint(getItem(getCount())); //"Hint to be displayed"
+//                    ((TextView)v.findViewById(android.R.id.text1)).setText("");
+//                    ((TextView)v.findViewById(android.R.id.text1)).setHint(getItem(getCount())); //"Hint to be displayed"
                 }
 
                 return v;
@@ -155,8 +155,8 @@ public class TakeAttendance extends AppCompatActivity
 
                 View v = super.getView(position, convertView, parent);
                 if (position == getCount()) {
-                    ((TextView)v.findViewById(android.R.id.text1)).setText("");
-                    ((TextView)v.findViewById(android.R.id.text1)).setHint(getItem(getCount())); //"Hint to be displayed"
+//                    ((TextView)v.findViewById(android.R.id.text1)).setText("");
+//                    ((TextView)v.findViewById(android.R.id.text1)).setHint(getItem(getCount())); //"Hint to be displayed"
                 }
 
                 return v;
@@ -179,8 +179,8 @@ public class TakeAttendance extends AppCompatActivity
 
                 View v = super.getView(position, convertView, parent);
                 if (position == getCount()) {
-                    ((TextView)v.findViewById(android.R.id.text1)).setText("");
-                    ((TextView)v.findViewById(android.R.id.text1)).setHint(getItem(getCount())); //"Hint to be displayed"
+//                    ((TextView)v.findViewById(android.R.id.text1)).setText("");
+//                    ((TextView)v.findViewById(android.R.id.text1)).setHint(getItem(getCount())); //"Hint to be displayed"
                 }
 
                 return v;
@@ -203,8 +203,8 @@ public class TakeAttendance extends AppCompatActivity
 
                 View v = super.getView(position, convertView, parent);
                 if (position == getCount()) {
-                    ((TextView)v.findViewById(android.R.id.text1)).setText("");
-                    ((TextView)v.findViewById(android.R.id.text1)).setHint(getItem(getCount())); //"Hint to be displayed"
+//                    ((TextView)v.findViewById(android.R.id.text1)).setText("");
+//                    ((TextView)v.findViewById(android.R.id.text1)).setHint(getItem(getCount())); //"Hint to be displayed"
                 }
 
                 return v;
