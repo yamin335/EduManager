@@ -30,7 +30,7 @@ public class AllStudentAttendanceShow extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.other_attendance_show);
         tableView = (TableView) findViewById(R.id.tableView);
-
+        Configuration config = getResources().getConfiguration();
         final SimpleTableHeaderAdapter simpleTableHeaderAdapter = new SimpleTableHeaderAdapter(this, "SI","Date","Present", "Late(m)");
         simpleTableHeaderAdapter.setTextColor(ContextCompat.getColor(this, R.color.table_header_text));
         tableView.setHeaderAdapter(simpleTableHeaderAdapter);
@@ -44,7 +44,7 @@ public class AllStudentAttendanceShow extends AppCompatActivity
         columnModel.setColumnWeight(1, 2);
 
         tableView.setColumnModel(columnModel);
-        Configuration config = getResources().getConfiguration();
+
         if (config.smallestScreenWidthDp > 320) {
             simpleTableHeaderAdapter.setTextSize(14);
             simpleTabledataAdapter.setTextSize(12);

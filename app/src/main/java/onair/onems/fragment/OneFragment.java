@@ -49,9 +49,11 @@ public class OneFragment extends Fragment {
     String monthUrl = "",monthAttendanceUrl="";
     String RFID;
     ProgressDialog dialog;
+    Configuration config;
     int sectionID,classID,shiftID,mediumID;
     JSONArray monthJsonArray;
     SimpleTableHeaderAdapter simpleTableHeaderAdapter;
+    SimpleTableDataAdapter simpleTabledataAdapter;
     private static final String [] [] Monthly_DATA_TO_SHOW=new String[30][30];
 
     public OneFragment() {
@@ -88,9 +90,17 @@ public class OneFragment extends Fragment {
         dialog.setMessage("Loading....");
         dialog.show();
         simpleTableHeaderAdapter = new SimpleTableHeaderAdapter(getActivity(),"SI","Date","Present", "Late(m)");
+
         simpleTableHeaderAdapter.setTextColor(ContextCompat.getColor(getActivity(), R.color.table_header_text ));
         tableView.setHeaderAdapter(simpleTableHeaderAdapter);
+         config = getResources().getConfiguration();
+        if (config.smallestScreenWidthDp >320) {
+            simpleTableHeaderAdapter.setTextSize(14);
 
+        } else {
+            simpleTableHeaderAdapter.setTextSize(10);
+
+        }
         int colorEvenRows = getResources().getColor(R.color.table_data_row_even);
         int colorOddRows = getResources().getColor(R.color.table_data_row_odd);
         tableView.setDataRowBackgroundProvider(TableDataRowBackgroundProviders.alternatingRowColors(colorEvenRows, colorOddRows));
@@ -204,9 +214,8 @@ public class OneFragment extends Fragment {
                 al.add(DATA_TO_SHOW[i][2]);
             }
 
-            final SimpleTableDataAdapter simpleTabledataAdapter = new SimpleTableDataAdapter(getActivity(),DATA_TO_SHOW);
+            simpleTabledataAdapter = new SimpleTableDataAdapter(getActivity(),DATA_TO_SHOW);
             tableView.setDataAdapter(simpleTabledataAdapter);
-            Configuration config = getResources().getConfiguration();
             if (config.smallestScreenWidthDp >320) {
                 simpleTableHeaderAdapter.setTextSize(14);
                 simpleTabledataAdapter.setTextSize(12);
@@ -214,6 +223,8 @@ public class OneFragment extends Fragment {
                 simpleTableHeaderAdapter.setTextSize(10);
                 simpleTabledataAdapter.setTextSize(10);
             }
+
+
 
         } catch (JSONException e) {
             Toast.makeText(getActivity(),""+e,Toast.LENGTH_LONG).show();
