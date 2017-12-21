@@ -44,9 +44,10 @@ public class OneFragment extends Fragment {
     TableView tableView;
     MaterialSpinner spinner;
     ListView monthList;
-    String monthUrl = "";
+    String monthUrl = "",monthAttendanceUrl="";
     ProgressDialog dialog;
     JSONArray monthJsonArray;
+    private static final String [] [] Monthly_DATA_TO_SHOW=new String[30][30];
     private static final String[][] DATA_TO_SHOW = {{ "01", "1/10/10", "Yes", "" },{ "02", "2/10/10", "Yes", "20" } ,{ "01", "12/10/10(weekend)", "", "" },{ "02", "13/10/10", "No", " " },{ "03", "14/10/10", "Yes", "20" },{ "04", "15/11/10", "Yes", "" },{ "05", "15/10/11", "Yes", "5" },{ "01", "12/10/10(weekend)", "Yes", "" },{ "02", "13/10/10", "No", " " },{ "03", "14/10/10", "Yes", "20" },{ "04", "15/11/10", "Yes", "" },{ "05", "15/10/11(Holiday)", "", "" },{ "01", "12/10/10(weekend)", "Yes", "" },{ "02", "13/10/10", "No", " " },{ "03", "14/10/10", "Yes", "20" },{ "04", "15/11/10", "Yes", "" },{ "05", "15/10/11", "Yes", "5" },{ "01", "12/10/10(weekend)", "Yes", "" },{ "02", "13/10/10", "No", " " },{ "03", "14/10/10", "Yes", "20" },{ "04", "15/11/10", "Yes", "" },{ "05", "15/10/11", "Yes", "5" },{ "01", "12/10/10(weekend)", "Yes", "" },{ "02", "13/10/10", "No", " " },
             { "03", "14/10/10", "Yes", "20" },{ "04", "15/11/10", "Yes", "" },{ "05", "15/10/11", "Yes", "5" },{ "01", "12/10/10(weekend)", "", "" },{ "02", "13/10/10", "No", " " },{ "03", "14/10/10", "Yes", "20" },{ "04", "15/11/10", "Yes", "" },{ "05", "15/10/11", "Yes", "5" }};
     public OneFragment() {
@@ -66,7 +67,8 @@ public class OneFragment extends Fragment {
         rootView = inflater.inflate(R.layout.self_attendance, container, false);
         tableView = (TableView)rootView.findViewById(R.id.tableView);
         tableView.setColumnCount(4);
-        monthUrl=monthUrl+getString(R.string.baseUrl)+"getMonth";
+        monthUrl=getString(R.string.baseUrl)+"getMonth";
+        monthAttendanceUrl=getString(R.string.baseUrl)+"getStudentMonthlyDeviceAttendance/1/1/1/1/11/65260115";
         dialog = new ProgressDialog(getActivity());
         dialog.setMessage("Loading....");
         dialog.show();
@@ -98,14 +100,14 @@ public class OneFragment extends Fragment {
             simpleTableHeaderAdapter.setTextSize(10);
             simpleTabledataAdapter.setTextSize(10);
         }
-        RequestQueue queue = Volley.newRequestQueue(getActivity());
+        RequestQueue queueMonth = Volley.newRequestQueue(getActivity());
 
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, monthUrl,
+        StringRequest stringMonthRequest = new StringRequest(Request.Method.GET, monthUrl,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
 
-                        parseJsonData(response);
+
 
                     }
                 }, new Response.ErrorListener() {
@@ -116,7 +118,26 @@ public class OneFragment extends Fragment {
             }
         });
 
-        queue.add(stringRequest);
+        queueMonth.add(stringMonthRequest);
+        RequestQueue queueShowMonthAttendance = Volley.newRequestQueue(getActivity());
+        StringRequest stringShowMonthAttendanceRequest = new StringRequest(Request.Method.GET, monthAttendanceUrl,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+
+                        Toast.makeText(getActivity(),response,Toast.LENGTH_LONG).show();
+
+
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(getActivity(),""+error,Toast.LENGTH_LONG).show();
+                dialog.dismiss();
+            }
+        });
+
+        queueShowMonthAttendance .add(stringShowMonthAttendanceRequest);
         spinner = (MaterialSpinner) rootView.findViewById(R.id.spinner);
         spinner.setOnItemSelectedListener(new MaterialSpinner.OnItemSelectedListener<String>() {
 

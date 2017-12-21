@@ -50,10 +50,7 @@ public class TwoFragment extends Fragment {
     private boolean shouldRefreshOnResume = false;
     private static int SPLASH_TIME_OUT = 1000;
     Runnable refresh;
-    List<String> dataClass = new LinkedList<>(Arrays.asList("One", "Two", "Three", "Four", "Five","Six","Seven","Eight","Nine","Ten"));
-    List<String> dataShift = new LinkedList<>(Arrays.asList("Morning","Day"));
-    List<String> dataSection = new LinkedList<>(Arrays.asList("A","B"));
-    List<String> dataMedium = new LinkedList<>(Arrays.asList("Bangla","English"));
+
     private static final String[][] DATA_TO_SHOW = { { "01", "Hasnat", "01", "01" },{ "01", "Hasnat", "01", "01" },{ "01", "Hasnat", "01", "01" },{ "01", "Hasnat", "01", "01" },{ "01", "Hasnat", "01", "01" },
             { "02", "Bony", "02", "02" },{"03","Jony","03","03"},{"04","Yamin","04","04"},{"05","Alamin","05","05"},{"05","Alamin","05","05"},{"05","Alamin","05","05"},{"05","Alamin","05","05"},{"05","Alamin","05","05"},{"05","Alamin","05","05"},{"05","Alamin","05","05"},{"05","Alamin","05","05"},{"05","Alamin","05","05"} };
     public TwoFragment() {
@@ -81,6 +78,7 @@ public class TwoFragment extends Fragment {
         mediumSpinner= (MaterialSpinner) rootView.findViewById(R.id.spinner_medium);
         sectionSpinner = (MaterialSpinner) rootView.findViewById(R.id.spinner_Section);
         monthSpinner = (MaterialSpinner) rootView.findViewById(R.id.spinner_Month);
+
         classUrl=getString(R.string.baseUrl)+"getAllClasses";
         mediumUrl=getString(R.string.baseUrl)+"getMedium";
         monthUrl=getString(R.string.baseUrl)+"getMonth";
@@ -253,6 +251,7 @@ public class TwoFragment extends Fragment {
             }
             ArrayAdapter adapter = new ArrayAdapter(getActivity(), android.R.layout.simple_list_item_1, al);
             monthSpinner.setAdapter(adapter);
+
             //spinner.setSelectedIndex(1);
         } catch (JSONException e) {
             Toast.makeText(getActivity(),""+e,Toast.LENGTH_LONG).show();
@@ -272,7 +271,7 @@ public class TwoFragment extends Fragment {
             }
             ArrayAdapter adapter = new ArrayAdapter(getActivity(), android.R.layout.simple_list_item_1, al);
             sectionSpinner.setAdapter(adapter);
-            //spinner.setSelectedIndex(1);
+
         } catch (JSONException e) {
             Toast.makeText(getActivity(),""+e,Toast.LENGTH_LONG).show();
             dialog.dismiss();
