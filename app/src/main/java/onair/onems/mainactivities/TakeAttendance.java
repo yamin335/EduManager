@@ -4,6 +4,7 @@ package onair.onems.mainactivities;
  * Created by User on 12/3/2017.
  */
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -27,13 +28,16 @@ import android.view.MenuItem;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ExpandableListView;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.jaredrummler.materialspinner.MaterialSpinner;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -51,174 +55,48 @@ public class TakeAttendance extends AppCompatActivity
     ExpandableListView expandableList;
     List<ExpandedMenuModel> listDataHeader;
     HashMap<ExpandedMenuModel, List<String>> listDataChild;
-    Spinner spinnerClass,spinnerShift,spinnerSection,spinnerMedium,spinnerSubject;
-    String classArray[] = {"five", "six", "seven", "eight","Nine", "Ten","Class"};
-    String shiftArray[] = {"Morning","Day","Shift"};
-    String sectionArray[] = {"A","B","Section"};
-    String mediumArray[] = {"English","Bangla","Medium"};
-    String subjectArray[] = {"Bangla","English","Mathematics","Subject"};
-
-    private RecyclerView recyclerView;
-    private AlbumsAdapter adapter;
-    private List<Album> albumList;
-
-    @Override
-    public void onResume() {
-        this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
-        super.onResume();
-    }
-
-    @Override
-    public void onStart() {
-        this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
-        super.onStart();
-    }
+    MaterialSpinner spinnerClass,spinnerShift,spinnerSection,spinnerMedium,spinnerSubject;
+    String classArray[] = {"five", "six", "seven", "eight","Nine", "Ten", "six", "seven", "eight","Nine", "Ten", "six", "seven", "eight","Nine", "Ten", "six", "seven", "eight","Nine", "Ten"};
+    String shiftArray[] = {"Morning","Day"};
+    String sectionArray[] = {"A","B"};
+    String mediumArray[] = {"English","Bangla"};
+    String subjectArray[] = {"Bangla","English","Mathematics"};
+    Button takeAttendance;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_take_attendance);
-        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
 
-        recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+        spinnerClass = (MaterialSpinner)findViewById(R.id.spinnerClass);
+        spinnerShift = (MaterialSpinner)findViewById(R.id.spinnerShift);
+        spinnerSection = (MaterialSpinner)findViewById(R.id.spinnerSection);
+        spinnerMedium =(MaterialSpinner)findViewById(R.id.spinnerMedium);
+        spinnerSubject = (MaterialSpinner)findViewById(R.id.spinnerSubject);
+        takeAttendance = (Button)findViewById(R.id.takeAttendance);
 
-        albumList = new ArrayList<>();
-        adapter = new AlbumsAdapter(this, albumList);
-
-        RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(this, 1);
-        recyclerView.setLayoutManager(mLayoutManager);
-        //recyclerView.addItemDecoration(new GridSpacingItemDecoration(2, dpToPx(10), true));
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
-        recyclerView.setAdapter(adapter);
-
-        prepareAlbums();
-
-        spinnerClass = (Spinner)findViewById(R.id.spinnerClass);
-        spinnerShift = (Spinner)findViewById(R.id.spinnerShift);
-        spinnerSection = (Spinner)findViewById(R.id.spinnerSection);
-        spinnerMedium =(Spinner)findViewById(R.id.spinnerMedium);
-        spinnerSubject = (Spinner)findViewById(R.id.spinnerSubject);
-
-
-        ArrayAdapter<String> class_spinner_adapter = new ArrayAdapter<String>(this, R.layout.spinner_item, classArray){
-
+        takeAttendance.setOnClickListener(new View.OnClickListener() {
             @Override
-            public View getView(int position, View convertView, ViewGroup parent) {
-
-                View v = super.getView(position, convertView, parent);
-                if (position == getCount()) {
-//                    ((TextView)v.findViewById(android.R.id.text1)).setText("");
-//                    ((TextView)v.findViewById(android.R.id.text1)).setHint(getItem(getCount())); //"Hint to be displayed"
-                }
-
-                return v;
+            public void onClick(View v) {
+                Intent intent = new Intent(TakeAttendance.this, TakeAttendanceDetails.class);
+                startActivity(intent);
             }
+        });
 
-            @Override
-            public int getCount() {
-                return super.getCount()-1; // you dont display last item. It is used as hint.
-            }
-
-        };
-        class_spinner_adapter.setDropDownViewResource(R.layout.spinner_drop_down_item);
+        ArrayAdapter<String> class_spinner_adapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1, classArray);
         spinnerClass.setAdapter(class_spinner_adapter);
-        spinnerClass.setSelection(class_spinner_adapter.getCount());
 
-        ArrayAdapter<String> shift_spinner_adapter = new ArrayAdapter<String>(this,R.layout.spinner_item, shiftArray){
-
-            @Override
-            public View getView(int position, View convertView, ViewGroup parent) {
-
-                View v = super.getView(position, convertView, parent);
-                if (position == getCount()) {
-//                    ((TextView)v.findViewById(android.R.id.text1)).setText("");
-//                    ((TextView)v.findViewById(android.R.id.text1)).setHint(getItem(getCount())); //"Hint to be displayed"
-                }
-
-                return v;
-            }
-
-            @Override
-            public int getCount() {
-                return super.getCount()-1; // you dont display last item. It is used as hint.
-            }
-
-        };
-        shift_spinner_adapter.setDropDownViewResource(R.layout.spinner_drop_down_item);
+        ArrayAdapter<String> shift_spinner_adapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1, shiftArray);
         spinnerShift.setAdapter(shift_spinner_adapter);
-        spinnerShift.setSelection(shift_spinner_adapter.getCount());
 
-        ArrayAdapter<String> section_spinner_adapter = new ArrayAdapter<String>(this,R.layout.spinner_item, sectionArray){
-
-            @Override
-            public View getView(int position, View convertView, ViewGroup parent) {
-
-                View v = super.getView(position, convertView, parent);
-                if (position == getCount()) {
-//                    ((TextView)v.findViewById(android.R.id.text1)).setText("");
-//                    ((TextView)v.findViewById(android.R.id.text1)).setHint(getItem(getCount())); //"Hint to be displayed"
-                }
-
-                return v;
-            }
-
-            @Override
-            public int getCount() {
-                return super.getCount()-1; // you dont display last item. It is used as hint.
-            }
-
-        };
-        section_spinner_adapter.setDropDownViewResource(R.layout.spinner_drop_down_item);
+        ArrayAdapter<String> section_spinner_adapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1, sectionArray);
         spinnerSection.setAdapter(section_spinner_adapter);
-        spinnerSection.setSelection(section_spinner_adapter.getCount());
 
-        ArrayAdapter<String> medium_spinner_adapter = new ArrayAdapter<String>(this,R.layout.spinner_item, mediumArray){
-
-            @Override
-            public View getView(int position, View convertView, ViewGroup parent) {
-
-                View v = super.getView(position, convertView, parent);
-                if (position == getCount()) {
-//                    ((TextView)v.findViewById(android.R.id.text1)).setText("");
-//                    ((TextView)v.findViewById(android.R.id.text1)).setHint(getItem(getCount())); //"Hint to be displayed"
-                }
-
-                return v;
-            }
-
-            @Override
-            public int getCount() {
-                return super.getCount()-1; // you dont display last item. It is used as hint.
-            }
-
-        };
-        medium_spinner_adapter.setDropDownViewResource(R.layout.spinner_drop_down_item);
+        ArrayAdapter<String> medium_spinner_adapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1, mediumArray);
         spinnerMedium.setAdapter(medium_spinner_adapter);
-        spinnerMedium.setSelection(medium_spinner_adapter.getCount());
 
-        ArrayAdapter<String> subject_spinner_adapter = new ArrayAdapter<String>(this,R.layout.spinner_item, subjectArray){
-
-            @Override
-            public View getView(int position, View convertView, ViewGroup parent) {
-
-                View v = super.getView(position, convertView, parent);
-                if (position == getCount()) {
-//                    ((TextView)v.findViewById(android.R.id.text1)).setText("");
-//                    ((TextView)v.findViewById(android.R.id.text1)).setHint(getItem(getCount())); //"Hint to be displayed"
-                }
-
-                return v;
-            }
-
-            @Override
-            public int getCount() {
-                return super.getCount()-1; // you dont display last item. It is used as hint.
-            }
-
-        };
-        subject_spinner_adapter.setDropDownViewResource(R.layout.spinner_drop_down_item);
+        ArrayAdapter<String> subject_spinner_adapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1, subjectArray);
         spinnerSubject.setAdapter(subject_spinner_adapter);
-        spinnerSubject.setSelection(subject_spinner_adapter.getCount());
 
 
 
@@ -270,52 +148,7 @@ public class TakeAttendance extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
     }
 
-    private void prepareAlbums() {
-        int[] covers = new int[]{
-                R.drawable.album1,
-                R.drawable.album2,
-                R.drawable.album3,
-                R.drawable.album4,
-                R.drawable.album5,
-                R.drawable.album6,
-                R.drawable.album7,
-                R.drawable.album8,
-                R.drawable.album9,
-                R.drawable.album10,
-                R.drawable.album11};
 
-        Album a = new Album("True Romance", 13);
-        albumList.add(a);
-
-        a = new Album("Xscpae", 8);
-        albumList.add(a);
-
-        a = new Album("Maroon 5", 11);
-        albumList.add(a);
-
-        a = new Album("Born to Die", 12);
-        albumList.add(a);
-
-        a = new Album("Honeymoon", 14);
-        albumList.add(a);
-
-        a = new Album("I Need a Doctor", 1);
-        albumList.add(a);
-
-        a = new Album("Loud", 11);
-        albumList.add(a);
-
-        a = new Album("Legend", 14);
-        albumList.add(a);
-
-        a = new Album("Hello", 11);
-        albumList.add(a);
-
-        a = new Album("Greatest Hits", 17);
-        albumList.add(a);
-
-        adapter.notifyDataSetChanged();
-    }
 
     private void prepareListData() {
         listDataHeader = new ArrayList<ExpandedMenuModel>();
