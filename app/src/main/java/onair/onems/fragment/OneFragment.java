@@ -3,8 +3,10 @@ package onair.onems.fragment;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
@@ -45,13 +47,15 @@ public class OneFragment extends Fragment {
     MaterialSpinner spinner;
     ListView monthList;
     String monthUrl = "",monthAttendanceUrl="";
+    String RFID;
     ProgressDialog dialog;
+    int sectionID,classID,shiftID,mediumID;
     JSONArray monthJsonArray;
+    SimpleTableHeaderAdapter simpleTableHeaderAdapter;
     private static final String [] [] Monthly_DATA_TO_SHOW=new String[30][30];
-    private static final String[][] DATA_TO_SHOW = {{ "01", "1/10/10", "Yes", "" },{ "02", "2/10/10", "Yes", "20" } ,{ "01", "12/10/10(weekend)", "", "" },{ "02", "13/10/10", "No", " " },{ "03", "14/10/10", "Yes", "20" },{ "04", "15/11/10", "Yes", "" },{ "05", "15/10/11", "Yes", "5" },{ "01", "12/10/10(weekend)", "Yes", "" },{ "02", "13/10/10", "No", " " },{ "03", "14/10/10", "Yes", "20" },{ "04", "15/11/10", "Yes", "" },{ "05", "15/10/11(Holiday)", "", "" },{ "01", "12/10/10(weekend)", "Yes", "" },{ "02", "13/10/10", "No", " " },{ "03", "14/10/10", "Yes", "20" },{ "04", "15/11/10", "Yes", "" },{ "05", "15/10/11", "Yes", "5" },{ "01", "12/10/10(weekend)", "Yes", "" },{ "02", "13/10/10", "No", " " },{ "03", "14/10/10", "Yes", "20" },{ "04", "15/11/10", "Yes", "" },{ "05", "15/10/11", "Yes", "5" },{ "01", "12/10/10(weekend)", "Yes", "" },{ "02", "13/10/10", "No", " " },
-            { "03", "14/10/10", "Yes", "20" },{ "04", "15/11/10", "Yes", "" },{ "05", "15/10/11", "Yes", "5" },{ "01", "12/10/10(weekend)", "", "" },{ "02", "13/10/10", "No", " " },{ "03", "14/10/10", "Yes", "20" },{ "04", "15/11/10", "Yes", "" },{ "05", "15/10/11", "Yes", "5" }};
+
     public OneFragment() {
-        // Required empty public constructor
+
     }
 
     @Override
@@ -67,16 +71,26 @@ public class OneFragment extends Fragment {
         rootView = inflater.inflate(R.layout.self_attendance, container, false);
         tableView = (TableView)rootView.findViewById(R.id.tableView);
         tableView.setColumnCount(4);
+
         monthUrl=getString(R.string.baseUrl)+"getMonth";
-        monthAttendanceUrl=getString(R.string.baseUrl)+"getStudentMonthlyDeviceAttendance/1/1/1/1/11/65260115";
+
+         SharedPreferences sharedPre = PreferenceManager.getDefaultSharedPreferences(getActivity());
+
+         RFID=sharedPre.getString("RFID","");
+         shiftID=sharedPre.getInt("ShiftID",0);
+         mediumID=sharedPre.getInt("MediumID",0);
+         classID=sharedPre.getInt("ClassID",0);
+         sectionID=sharedPre.getInt("SectionID",0);
+
+
+
         dialog = new ProgressDialog(getActivity());
         dialog.setMessage("Loading....");
         dialog.show();
-        final SimpleTableHeaderAdapter simpleTableHeaderAdapter = new SimpleTableHeaderAdapter(getActivity(),"SI","Date","Present", "Late(m)");
+        simpleTableHeaderAdapter = new SimpleTableHeaderAdapter(getActivity(),"SI","Date","Present", "Late(m)");
         simpleTableHeaderAdapter.setTextColor(ContextCompat.getColor(getActivity(), R.color.table_header_text ));
         tableView.setHeaderAdapter(simpleTableHeaderAdapter);
-        final SimpleTableDataAdapter simpleTabledataAdapter = new SimpleTableDataAdapter(getActivity(),DATA_TO_SHOW);
-        tableView.setDataAdapter(simpleTabledataAdapter);
+
         int colorEvenRows = getResources().getColor(R.color.table_data_row_even);
         int colorOddRows = getResources().getColor(R.color.table_data_row_odd);
         tableView.setDataRowBackgroundProvider(TableDataRowBackgroundProviders.alternatingRowColors(colorEvenRows, colorOddRows));
@@ -92,22 +106,15 @@ public class OneFragment extends Fragment {
                 startActivity(i);
             }
         });
-        Configuration config = getResources().getConfiguration();
-         if (config.smallestScreenWidthDp >320) {
-            simpleTableHeaderAdapter.setTextSize(14);
-            simpleTabledataAdapter.setTextSize(12);
-        } else {
-            simpleTableHeaderAdapter.setTextSize(10);
-            simpleTabledataAdapter.setTextSize(10);
-        }
-        RequestQueue queueMonth = Volley.newRequestQueue(getActivity());
 
+
+        RequestQueue queueMonth = Volley.newRequestQueue(getActivity());
         StringRequest stringMonthRequest = new StringRequest(Request.Method.GET, monthUrl,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
 
-
+                     parseJsonData(response);
 
                     }
                 }, new Response.ErrorListener() {
@@ -119,30 +126,37 @@ public class OneFragment extends Fragment {
         });
 
         queueMonth.add(stringMonthRequest);
-        RequestQueue queueShowMonthAttendance = Volley.newRequestQueue(getActivity());
-        StringRequest stringShowMonthAttendanceRequest = new StringRequest(Request.Method.GET, monthAttendanceUrl,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
 
-                        Toast.makeText(getActivity(),response,Toast.LENGTH_LONG).show();
-
-
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Toast.makeText(getActivity(),""+error,Toast.LENGTH_LONG).show();
-                dialog.dismiss();
-            }
-        });
-
-        queueShowMonthAttendance .add(stringShowMonthAttendanceRequest);
         spinner = (MaterialSpinner) rootView.findViewById(R.id.spinner);
-        spinner.setOnItemSelectedListener(new MaterialSpinner.OnItemSelectedListener<String>() {
 
-            @Override public void onItemSelected(MaterialSpinner view, int position, long id, String item) {
-               // Snackbar.make(view, "Clicked " + item, Snackbar.LENGTH_LONG).show();
+        spinner.setOnItemSelectedListener(new MaterialSpinner.OnItemSelectedListener<String>()
+        {
+
+            @Override public void onItemSelected(MaterialSpinner view, int position, long id, String item)
+            {
+                int monthid=position+1;
+
+                monthAttendanceUrl=getString(R.string.baseUrl)+"getStudentMonthlyDeviceAttendance/"+shiftID+"/"+mediumID+"/"+classID+"/"+sectionID+"/"+monthid+"/"+RFID;
+                RequestQueue queue = Volley.newRequestQueue(getActivity());
+
+                StringRequest stringRequest = new StringRequest(Request.Method.GET, monthAttendanceUrl,
+                        new Response.Listener<String>() {
+                            @Override
+                            public void onResponse(String response) {
+
+                                parseMonthlyAttendanceJsonData(response);
+
+                            }
+                        }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+
+                        dialog.dismiss();
+                    }
+                });
+
+                queue.add(stringRequest);
+
             }
         });
 
@@ -150,6 +164,7 @@ public class OneFragment extends Fragment {
     }
     void parseJsonData(String jsonString) {
         try {
+
             JSONArray jsonArray = new JSONArray(jsonString);
             ArrayList al = new ArrayList();
             for(int i = 0; i < jsonArray.length(); ++i) {
@@ -159,7 +174,47 @@ public class OneFragment extends Fragment {
             }
             ArrayAdapter adapter = new ArrayAdapter(getActivity(), android.R.layout.simple_list_item_1, al);
             spinner.setAdapter(adapter);
-            spinner.setSelectedIndex(1);
+        }
+        catch (JSONException e) {
+            Toast.makeText(getActivity(),""+e,Toast.LENGTH_LONG).show();
+        }
+
+        dialog.dismiss();
+    }
+    void parseMonthlyAttendanceJsonData(String jsonString) {
+        try {
+            JSONArray jsonArray = new JSONArray(jsonString);
+            ArrayList al = new ArrayList();
+            String[][] DATA_TO_SHOW = new String[jsonArray.length()][4];
+            for(int i = 0; i < jsonArray.length(); ++i) {
+                JSONObject jsonObject=jsonArray.getJSONObject(i);
+                DATA_TO_SHOW[i][0]= String.valueOf((i+1));
+                DATA_TO_SHOW [i][1]=jsonObject.getString("Date");
+                int status=jsonObject.getInt("Present");
+                if(status==1)
+                {
+                    DATA_TO_SHOW[i][2]="YES";
+                }
+                else
+                    DATA_TO_SHOW[i][2]="NO";
+                DATA_TO_SHOW [i][3]=jsonObject.getString("Late");
+
+                al.add(DATA_TO_SHOW[i][0]);
+                al.add(DATA_TO_SHOW[i][1]);
+                al.add(DATA_TO_SHOW[i][2]);
+            }
+
+            final SimpleTableDataAdapter simpleTabledataAdapter = new SimpleTableDataAdapter(getActivity(),DATA_TO_SHOW);
+            tableView.setDataAdapter(simpleTabledataAdapter);
+            Configuration config = getResources().getConfiguration();
+            if (config.smallestScreenWidthDp >320) {
+                simpleTableHeaderAdapter.setTextSize(14);
+                simpleTabledataAdapter.setTextSize(12);
+            } else {
+                simpleTableHeaderAdapter.setTextSize(10);
+                simpleTabledataAdapter.setTextSize(10);
+            }
+
         } catch (JSONException e) {
             Toast.makeText(getActivity(),""+e,Toast.LENGTH_LONG).show();
         }

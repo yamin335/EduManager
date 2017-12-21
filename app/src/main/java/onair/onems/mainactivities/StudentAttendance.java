@@ -75,8 +75,10 @@ public class StudentAttendance extends AppCompatActivity implements NavigationVi
         ImageView profilePicture = (ImageView)view.findViewById(R.id.profile);
         TextView  studentName=(TextView) view.findViewById(R.id.name);
         SharedPreferences sharedPre = PreferenceManager.getDefaultSharedPreferences(this);
+
         String name=sharedPre.getString("UserFullName","");
         studentName.setText(name);
+
         Glide.with(this).load(R.drawable.student1).apply(RequestOptions.circleCropTransform()).into(profilePicture);
         navigationView.addHeaderView(view);
         if (navigationView != null) {

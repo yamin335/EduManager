@@ -53,10 +53,12 @@ public class TwoFragment extends Fragment {
 
     private static final String[][] DATA_TO_SHOW = { { "01", "Hasnat", "01", "01" },{ "01", "Hasnat", "01", "01" },{ "01", "Hasnat", "01", "01" },{ "01", "Hasnat", "01", "01" },{ "01", "Hasnat", "01", "01" },
             { "02", "Bony", "02", "02" },{"03","Jony","03","03"},{"04","Yamin","04","04"},{"05","Alamin","05","05"},{"05","Alamin","05","05"},{"05","Alamin","05","05"},{"05","Alamin","05","05"},{"05","Alamin","05","05"},{"05","Alamin","05","05"},{"05","Alamin","05","05"},{"05","Alamin","05","05"},{"05","Alamin","05","05"} };
-    public TwoFragment() {
-        // Required empty public constructor
+    public TwoFragment()
+    {
+
     }
-    public static TwoFragment newInstance() {
+    public static TwoFragment newInstance()
+    {
         TwoFragment fragment = new TwoFragment();
         return fragment;
     }
@@ -84,6 +86,7 @@ public class TwoFragment extends Fragment {
         monthUrl=getString(R.string.baseUrl)+"getMonth";
         sectionUrl=getString(R.string.baseUrl)+"getCmnSection";
         shiftUrl=getString(R.string.baseUrl)+"getShift";
+
         dialog = new ProgressDialog(getActivity());
         dialog.setMessage("Loading....");
         dialog.show();
@@ -116,7 +119,7 @@ public class TwoFragment extends Fragment {
             }
         });
 
-         queueClass.add(stringClassRequest);
+        queueClass.add(stringClassRequest);
         RequestQueue queueMedium = Volley.newRequestQueue(getActivity());
 
         StringRequest stringMediumRequest = new StringRequest(Request.Method.GET, mediumUrl,
