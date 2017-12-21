@@ -1,4 +1,4 @@
-package onair.onems.mainactivities;
+package onair.onems.customadapters;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
@@ -11,14 +11,15 @@ import android.widget.TextView;
 import java.util.List;
 
 import onair.onems.R;
+import onair.onems.mainactivities.AttendanceSheet;
 
 /**
  * Created by Ravi Tamada on 18/05/16.
  */
-public class AlbumsAdapter extends RecyclerView.Adapter<AlbumsAdapter.MyViewHolder> {
+public class AttendanceSheetAdapter extends RecyclerView.Adapter<AttendanceSheetAdapter.MyViewHolder> {
 
     private Context mContext;
-    private List<Album> albumList;
+    private List<AttendanceSheet> attendanceSheetList;
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
         public TextView title, count;
@@ -34,9 +35,9 @@ public class AlbumsAdapter extends RecyclerView.Adapter<AlbumsAdapter.MyViewHold
     }
 
 
-    public AlbumsAdapter(Context mContext, List<Album> albumList) {
+    public AttendanceSheetAdapter(Context mContext, List<AttendanceSheet> attendanceSheetList) {
         this.mContext = mContext;
-        this.albumList = albumList;
+        this.attendanceSheetList = attendanceSheetList;
     }
 
     @Override
@@ -49,12 +50,12 @@ public class AlbumsAdapter extends RecyclerView.Adapter<AlbumsAdapter.MyViewHold
 
     @Override
     public void onBindViewHolder(final MyViewHolder holder, int position) {
-        Album album = albumList.get(position);
-        holder.title.setText(album.getName());
-        holder.count.setText(album.getNumOfSongs() + " songs");
+        AttendanceSheet attendanceSheet = attendanceSheetList.get(position);
+        holder.title.setText(attendanceSheet.getName());
+        holder.count.setText(attendanceSheet.getNumOfSongs() + " songs");
 
-        // loading album cover using Glide library
-       // Glide.with(mContext).load(album.getThumbnail()).into(holder.thumbnail);
+        // loading attendanceSheet cover using Glide library
+       // Glide.with(mContext).load(attendanceSheet.getThumbnail()).into(holder.thumbnail);
 
 //        holder.overflow.setOnClickListener(new View.OnClickListener() {
 //            @Override
@@ -101,6 +102,6 @@ public class AlbumsAdapter extends RecyclerView.Adapter<AlbumsAdapter.MyViewHold
 
     @Override
     public int getItemCount() {
-        return albumList.size();
+        return attendanceSheetList.size();
     }
 }

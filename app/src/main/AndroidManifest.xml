@@ -53,6 +53,15 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="onair.onems.mainactivities.StudentAttendance" />
         </activity>
+        <activity
+            android:name="onair.onems.mainactivities.TakeAttendanceDetails"
+            android:label="Take Attendance"
+            android:parentActivityName="onair.onems.mainactivities.TakeAttendance">
+            <!-- The meta-data element is needed for versions lower than 4.1 -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="onair.onems.mainactivities.TakeAttendance" />
+        </activity>
         <activity android:name=".mainactivities.SubjectWiseAttendance"
             android:theme="@style/AppTheme"
             android:label="Attendance"

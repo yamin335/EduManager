@@ -3,15 +3,15 @@ package onair.onems.mainactivities;
 /**
  * Created by Lincoln on 18/05/16.
  */
-public class Album {
+public class AttendanceSheet {
     private String name;
     private int numOfSongs;
     private int thumbnail;
 
-    public Album() {
+    public AttendanceSheet() {
     }
 
-    public Album(String name, int numOfSongs) {
+    public AttendanceSheet(String name, int numOfSongs) {
         this.name = name;
         this.numOfSongs = numOfSongs;
         this.thumbnail = thumbnail;

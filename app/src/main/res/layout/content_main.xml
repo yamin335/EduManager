@@ -2,98 +2,124 @@
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:table="http://schemas.android.com/apk/res-auto"
     android:id="@+id/upperConstraint"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#0277bd"
+    android:background="#ffffff"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="onair.onems.mainactivities.TakeAttendance"
     tools:showIn="@layout/app_bar_main">
 
-    <Spinner
+    <com.jaredrummler.materialspinner.MaterialSpinner
         android:id="@+id/spinnerSection"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:backgroundTint="@android:color/white"
-        android:popupBackground="@drawable/drop_down_menu"
+        android:layout_marginTop="8dp"
+        android:text="Section"
+        android:textSize="18dp"
+        android:textStyle="bold"
+        table:ms_dropdown_max_height="250dp"
+        table:ms_background_color="#0277bd"
+        android:elevation="5dp"
+        table:ms_text_color="#ffffff"
         app:layout_constraintBottom_toTopOf="@+id/guideline9"
         app:layout_constraintEnd_toStartOf="@+id/guideline6"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/guideline5"
         app:layout_constraintTop_toTopOf="@+id/guideline8"
-        app:layout_constraintVertical_bias="0.296" />
+        app:layout_constraintVertical_bias="0.32999998" />
 
-    <Spinner
+    <com.jaredrummler.materialspinner.MaterialSpinner
         android:id="@+id/spinnerShift"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:backgroundTint="@android:color/white"
-        android:popupBackground="@drawable/drop_down_menu"
+        android:text="Shift"
+        android:textSize="18dp"
+        android:textStyle="bold"
+        table:ms_dropdown_max_height="250dp"
+        table:ms_background_color="#0277bd"
+        android:elevation="5dp"
+        table:ms_text_color="#ffffff"
         app:layout_constraintBottom_toTopOf="@+id/guideline9"
         app:layout_constraintEnd_toStartOf="@+id/guideline6"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/guideline5"
         app:layout_constraintTop_toTopOf="@+id/guideline8"
-        app:layout_constraintVertical_bias="0.167" />
+        app:layout_constraintVertical_bias="0.19999999" />
 
-    <Spinner
+    <com.jaredrummler.materialspinner.MaterialSpinner
         android:id="@+id/spinnerClass"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:background="@drawable/drop_down_background"
-        android:backgroundTint="@android:color/white"
-        android:popupBackground="@drawable/drop_down_menu"
+        android:text="Class"
+        android:textSize="18dp"
+        android:textStyle="bold"
+        table:ms_dropdown_max_height="250dp"
+        table:ms_background_color="#0277bd"
+        android:elevation="5dp"
+        table:ms_text_color="#ffffff"
         app:layout_constraintBottom_toTopOf="@+id/guideline9"
         app:layout_constraintEnd_toStartOf="@+id/guideline6"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/guideline5"
         app:layout_constraintTop_toTopOf="@+id/guideline8"
-        app:layout_constraintVertical_bias="0.041" />
+        app:layout_constraintVertical_bias="0.050000012" />
 
-    <Spinner
+    <com.jaredrummler.materialspinner.MaterialSpinner
         android:id="@+id/spinnerMedium"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:backgroundTint="@android:color/white"
-        android:popupBackground="@drawable/drop_down_menu"
+        android:text="Medium"
+        android:textSize="18dp"
+        android:textStyle="bold"
+        table:ms_dropdown_max_height="250dp"
+        table:ms_background_color="#0277bd"
+        android:elevation="5dp"
+        table:ms_text_color="#ffffff"
         app:layout_constraintBottom_toTopOf="@+id/guideline9"
         app:layout_constraintEnd_toStartOf="@+id/guideline6"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/guideline5"
         app:layout_constraintTop_toTopOf="@+id/guideline8"
-        app:layout_constraintVertical_bias="0.392">
+        app:layout_constraintVertical_bias="0.49">
 
-    </Spinner>
+    </com.jaredrummler.materialspinner.MaterialSpinner>
 
-    <Spinner
+    <com.jaredrummler.materialspinner.MaterialSpinner
         android:id="@+id/spinnerSubject"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:backgroundTint="@android:color/white"
-        android:popupBackground="@drawable/drop_down_menu"
+        android:text="Subject"
+        android:textSize="18dp"
+        android:textStyle="bold"
+        table:ms_dropdown_max_height="250dp"
+        table:ms_background_color="#0277bd"
+        android:elevation="5dp"
+        table:ms_text_color="#ffffff"
         app:layout_constraintBottom_toTopOf="@+id/guideline9"
         app:layout_constraintEnd_toStartOf="@+id/guideline6"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/guideline5"
-        app:layout_constraintTop_toTopOf="@+id/guideline8">
+        app:layout_constraintTop_toTopOf="@+id/guideline8"
+        app:layout_constraintVertical_bias="0.64">
 
-    </Spinner>
+    </com.jaredrummler.materialspinner.MaterialSpinner>
 
     <android.support.constraint.Guideline
         android:id="@+id/guideline5"
@@ -124,21 +150,43 @@
         app:layout_constraintGuide_end="20dp" />
 
     <Button
-        android:id="@+id/button"
+        android:id="@+id/pickDate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
+        android:background="@drawable/button"
         android:drawableRight="@drawable/ic_date_range"
+        android:paddingLeft="14dp"
+        android:paddingRight="11dp"
         android:text="Pick Date"
         android:textAllCaps="false"
+        android:textColor="@android:color/white"
         app:layout_constraintBottom_toTopOf="@+id/guideline9"
         app:layout_constraintEnd_toStartOf="@+id/guideline6"
-        app:layout_constraintHorizontal_bias="0.87"
+        app:layout_constraintHorizontal_bias="0.938"
         app:layout_constraintStart_toStartOf="@+id/guideline5"
         app:layout_constraintTop_toTopOf="@+id/guideline8"
-        app:layout_constraintVertical_bias="0.624" />
+        app:layout_constraintVertical_bias="0.791" />
+
+    <Button
+        android:id="@+id/takeAttendance"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="20dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/button"
+        android:text="Take Attendance"
+        android:textAllCaps="false"
+        android:textColor="@android:color/white"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toTopOf="@+id/guideline9"
+        app:layout_constraintEnd_toStartOf="@+id/guideline6"
+        app:layout_constraintStart_toStartOf="@+id/guideline5"
+        app:layout_constraintTop_toTopOf="@+id/guideline8"
+        app:layout_constraintVertical_bias="0.958" />
 
 </android.support.constraint.ConstraintLayout>
