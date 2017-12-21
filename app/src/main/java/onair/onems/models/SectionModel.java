@@ -9,7 +9,7 @@ public class SectionModel {
     private int SectionID;
     private String SectionName;
 
-    SectionModel(int SectionID, String SectionName)
+    public SectionModel(int SectionID, String SectionName)
     {
         this.SectionID = SectionID;
         this.SectionName = SectionName;

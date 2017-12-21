@@ -19,7 +19,7 @@ public class SubjectModel {
     private int ParentID;
     private String ParentSubject;
 
-    SubjectModel(int SubjectID, int SubjectNo, String SubjectName, int InsSubjectID,
+    public SubjectModel(int SubjectID, int SubjectNo, String SubjectName, int InsSubjectID,
                  int InstituteID, int DepartmentID, int MediumID, int ClassID, boolean IsActive,
                  boolean IsCombined, int ParentID, String ParentSubject) {
         this.SubjectID = SubjectID;

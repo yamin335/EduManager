@@ -9,20 +9,20 @@ public class ShiftModel {
     private int ShiftID;
     private String ShiftName;
 
-    ShiftModel(int ShiftID, String ShiftName)
+    public ShiftModel(String ShiftID, String ShiftName)
     {
-        this.ShiftID = ShiftID;
+        this.ShiftID = Integer.parseInt(ShiftID);
         this.ShiftName = ShiftName;
     }
 
-    public void setShiftID(int shiftID)
+    public void setShiftID(String ShiftID)
     {
-        this.ShiftID = ShiftID;
+        this.ShiftID = Integer.parseInt(ShiftID);
     }
 
-    public void setShiftName(String shiftName)
+    public void setShiftName(String ShiftName)
     {
-        this.ShiftName = shiftName;
+        this.ShiftName = ShiftName;
     }
 
     public int getShiftID()
