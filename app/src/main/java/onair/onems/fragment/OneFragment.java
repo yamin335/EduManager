@@ -50,13 +50,16 @@ public class OneFragment extends Fragment {
     String RFID;
     ProgressDialog dialog;
     Configuration config;
+    SharedPreferences sharedPre;
     int sectionID,classID,shiftID,mediumID;
     JSONArray monthJsonArray;
     SimpleTableHeaderAdapter simpleTableHeaderAdapter;
     SimpleTableDataAdapter simpleTabledataAdapter;
     private static final String [] [] Monthly_DATA_TO_SHOW=new String[30][30];
+    String[][] DATA_TO_SHOW;
 
-    public OneFragment() {
+    public OneFragment()
+    {
 
     }
 
@@ -76,7 +79,7 @@ public class OneFragment extends Fragment {
 
         monthUrl=getString(R.string.baseUrl)+"getMonth";
 
-         SharedPreferences sharedPre = PreferenceManager.getDefaultSharedPreferences(getActivity());
+         sharedPre = PreferenceManager.getDefaultSharedPreferences(getActivity());
 
          RFID=sharedPre.getString("RFID","");
          shiftID=sharedPre.getInt("ShiftID",0);
@@ -89,6 +92,7 @@ public class OneFragment extends Fragment {
         dialog = new ProgressDialog(getActivity());
         dialog.setMessage("Loading....");
         dialog.show();
+
         simpleTableHeaderAdapter = new SimpleTableHeaderAdapter(getActivity(),"SI","Date","Present", "Late(m)");
 
         simpleTableHeaderAdapter.setTextColor(ContextCompat.getColor(getActivity(), R.color.table_header_text ));
@@ -112,15 +116,21 @@ public class OneFragment extends Fragment {
             @Override
             public void onDataClicked(int rowIndex, Object clickedData)
             {
+                SharedPreferences.Editor editor = sharedPre.edit();
+                editor.putString("Date", DATA_TO_SHOW[rowIndex][1]);
+                editor.commit();
+                //Toast.makeText(getActivity(),""+DATA_TO_SHOW[rowIndex][1],Toast.LENGTH_LONG).show();
                 Intent i = new Intent(getActivity(), SubjectWiseAttendance.class);
                 startActivity(i);
+
             }
         });
 
 
         RequestQueue queueMonth = Volley.newRequestQueue(getActivity());
         StringRequest stringMonthRequest = new StringRequest(Request.Method.GET, monthUrl,
-                new Response.Listener<String>() {
+                new Response.Listener<String>()
+                {
                     @Override
                     public void onResponse(String response) {
 
@@ -195,7 +205,7 @@ public class OneFragment extends Fragment {
         try {
             JSONArray jsonArray = new JSONArray(jsonString);
             ArrayList al = new ArrayList();
-            String[][] DATA_TO_SHOW = new String[jsonArray.length()][4];
+             DATA_TO_SHOW = new String[jsonArray.length()][4];
             for(int i = 0; i < jsonArray.length(); ++i) {
                 JSONObject jsonObject=jsonArray.getJSONObject(i);
                 DATA_TO_SHOW[i][0]= String.valueOf((i+1));
