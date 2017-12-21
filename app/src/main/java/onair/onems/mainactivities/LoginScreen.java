@@ -35,8 +35,9 @@ public class LoginScreen extends AppCompatActivity {
     private Button loginButton;
     private EditText takeId;
     private EditText takePassword;
-    private String UserID = "",LoginId="",LoginPassword="",Password = "",UserFullName="",ImageUrl="",InstituteName="",DepartmentName="",DesignationName="",BrunchName="",RFID="",RollNo="",StudentNo="";
-    int UserTypeID=0,InstituteID=0,DepartmentID,DesignationID,BrunchID,SBrunchID=0,BoardID,SDepartmentID,MediumID=0, SectionID=0,SessionID=0,ShiftID=0,ClassID=0;
+    private String UserID = "",LoginId="",LoginPassword="",Password = "",UserFullName="",ImageUrl="",InstituteName="",DepartmentName="",
+            DesignationName="",BrunchName="",RFID="",RollNo="",StudentNo="",DepartmentID="",DesignationID="", BrunchID="";
+    int UserTypeID=0,InstituteID=0,SBrunchID=0,BoardID,SDepartmentID,MediumID=0, SectionID=0,SessionID=0,ShiftID=0,ClassID=0;
     String loginurl = "";
     ProgressDialog dialog;
     @Override
@@ -63,6 +64,7 @@ public class LoginScreen extends AppCompatActivity {
                             @Override
                             public void onResponse(String response) {
                                 parseJsonData(response);
+
                                 LoginId = takeId.getText().toString();
                                 LoginPassword = takePassword.getText().toString();
                                 if(UserID.length()>0)
@@ -107,25 +109,24 @@ public class LoginScreen extends AppCompatActivity {
             UserFullName=jsonArray.getJSONObject(0).getString("UserFullName");
             InstituteName=jsonArray.getJSONObject(0).getString("InstituteName");
             InstituteID=jsonArray.getJSONObject(0).getInt("InstituteID");
-            //ImageUrl=jsonArray.getJSONObject(0).getString("ImageUrl");
-           // DepartmentID=jsonArray.getJSONObject(0).getInt("DepartmentID");
-           // DesignationID =jsonArray.getJSONObject(0).getInt("DesignationID");
-           // BrunchID =jsonArray.getJSONObject(0).getInt("BrunchID");
-
-           // DepartmentName=jsonArray.getJSONObject(0).getString("DepartmentName");
-           // DesignationName=jsonArray.getJSONObject(0).getString("DesignationName");
-            //BrunchName=jsonArray.getJSONObject(0).getString("BrunchName");
-           // SBrunchID=jsonArray.getJSONObject(0).getInt("SBrunchID");
-            //BoardID =jsonArray.getJSONObject(0).getInt("BoardID");
-            //SDepartmentID =jsonArray.getJSONObject(0).getInt("SDepartmentID");
-           // MediumID =jsonArray.getJSONObject(0).getInt("MediumID");
-           // RFID=jsonArray.getJSONObject(0).getString("RFID");
-            //RollNo=jsonArray.getJSONObject(0).getString("RollNo");
-           // SectionID =jsonArray.getJSONObject(0).getInt("SectionID");
-            //SessionID =jsonArray.getJSONObject(0).getInt("SessionID");
-            //ShiftID =jsonArray.getJSONObject(0).getInt("ShiftID");
-            //ClassID =jsonArray.getJSONObject(0).getInt("ClassID");
-            //StudentNo=jsonArray.getJSONObject(0).getString("StudentNo");
+            ImageUrl=jsonArray.getJSONObject(0).getString("ImageUrl");
+            DepartmentID=jsonArray.getJSONObject(0).getString("DepartmentID");
+            DesignationID =jsonArray.getJSONObject(0).getString("DesignationID");
+            BrunchID =jsonArray.getJSONObject(0).getString("BrunchID");
+            DepartmentName=jsonArray.getJSONObject(0).getString("DepartmentName");
+            DesignationName=jsonArray.getJSONObject(0).getString("DesignationName");
+            BrunchName=jsonArray.getJSONObject(0).getString("BrunchName");
+            SBrunchID=jsonArray.getJSONObject(0).getInt("SBrunchID");
+            BoardID =jsonArray.getJSONObject(0).getInt("BoardID");
+            SDepartmentID =jsonArray.getJSONObject(0).getInt("SDepartmentID");
+            MediumID =jsonArray.getJSONObject(0).getInt("MediumID");
+            RFID=jsonArray.getJSONObject(0).getString("RFID");
+            RollNo=jsonArray.getJSONObject(0).getString("RollNo");
+            SectionID =jsonArray.getJSONObject(0).getInt("SectionID");
+            SessionID =jsonArray.getJSONObject(0).getInt("SessionID");
+            ShiftID =jsonArray.getJSONObject(0).getInt("ShiftID");
+            ClassID =jsonArray.getJSONObject(0).getInt("ClassID");
+            StudentNo=jsonArray.getJSONObject(0).getString("StudentNo");
             SharedPreferences sharedPre = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
             SharedPreferences.Editor editor = sharedPre.edit();
             editor.putString("UserID", UserID);
@@ -134,30 +135,29 @@ public class LoginScreen extends AppCompatActivity {
             editor.putString("UserFullName",UserFullName);
             editor.putInt("InstituteID",InstituteID);
             editor.putString("InstituteName",InstituteName);
-            //editor.putString("ImageUrl",ImageUrl);
-            //editor.putInt("DepartmentID",DepartmentID);
-            //editor.putInt("DesignationID",DesignationID);
-            //editor.putInt("BrunchID",BrunchID);
-
-           // editor.putString("DepartmentName",DepartmentName);
-          //  editor.putString("DesignationName",DesignationName);
-           // editor.putString("BrunchName",BrunchName);
-            //editor.putInt("SBrunchID",SBrunchID);
-            //editor.putInt(" BoardID", BoardID);
-            //editor.putInt("SDepartmentID",SDepartmentID);
-            //editor.putInt("MediumID",MediumID);
-            //editor.putString("RFID",RFID);
-            //editor.putString("RollNo",RollNo);
-            //editor.putInt("SectionID",SectionID);
-           // editor.putInt("SessionID",SessionID);
-           // editor.putInt("ShiftID",ShiftID);
-            //editor.putInt("ClassID",ClassID );
-          //  editor.putString("StudentNo",StudentNo);
+            editor.putString("ImageUrl",ImageUrl);
+            editor.putString("DepartmentID",DepartmentID);
+            editor.putString("DesignationID",DesignationID);
+            editor.putString("BrunchID",BrunchID);
+            editor.putString("DepartmentName",DepartmentName);
+            editor.putString("DesignationName",DesignationName);
+            editor.putString("BrunchName",BrunchName);
+            editor.putInt("SBrunchID",SBrunchID);
+            editor.putInt(" BoardID", BoardID);
+            editor.putInt("SDepartmentID",SDepartmentID);
+            editor.putInt("MediumID",MediumID);
+            editor.putString("RFID",RFID);
+            editor.putString("RollNo",RollNo);
+            editor.putInt("SectionID",SectionID);
+            editor.putInt("SessionID",SessionID);
+            editor.putInt("ShiftID",ShiftID);
+            editor.putInt("ClassID",ClassID );
+            editor.putString("StudentNo",StudentNo);
             editor.commit();
 
         }
         catch (JSONException e) {
-            //Toast.makeText(this,"Json : "+e,Toast.LENGTH_LONG).show();
+            Toast.makeText(this,"Json : "+e,Toast.LENGTH_LONG).show();
         }
 
        dialog.dismiss();
