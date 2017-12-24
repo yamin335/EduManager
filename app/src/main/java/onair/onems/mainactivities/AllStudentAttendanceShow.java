@@ -9,6 +9,7 @@ import android.preference.PreferenceManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -39,6 +40,7 @@ import onair.onems.R;
 
 public class AllStudentAttendanceShow extends AppCompatActivity
 {
+    TextView name,roll,id;
     TableView tableView;
     SimpleTableHeaderAdapter simpleTableHeaderAdapter;
     SimpleTableDataAdapter simpleTabledataAdapter;
@@ -46,7 +48,7 @@ public class AllStudentAttendanceShow extends AppCompatActivity
     SharedPreferences sharedPre;
     Configuration config;
     ProgressDialog dialog;
-    String RFID="",monthUrl = "",monthAttendanceUrl="",studentName="",studentRFID="",studentRoll="";
+    String RFID="",monthAttendanceUrl="",studentName="",studentRoll="";
     int InstituteID=0,SectionID=0,ClassID=0,MediumID=0,ShiftID=0,MonthID=0;
 
     @Override
@@ -54,6 +56,9 @@ public class AllStudentAttendanceShow extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.other_attendance_show);
         tableView = (TableView) findViewById(R.id.tableView);
+        name=(TextView) findViewById(R.id.name);
+        roll=(TextView) findViewById(R.id.roll);
+        id=(TextView) findViewById(R.id.Id);
 
         // Loding Show
         dialog = new ProgressDialog(this);
@@ -71,8 +76,12 @@ public class AllStudentAttendanceShow extends AppCompatActivity
         SectionID=sharedPre.getInt("SectionSelectID",0);
         MonthID=sharedPre.getInt("MonthSelectID",0);
         RFID=sharedPre.getString("SelectStudentRFID","");
-
+        studentName=sharedPre.getString("SelectStudentName","");
+        studentRoll=sharedPre.getString("SelectStudentRoll","");
         // get Internal Data using SharedPreferences end
+        name.setText(""+studentName);
+        roll.setText("Roll: "+studentRoll);
+        id.setText("ID: "+RFID);
 
         monthAttendanceUrl=getString(R.string.baseUrl)+"getStudentMonthlyDeviceAttendance/"+ShiftID+"/"+MediumID+"/"+ClassID+"/"+SectionID+"/"+MonthID+"/"+RFID;
        // Toast.makeText(this,""+monthAttendanceUrl,Toast.LENGTH_LONG).show();
@@ -118,6 +127,7 @@ public class AllStudentAttendanceShow extends AppCompatActivity
             @Override
             public void onDataClicked(int rowIndex, Object clickedData)
             {
+                dialog.show();
                 SharedPreferences.Editor editor = sharedPre.edit();
                 editor.putString("SelectDate", DATA_TO_SHOW[rowIndex][1]);
                 editor.commit();
