@@ -11,18 +11,18 @@ public class MediumModel {
     private int InstituteID;
     private boolean IsActive;
 
-    MediumModel(int MediumID, String MameName, int InstMediumID, int InstituteID, boolean IsActive)
+    public MediumModel(String MediumID, String MameName, String InstMediumID, String InstituteID, String IsActive)
     {
-        this.MediumID = MediumID;
+        this.MediumID = Integer.parseInt(MediumID);
         this.MameName = MameName;
-        this.InstMediumID =InstMediumID;
-        this.InstituteID = InstituteID;
-        this.IsActive = IsActive;
+        this.InstMediumID = Integer.parseInt(InstMediumID);
+        this.InstituteID = Integer.parseInt(InstituteID);
+        this.IsActive = Boolean.parseBoolean(IsActive);
     }
 
-    public void setMediumID(int MediumID)
+    public void setMediumID(String MediumID)
     {
-        this.MediumID = MediumID;
+        this.MediumID = Integer.parseInt(MediumID);
     }
 
     public void setMameName(String MameName)
@@ -30,20 +30,20 @@ public class MediumModel {
         this.MameName = MameName;
     }
 
-    public void setInstMediumID(int InstMediumID)
+    public void setInstMediumID(String InstMediumID)
     {
-        this.InstMediumID = InstMediumID;
+        this.InstMediumID = Integer.parseInt(InstMediumID);
     }
 
-    public void setInstituteID(int InstituteID)
+    public void setInstituteID(String InstituteID)
     {
-        this.InstituteID = InstituteID;
+        this.InstituteID = Integer.parseInt(InstituteID);
 
     }
 
-    public void setIsActive(boolean IsActive)
+    public void setIsActive(String IsActive)
     {
-        this.IsActive = IsActive;
+        this.IsActive = Boolean.parseBoolean(IsActive);
 
     }
 

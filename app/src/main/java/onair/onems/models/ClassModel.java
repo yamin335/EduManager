@@ -9,15 +9,15 @@ public class ClassModel {
     private int ClassID;
     private String ClassName;
 
-    ClassModel(int ClassID, String ClassName)
+    public ClassModel(String ClassID, String ClassName)
     {
-        this.ClassID = ClassID;
+        this.ClassID = Integer.parseInt(ClassID);
         this.ClassName = ClassName;
     }
 
-    public void setClassID(int ClassID)
+    public void setClassID(String ClassID)
     {
-        this.ClassID = ClassID;
+        this.ClassID = Integer.parseInt(ClassID);
     }
 
     public void setClassName(String ClassName)

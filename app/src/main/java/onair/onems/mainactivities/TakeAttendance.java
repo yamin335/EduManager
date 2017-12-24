@@ -4,6 +4,7 @@ package onair.onems.mainactivities;
  * Created by User on 12/3/2017.
  */
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -35,9 +36,19 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.jaredrummler.materialspinner.MaterialSpinner;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -45,7 +56,9 @@ import java.util.List;
 
 import onair.onems.R;
 import onair.onems.customadapters.ExpandableListAdapter;
+import onair.onems.models.ClassModel;
 import onair.onems.models.ExpandedMenuModel;
+import onair.onems.models.ShiftModel;
 
 public class TakeAttendance extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -62,6 +75,10 @@ public class TakeAttendance extends AppCompatActivity
     String mediumArray[] = {"English","Bangla"};
     String subjectArray[] = {"Bangla","English","Mathematics"};
     Button takeAttendance;
+    ProgressDialog dialog;
+    String classUrl, shiftUrl,sectionUrl,mediumUrl,subjectUrl;
+    ArrayList<ClassModel> allClassArrayList;
+    ArrayList<ShiftModel> allShiftArrayList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,6 +92,54 @@ public class TakeAttendance extends AppCompatActivity
         spinnerSubject = (MaterialSpinner)findViewById(R.id.spinnerSubject);
         takeAttendance = (Button)findViewById(R.id.takeAttendance);
 
+        allClassArrayList = new ArrayList<ClassModel>();
+        allShiftArrayList = new ArrayList<ShiftModel>();
+
+        classUrl = getString(R.string.baseUrlLocal)+"getInsClass/1";
+        shiftUrl = getString(R.string.baseUrlLocal)+"getInsShift/1";
+
+        dialog = new ProgressDialog(this);
+        dialog.setMessage("Loading....");
+        dialog.show();
+
+        //Preparing claas data from server
+        RequestQueue queueClass = Volley.newRequestQueue(this);
+        StringRequest stringClassRequest = new StringRequest(Request.Method.GET, classUrl,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+
+                        parseClassJsonData(response);
+
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+                dialog.dismiss();
+            }
+        });
+        queueClass.add(stringClassRequest);
+
+        //Preparing Shift data from server
+        RequestQueue queueShift = Volley.newRequestQueue(this);
+        StringRequest stringShiftRequest = new StringRequest(Request.Method.GET, shiftUrl,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+
+                        parseShiftJsonData(response);
+
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+                dialog.dismiss();
+            }
+        });
+        queueShift.add(stringShiftRequest);
+
         takeAttendance.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -82,12 +147,6 @@ public class TakeAttendance extends AppCompatActivity
                 startActivity(intent);
             }
         });
-
-        ArrayAdapter<String> class_spinner_adapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1, classArray);
-        spinnerClass.setAdapter(class_spinner_adapter);
-
-        ArrayAdapter<String> shift_spinner_adapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1, shiftArray);
-        spinnerShift.setAdapter(shift_spinner_adapter);
 
         ArrayAdapter<String> section_spinner_adapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1, sectionArray);
         spinnerSection.setAdapter(section_spinner_adapter);
@@ -146,6 +205,47 @@ public class TakeAttendance extends AppCompatActivity
         mDrawerLayout.addDrawerListener(toggle);
         toggle.syncState();
         navigationView.setNavigationItemSelectedListener(this);
+    }
+
+    void parseClassJsonData(String jsonString) {
+        try {
+            JSONArray classJsonArray = new JSONArray(jsonString);
+            ArrayList classArrayList = new ArrayList();
+            for(int i = 0; i < classJsonArray.length(); ++i) {
+                JSONObject classJsonObject = classJsonArray.getJSONObject(i);
+                ClassModel classModel = new ClassModel(classJsonObject.getString("ClassID"), classJsonObject.getString("ClassName"));
+//                Toast.makeText(this,classJsonObject.getString("ClassID")+classJsonObject.getString("ClassName"),Toast.LENGTH_LONG).show();
+                allClassArrayList.add(classModel);
+                classArrayList.add(classModel.getClassName());
+            }
+            ArrayAdapter<ArrayList> class_spinner_adapter = new ArrayAdapter<ArrayList>(this,android.R.layout.simple_list_item_1, classArrayList);
+            spinnerClass.setAdapter(class_spinner_adapter);
+            //spinner.setSelectedIndex(1);
+        } catch (JSONException e) {
+            Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
+            dialog.dismiss();
+        }
+    }
+
+    void parseShiftJsonData(String jsonString) {
+        try {
+            JSONArray shiftJsonArray = new JSONArray(jsonString);
+            ArrayList shiftArrayList = new ArrayList();
+            for(int i = 0; i < shiftJsonArray.length(); ++i) {
+                JSONObject shiftJsonObject = shiftJsonArray.getJSONObject(i);
+                ShiftModel shiftModel = new ShiftModel(shiftJsonObject.getString("ShiftID"), shiftJsonObject.getString("ShiftName"));
+//                Toast.makeText(this,classJsonObject.getString("ClassID")+classJsonObject.getString("ClassName"),Toast.LENGTH_LONG).show();
+                allShiftArrayList.add(shiftModel);
+                shiftArrayList.add(shiftModel.getShiftName());
+            }
+            ArrayAdapter<ArrayList> shift_spinner_adapter = new ArrayAdapter<ArrayList>(this,android.R.layout.simple_list_item_1, shiftArrayList);
+            spinnerShift.setAdapter(shift_spinner_adapter);
+            dialog.dismiss();
+            //spinner.setSelectedIndex(1);
+        } catch (JSONException e) {
+            Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
+            dialog.dismiss();
+        }
     }
 
 

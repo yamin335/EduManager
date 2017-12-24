@@ -29,7 +29,7 @@ public class StudentModel {
     private String Shift;
     private String Class;
 
-    StudentModel(int UserID, String UserFullName, Long RFID, int RollNo, int SubjectID,
+    public StudentModel(int UserID, String UserFullName, Long RFID, int RollNo, int SubjectID,
                  int DepartmentID, int SectionID, int[] InstituteID, int MediumID, int ShiftID,
                  int ClassID, boolean IsPresent, boolean Islate, int LateTime, boolean IsLeave,
                  boolean IsAbsent, String Remarks, String Subject, String Department, String Medium,
