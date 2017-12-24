@@ -4,10 +4,14 @@ package onair.onems.mainactivities;
  * Created by User on 12/3/2017.
  */
 
+import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
@@ -28,8 +32,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.ExpandableListView;
 import android.widget.ImageView;
 import android.widget.Spinner;
@@ -51,6 +57,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 
@@ -58,7 +65,11 @@ import onair.onems.R;
 import onair.onems.customadapters.ExpandableListAdapter;
 import onair.onems.models.ClassModel;
 import onair.onems.models.ExpandedMenuModel;
+import onair.onems.models.MediumModel;
+import onair.onems.models.SectionModel;
 import onair.onems.models.ShiftModel;
+import onair.onems.models.StudentModel;
+import onair.onems.models.SubjectModel;
 
 public class TakeAttendance extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -68,39 +79,80 @@ public class TakeAttendance extends AppCompatActivity
     ExpandableListView expandableList;
     List<ExpandedMenuModel> listDataHeader;
     HashMap<ExpandedMenuModel, List<String>> listDataChild;
-    MaterialSpinner spinnerClass,spinnerShift,spinnerSection,spinnerMedium,spinnerSubject;
-    String classArray[] = {"five", "six", "seven", "eight","Nine", "Ten", "six", "seven", "eight","Nine", "Ten", "six", "seven", "eight","Nine", "Ten", "six", "seven", "eight","Nine", "Ten"};
-    String shiftArray[] = {"Morning","Day"};
-    String sectionArray[] = {"A","B"};
-    String mediumArray[] = {"English","Bangla"};
-    String subjectArray[] = {"Bangla","English","Mathematics"};
+    MaterialSpinner spinnerShift,spinnerSection,spinnerMedium,spinnerSubject;
+    Spinner spinnerClass;
     Button takeAttendance;
     ProgressDialog dialog;
-    String classUrl, shiftUrl,sectionUrl,mediumUrl,subjectUrl;
+    String classUrl, shiftUrl,sectionUrl,mediumUrl,subjectUrl, selectedDate;
     ArrayList<ClassModel> allClassArrayList;
     ArrayList<ShiftModel> allShiftArrayList;
+    ArrayList<SectionModel> allSectionArrayList;
+    ArrayList<MediumModel> allMediumArrayList;
+    ArrayList<SubjectModel> allSubjectArrayList;
+
+    ClassModel selectedClass;
+    ShiftModel selectedShift;
+    SectionModel selectedSection;
+    MediumModel selectedMedium;
+    SubjectModel selectedSubject;
+    Button datePicker;
+    private DatePickerDialog datePickerDialog;
+    int classSpinnerPosition;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_take_attendance);
 
-        spinnerClass = (MaterialSpinner)findViewById(R.id.spinnerClass);
+        spinnerClass = (Spinner)findViewById(R.id.spinnerClass);
         spinnerShift = (MaterialSpinner)findViewById(R.id.spinnerShift);
         spinnerSection = (MaterialSpinner)findViewById(R.id.spinnerSection);
         spinnerMedium =(MaterialSpinner)findViewById(R.id.spinnerMedium);
         spinnerSubject = (MaterialSpinner)findViewById(R.id.spinnerSubject);
         takeAttendance = (Button)findViewById(R.id.takeAttendance);
+        datePicker = (Button)findViewById(R.id.pickDate);
 
         allClassArrayList = new ArrayList<ClassModel>();
         allShiftArrayList = new ArrayList<ShiftModel>();
+        allSectionArrayList = new ArrayList<SectionModel>();
+        allMediumArrayList = new ArrayList<MediumModel>();
+        allSubjectArrayList = new ArrayList<SubjectModel>();
 
         classUrl = getString(R.string.baseUrlLocal)+"getInsClass/1";
         shiftUrl = getString(R.string.baseUrlLocal)+"getInsShift/1";
+        mediumUrl = getString(R.string.baseUrlLocal)+"getInsMedium/1";
 
         dialog = new ProgressDialog(this);
-        dialog.setMessage("Loading....");
+        dialog.setTitle("Loading...");
+        dialog.setMessage("Please Wait...");
+        dialog.setCancelable(false);
         dialog.show();
+
+        datePicker.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // calender class's instance and get current date , month and year from calender
+                final Calendar c = Calendar.getInstance();
+                int mYear = c.get(Calendar.YEAR); // current year
+                int mMonth = c.get(Calendar.MONTH); // current month
+                int mDay = c.get(Calendar.DAY_OF_MONTH); // current day
+                // date picker dialog
+                datePickerDialog = new DatePickerDialog(TakeAttendance.this,
+                        new DatePickerDialog.OnDateSetListener() {
+
+                            @Override
+                            public void onDateSet(DatePicker view, int year,
+                                                  int monthOfYear, int dayOfMonth) {
+                                // set day of month , month and year value in the edit text
+                                selectedDate = dayOfMonth + "/" + (monthOfYear + 1) + "/" + year;
+                                datePicker.setText(selectedDate);
+
+                            }
+                        }, mYear, mMonth, mDay);
+                datePickerDialog.show();
+            }
+        });
 
         //Preparing claas data from server
         RequestQueue queueClass = Volley.newRequestQueue(this);
@@ -140,25 +192,133 @@ public class TakeAttendance extends AppCompatActivity
         });
         queueShift.add(stringShiftRequest);
 
+        //Preparing Medium data from server
+        RequestQueue queueMedium = Volley.newRequestQueue(this);
+        StringRequest stringMediumRequest = new StringRequest(Request.Method.GET, mediumUrl,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+
+                        parseMediumJsonData(response);
+
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+                dialog.dismiss();
+            }
+        });
+        queueMedium.add(stringMediumRequest);
+
         takeAttendance.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                SharedPreferences StudentSelection = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                SharedPreferences.Editor editor = StudentSelection.edit();
+                editor.putInt("InstituteID", 1);
+                editor.putInt("MediumID",selectedMedium.getMediumID());
+                editor.putInt("ShiftID",selectedShift.getShiftID());
+                editor.putInt("ClassID",selectedClass.getClassID());
+                editor.putInt("SectionID",selectedSection.getSectionID());
+                editor.putInt("SubjectID",selectedSubject.getSubjectID());
+                editor.putInt("DepertmentID",selectedSubject.getDepartmentID());
+                editor.commit();
                 Intent intent = new Intent(TakeAttendance.this, TakeAttendanceDetails.class);
                 startActivity(intent);
             }
         });
 
-        ArrayAdapter<String> section_spinner_adapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1, sectionArray);
-        spinnerSection.setAdapter(section_spinner_adapter);
+        spinnerClass.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
-        ArrayAdapter<String> medium_spinner_adapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1, mediumArray);
-        spinnerMedium.setAdapter(medium_spinner_adapter);
+                if(position != classSpinnerPosition)
+                {
+                    selectedClass = allClassArrayList.get(position);
+                    int classId = selectedClass.getClassID();
+                    sectionUrl = getString(R.string.baseUrlLocal)+"getInsSection/1"+"/"+classId;
+                    dialog.show();
+                    //Preparing section data from server
+                    RequestQueue queueSection = Volley.newRequestQueue(TakeAttendance.this);
+                    StringRequest stringSectionRequest = new StringRequest(Request.Method.GET, sectionUrl,
+                            new Response.Listener<String>() {
+                                @Override
+                                public void onResponse(String response) {
 
-        ArrayAdapter<String> subject_spinner_adapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1, subjectArray);
-        spinnerSubject.setAdapter(subject_spinner_adapter);
+                                    parseSectionJsonData(response);
 
+                                }
+                            }, new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
 
+                            dialog.dismiss();
+                        }
+                    });
+                    queueSection.add(stringSectionRequest);
+                }
 
+//                  String selectedItemName = spinnerClass.getSelectedItem().toString();
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+        spinnerShift.setOnItemSelectedListener(new MaterialSpinner.OnItemSelectedListener<String>() {
+
+            @Override public void onItemSelected(MaterialSpinner view, int position, long id, String item) {
+                selectedShift = allShiftArrayList.get(position);
+            }
+        });
+
+        spinnerSection.setOnItemSelectedListener(new MaterialSpinner.OnItemSelectedListener<String>() {
+
+            @Override public void onItemSelected(MaterialSpinner view, int position, long id, String item) {
+                selectedSection = allSectionArrayList.get(position);
+
+            }
+        });
+
+        spinnerMedium.setOnItemSelectedListener(new MaterialSpinner.OnItemSelectedListener<String>() {
+
+            @Override public void onItemSelected(MaterialSpinner view, int position, long id, String item) {
+                selectedMedium = allMediumArrayList.get(position);
+                int mediumId = selectedMedium.getMediumID();
+                subjectUrl = getString(R.string.baseUrlLocal)+"getInsSubject"+"/"+selectedClass.getClassID()+"/"+mediumId;
+                dialog.show();
+                //Preparing subject data from server
+                RequestQueue queueSubject = Volley.newRequestQueue(TakeAttendance.this);
+                StringRequest stringSubjectRequest = new StringRequest(Request.Method.GET, subjectUrl,
+                        new Response.Listener<String>() {
+                            @Override
+                            public void onResponse(String response) {
+
+                                parseSubjectJsonData(response);
+
+                            }
+                        }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+
+                        dialog.dismiss();
+                    }
+                });
+                queueSubject.add(stringSubjectRequest);
+
+            }
+        });
+
+        spinnerSubject.setOnItemSelectedListener(new MaterialSpinner.OnItemSelectedListener<String>() {
+
+            @Override public void onItemSelected(MaterialSpinner view, int position, long id, String item) {
+                selectedSubject = allSubjectArrayList.get(position);
+            }
+        });
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -218,8 +378,32 @@ public class TakeAttendance extends AppCompatActivity
                 allClassArrayList.add(classModel);
                 classArrayList.add(classModel.getClassName());
             }
-            ArrayAdapter<ArrayList> class_spinner_adapter = new ArrayAdapter<ArrayList>(this,android.R.layout.simple_list_item_1, classArrayList);
+            classArrayList.add("SELECT CLASS");
+            classSpinnerPosition = classArrayList.indexOf("SELECT CLASS");
+            selectedClass = allClassArrayList.get(0);
+            ArrayAdapter<ArrayList> class_spinner_adapter = new ArrayAdapter<ArrayList>(this,R.layout.spinner_item, classArrayList){
+
+                @Override
+                public View getView(int position, View convertView, ViewGroup parent) {
+
+                    View v = super.getView(position, convertView, parent);
+                    if (position == getCount()) {
+//                    ((TextView)v.findViewById(android.R.id.text1)).setText("");
+//                    ((TextView)v.findViewById(android.R.id.text1)).setHint(getItem(getCount())); //"Hint to be displayed"
+                    }
+
+                    return v;
+                }
+
+                @Override
+                public int getCount() {
+                    return super.getCount()-1; // you dont display last item. It is used as hint.
+                }
+
+            };
+            class_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             spinnerClass.setAdapter(class_spinner_adapter);
+            spinnerClass.setSelection(class_spinner_adapter.getCount());
             //spinner.setSelectedIndex(1);
         } catch (JSONException e) {
             Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
@@ -238,6 +422,7 @@ public class TakeAttendance extends AppCompatActivity
                 allShiftArrayList.add(shiftModel);
                 shiftArrayList.add(shiftModel.getShiftName());
             }
+            selectedShift = allShiftArrayList.get(0);
             ArrayAdapter<ArrayList> shift_spinner_adapter = new ArrayAdapter<ArrayList>(this,android.R.layout.simple_list_item_1, shiftArrayList);
             spinnerShift.setAdapter(shift_spinner_adapter);
             dialog.dismiss();
@@ -248,7 +433,76 @@ public class TakeAttendance extends AppCompatActivity
         }
     }
 
+    void parseSectionJsonData(String jsonString) {
+        try {
+            JSONArray sectionJsonArray = new JSONArray(jsonString);
+            ArrayList sectionArrayList = new ArrayList();
+            for(int i = 0; i < sectionJsonArray.length(); ++i) {
+                JSONObject sectionJsonObject = sectionJsonArray.getJSONObject(i);
+                SectionModel sectionModel = new SectionModel(sectionJsonObject.getString("SectionID"), sectionJsonObject.getString("SectionName"));
+//                Toast.makeText(this,classJsonObject.getString("ClassID")+classJsonObject.getString("ClassName"),Toast.LENGTH_LONG).show();
+                allSectionArrayList.add(sectionModel);
+                sectionArrayList.add(sectionModel.getSectionName());
+            }
+            selectedSection = allSectionArrayList.get(0);
+            ArrayAdapter<ArrayList> section_spinner_adapter = new ArrayAdapter<ArrayList>(this,android.R.layout.simple_list_item_1, sectionArrayList);
+            spinnerSection.setAdapter(section_spinner_adapter);
+            dialog.dismiss();
+            //spinner.setSelectedIndex(1);
+        } catch (JSONException e) {
+            Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
+            dialog.dismiss();
+        }
+    }
 
+    void parseMediumJsonData(String jsonString) {
+        try {
+            JSONArray mediumJsonArray = new JSONArray(jsonString);
+            ArrayList mediumnArrayList = new ArrayList();
+            for(int i = 0; i < mediumJsonArray.length(); ++i) {
+                JSONObject mediumJsonObject = mediumJsonArray.getJSONObject(i);
+                MediumModel mediumModel = new MediumModel(mediumJsonObject.getString("MediumID"), mediumJsonObject.getString("MameName"),
+                        mediumJsonObject.getString("InstMediumID"), mediumJsonObject.getString("InstituteID"), mediumJsonObject.getString("IsActive"));
+//                Toast.makeText(this,classJsonObject.getString("ClassID")+classJsonObject.getString("ClassName"),Toast.LENGTH_LONG).show();
+                allMediumArrayList.add(mediumModel);
+                mediumnArrayList.add(mediumModel.getMameName());
+            }
+            selectedMedium = allMediumArrayList.get(0);
+            ArrayAdapter<ArrayList> medium_spinner_adapter = new ArrayAdapter<ArrayList>(this,android.R.layout.simple_list_item_1, mediumnArrayList);
+            spinnerMedium.setAdapter(medium_spinner_adapter);
+            dialog.dismiss();
+            //spinner.setSelectedIndex(1);
+        } catch (JSONException e) {
+            Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
+            dialog.dismiss();
+        }
+    }
+
+    void parseSubjectJsonData(String jsonString) {
+        try {
+            JSONArray subjectJsonArray = new JSONArray(jsonString);
+            ArrayList subjectArrayList = new ArrayList();
+            for(int i = 0; i < subjectJsonArray.length(); ++i) {
+                JSONObject subjectJsonObject = subjectJsonArray.getJSONObject(i);
+                SubjectModel subjectModel = new SubjectModel(subjectJsonObject.getString("SubjectID"), subjectJsonObject.getString("SubjectNo"),
+                        subjectJsonObject.getString("SubjectName"), subjectJsonObject.getString("InsSubjectID"), subjectJsonObject.getString("InstituteID"),
+                        subjectJsonObject.getString("DepartmentID"), subjectJsonObject.getString("MediumID"), subjectJsonObject.getString("ClassID"),
+                        subjectJsonObject.getString("IsActive"), subjectJsonObject.getString("IsCombined"), subjectJsonObject.getString("ParentID"),
+                        subjectJsonObject.getString("ParentSubject"));
+//                Toast.makeText(this,classJsonObject.getString("ClassID")+classJsonObject.getString("ClassName"),Toast.LENGTH_LONG).show();
+                allSubjectArrayList.add(subjectModel);
+                subjectArrayList.add(subjectModel.getSubjectName());
+            }
+            selectedSubject = allSubjectArrayList.get(0);
+            ArrayAdapter<ArrayList> subject_spinner_adapter = new ArrayAdapter<ArrayList>(this,android.R.layout.simple_list_item_1, subjectArrayList);
+            spinnerSubject.setAdapter(subject_spinner_adapter);
+            dialog.dismiss();
+            //spinner.setSelectedIndex(1);
+        } catch (JSONException e) {
+            Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
+            dialog.dismiss();
+        }
+    }
 
     private void prepareListData() {
         listDataHeader = new ArrayList<ExpandedMenuModel>();

@@ -15,7 +15,14 @@ public class MediumModel {
     {
         this.MediumID = Integer.parseInt(MediumID);
         this.MameName = MameName;
-        this.InstMediumID = Integer.parseInt(InstMediumID);
+        if(InstMediumID.equals("null"))
+        {
+            this.InstMediumID = 0;
+        }
+        else
+        {
+            this.InstMediumID = Integer.parseInt(InstMediumID);
+        }
         this.InstituteID = Integer.parseInt(InstituteID);
         this.IsActive = Boolean.parseBoolean(IsActive);
     }

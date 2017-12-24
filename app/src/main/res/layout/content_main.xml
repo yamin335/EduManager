@@ -54,26 +54,29 @@
         app:layout_constraintTop_toTopOf="@+id/guideline8"
         app:layout_constraintVertical_bias="0.19999999" />
 
-    <com.jaredrummler.materialspinner.MaterialSpinner
-        android:id="@+id/spinnerClass"
+    <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:orientation="vertical"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:text="Class"
-        android:textSize="18dp"
-        android:textStyle="bold"
-        table:ms_dropdown_max_height="250dp"
-        table:ms_background_color="#0277bd"
+        android:background="@drawable/button"
         android:elevation="5dp"
-        table:ms_text_color="#ffffff"
         app:layout_constraintBottom_toTopOf="@+id/guideline9"
         app:layout_constraintEnd_toStartOf="@+id/guideline6"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/guideline5"
         app:layout_constraintTop_toTopOf="@+id/guideline8"
-        app:layout_constraintVertical_bias="0.050000012" />
+        app:layout_constraintVertical_bias="0.050000012" >
+        <Spinner
+            android:layout_weight="1"
+            android:id="@+id/spinnerClass"
+            android:backgroundTint="#ffffff"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:spinnerMode="dropdown" />
+    </LinearLayout>
 
     <com.jaredrummler.materialspinner.MaterialSpinner
         android:id="@+id/spinnerMedium"
@@ -108,7 +111,7 @@
         android:text="Subject"
         android:textSize="18dp"
         android:textStyle="bold"
-        table:ms_dropdown_max_height="250dp"
+        table:ms_dropdown_max_height="100dp"
         table:ms_background_color="#0277bd"
         android:elevation="5dp"
         table:ms_text_color="#ffffff"

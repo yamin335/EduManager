@@ -9,15 +9,15 @@ public class SectionModel {
     private int SectionID;
     private String SectionName;
 
-    public SectionModel(int SectionID, String SectionName)
+    public SectionModel(String SectionID, String SectionName)
     {
-        this.SectionID = SectionID;
+        this.SectionID = Integer.parseInt(SectionID);
         this.SectionName = SectionName;
     }
 
-    public void setSectionID(int SectionID)
+    public void setSectionID(String SectionID)
     {
-        this.SectionID = SectionID;
+        this.SectionID = Integer.parseInt(SectionID);
     }
 
     public void setSectionName(String SectionName)

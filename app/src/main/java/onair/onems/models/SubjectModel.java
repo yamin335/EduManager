@@ -19,20 +19,35 @@ public class SubjectModel {
     private int ParentID;
     private String ParentSubject;
 
-    public SubjectModel(int SubjectID, int SubjectNo, String SubjectName, int InsSubjectID,
-                 int InstituteID, int DepartmentID, int MediumID, int ClassID, boolean IsActive,
-                 boolean IsCombined, int ParentID, String ParentSubject) {
-        this.SubjectID = SubjectID;
-        this.SubjectNo = SubjectNo;
+    public SubjectModel(String SubjectID, String SubjectNo, String SubjectName, String InsSubjectID,
+                        String InstituteID, String DepartmentID, String MediumID, String ClassID, String IsActive,
+                        String IsCombined, String ParentID, String ParentSubject) {
+        this.SubjectID = Integer.parseInt(SubjectID);
+        this.SubjectNo = Integer.parseInt(SubjectNo);
         this.SubjectName = SubjectName;
-        this.InsSubjectID = InsSubjectID;
-        this.InstituteID = InstituteID;
-        this.DepartmentID = DepartmentID;
-        this.MediumID = MediumID;
-        this.ClassID = ClassID;
-        this.IsActive = IsActive;
-        this.IsCombined = IsCombined;
-        this.ParentID = ParentID;
+        if(InsSubjectID.equals("null"))
+        {
+            this.InsSubjectID = 0;
+        }
+        else
+        {
+            this.InsSubjectID = Integer.parseInt(InsSubjectID);
+        }
+        this.InstituteID = Integer.parseInt(InstituteID);
+        this.DepartmentID = Integer.parseInt(DepartmentID);
+        this.MediumID = Integer.parseInt(MediumID);
+        this.ClassID = Integer.parseInt(ClassID);
+        this.IsActive = Boolean.parseBoolean(IsActive);
+        this.IsCombined = Boolean.parseBoolean(IsCombined);
+        if(ParentID.equals("null"))
+        {
+            this.ParentID = 0;
+        }
+        else
+        {
+            this.ParentID = Integer.parseInt(ParentID);
+        }
+
         this.ParentSubject = ParentSubject;
 
     }

@@ -1,12 +1,16 @@
 package onair.onems.mainactivities;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.WindowManager;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +27,7 @@ public class TakeAttendanceDetails extends AppCompatActivity {
     private RecyclerView recyclerView;
     private AttendanceSheetAdapter adapter;
     private List<AttendanceSheet> attendanceSheetList;
+    private int InstituteID,MediumID,ShiftID,ClassID,SectionID,SubjectID,DepertmentID;
 
     @Override
     public void onResume() {
@@ -40,15 +45,23 @@ public class TakeAttendanceDetails extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_take_attendance_screen);
-
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
+
+        SharedPreferences StudentSelection = PreferenceManager.getDefaultSharedPreferences(this);
+        InstituteID = StudentSelection.getInt("InstituteID",0);
+        MediumID = StudentSelection.getInt("MediumID",0);
+        ShiftID = StudentSelection.getInt("ShiftID",0);
+        ClassID = StudentSelection.getInt("ClassID",0);
+        SectionID = StudentSelection.getInt("SectionID",0);
+        SubjectID = StudentSelection.getInt("SubjectID",0);
+        DepertmentID = StudentSelection.getInt("DepertmentID",0);
 
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
 
         attendanceSheetList = new ArrayList<>();
         adapter = new AttendanceSheetAdapter(this, attendanceSheetList);
 
-        RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(this, 1);
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(mLayoutManager);
         //recyclerView.addItemDecoration(new GridSpacingItemDecoration(2, dpToPx(10), true));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
