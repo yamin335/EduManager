@@ -2,8 +2,10 @@ package onair.onems.fragment;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
@@ -42,17 +44,19 @@ public class TwoFragment extends Fragment {
     MaterialSpinner classSpinner,sectionSpinner,mediumSpinner,monthSpinner,shiftSpinner;
     TableView tableView;
     String classUrl = "",mediumUrl="",monthUrl="",sectionUrl="",shiftUrl;
+    int ClassID[],ShiftID[],MediumID[],MonthID[],SectionID[];
     ProgressDialog dialog;
     Fragment fragment;
     FragmentManager fragmentManager;
     Handler handler;
+    SharedPreferences sharedPre;
     Button student_find_button;
     private boolean shouldRefreshOnResume = false;
     private static int SPLASH_TIME_OUT = 1000;
     Runnable refresh;
+    int SectionSelectID=0,ShiftSelectID=0,MediumSelectID=0,ClassSelectID=0,MonthSelectID=0;
 
-    private static final String[][] DATA_TO_SHOW = { { "01", "Hasnat", "01", "01" },{ "01", "Hasnat", "01", "01" },{ "01", "Hasnat", "01", "01" },{ "01", "Hasnat", "01", "01" },{ "01", "Hasnat", "01", "01" },
-            { "02", "Bony", "02", "02" },{"03","Jony","03","03"},{"04","Yamin","04","04"},{"05","Alamin","05","05"},{"05","Alamin","05","05"},{"05","Alamin","05","05"},{"05","Alamin","05","05"},{"05","Alamin","05","05"},{"05","Alamin","05","05"},{"05","Alamin","05","05"},{"05","Alamin","05","05"},{"05","Alamin","05","05"} };
+
     public TwoFragment()
     {
 
@@ -80,13 +84,12 @@ public class TwoFragment extends Fragment {
         mediumSpinner= (MaterialSpinner) rootView.findViewById(R.id.spinner_medium);
         sectionSpinner = (MaterialSpinner) rootView.findViewById(R.id.spinner_Section);
         monthSpinner = (MaterialSpinner) rootView.findViewById(R.id.spinner_Month);
+        sharedPre = PreferenceManager.getDefaultSharedPreferences(getActivity());
 
-        classUrl=getString(R.string.baseUrl)+"getAllClasses";
-        mediumUrl=getString(R.string.baseUrl)+"getMedium";
+        classUrl=getString(R.string.baseUrl)+"getInsClass/"+sharedPre.getInt("InstituteID",0);
+        mediumUrl=getString(R.string.baseUrl)+"getInsMedium/"+sharedPre.getInt("InstituteID",0);
         monthUrl=getString(R.string.baseUrl)+"getMonth";
-        sectionUrl=getString(R.string.baseUrl)+"getCmnSection";
-        shiftUrl=getString(R.string.baseUrl)+"getShift";
-
+        shiftUrl=getString(R.string.baseUrl)+"getInsShift/"+sharedPre.getInt("InstituteID",0);
         dialog = new ProgressDialog(getActivity());
         dialog.setMessage("Loading....");
         dialog.show();
@@ -95,6 +98,15 @@ public class TwoFragment extends Fragment {
         {
             @Override
             public void onClick(View view) {
+                dialog.show();
+                SharedPreferences.Editor editor = sharedPre.edit();
+                editor.putInt("ShiftSelectID",ShiftSelectID);
+                editor.putInt("ClassSelectID",ClassSelectID);
+                editor.putInt("MediumSelectID",MediumSelectID);
+                editor.putInt("SectionSelectID",SectionSelectID);
+                editor.putInt("MonthSelectID",MonthSelectID);
+                editor.commit();
+               //Toast.makeText(getActivity(),"ShiftID="+ShiftSelectID+" ClassID= "+ClassSelectID+ "MediumID= "+MediumSelectID+" MonthID="+MediumSelectID+" SectionID= "+SectionSelectID+"MonthID= "+MonthSelectID,Toast.LENGTH_LONG).show();
                 Intent i = new Intent(getActivity(), StudentAttendanceShow.class);
                 startActivity(i);
                 getActivity().finish();
@@ -109,7 +121,24 @@ public class TwoFragment extends Fragment {
                     public void onResponse(String response) {
 
                         parseClassJsonData(response);
+                        RequestQueue queueSection = Volley.newRequestQueue(getActivity());
+                        sectionUrl=getString(R.string.baseUrl)+"getInsSection/"+sharedPre.getInt("InstituteID",0)+"/"+ClassSelectID;
+                        StringRequest stringSectionRequest = new StringRequest(Request.Method.GET, sectionUrl,
+                                new Response.Listener<String>() {
+                                    @Override
+                                    public void onResponse(String response) {
 
+                                        parseSectionJsonData(response);
+
+                                    }
+                                }, new Response.ErrorListener() {
+                            @Override
+                            public void onErrorResponse(VolleyError error) {
+
+                                dialog.dismiss();
+                            }
+                        });
+                        queueSection.add(stringSectionRequest);
                     }
                 }, new Response.ErrorListener() {
             @Override
@@ -158,25 +187,7 @@ public class TwoFragment extends Fragment {
         });
 
         queueMonth.add(stringMonthRequest);
-        RequestQueue queueSection = Volley.newRequestQueue(getActivity());
 
-        StringRequest stringSectionRequest = new StringRequest(Request.Method.GET, sectionUrl,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-
-                        parseSectionJsonData(response);
-
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-
-                dialog.dismiss();
-            }
-        });
-
-        queueSection.add(stringSectionRequest);
         RequestQueue queueShift = Volley.newRequestQueue(getActivity());
 
         StringRequest stringShiftRequest = new StringRequest(Request.Method.GET, shiftUrl,
@@ -195,13 +206,63 @@ public class TwoFragment extends Fragment {
             }
         });
         queueShift.add(stringShiftRequest);
+
         tableView = (TableView)rootView.findViewById(R.id.tableView);
-        classSpinner.setOnClickListener(new View.OnClickListener() {
+        shiftSpinner.setOnItemSelectedListener(new MaterialSpinner.OnItemSelectedListener() {
             @Override
-            public void onClick(View view)
-            {
+            public void onItemSelected(MaterialSpinner view, int position, long id, Object item) {
+                 ShiftSelectID=ShiftID[position];
             }
         });
+        mediumSpinner.setOnItemSelectedListener(new MaterialSpinner.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(MaterialSpinner view, int position, long id, Object item) {
+                MediumSelectID=MediumID[position];
+            }
+        });
+        monthSpinner.setOnItemSelectedListener(new MaterialSpinner.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(MaterialSpinner view, int position, long id, Object item) {
+                MonthSelectID=MonthID[position];
+            }
+        });
+        sectionSpinner.setOnItemSelectedListener(new MaterialSpinner.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(MaterialSpinner view, int position, long id, Object item) {
+                SectionSelectID=SectionID[position];
+
+
+            }
+        });
+        classSpinner.setOnItemSelectedListener(new MaterialSpinner.OnItemSelectedListener<String>()
+        {
+
+            @Override public void onItemSelected(MaterialSpinner view, int position, long id, String item)
+            {
+                ClassSelectID=ClassID[position];
+                RequestQueue queueSection = Volley.newRequestQueue(getActivity());
+                sectionUrl=getString(R.string.baseUrl)+"getInsSection/"+sharedPre.getInt("InstituteID",0)+"/"+ClassSelectID;
+                StringRequest stringSectionRequest = new StringRequest(Request.Method.GET, sectionUrl,
+                        new Response.Listener<String>() {
+                            @Override
+                            public void onResponse(String response) {
+
+                                parseSectionJsonData(response);
+
+                            }
+                        }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+
+                        dialog.dismiss();
+                    }
+                });
+
+                queueSection.add(stringSectionRequest);
+
+            }
+        });
+
         return rootView;
     }
 
@@ -209,11 +270,15 @@ public class TwoFragment extends Fragment {
         try {
             JSONArray jsonArray = new JSONArray(jsonString);
             ArrayList al = new ArrayList();
-            for(int i = 0; i < jsonArray.length(); ++i) {
+            ClassID=new int[jsonArray.length()];
+            for(int i = 0; i < jsonArray.length(); ++i)
+            {
                 JSONObject jsonObject=jsonArray.getJSONObject(i);
                 String name=jsonObject.getString("ClassName");
+                ClassID[i]=jsonObject.getInt("ClassID");
                 al.add(name);
             }
+            ClassSelectID=ClassID[0];
             ArrayAdapter adapter = new ArrayAdapter(getActivity(), android.R.layout.simple_list_item_1, al);
             classSpinner.setAdapter(adapter);
             //spinner.setSelectedIndex(1);
@@ -228,11 +293,14 @@ public class TwoFragment extends Fragment {
         try {
             JSONArray jsonArray = new JSONArray(jsonString);
             ArrayList al = new ArrayList();
+            MediumID=new int[jsonArray.length()];
             for(int i = 0; i < jsonArray.length(); ++i) {
                 JSONObject jsonObject=jsonArray.getJSONObject(i);
                 String name=jsonObject.getString("MameName");
+                MediumID[i]=jsonObject.getInt("MediumID");
                 al.add(name);
             }
+            MediumSelectID=MediumID[0];
             ArrayAdapter adapter = new ArrayAdapter(getActivity(), android.R.layout.simple_list_item_1, al);
             mediumSpinner.setAdapter(adapter);
             //spinner.setSelectedIndex(1);
@@ -247,11 +315,14 @@ public class TwoFragment extends Fragment {
         try {
             JSONArray jsonArray = new JSONArray(jsonString);
             ArrayList al = new ArrayList();
+            MonthID=new int[jsonArray.length()];
             for(int i = 0; i < jsonArray.length(); ++i) {
                 JSONObject jsonObject=jsonArray.getJSONObject(i);
                 String name=jsonObject.getString("MonthName");
+                MonthID[i]=jsonObject.getInt("MonthID");
                 al.add(name);
             }
+            MonthSelectID=MonthID[0];
             ArrayAdapter adapter = new ArrayAdapter(getActivity(), android.R.layout.simple_list_item_1, al);
             monthSpinner.setAdapter(adapter);
 
@@ -267,11 +338,14 @@ public class TwoFragment extends Fragment {
         try {
             JSONArray jsonArray = new JSONArray(jsonString);
             ArrayList al = new ArrayList();
+            SectionID=new int[jsonArray.length()];
             for(int i = 0; i < jsonArray.length(); ++i) {
                 JSONObject jsonObject=jsonArray.getJSONObject(i);
                 String name=jsonObject.getString("SectionName");
+                SectionID[i]=jsonObject.getInt("SectionID");
                 al.add(name);
             }
+            SectionSelectID= SectionID[0];
             ArrayAdapter adapter = new ArrayAdapter(getActivity(), android.R.layout.simple_list_item_1, al);
             sectionSpinner.setAdapter(adapter);
 
@@ -285,12 +359,15 @@ public class TwoFragment extends Fragment {
     void parseShiftJsonData(String jsonString) {
         try {
             JSONArray jsonArray = new JSONArray(jsonString);
+            ShiftID=new int[jsonArray.length()];
             ArrayList al = new ArrayList();
             for(int i = 0; i < jsonArray.length(); ++i) {
                 JSONObject jsonObject=jsonArray.getJSONObject(i);
                 String name=jsonObject.getString("ShiftName");
+                ShiftID[i]=jsonObject.getInt("ShiftID");
                 al.add(name);
             }
+            ShiftSelectID=ShiftID[0];
             ArrayAdapter adapter = new ArrayAdapter(getActivity(), android.R.layout.simple_list_item_1, al);
             shiftSpinner.setAdapter(adapter);
             //spinner.setSelectedIndex(1);

@@ -74,8 +74,9 @@ public class StudentAttendance extends AppCompatActivity implements NavigationVi
         View view = getLayoutInflater().inflate(R.layout.nav_header_student_attendance,null);
         ImageView profilePicture = (ImageView)view.findViewById(R.id.profile);
         TextView  studentName=(TextView) view.findViewById(R.id.name);
-        SharedPreferences sharedPre = PreferenceManager.getDefaultSharedPreferences(this);
 
+
+        SharedPreferences sharedPre = PreferenceManager.getDefaultSharedPreferences(this);
         String name=sharedPre.getString("UserFullName","");
         studentName.setText(name);
 

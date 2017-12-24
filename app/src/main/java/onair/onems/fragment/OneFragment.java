@@ -55,7 +55,7 @@ public class OneFragment extends Fragment {
     JSONArray monthJsonArray;
     SimpleTableHeaderAdapter simpleTableHeaderAdapter;
     SimpleTableDataAdapter simpleTabledataAdapter;
-    private static final String [] [] Monthly_DATA_TO_SHOW=new String[30][30];
+
     String[][] DATA_TO_SHOW;
 
     public OneFragment()
@@ -77,7 +77,7 @@ public class OneFragment extends Fragment {
         tableView = (TableView)rootView.findViewById(R.id.tableView);
         tableView.setColumnCount(4);
 
-        monthUrl=getString(R.string.baseUrl)+"getMonth";
+         monthUrl=getString(R.string.baseUrl)+"getMonth";
 
          sharedPre = PreferenceManager.getDefaultSharedPreferences(getActivity());
 
@@ -86,7 +86,6 @@ public class OneFragment extends Fragment {
          mediumID=sharedPre.getInt("MediumID",0);
          classID=sharedPre.getInt("ClassID",0);
          sectionID=sharedPre.getInt("SectionID",0);
-
 
 
         dialog = new ProgressDialog(getActivity());
@@ -205,7 +204,7 @@ public class OneFragment extends Fragment {
         try {
             JSONArray jsonArray = new JSONArray(jsonString);
             ArrayList al = new ArrayList();
-             DATA_TO_SHOW = new String[jsonArray.length()][4];
+            DATA_TO_SHOW = new String[jsonArray.length()][4];
             for(int i = 0; i < jsonArray.length(); ++i) {
                 JSONObject jsonObject=jsonArray.getJSONObject(i);
                 DATA_TO_SHOW[i][0]= String.valueOf((i+1));
@@ -222,6 +221,7 @@ public class OneFragment extends Fragment {
                 al.add(DATA_TO_SHOW[i][0]);
                 al.add(DATA_TO_SHOW[i][1]);
                 al.add(DATA_TO_SHOW[i][2]);
+                al.add(DATA_TO_SHOW[i][3]);
             }
 
             simpleTabledataAdapter = new SimpleTableDataAdapter(getActivity(),DATA_TO_SHOW);
