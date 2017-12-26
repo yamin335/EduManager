@@ -188,7 +188,7 @@ public class StudentAttendance extends AppCompatActivity implements NavigationVi
     }
 
     private void setupDrawerContent(NavigationView navigationView) {
-        //revision: this don't works, use setOnChildClickListener() and setOnGroupClickListener() above instead
+
         navigationView.setNavigationItemSelectedListener(
                 new NavigationView.OnNavigationItemSelectedListener() {
                     @Override
@@ -208,6 +208,7 @@ public class StudentAttendance extends AppCompatActivity implements NavigationVi
         } else {
             super.onBackPressed();
         }
+
     }
 
     @Override

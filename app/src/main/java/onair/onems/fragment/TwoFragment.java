@@ -109,7 +109,7 @@ public class TwoFragment extends Fragment {
                //Toast.makeText(getActivity(),"ShiftID="+ShiftSelectID+" ClassID= "+ClassSelectID+ "MediumID= "+MediumSelectID+" MonthID="+MediumSelectID+" SectionID= "+SectionSelectID+"MonthID= "+MonthSelectID,Toast.LENGTH_LONG).show();
                 Intent i = new Intent(getActivity(), StudentAttendanceShow.class);
                 startActivity(i);
-                getActivity().finish();
+
 
             }
         });
