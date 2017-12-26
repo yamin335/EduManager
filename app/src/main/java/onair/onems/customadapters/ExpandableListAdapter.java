@@ -46,7 +46,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
     @Override
     public int getChildrenCount(int groupPosition) {
         int childCount = 0;
-        if (groupPosition != 2) {
+        if (groupPosition != 4) {
             childCount = this.mListDataChild.get(this.mListDataHeader.get(groupPosition))
                     .size();
         }
@@ -85,12 +85,10 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
     public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
         ExpandedMenuModel headerTitle = (ExpandedMenuModel) getGroup(groupPosition);
         if (convertView == null) {
-            LayoutInflater infalInflater = (LayoutInflater) this.mContext
-                    .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            LayoutInflater infalInflater = (LayoutInflater) this.mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = infalInflater.inflate(R.layout.listheader, null);
         }
-        TextView lblListHeader = (TextView) convertView
-                .findViewById(R.id.submenu);
+        TextView lblListHeader = (TextView) convertView.findViewById(R.id.submenu);
         ImageView headerIcon = (ImageView) convertView.findViewById(R.id.iconimage);
         ImageView indicator = (ImageView) convertView.findViewById(R.id.arrow);
         switch (groupPosition) {
@@ -98,6 +96,9 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
                 indicator.setVisibility(View.VISIBLE);
                 break;
             case 1:
+                indicator.setVisibility(View.VISIBLE);
+                break;
+            case 2:
                 indicator.setVisibility(View.VISIBLE);
                 break;
             default:

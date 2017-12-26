@@ -40,6 +40,14 @@
         <activity
             android:name=".mainactivities.TakeAttendance"
             android:theme="@style/AppTheme.NoActionBar"></activity>
+        <activity android:name=".mainactivities.ShowAttendance"
+            android:theme="@style/AppTheme"
+            android:label="Show Attendance"
+            android:parentActivityName="onair.onems.mainactivities.TakeAttendance">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="onair.onems.mainactivities.TakeAttendance" />
+        </activity>
         <activity
             android:name=".mainactivities.StudentAttendance"
             android:theme="@style/AppTheme.NoActionBar">

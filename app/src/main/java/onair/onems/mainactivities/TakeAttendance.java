@@ -20,6 +20,7 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -89,6 +90,9 @@ public class TakeAttendance extends AppCompatActivity
     ArrayList<MediumModel> allMediumArrayList;
     ArrayList<SubjectModel> allSubjectArrayList;
 
+    String[] tempSectionArray = {"Select Section"};
+    String[] tempSubjectArray = {"Select Subject"};
+
     ClassModel selectedClass;
     ShiftModel selectedShift;
     SectionModel selectedSection;
@@ -112,7 +116,13 @@ public class TakeAttendance extends AppCompatActivity
         showAttendance = (Button)findViewById(R.id.showAttendance);
         datePicker = (Button)findViewById(R.id.pickDate);
 
+        ArrayAdapter<String> section_spinner_adapter = new ArrayAdapter<String>(this, R.layout.spinner_item, tempSectionArray);
+        section_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerSection.setAdapter(section_spinner_adapter);
 
+        ArrayAdapter<String> subject_spinner_adapter = new ArrayAdapter<String>(this, R.layout.spinner_item, tempSubjectArray);
+        subject_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerSubject.setAdapter(subject_spinner_adapter);
 
         allClassArrayList = new ArrayList<ClassModel>();
         allShiftArrayList = new ArrayList<ShiftModel>();
@@ -405,7 +415,13 @@ public class TakeAttendance extends AppCompatActivity
         expandableList.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
             @Override
             public boolean onChildClick(ExpandableListView expandableListView, View view, int i, int i1, long l) {
-                //Log.d("DEBUG", "submenu item clicked");
+                Log.d("DEBUG", "submenu item clicked-"+i+"-"+i1+"-"+l);
+                if((i == 2) && (i1 == 1) && (l == 1))
+                {
+                    Intent intent = new Intent(TakeAttendance.this, ShowAttendance.class);
+                    startActivity(intent);
+                }
+
                 return false;
             }
         });
@@ -435,8 +451,8 @@ public class TakeAttendance extends AppCompatActivity
                 allClassArrayList.add(classModel);
                 classArrayList.add(classModel.getClassName());
             }
-            classArrayList.add("SELECT CLASS");
-            classSpinnerPosition = classArrayList.indexOf("SELECT CLASS");
+            classArrayList.add("Select Class");
+            classSpinnerPosition = classArrayList.indexOf("Select Class");
             selectedClass = allClassArrayList.get(0);
             ArrayAdapter<ArrayList> class_spinner_adapter = new ArrayAdapter<ArrayList>(this,R.layout.spinner_item, classArrayList){
 
@@ -479,8 +495,8 @@ public class TakeAttendance extends AppCompatActivity
                 allShiftArrayList.add(shiftModel);
                 shiftArrayList.add(shiftModel.getShiftName());
             }
-            shiftArrayList.add("SELECT SHIFT");
-            shiftSpinnerPosition = shiftArrayList.indexOf("SELECT SHIFT");
+            shiftArrayList.add("Select Shift");
+            shiftSpinnerPosition = shiftArrayList.indexOf("Select Shift");
             selectedShift = allShiftArrayList.get(0);
             ArrayAdapter<ArrayList> shift_spinner_adapter = new ArrayAdapter<ArrayList>(this,R.layout.spinner_item, shiftArrayList){
 
@@ -524,8 +540,8 @@ public class TakeAttendance extends AppCompatActivity
                 allSectionArrayList.add(sectionModel);
                 sectionArrayList.add(sectionModel.getSectionName());
             }
-            sectionArrayList.add("SELECT SECTION");
-            sectionSpinnerPosition = sectionArrayList.indexOf("SELECT SECTION");
+            sectionArrayList.add("Select Section");
+            sectionSpinnerPosition = sectionArrayList.indexOf("Select Section");
             selectedSection = allSectionArrayList.get(0);
             ArrayAdapter<ArrayList> section_spinner_adapter = new ArrayAdapter<ArrayList>(this,R.layout.spinner_item, sectionArrayList){
 
@@ -570,8 +586,8 @@ public class TakeAttendance extends AppCompatActivity
                 allMediumArrayList.add(mediumModel);
                 mediumnArrayList.add(mediumModel.getMameName());
             }
-            mediumnArrayList.add("SELECT MEDIUM");
-            mediumSpinnerPosition = mediumnArrayList.indexOf("SELECT MEDIUM");
+            mediumnArrayList.add("Select Medium");
+            mediumSpinnerPosition = mediumnArrayList.indexOf("Select Medium");
             selectedMedium = allMediumArrayList.get(0);
             ArrayAdapter<ArrayList> medium_spinner_adapter = new ArrayAdapter<ArrayList>(this,R.layout.spinner_item, mediumnArrayList){
 
@@ -619,8 +635,8 @@ public class TakeAttendance extends AppCompatActivity
                 allSubjectArrayList.add(subjectModel);
                 subjectArrayList.add(subjectModel.getSubjectName());
             }
-            subjectArrayList.add("SELECT SUBJECT");
-            subjectSpinnerPosition = subjectArrayList.indexOf("SELECT SUBJECT");
+            subjectArrayList.add("Select Subject");
+            subjectSpinnerPosition = subjectArrayList.indexOf("Select Subject");
             selectedSubject = allSubjectArrayList.get(0);
             ArrayAdapter<ArrayList> subject_spinner_adapter = new ArrayAdapter<ArrayList>(this,R.layout.spinner_item, subjectArrayList){
 
@@ -703,6 +719,9 @@ public class TakeAttendance extends AppCompatActivity
         headingRoutine.add("Final Exam");
 
         List<String> headingAttendance = new ArrayList<String>();
+        headingAttendance.add("Take Attendance");
+        headingAttendance.add("Show Attendance");
+
         List<String> headingSyllabus = new ArrayList<String>();
         List<String> headingExam = new ArrayList<String>();
         List<String> headingResult = new ArrayList<String>();
