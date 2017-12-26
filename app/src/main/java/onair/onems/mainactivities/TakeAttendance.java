@@ -20,7 +20,6 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -91,8 +90,7 @@ public class TakeAttendance extends AppCompatActivity
     ArrayList<SubjectModel> allSubjectArrayList;
 
     String[] tempSectionArray = {"Select Section"};
-    String[] tempSubjectArray = {"Select Subject"};
-
+    String[] tempSubjectArray = {"Select Section"};
     ClassModel selectedClass;
     ShiftModel selectedShift;
     SectionModel selectedSection;
@@ -115,7 +113,6 @@ public class TakeAttendance extends AppCompatActivity
         takeAttendance = (Button)findViewById(R.id.takeAttendance);
         showAttendance = (Button)findViewById(R.id.showAttendance);
         datePicker = (Button)findViewById(R.id.pickDate);
-
         ArrayAdapter<String> section_spinner_adapter = new ArrayAdapter<String>(this, R.layout.spinner_item, tempSectionArray);
         section_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerSection.setAdapter(section_spinner_adapter);

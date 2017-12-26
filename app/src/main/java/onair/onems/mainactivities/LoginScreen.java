@@ -68,42 +68,42 @@ public class LoginScreen extends AppCompatActivity {
                     LoginScreen.this.finish();
                 }
 
-//                RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
-//                StringRequest stringRequest = new StringRequest(Request.Method.GET, loginurl,
-//                        new Response.Listener<String>() {
-//                            @Override
-//                            public void onResponse(String response) {
-//                                parseJsonData(response);
-//
-//                                LoginId = takeId.getText().toString();
-//                                LoginPassword = takePassword.getText().toString();
-//                                if(UserID.length()>0)
-//                                {
-//                                    Intent mainIntent = new Intent(LoginScreen.this,StudentMainScreen.class);
-//                                    LoginScreen.this.startActivity(mainIntent);
-//                                    LoginScreen.this.finish();
-//                                }
-//                                else if((LoginId.equals("22"))&&(LoginPassword.equals("22")))
-//                                {
-//                                    Intent mainIntent = new Intent(LoginScreen.this,TeacherMainScreen.class);
-//                                    LoginScreen.this.startActivity(mainIntent);
-//                                    LoginScreen.this.finish();
-//                                }
-//                                else
-//                                {
-//                                    Toast.makeText(LoginScreen.this,"Please enter valid id",Toast.LENGTH_LONG).show();
-//                                }
-//
-//                            }
-//                        }, new Response.ErrorListener() {
-//                    @Override
-//                    public void onErrorResponse(VolleyError error) {
-//                      // Toast.makeText(getApplicationContext(),"error:"+error,Toast.LENGTH_LONG).show();
-//                        dialog.dismiss();
-//                    }
-//                });
-//
-//                queue.add(stringRequest);
+                RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
+                StringRequest stringRequest = new StringRequest(Request.Method.GET, loginurl,
+                        new Response.Listener<String>() {
+                            @Override
+                            public void onResponse(String response) {
+                                parseJsonData(response);
+
+                                LoginId = takeId.getText().toString();
+                                LoginPassword = takePassword.getText().toString();
+                                if(UserID.length()>0)
+                                {
+                                    Intent mainIntent = new Intent(LoginScreen.this,StudentMainScreen.class);
+                                    LoginScreen.this.startActivity(mainIntent);
+                                    LoginScreen.this.finish();
+                                }
+                                else if((LoginId.equals("22"))&&(LoginPassword.equals("22")))
+                                {
+                                    Intent mainIntent = new Intent(LoginScreen.this,TeacherMainScreen.class);
+                                    LoginScreen.this.startActivity(mainIntent);
+                                    LoginScreen.this.finish();
+                                }
+                                else
+                                {
+                                    Toast.makeText(LoginScreen.this,"Please enter valid id",Toast.LENGTH_LONG).show();
+                                }
+
+                            }
+                        }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+
+                        dialog.dismiss();
+                    }
+                });
+
+                queue.add(stringRequest);
 
 
             }
