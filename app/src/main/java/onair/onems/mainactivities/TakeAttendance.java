@@ -234,7 +234,9 @@ public class TakeAttendance extends AppCompatActivity
                 editor.putInt("SectionID",selectedSection.getSectionID());
                 editor.putInt("SubjectID",selectedSubject.getSubjectID());
                 editor.putInt("DepertmentID",selectedSubject.getDepartmentID());
+                editor.putString("Date",selectedDate);
                 editor.commit();
+
                 Intent intent = new Intent(TakeAttendance.this, TakeAttendanceDetails.class);
                 startActivity(intent);
             }
@@ -415,7 +417,6 @@ public class TakeAttendance extends AppCompatActivity
         expandableList.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
             @Override
             public boolean onChildClick(ExpandableListView expandableListView, View view, int i, int i1, long l) {
-                Log.d("DEBUG", "submenu item clicked-"+i+"-"+i1+"-"+l);
                 if((i == 2) && (i1 == 1) && (l == 1))
                 {
                     Intent intent = new Intent(TakeAttendance.this, ShowAttendance.class);
