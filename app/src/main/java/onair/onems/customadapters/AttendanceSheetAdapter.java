@@ -5,6 +5,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -20,15 +22,16 @@ public class AttendanceSheetAdapter extends RecyclerView.Adapter<AttendanceSheet
 
     private Context mContext;
     private List<AttendanceSheet> attendanceSheetList;
-
+//    TakeAttendanceAdapter
     public class MyViewHolder extends RecyclerView.ViewHolder {
         public TextView title, count;
         public ImageView thumbnail, overflow;
 
         public MyViewHolder(View view) {
             super(view);
-            title = (TextView) view.findViewById(R.id.title);
-            count = (TextView) view.findViewById(R.id.count);
+            title = (TextView) view.findViewById(R.id.studentName);
+            count = (TextView) view.findViewById(R.id.studentRoll);
+
             //thumbnail = (ImageView) view.findViewById(R.id.thumbnail);
             //overflow = (ImageView) view.findViewById(R.id.overflow);
         }
@@ -53,6 +56,8 @@ public class AttendanceSheetAdapter extends RecyclerView.Adapter<AttendanceSheet
         AttendanceSheet attendanceSheet = attendanceSheetList.get(position);
         holder.title.setText(attendanceSheet.getName());
         holder.count.setText(attendanceSheet.getNumOfSongs() + " songs");
+
+
 
         // loading attendanceSheet cover using Glide library
        // Glide.with(mContext).load(attendanceSheet.getThumbnail()).into(holder.thumbnail);

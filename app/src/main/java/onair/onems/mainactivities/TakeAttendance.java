@@ -225,19 +225,18 @@ public class TakeAttendance extends AppCompatActivity
         takeAttendance.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                SharedPreferences StudentSelection = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-                SharedPreferences.Editor editor = StudentSelection.edit();
-                editor.putInt("InstituteID", 1);
-                editor.putInt("MediumID",selectedMedium.getMediumID());
-                editor.putInt("ShiftID",selectedShift.getShiftID());
-                editor.putInt("ClassID",selectedClass.getClassID());
-                editor.putInt("SectionID",selectedSection.getSectionID());
-                editor.putInt("SubjectID",selectedSubject.getSubjectID());
-                editor.putInt("DepertmentID",selectedSubject.getDepartmentID());
-                editor.putString("Date",selectedDate);
-                editor.commit();
+                Bundle bundle = new Bundle();
+                bundle.putInt("InstituteID", 1);
+                bundle.putInt("MediumID",selectedMedium.getMediumID());
+                bundle.putInt("ShiftID",selectedShift.getShiftID());
+                bundle.putInt("ClassID",selectedClass.getClassID());
+                bundle.putInt("SectionID",selectedSection.getSectionID());
+                bundle.putInt("SubjectID",selectedSubject.getSubjectID());
+                bundle.putInt("DepertmentID",selectedSubject.getDepartmentID());
+                bundle.putString("Date",selectedDate);
 
                 Intent intent = new Intent(TakeAttendance.this, TakeAttendanceDetails.class);
+                intent.putExtras(bundle);
                 startActivity(intent);
             }
         });
