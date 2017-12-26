@@ -79,9 +79,8 @@ public class TakeAttendance extends AppCompatActivity
     ExpandableListView expandableList;
     List<ExpandedMenuModel> listDataHeader;
     HashMap<ExpandedMenuModel, List<String>> listDataChild;
-    MaterialSpinner spinnerShift,spinnerSection,spinnerMedium,spinnerSubject;
-    Spinner spinnerClass;
-    Button takeAttendance;
+    Spinner spinnerClass, spinnerShift,spinnerSection,spinnerMedium,spinnerSubject;
+    Button takeAttendance, datePicker, showAttendance;
     ProgressDialog dialog;
     String classUrl, shiftUrl,sectionUrl,mediumUrl,subjectUrl, selectedDate;
     ArrayList<ClassModel> allClassArrayList;
@@ -95,9 +94,8 @@ public class TakeAttendance extends AppCompatActivity
     SectionModel selectedSection;
     MediumModel selectedMedium;
     SubjectModel selectedSubject;
-    Button datePicker;
     private DatePickerDialog datePickerDialog;
-    int classSpinnerPosition;
+    int classSpinnerPosition, shiftSpinnerPosition, sectionSpinnerPosition, mediumSpinnerPosition, subjectSpinnerPosition;
 
 
     @Override
@@ -106,12 +104,15 @@ public class TakeAttendance extends AppCompatActivity
         setContentView(R.layout.activity_take_attendance);
 
         spinnerClass = (Spinner)findViewById(R.id.spinnerClass);
-        spinnerShift = (MaterialSpinner)findViewById(R.id.spinnerShift);
-        spinnerSection = (MaterialSpinner)findViewById(R.id.spinnerSection);
-        spinnerMedium =(MaterialSpinner)findViewById(R.id.spinnerMedium);
-        spinnerSubject = (MaterialSpinner)findViewById(R.id.spinnerSubject);
+        spinnerShift = (Spinner)findViewById(R.id.spinnerShift);
+        spinnerSection = (Spinner)findViewById(R.id.spinnerSection);
+        spinnerMedium =(Spinner)findViewById(R.id.spinnerMedium);
+        spinnerSubject = (Spinner)findViewById(R.id.spinnerSubject);
         takeAttendance = (Button)findViewById(R.id.takeAttendance);
+        showAttendance = (Button)findViewById(R.id.showAttendance);
         datePicker = (Button)findViewById(R.id.pickDate);
+
+
 
         allClassArrayList = new ArrayList<ClassModel>();
         allShiftArrayList = new ArrayList<ShiftModel>();
@@ -229,6 +230,13 @@ public class TakeAttendance extends AppCompatActivity
             }
         });
 
+        showAttendance.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+
         spinnerClass.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -258,9 +266,6 @@ public class TakeAttendance extends AppCompatActivity
                     });
                     queueSection.add(stringSectionRequest);
                 }
-
-//                  String selectedItemName = spinnerClass.getSelectedItem().toString();
-
             }
 
             @Override
@@ -269,54 +274,106 @@ public class TakeAttendance extends AppCompatActivity
             }
         });
 
-        spinnerShift.setOnItemSelectedListener(new MaterialSpinner.OnItemSelectedListener<String>() {
+        spinnerShift.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
-            @Override public void onItemSelected(MaterialSpinner view, int position, long id, String item) {
-                selectedShift = allShiftArrayList.get(position);
+                if(position != shiftSpinnerPosition)
+                {
+                    selectedShift = allShiftArrayList.get(position);
+                }
             }
-        });
 
-        spinnerSection.setOnItemSelectedListener(new MaterialSpinner.OnItemSelectedListener<String>() {
-
-            @Override public void onItemSelected(MaterialSpinner view, int position, long id, String item) {
-                selectedSection = allSectionArrayList.get(position);
-
-            }
-        });
-
-        spinnerMedium.setOnItemSelectedListener(new MaterialSpinner.OnItemSelectedListener<String>() {
-
-            @Override public void onItemSelected(MaterialSpinner view, int position, long id, String item) {
-                selectedMedium = allMediumArrayList.get(position);
-                int mediumId = selectedMedium.getMediumID();
-                subjectUrl = getString(R.string.baseUrlLocal)+"getInsSubject"+"/"+selectedClass.getClassID()+"/"+mediumId;
-                dialog.show();
-                //Preparing subject data from server
-                RequestQueue queueSubject = Volley.newRequestQueue(TakeAttendance.this);
-                StringRequest stringSubjectRequest = new StringRequest(Request.Method.GET, subjectUrl,
-                        new Response.Listener<String>() {
-                            @Override
-                            public void onResponse(String response) {
-
-                                parseSubjectJsonData(response);
-
-                            }
-                        }, new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-
-                        dialog.dismiss();
-                    }
-                });
-                queueSubject.add(stringSubjectRequest);
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
 
             }
         });
 
-        spinnerSubject.setOnItemSelectedListener(new MaterialSpinner.OnItemSelectedListener<String>() {
+//        spinnerClass.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+//            @Override
+//            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+//
+//                if(position != classSpinnerPosition)
+//                {
+//
+//                }
+//            }
+//
+//            @Override
+//            public void onNothingSelected(AdapterView<?> parent) {
+//
+//            }
+//        });
 
-            @Override public void onItemSelected(MaterialSpinner view, int position, long id, String item) {
-                selectedSubject = allSubjectArrayList.get(position);
+
+
+        spinnerSection.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                if(position != sectionSpinnerPosition)
+                {
+                    selectedSection = allSectionArrayList.get(position);
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+        spinnerMedium.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                if(position != mediumSpinnerPosition)
+                {
+                    selectedMedium = allMediumArrayList.get(position);
+                    int mediumId = selectedMedium.getMediumID();
+                    subjectUrl = getString(R.string.baseUrlLocal)+"getInsSubject"+"/"+selectedClass.getClassID()+"/"+mediumId;
+                    dialog.show();
+                    //Preparing subject data from server
+                    RequestQueue queueSubject = Volley.newRequestQueue(TakeAttendance.this);
+                    StringRequest stringSubjectRequest = new StringRequest(Request.Method.GET, subjectUrl,
+                            new Response.Listener<String>() {
+                                @Override
+                                public void onResponse(String response) {
+
+                                    parseSubjectJsonData(response);
+
+                                }
+                            }, new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+
+                            dialog.dismiss();
+                        }
+                    });
+                    queueSubject.add(stringSubjectRequest);
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+        spinnerSubject.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                if(position != subjectSpinnerPosition)
+                {
+                    selectedSubject = allSubjectArrayList.get(position);
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
             }
         });
 
@@ -422,9 +479,32 @@ public class TakeAttendance extends AppCompatActivity
                 allShiftArrayList.add(shiftModel);
                 shiftArrayList.add(shiftModel.getShiftName());
             }
+            shiftArrayList.add("SELECT SHIFT");
+            shiftSpinnerPosition = shiftArrayList.indexOf("SELECT SHIFT");
             selectedShift = allShiftArrayList.get(0);
-            ArrayAdapter<ArrayList> shift_spinner_adapter = new ArrayAdapter<ArrayList>(this,android.R.layout.simple_list_item_1, shiftArrayList);
+            ArrayAdapter<ArrayList> shift_spinner_adapter = new ArrayAdapter<ArrayList>(this,R.layout.spinner_item, shiftArrayList){
+
+                @Override
+                public View getView(int position, View convertView, ViewGroup parent) {
+
+                    View v = super.getView(position, convertView, parent);
+                    if (position == getCount()) {
+//                    ((TextView)v.findViewById(android.R.id.text1)).setText("");
+//                    ((TextView)v.findViewById(android.R.id.text1)).setHint(getItem(getCount())); //"Hint to be displayed"
+                    }
+
+                    return v;
+                }
+
+                @Override
+                public int getCount() {
+                    return super.getCount()-1; // you dont display last item. It is used as hint.
+                }
+
+            };
+            shift_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             spinnerShift.setAdapter(shift_spinner_adapter);
+            spinnerShift.setSelection(shift_spinner_adapter.getCount());
             dialog.dismiss();
             //spinner.setSelectedIndex(1);
         } catch (JSONException e) {
@@ -444,9 +524,32 @@ public class TakeAttendance extends AppCompatActivity
                 allSectionArrayList.add(sectionModel);
                 sectionArrayList.add(sectionModel.getSectionName());
             }
+            sectionArrayList.add("SELECT SECTION");
+            sectionSpinnerPosition = sectionArrayList.indexOf("SELECT SECTION");
             selectedSection = allSectionArrayList.get(0);
-            ArrayAdapter<ArrayList> section_spinner_adapter = new ArrayAdapter<ArrayList>(this,android.R.layout.simple_list_item_1, sectionArrayList);
+            ArrayAdapter<ArrayList> section_spinner_adapter = new ArrayAdapter<ArrayList>(this,R.layout.spinner_item, sectionArrayList){
+
+                @Override
+                public View getView(int position, View convertView, ViewGroup parent) {
+
+                    View v = super.getView(position, convertView, parent);
+                    if (position == getCount()) {
+//                    ((TextView)v.findViewById(android.R.id.text1)).setText("");
+//                    ((TextView)v.findViewById(android.R.id.text1)).setHint(getItem(getCount())); //"Hint to be displayed"
+                    }
+
+                    return v;
+                }
+
+                @Override
+                public int getCount() {
+                    return super.getCount()-1; // you dont display last item. It is used as hint.
+                }
+
+            };
+            section_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             spinnerSection.setAdapter(section_spinner_adapter);
+            spinnerSection.setSelection(section_spinner_adapter.getCount());
             dialog.dismiss();
             //spinner.setSelectedIndex(1);
         } catch (JSONException e) {
@@ -467,9 +570,32 @@ public class TakeAttendance extends AppCompatActivity
                 allMediumArrayList.add(mediumModel);
                 mediumnArrayList.add(mediumModel.getMameName());
             }
+            mediumnArrayList.add("SELECT MEDIUM");
+            mediumSpinnerPosition = mediumnArrayList.indexOf("SELECT MEDIUM");
             selectedMedium = allMediumArrayList.get(0);
-            ArrayAdapter<ArrayList> medium_spinner_adapter = new ArrayAdapter<ArrayList>(this,android.R.layout.simple_list_item_1, mediumnArrayList);
+            ArrayAdapter<ArrayList> medium_spinner_adapter = new ArrayAdapter<ArrayList>(this,R.layout.spinner_item, mediumnArrayList){
+
+                @Override
+                public View getView(int position, View convertView, ViewGroup parent) {
+
+                    View v = super.getView(position, convertView, parent);
+                    if (position == getCount()) {
+//                    ((TextView)v.findViewById(android.R.id.text1)).setText("");
+//                    ((TextView)v.findViewById(android.R.id.text1)).setHint(getItem(getCount())); //"Hint to be displayed"
+                    }
+
+                    return v;
+                }
+
+                @Override
+                public int getCount() {
+                    return super.getCount()-1; // you dont display last item. It is used as hint.
+                }
+
+            };
+            medium_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             spinnerMedium.setAdapter(medium_spinner_adapter);
+            spinnerMedium.setSelection(medium_spinner_adapter.getCount());
             dialog.dismiss();
             //spinner.setSelectedIndex(1);
         } catch (JSONException e) {
@@ -493,9 +619,32 @@ public class TakeAttendance extends AppCompatActivity
                 allSubjectArrayList.add(subjectModel);
                 subjectArrayList.add(subjectModel.getSubjectName());
             }
+            subjectArrayList.add("SELECT SUBJECT");
+            subjectSpinnerPosition = subjectArrayList.indexOf("SELECT SUBJECT");
             selectedSubject = allSubjectArrayList.get(0);
-            ArrayAdapter<ArrayList> subject_spinner_adapter = new ArrayAdapter<ArrayList>(this,android.R.layout.simple_list_item_1, subjectArrayList);
+            ArrayAdapter<ArrayList> subject_spinner_adapter = new ArrayAdapter<ArrayList>(this,R.layout.spinner_item, subjectArrayList){
+
+                @Override
+                public View getView(int position, View convertView, ViewGroup parent) {
+
+                    View v = super.getView(position, convertView, parent);
+                    if (position == getCount()) {
+//                    ((TextView)v.findViewById(android.R.id.text1)).setText("");
+//                    ((TextView)v.findViewById(android.R.id.text1)).setHint(getItem(getCount())); //"Hint to be displayed"
+                    }
+
+                    return v;
+                }
+
+                @Override
+                public int getCount() {
+                    return super.getCount()-1; // you dont display last item. It is used as hint.
+                }
+
+            };
+            subject_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             spinnerSubject.setAdapter(subject_spinner_adapter);
+            spinnerSubject.setSelection(subject_spinner_adapter.getCount());
             dialog.dismiss();
             //spinner.setSelectedIndex(1);
         } catch (JSONException e) {
