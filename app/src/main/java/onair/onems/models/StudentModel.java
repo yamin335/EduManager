@@ -1,5 +1,7 @@
 package onair.onems.models;
 
+import java.util.ArrayList;
+
 /**
  * Created by User on 12/21/2017.
  */
@@ -29,28 +31,37 @@ public class StudentModel {
     private String Shift;
     private String Class;
 
-    public StudentModel(int UserID, String UserFullName, Long RFID, int RollNo, int SubjectID,
-                 int DepartmentID, int SectionID, int[] InstituteID, int MediumID, int ShiftID,
-                 int ClassID, boolean IsPresent, boolean Islate, int LateTime, boolean IsLeave,
-                 boolean IsAbsent, String Remarks, String Subject, String Department, String Medium,
-                 String Shift, String Class)
+    public StudentModel()
     {
-        this.UserID = UserID;
+
+    }
+
+    public StudentModel(String UserID, String UserFullName, String RFID, String RollNo, String SubjectID,
+                        String DepartmentID, String SectionID, String[] InstituteID, String MediumID, String ShiftID,
+                        String ClassID, String IsPresent, String Islate, String LateTime, String IsLeave,
+                        String IsAbsent, String Remarks, String Subject, String Department, String Medium,
+                        String Shift, String Class)
+    {
+        this.UserID = Integer.parseInt(UserID);
         this.UserFullName = UserFullName;
-        this.RFID = RFID;
-        this.RollNo = RollNo;
-        this.SubjectID = SubjectID;
-        this.DepartmentID = DepartmentID;
-        this.SectionID = SectionID;
-        this.InstituteID = InstituteID;
-        this.MediumID = MediumID;
-        this.ShiftID = ShiftID;
-        this.ClassID = ClassID;
-        this.IsPresent = IsPresent;
-        this.Islate = Islate;
-        this.LateTime = LateTime;
-        this.IsLeave = IsLeave;
-        this.IsAbsent = IsAbsent;
+        this.RFID = Long.parseLong(RFID);
+        this.RollNo = Integer.parseInt(RollNo);
+        this.SubjectID = Integer.parseInt(SubjectID);
+        this.DepartmentID = Integer.parseInt(DepartmentID);
+        this.SectionID = Integer.parseInt(SectionID);
+        this.InstituteID = new int[InstituteID.length];
+        for(int i = 0; i<InstituteID.length; i++)
+        {
+            this.InstituteID[i] = Integer.parseInt(InstituteID[i]);
+        }
+        this.MediumID = Integer.parseInt(MediumID);
+        this.ShiftID = Integer.parseInt(ShiftID);
+        this.ClassID = Integer.parseInt(ClassID);
+        this.IsPresent = Boolean.parseBoolean(IsPresent);
+        this.Islate = Boolean.parseBoolean(Islate);
+        this.LateTime = Integer.parseInt(LateTime);
+        this.IsLeave = Boolean.parseBoolean(IsLeave);
+        this.IsAbsent = Boolean.parseBoolean(IsAbsent);
         this.Remarks = Remarks;
         this.Subject = Subject;
         this.Department = Department;
@@ -59,9 +70,9 @@ public class StudentModel {
         this.Class = Class;
     }
 
-    public void setUserID(int UserID)
+    public void setUserID(String UserID)
     {
-        this.UserID = UserID;
+        this.UserID = Integer.parseInt(UserID);
     }
 
     public void setUserFullName(String UserFullName )
@@ -69,74 +80,78 @@ public class StudentModel {
         this.UserFullName = UserFullName;
     }
 
-    public void setRFID(Long RFID)
+    public void setRFID(String RFID)
     {
-        this.RFID = RFID;
+        this.RFID = Long.parseLong(RFID);
     }
 
-    public void setRollNo(int RollNo)
+    public void setRollNo(String RollNo)
     {
-        this.RollNo = RollNo;
+        this.RollNo = Integer.parseInt(RollNo);
     }
 
-    public void setSubjectID(int SubjectID)
+    public void setSubjectID(String SubjectID)
     {
-        this.SubjectID = SubjectID;
+        this.SubjectID = Integer.parseInt(SubjectID);
     }
 
-    public void setDepartmentID(int DepartmentID)
+    public void setDepartmentID(String DepartmentID)
     {
-        this.DepartmentID = DepartmentID;
+        this.DepartmentID = Integer.parseInt(DepartmentID);
     }
 
-    public void setSectionID(int SectionID)
+    public void setSectionID(String SectionID)
     {
-        this.SectionID = SectionID;
+        this.SectionID = Integer.parseInt(SectionID);
     }
 
-    public void setInstituteID(int[] InstituteID)
+    public void setInstituteID(String[] InstituteID)
     {
-        this.InstituteID = InstituteID;
+        this.InstituteID = new int[InstituteID.length];
+        for(int i = 0; i<InstituteID.length; i++)
+        {
+            this.InstituteID[i] = Integer.parseInt(InstituteID[i]);
+        }
     }
 
-    public void setMediumID(int MediumID)
+    public void setMediumID(String MediumID)
     {
-        this.MediumID = MediumID;
+        this.MediumID = Integer.parseInt(MediumID);
     }
 
-    public void setShiftID(int ShiftID)
+    public void setShiftID(String ShiftID)
     {
-        this.ShiftID = ShiftID;
+        this.ShiftID = Integer.parseInt(ShiftID);
     }
 
-    public void setClassID(int ClassID)
+    public void setClassID(String ClassID)
     {
-        this.ClassID = ClassID;
+        this.ClassID = Integer.parseInt(ClassID);
     }
 
-    public void setIsPresent(boolean IsPresent)
+    public void setIsPresent(String IsPresent)
     {
-        this.IsPresent = IsPresent;
+        this.IsPresent = Boolean.parseBoolean(IsPresent);
     }
 
-    public void setIslate(boolean Islate)
+    public void setIslate(String Islate)
     {
-        this.Islate = Islate;
+        this.Islate = Boolean.parseBoolean(Islate);
     }
 
-    public void setLateTime(int LateTime)
+    public void setLateTime(String LateTime)
     {
-        this.LateTime = LateTime;
+        this.LateTime = Integer.parseInt(LateTime);
     }
 
-    public void setIsLeave(boolean IsLeave)
+    public void setIsLeave(String IsLeave)
     {
-        this.IsLeave = IsLeave;
+        this.IsLeave = Boolean.parseBoolean(IsLeave);
     }
 
-    public void setIsAbsent(boolean IsAbsent)
+    public void setIsAbsent(String IsAbsent)
     {
-        this.IsAbsent = IsAbsent;
+        this.IsAbsent = Boolean.parseBoolean(IsAbsent);
     }
 
     public void setRemarks(String Remarks)
