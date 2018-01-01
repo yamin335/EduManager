@@ -58,7 +58,7 @@ public class ShowAttendance extends AppCompatActivity {
         classSpinner = (MaterialSpinner) findViewById(R.id.spinner_Class);
         shiftSpinner = (MaterialSpinner) findViewById(R.id.spinner_Shift);
         mediumSpinner= (MaterialSpinner) findViewById(R.id.spinner_medium);
-        sectionSpinner = (MaterialSpinner) findViewById(R.id.spinner_Section);
+        sectionSpinner =(MaterialSpinner) findViewById(R.id.spinner_Section);
         monthSpinner = (MaterialSpinner) findViewById(R.id.spinner_Month);
         sharedPre = PreferenceManager.getDefaultSharedPreferences(this);
         classUrl=getString(R.string.baseUrl)+"getInsClass/1";

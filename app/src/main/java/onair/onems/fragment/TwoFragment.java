@@ -361,7 +361,8 @@ public class TwoFragment extends Fragment {
             JSONArray jsonArray = new JSONArray(jsonString);
             ShiftID=new int[jsonArray.length()];
             ArrayList al = new ArrayList();
-            for(int i = 0; i < jsonArray.length(); ++i) {
+            for(int i = 0; i < jsonArray.length(); ++i)
+            {
                 JSONObject jsonObject=jsonArray.getJSONObject(i);
                 String name=jsonObject.getString("ShiftName");
                 ShiftID[i]=jsonObject.getInt("ShiftID");
@@ -371,7 +372,9 @@ public class TwoFragment extends Fragment {
             ArrayAdapter adapter = new ArrayAdapter(getActivity(), android.R.layout.simple_list_item_1, al);
             shiftSpinner.setAdapter(adapter);
             //spinner.setSelectedIndex(1);
-        } catch (JSONException e) {
+        }
+        catch (JSONException e)
+        {
             Toast.makeText(getActivity(),""+e,Toast.LENGTH_LONG).show();
 
 

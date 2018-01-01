@@ -30,7 +30,8 @@ import java.util.ArrayList;
 import onair.onems.R;
 
 
-public class LoginScreen extends AppCompatActivity {
+public class LoginScreen extends AppCompatActivity
+{
 
     private Button loginButton;
     private EditText takeId;
@@ -41,20 +42,25 @@ public class LoginScreen extends AppCompatActivity {
     String loginurl = "";
     ProgressDialog dialog;
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    protected void onCreate(@Nullable Bundle savedInstanceState)
+    {
 
+        super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
         loginButton = (Button)findViewById(R.id.login_button);
         takeId = (EditText)findViewById(R.id.id);
         dialog = new ProgressDialog(this);
         takePassword = (EditText) findViewById(R.id.password);
 
 
-        loginButton.setOnClickListener(new View.OnClickListener() {
+        loginButton.setOnClickListener(new View.OnClickListener()
+        {
             @Override
-            public void onClick(View v) {
-               loginurl=getString(R.string.baseUrl)+"getLoginInformation"+"/"+takeId.getText().toString()+"/"+takePassword.getText().toString();
+            public void onClick(View v)
+            {
+
+                loginurl=getString(R.string.baseUrl)+"getLoginInformation"+"/"+takeId.getText().toString()+"/"+takePassword.getText().toString();
 
 //                dialog.show();
 
@@ -68,21 +74,30 @@ public class LoginScreen extends AppCompatActivity {
                     LoginScreen.this.finish();
                 }
 
+               // Get Login ID and Password From Server Using Volley
+
                 RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
                 StringRequest stringRequest = new StringRequest(Request.Method.GET, loginurl,
-                        new Response.Listener<String>() {
+                        new Response.Listener<String>()
+                        {
                             @Override
                             public void onResponse(String response) {
-                                parseJsonData(response);
+
+                                parseJsonData(response); // User define Function For parsing JSON data
 
                                 LoginId = takeId.getText().toString();
                                 LoginPassword = takePassword.getText().toString();
+
+                            // Login For User
+
                                 if(UserID.length()>0)
                                 {
+
                                     Intent mainIntent = new Intent(LoginScreen.this,StudentMainScreen.class);
                                     LoginScreen.this.startActivity(mainIntent);
                                     LoginScreen.this.finish();
                                 }
+                                // Login For Teacher
                                 else if((LoginId.equals("22"))&&(LoginPassword.equals("22")))
                                 {
                                     Intent mainIntent = new Intent(LoginScreen.this,TeacherMainScreen.class);
@@ -95,9 +110,11 @@ public class LoginScreen extends AppCompatActivity {
                                 }
 
                             }
-                        }, new Response.ErrorListener() {
+                        }, new Response.ErrorListener()
+                {
                     @Override
-                    public void onErrorResponse(VolleyError error) {
+                    public void onErrorResponse(VolleyError error)
+                    {
 
                         dialog.dismiss();
                     }
@@ -105,13 +122,17 @@ public class LoginScreen extends AppCompatActivity {
 
                 queue.add(stringRequest);
 
+                // Get Login ID and Password From Server Using Volley END
+
 
             }
         });
     }
 
-    void parseJsonData(String jsonString) {
-        try {
+    void parseJsonData(String jsonString)
+    {
+        try
+        {
             JSONArray jsonArray = new JSONArray(jsonString);
             UserID=jsonArray.getJSONObject(0).getString("UserID");
             Password=jsonArray.getJSONObject(0).getString("Password");
@@ -166,7 +187,8 @@ public class LoginScreen extends AppCompatActivity {
             editor.commit();
 
         }
-        catch (JSONException e) {
+        catch (JSONException e)
+        {
             Toast.makeText(this,"Json : "+e,Toast.LENGTH_LONG).show();
         }
 
