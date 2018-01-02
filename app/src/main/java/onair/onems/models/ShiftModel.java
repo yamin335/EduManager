@@ -6,18 +6,18 @@ package onair.onems.models;
 
 public class ShiftModel {
 
-    private int ShiftID;
+    private long ShiftID;
     private String ShiftName;
 
     public ShiftModel(String ShiftID, String ShiftName)
     {
-        this.ShiftID = Integer.parseInt(ShiftID);
+        this.ShiftID = Long.parseLong(ShiftID);
         this.ShiftName = ShiftName;
     }
 
     public void setShiftID(String ShiftID)
     {
-        this.ShiftID = Integer.parseInt(ShiftID);
+        this.ShiftID = Long.parseLong(ShiftID);
     }
 
     public void setShiftName(String ShiftName)
@@ -25,7 +25,7 @@ public class ShiftModel {
         this.ShiftName = ShiftName;
     }
 
-    public int getShiftID()
+    public long getShiftID()
     {
         return ShiftID;
     }

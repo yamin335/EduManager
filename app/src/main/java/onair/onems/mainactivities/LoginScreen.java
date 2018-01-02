@@ -1,7 +1,6 @@
 package onair.onems.mainactivities;
 
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -9,9 +8,10 @@ import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -23,9 +23,6 @@ import com.android.volley.toolbox.Volley;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
 
 import onair.onems.R;
 
@@ -33,8 +30,9 @@ import onair.onems.R;
 public class LoginScreen extends AppCompatActivity {
 
     private Button loginButton;
-    private EditText takeId;
+    private AutoCompleteTextView takeId;
     private EditText takePassword;
+    TextView errorView;
     private String UserID = "",LoginId="",LoginPassword="",Password = "",UserFullName="",ImageUrl="",InstituteName="",DepartmentName="",
             DesignationName="",BrunchName="",RFID="",RollNo="",StudentNo="",DepartmentID="",DesignationID="", BrunchID="";
     int UserTypeID=0,InstituteID=0,SBrunchID=0,BoardID,SDepartmentID,MediumID=0, SectionID=0,SessionID=0,ShiftID=0,ClassID=0;
@@ -46,15 +44,16 @@ public class LoginScreen extends AppCompatActivity {
 
         setContentView(R.layout.activity_login);
         loginButton = (Button)findViewById(R.id.login_button);
-        takeId = (EditText)findViewById(R.id.id);
+        takeId = (AutoCompleteTextView)findViewById(R.id.email);
         dialog = new ProgressDialog(this);
         takePassword = (EditText) findViewById(R.id.password);
+        errorView = (TextView)findViewById(R.id.error);
 
 
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-               loginurl=getString(R.string.baseUrl)+"getLoginInformation"+"/"+takeId.getText().toString()+"/"+takePassword.getText().toString();
+               loginurl = getString(R.string.baseUrl)+"getLoginInformation"+"/"+takeId.getText().toString()+"/"+takePassword.getText().toString();
 
 //                dialog.show();
 

@@ -90,7 +90,7 @@ public class TakeAttendance extends AppCompatActivity
     ArrayList<SubjectModel> allSubjectArrayList;
 
     String[] tempSectionArray = {"Select Section"};
-    String[] tempSubjectArray = {"Select Section"};
+    String[] tempSubjectArray = {"Select Subject"};
     ClassModel selectedClass;
     ShiftModel selectedShift;
     SectionModel selectedSection;
@@ -153,7 +153,8 @@ public class TakeAttendance extends AppCompatActivity
                             public void onDateSet(DatePicker view, int year,
                                                   int monthOfYear, int dayOfMonth) {
                                 // set day of month , month and year value in the edit text
-                                selectedDate = dayOfMonth + "/" + (monthOfYear + 1) + "/" + year;
+//                                selectedDate = dayOfMonth + "/" + (monthOfYear + 1) + "/" + year;
+                                selectedDate = year + "-" + (monthOfYear + 1) + "-" + dayOfMonth;
                                 datePicker.setText(selectedDate);
 
                             }
@@ -223,13 +224,13 @@ public class TakeAttendance extends AppCompatActivity
             @Override
             public void onClick(View v) {
                 Bundle bundle = new Bundle();
-                bundle.putInt("InstituteID", 1);
-                bundle.putInt("MediumID",selectedMedium.getMediumID());
-                bundle.putInt("ShiftID",selectedShift.getShiftID());
-                bundle.putInt("ClassID",selectedClass.getClassID());
-                bundle.putInt("SectionID",selectedSection.getSectionID());
-                bundle.putInt("SubjectID",selectedSubject.getSubjectID());
-                bundle.putInt("DepertmentID",selectedSubject.getDepartmentID());
+                bundle.putLong("InstituteID", 1);
+                bundle.putLong("MediumID",selectedMedium.getMediumID());
+                bundle.putLong("ShiftID",selectedShift.getShiftID());
+                bundle.putLong("ClassID",selectedClass.getClassID());
+                bundle.putLong("SectionID",selectedSection.getSectionID());
+                bundle.putLong("SubjectID",selectedSubject.getSubjectID());
+                bundle.putLong("DepertmentID",selectedSubject.getDepartmentID());
                 bundle.putString("Date",selectedDate);
 
                 Intent intent = new Intent(TakeAttendance.this, TakeAttendanceDetails.class);
@@ -252,7 +253,7 @@ public class TakeAttendance extends AppCompatActivity
                 if(position != classSpinnerPosition)
                 {
                     selectedClass = allClassArrayList.get(position);
-                    int classId = selectedClass.getClassID();
+                    long classId = selectedClass.getClassID();
                     sectionUrl = getString(R.string.baseUrlLocal)+"getInsSection/1"+"/"+classId;
                     dialog.show();
                     //Preparing section data from server
@@ -339,7 +340,7 @@ public class TakeAttendance extends AppCompatActivity
                 if(position != mediumSpinnerPosition)
                 {
                     selectedMedium = allMediumArrayList.get(position);
-                    int mediumId = selectedMedium.getMediumID();
+                    long mediumId = selectedMedium.getMediumID();
                     subjectUrl = getString(R.string.baseUrlLocal)+"getInsSubject"+"/"+selectedClass.getClassID()+"/"+mediumId;
                     dialog.show();
                     //Preparing subject data from server

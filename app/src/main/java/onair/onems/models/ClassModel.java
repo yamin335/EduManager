@@ -6,7 +6,7 @@ package onair.onems.models;
 
 public class ClassModel {
 
-    private int ClassID;
+    private long ClassID;
     private String ClassName;
 
     public ClassModel(String ClassID, String ClassName)
@@ -17,7 +17,7 @@ public class ClassModel {
 
     public void setClassID(String ClassID)
     {
-        this.ClassID = Integer.parseInt(ClassID);
+        this.ClassID = Long.parseLong(ClassID);
     }
 
     public void setClassName(String ClassName)
@@ -25,7 +25,7 @@ public class ClassModel {
         this.ClassName = ClassName;
     }
 
-    public int getClassID()
+    public long getClassID()
     {
         return ClassID;
     }

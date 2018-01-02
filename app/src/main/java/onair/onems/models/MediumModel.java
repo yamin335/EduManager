@@ -5,15 +5,15 @@ package onair.onems.models;
  */
 
 public class MediumModel {
-    private int MediumID;
+    private long MediumID;
     private String MameName;
-    private int InstMediumID;
-    private int InstituteID;
-    private boolean IsActive;
+    private long InstMediumID;
+    private long InstituteID;
+    private int IsActive;
 
     public MediumModel(String MediumID, String MameName, String InstMediumID, String InstituteID, String IsActive)
     {
-        this.MediumID = Integer.parseInt(MediumID);
+        this.MediumID = Long.parseLong(MediumID);
         this.MameName = MameName;
         if(InstMediumID.equals("null"))
         {
@@ -21,15 +21,15 @@ public class MediumModel {
         }
         else
         {
-            this.InstMediumID = Integer.parseInt(InstMediumID);
+            this.InstMediumID = Long.parseLong(InstMediumID);
         }
-        this.InstituteID = Integer.parseInt(InstituteID);
-        this.IsActive = Boolean.parseBoolean(IsActive);
+        this.InstituteID = Long.parseLong(InstituteID);
+        this.IsActive = Integer.parseInt(IsActive);
     }
 
     public void setMediumID(String MediumID)
     {
-        this.MediumID = Integer.parseInt(MediumID);
+        this.MediumID = Long.parseLong(MediumID);
     }
 
     public void setMameName(String MameName)
@@ -39,22 +39,29 @@ public class MediumModel {
 
     public void setInstMediumID(String InstMediumID)
     {
-        this.InstMediumID = Integer.parseInt(InstMediumID);
+        if(InstMediumID.equals("null"))
+        {
+            this.InstMediumID = 0;
+        }
+        else
+        {
+            this.InstMediumID = Long.parseLong(InstMediumID);
+        }
     }
 
     public void setInstituteID(String InstituteID)
     {
-        this.InstituteID = Integer.parseInt(InstituteID);
+        this.InstituteID = Long.parseLong(InstituteID);
 
     }
 
     public void setIsActive(String IsActive)
     {
-        this.IsActive = Boolean.parseBoolean(IsActive);
+        this.IsActive = Integer.parseInt(IsActive);
 
     }
 
-    public int getMediumID()
+    public long getMediumID()
     {
         return MediumID;
     }
@@ -64,17 +71,17 @@ public class MediumModel {
         return MameName;
     }
 
-    public int getInstMediumID()
+    public long getInstMediumID()
     {
         return InstMediumID;
     }
 
-    public int getInstituteID()
+    public long getInstituteID()
     {
         return InstituteID;
     }
 
-    public boolean getIsActive()
+    public int getIsActive()
     {
         return IsActive;
     }

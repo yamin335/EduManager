@@ -8,22 +8,29 @@ import java.util.ArrayList;
 
 public class StudentModel {
 
-    private int UserID;
+    private String UserID;
     private String UserFullName;
-    private Long RFID;
-    private int RollNo;
-    private int SubjectID;
-    private int DepartmentID;
-    private int SectionID;
-    private int[] InstituteID;
-    private int MediumID;
-    private int ShiftID;
-    private int ClassID;
-    private boolean IsPresent;
-    private boolean Islate;
+    private String RFID;
+    private String RollNo;
+    private long SubjectID;
+    private long DepartmentID;
+    private long SectionID;
+    private String Section;
+//    private long[] InstituteID;
+    private long MediumID;
+    private long ShiftID;
+    private long ClassID;
+    private long BoardID;
+    private String Board;
+    private String Brunch;
+    private String Session;
+    private long BrunchID;
+    private long SessionID;
+    private int IsPresent;
+    private int Islate;
     private int LateTime;
-    private boolean IsLeave;
-    private boolean IsAbsent;
+    private int IsLeave;
+    private int IsAbsent;
     private String Remarks;
     private String Subject;
     private String Department;
@@ -36,32 +43,74 @@ public class StudentModel {
 
     }
 
-    public StudentModel(String UserID, String UserFullName, String RFID, String RollNo, String SubjectID,
-                        String DepartmentID, String SectionID, String[] InstituteID, String MediumID, String ShiftID,
-                        String ClassID, String IsPresent, String Islate, String LateTime, String IsLeave,
-                        String IsAbsent, String Remarks, String Subject, String Department, String Medium,
-                        String Shift, String Class)
+    public StudentModel(String UserFullName, String RollNo, String IsPresent, String Islate,
+                        String LateTime, String IsLeave, String IsAbsent)
     {
-        this.UserID = Integer.parseInt(UserID);
+//        this.UserID = Integer.parseInt(UserID);
         this.UserFullName = UserFullName;
-        this.RFID = Long.parseLong(RFID);
-        this.RollNo = Integer.parseInt(RollNo);
-        this.SubjectID = Integer.parseInt(SubjectID);
-        this.DepartmentID = Integer.parseInt(DepartmentID);
-        this.SectionID = Integer.parseInt(SectionID);
-        this.InstituteID = new int[InstituteID.length];
-        for(int i = 0; i<InstituteID.length; i++)
-        {
-            this.InstituteID[i] = Integer.parseInt(InstituteID[i]);
-        }
-        this.MediumID = Integer.parseInt(MediumID);
-        this.ShiftID = Integer.parseInt(ShiftID);
-        this.ClassID = Integer.parseInt(ClassID);
-        this.IsPresent = Boolean.parseBoolean(IsPresent);
-        this.Islate = Boolean.parseBoolean(Islate);
+//        this.RFID = Long.parseLong(RFID);
+        this.RollNo = RollNo;
+//        this.SubjectID = Integer.parseInt(SubjectID);
+//        this.DepartmentID = Integer.parseInt(DepartmentID);
+//        this.SectionID = Integer.parseInt(SectionID);
+//        this.InstituteID = new int[InstituteID.length];
+//        for(int i = 0; i<InstituteID.length; i++)
+//        {
+//            this.InstituteID[i] = Integer.parseInt(InstituteID[i]);
+//        }
+//        this.MediumID = Integer.parseInt(MediumID);
+//        this.ShiftID = Integer.parseInt(ShiftID);
+//        this.ClassID = Integer.parseInt(ClassID);
+        this.IsPresent = Integer.parseInt(IsPresent);
+        this.Islate = Integer.parseInt(Islate);
         this.LateTime = Integer.parseInt(LateTime);
-        this.IsLeave = Boolean.parseBoolean(IsLeave);
-        this.IsAbsent = Boolean.parseBoolean(IsAbsent);
+        this.IsLeave = Integer.parseInt(IsLeave);
+        this.IsAbsent = Integer.parseInt(IsAbsent);
+//        this.Remarks = Remarks;
+//        this.Subject = Subject;
+//        this.Department = Department;
+//        this.Medium = Medium;
+//        this.Shift = Shift;
+//        this.Class = Class;
+//        ,
+//        String[] InstituteID
+    }
+
+    public StudentModel(String UserID, String UserFullName, String RFID, String RollNo,
+                        String SubjectID, String DepartmentID, String SectionID, String Section,
+                        String MediumID, String ShiftID, String ClassID,
+                        String BoardID, String Board, String Brunch, String Session, String BrunchID,
+                        String SessionID, String IsPresent, String Islate, String LateTime,
+                        String IsLeave, String IsAbsent, String Remarks, String Subject,
+                        String Department, String Medium, String Shift, String Class)
+    {
+        this.UserID = UserID;
+        this.UserFullName = UserFullName;
+        this.RFID = RFID;
+        this.RollNo = RollNo;
+        this.SubjectID = Long.parseLong(SubjectID);
+        this.DepartmentID = Long.parseLong(DepartmentID);
+        this.SectionID = Long.parseLong(SectionID);
+        this.Section = Section;
+//        this.InstituteID = new long[InstituteID.length];
+//        for(int i = 0; i<InstituteID.length; ++i)
+//        {
+//            this.InstituteID[i] = Long.parseLong(InstituteID[i]);
+//        }
+        this.MediumID = Long.parseLong(MediumID);
+        this.ShiftID = Long.parseLong(ShiftID);
+        this.ClassID = Long.parseLong(ClassID);
+        this.BoardID = Long.parseLong(BoardID);
+        this.Board = Board;
+        this.Brunch = Brunch;
+        this.Session = Session;
+        this.BrunchID = Long.parseLong(BrunchID);
+        this.SessionID = Long.parseLong(SessionID);
+        this.IsPresent = Integer.parseInt(IsPresent);
+        this.Islate = Integer.parseInt(Islate);
+        this.LateTime = Integer.parseInt(LateTime);
+        this.IsLeave = Integer.parseInt(IsLeave);
+        this.IsAbsent = Integer.parseInt(IsAbsent);
         this.Remarks = Remarks;
         this.Subject = Subject;
         this.Department = Department;
@@ -72,71 +121,106 @@ public class StudentModel {
 
     public void setUserID(String UserID)
     {
-        this.UserID = Integer.parseInt(UserID);
+        this.UserID = UserID;
     }
 
-    public void setUserFullName(String UserFullName )
+    public void setUserFullName(String UserFullName)
     {
         this.UserFullName = UserFullName;
     }
 
     public void setRFID(String RFID)
     {
-        this.RFID = Long.parseLong(RFID);
+        this.RFID = RFID;
     }
 
     public void setRollNo(String RollNo)
     {
-        this.RollNo = Integer.parseInt(RollNo);
+        this.RollNo = RollNo;
     }
 
     public void setSubjectID(String SubjectID)
     {
-        this.SubjectID = Integer.parseInt(SubjectID);
+        this.SubjectID = Long.parseLong(SubjectID);
     }
 
     public void setDepartmentID(String DepartmentID)
     {
-        this.DepartmentID = Integer.parseInt(DepartmentID);
+        this.DepartmentID = Long.parseLong(DepartmentID);
     }
 
     public void setSectionID(String SectionID)
     {
-        this.SectionID = Integer.parseInt(SectionID);
+        this.SectionID = Long.parseLong(SectionID);
     }
 
-    public void setInstituteID(String[] InstituteID)
+    public void setSection(String Section)
     {
-        this.InstituteID = new int[InstituteID.length];
-        for(int i = 0; i<InstituteID.length; i++)
-        {
-            this.InstituteID[i] = Integer.parseInt(InstituteID[i]);
-        }
+        this.Section = Section;
     }
+
+//    public void setInstituteID(String[] InstituteID)
+//    {
+//        this.InstituteID = new long[InstituteID.length];
+//        for(int i = 0; i<InstituteID.length; i++)
+//        {
+//            this.InstituteID[i] = Long.parseLong(InstituteID[i]);
+//        }
+//    }
 
     public void setMediumID(String MediumID)
     {
-        this.MediumID = Integer.parseInt(MediumID);
+        this.MediumID = Long.parseLong(MediumID);
     }
 
     public void setShiftID(String ShiftID)
     {
-        this.ShiftID = Integer.parseInt(ShiftID);
+        this.ShiftID = Long.parseLong(ShiftID);
     }
 
     public void setClassID(String ClassID)
     {
-        this.ClassID = Integer.parseInt(ClassID);
+        this.ClassID = Long.parseLong(ClassID);
+    }
+
+    public void setBoardID(String BoardID)
+    {
+        this.BoardID = Long.parseLong(BoardID);
+    }
+
+    public void setBoard(String Board)
+    {
+        this.Board = Board;
+    }
+
+    public void setBrunch(String Brunch)
+    {
+        this.Brunch = Brunch;
+    }
+
+    public void setSession(String Session)
+    {
+        this.Session = Session;
+    }
+
+    public void setBrunchID(String BrunchID)
+    {
+        this.BrunchID = Long.parseLong(BrunchID);
+    }
+
+    public void setSessionID(String SessionID)
+    {
+        this.SessionID = Long.parseLong(SessionID);
     }
 
     public void setIsPresent(String IsPresent)
     {
-        this.IsPresent = Boolean.parseBoolean(IsPresent);
+        this.IsPresent = Integer.parseInt(IsPresent);
     }
 
     public void setIslate(String Islate)
     {
-        this.Islate = Boolean.parseBoolean(Islate);
+        this.Islate = Integer.parseInt(Islate);
     }
 
     public void setLateTime(String LateTime)
@@ -146,12 +230,12 @@ public class StudentModel {
 
     public void setIsLeave(String IsLeave)
     {
-        this.IsLeave = Boolean.parseBoolean(IsLeave);
+        this.IsLeave = Integer.parseInt(IsLeave);
     }
 
     public void setIsAbsent(String IsAbsent)
     {
-        this.IsAbsent = Boolean.parseBoolean(IsAbsent);
+        this.IsAbsent = Integer.parseInt(IsAbsent);
     }
 
     public void setRemarks(String Remarks)
@@ -184,7 +268,7 @@ public class StudentModel {
         this.Class = Class;
     }
 
-    public int getUserID()
+    public String getUserID()
     {
         return UserID;
     }
@@ -194,57 +278,92 @@ public class StudentModel {
         return UserFullName;
     }
 
-    public Long getRFID()
+    public String getRFID()
     {
         return RFID;
     }
 
-    public int getRollNo()
+    public String getRollNo()
     {
         return RollNo;
     }
 
-    public int getSubjectID()
+    public long getSubjectID()
     {
         return SubjectID;
     }
 
-    public int getDepartmentID()
+    public long getDepartmentID()
     {
         return DepartmentID;
     }
 
-    public int getSectionID()
+    public long getSectionID()
     {
         return SectionID;
     }
 
-    public int[] getInstituteID()
+    public String getSection()
     {
-        return InstituteID;
+        return Section;
     }
 
-    public int getMediumID()
+//    public long[] getInstituteID()
+//    {
+//        return InstituteID;
+//    }
+
+    public long getMediumID()
     {
         return MediumID;
     }
 
-    public int getShiftID()
+    public long getShiftID()
     {
         return ShiftID;
     }
 
-    public int getClassID()
+    public long getClassID()
     {
         return ClassID;
     }
 
-    public boolean getIsPresent()
+    public long getBoardID()
+    {
+        return BoardID;
+    }
+
+    public String getBoard()
+    {
+        return Board;
+    }
+
+    public String getBrunch()
+    {
+        return Brunch;
+    }
+
+    public String getSession()
+    {
+        return Session;
+    }
+
+    public long getBrunchID()
+    {
+        return BrunchID;
+    }
+
+    public long getSessionID()
+    {
+        return SessionID;
+    }
+
+    public int getIsPresent()
     {
         return IsPresent;
     }
 
-    public boolean getIslate()
+    public int getIslate()
     {
         return Islate;
     }
@@ -254,12 +373,12 @@ public class StudentModel {
         return LateTime;
     }
 
-    public boolean getIsLeave()
+    public int getIsLeave()
     {
         return IsLeave;
     }
 
-    public boolean getIsAbsent()
+    public int getIsAbsent()
     {
         return IsAbsent;
     }
@@ -293,5 +412,4 @@ public class StudentModel {
     {
         return Class;
     }
-
 }
