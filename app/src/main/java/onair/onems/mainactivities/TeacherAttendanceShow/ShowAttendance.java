@@ -1,4 +1,4 @@
-package onair.onems.mainactivities;
+package onair.onems.mainactivities.TeacherAttendanceShow;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -31,6 +31,7 @@ import java.util.ArrayList;
 
 import de.codecrafters.tableview.TableView;
 import onair.onems.R;
+import onair.onems.mainactivities.StudentAttendanceShow;
 
 /**
  * Created by User on 12/26/2017.
@@ -82,7 +83,7 @@ public class ShowAttendance extends AppCompatActivity {
                 editor.putInt("MonthSelectID",MonthSelectID);
                 editor.commit();
                 //Toast.makeText(getActivity(),"ShiftID="+ShiftSelectID+" ClassID= "+ClassSelectID+ "MediumID= "+MediumSelectID+" MonthID="+MediumSelectID+" SectionID= "+SectionSelectID+"MonthID= "+MonthSelectID,Toast.LENGTH_LONG).show();
-                Intent i = new Intent(ShowAttendance.this, StudentAttendanceShow.class);
+                Intent i = new Intent(ShowAttendance.this, ShowAllStudent.class);
                 startActivity(i);
 
 

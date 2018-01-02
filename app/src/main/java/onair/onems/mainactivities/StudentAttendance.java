@@ -115,7 +115,8 @@ public class StudentAttendance extends AppCompatActivity implements NavigationVi
 
     }
 
-    private void prepareListData() {
+    private void prepareListData()
+    {
         listDataHeader = new ArrayList<ExpandedMenuModel>();
         listDataChild = new HashMap<ExpandedMenuModel, List<String>>();
 

@@ -37,10 +37,13 @@ public class LoginScreen extends AppCompatActivity
     private EditText takeId;
     private EditText takePassword;
     private String UserID = "",LoginId="",LoginPassword="",Password = "",UserFullName="",ImageUrl="",InstituteName="",DepartmentName="",
-            DesignationName="",BrunchName="",RFID="",RollNo="",StudentNo="",DepartmentID="",DesignationID="", BrunchID="";
+                            DesignationName="",BrunchName="",RFID="",RollNo="",StudentNo="",DepartmentID="",DesignationID="", BrunchID="";
+
     int UserTypeID=0,InstituteID=0,SBrunchID=0,BoardID,SDepartmentID,MediumID=0, SectionID=0,SessionID=0,ShiftID=0,ClassID=0;
     String loginurl = "";
+
     ProgressDialog dialog;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState)
     {
@@ -62,7 +65,7 @@ public class LoginScreen extends AppCompatActivity
 
                 loginurl=getString(R.string.baseUrl)+"getLoginInformation"+"/"+takeId.getText().toString()+"/"+takePassword.getText().toString();
 
-//                dialog.show();
+                dialog.show();
 
                 LoginId = takeId.getText().toString();
                 LoginPassword = takePassword.getText().toString();
@@ -72,6 +75,7 @@ public class LoginScreen extends AppCompatActivity
                     Intent mainIntent = new Intent(LoginScreen.this,TeacherMainScreen.class);
                     LoginScreen.this.startActivity(mainIntent);
                     LoginScreen.this.finish();
+                    dialog.dismiss();
                 }
 
                // Get Login ID and Password From Server Using Volley
@@ -133,6 +137,8 @@ public class LoginScreen extends AppCompatActivity
     {
         try
         {
+            // Parse Json data From API
+
             JSONArray jsonArray = new JSONArray(jsonString);
             UserID=jsonArray.getJSONObject(0).getString("UserID");
             Password=jsonArray.getJSONObject(0).getString("Password");
@@ -158,8 +164,15 @@ public class LoginScreen extends AppCompatActivity
             ShiftID =jsonArray.getJSONObject(0).getInt("ShiftID");
             ClassID =jsonArray.getJSONObject(0).getInt("ClassID");
             StudentNo=jsonArray.getJSONObject(0).getString("StudentNo");
+
+            // Parse Json data From API END
+
+
+            // Using SharedPreferences For save Internal Data
+
             SharedPreferences sharedPre = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
             SharedPreferences.Editor editor = sharedPre.edit();
+
             editor.putString("UserID", UserID);
             editor.putString("Password",Password);
             editor.putInt("UserTypeID",UserTypeID);
@@ -185,6 +198,9 @@ public class LoginScreen extends AppCompatActivity
             editor.putInt("ClassID",ClassID );
             editor.putString("StudentNo",StudentNo);
             editor.commit();
+
+
+        // Using SharedPreferences For save Internal Data  End
 
         }
         catch (JSONException e)

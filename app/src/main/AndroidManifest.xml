@@ -40,14 +40,7 @@
         <activity
             android:name=".mainactivities.TakeAttendance"
             android:theme="@style/AppTheme.NoActionBar"></activity>
-        <activity android:name=".mainactivities.ShowAttendance"
-            android:theme="@style/AppTheme"
-            android:label="Show Attendance"
-            android:parentActivityName="onair.onems.mainactivities.TakeAttendance">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="onair.onems.mainactivities.TakeAttendance" />
-        </activity>
+
         <activity
             android:name=".mainactivities.StudentAttendance"
             android:theme="@style/AppTheme.NoActionBar">
@@ -97,6 +90,43 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="onair.onems.mainactivities.AllStudentAttendanceShow" />
+        </activity>
+        <activity
+            android:name="onair.onems.mainactivities.TeacherAttendanceShow.ShowAttendance"
+            android:label="Attendance"
+            android:parentActivityName=".mainactivities.TeacherMainScreen"
+          >
+            <!-- The meta-data element is needed for versions lower than 4.1 -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="mainactivities.TeacherMainScreen" />
+        </activity>
+        <activity
+            android:name="onair.onems.mainactivities.TeacherAttendanceShow.ShowAllStudent"
+            android:label="Attendance"
+            android:parentActivityName="onair.onems.mainactivities.TeacherAttendanceShow.ShowAttendance">
+            <!-- The meta-data element is needed for versions lower than 4.1 -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="onair.onems.mainactivities.TeacherAttendanceShow.ShowAttendance" />
+        </activity>
+        <activity
+            android:name="onair.onems.mainactivities.TeacherAttendanceShow.DateAttendance"
+            android:label="Attendance"
+            android:parentActivityName="onair.onems.mainactivities.TeacherAttendanceShow.ShowAllStudent">
+            <!-- The meta-data element is needed for versions lower than 4.1 -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="onair.onems.mainactivities.TeacherAttendanceShow.ShowAllStudent" />
+        </activity>
+        <activity
+            android:name="onair.onems.mainactivities.TeacherAttendanceShow.ShowSubjectWiseAttendance"
+            android:label="Attendance"
+            android:parentActivityName="onair.onems.mainactivities.TeacherAttendanceShow.DateAttendance">
+            <!-- The meta-data element is needed for versions lower than 4.1 -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="onair.onems.mainactivities.TeacherAttendanceShow.DateAttendance" />
         </activity>
     </application>
 
