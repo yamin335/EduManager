@@ -1,6 +1,7 @@
 package onair.onems.mainactivities;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -23,26 +24,35 @@ import com.android.volley.toolbox.Volley;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
 
 import onair.onems.R;
 
 
-public class LoginScreen extends AppCompatActivity {
+public class LoginScreen extends AppCompatActivity
+{
 
     private Button loginButton;
     private AutoCompleteTextView takeId;
     private EditText takePassword;
     TextView errorView;
     private String UserID = "",LoginId="",LoginPassword="",Password = "",UserFullName="",ImageUrl="",InstituteName="",DepartmentName="",
-            DesignationName="",BrunchName="",RFID="",RollNo="",StudentNo="",DepartmentID="",DesignationID="", BrunchID="";
+                            DesignationName="",BrunchName="",RFID="",RollNo="",StudentNo="",DepartmentID="",DesignationID="", BrunchID="";
+
     int UserTypeID=0,InstituteID=0,SBrunchID=0,BoardID,SDepartmentID,MediumID=0, SectionID=0,SessionID=0,ShiftID=0,ClassID=0;
     String loginurl = "";
-    ProgressDialog dialog;
-    @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
 
+    ProgressDialog dialog;
+
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState)
+    {
+
+        super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
         loginButton = (Button)findViewById(R.id.login_button);
         takeId = (AutoCompleteTextView)findViewById(R.id.email);
         dialog = new ProgressDialog(this);
@@ -50,12 +60,15 @@ public class LoginScreen extends AppCompatActivity {
         errorView = (TextView)findViewById(R.id.error);
 
 
-        loginButton.setOnClickListener(new View.OnClickListener() {
+        loginButton.setOnClickListener(new View.OnClickListener()
+        {
             @Override
-            public void onClick(View v) {
-               loginurl = getString(R.string.baseUrl)+"getLoginInformation"+"/"+takeId.getText().toString()+"/"+takePassword.getText().toString();
+            public void onClick(View v)
+            {
 
-//                dialog.show();
+                loginurl=getString(R.string.baseUrl)+"getLoginInformation"+"/"+takeId.getText().toString()+"/"+takePassword.getText().toString();
+
+                dialog.show();
 
                 LoginId = takeId.getText().toString();
                 LoginPassword = takePassword.getText().toString();
@@ -65,23 +78,33 @@ public class LoginScreen extends AppCompatActivity {
                     Intent mainIntent = new Intent(LoginScreen.this,TeacherMainScreen.class);
                     LoginScreen.this.startActivity(mainIntent);
                     LoginScreen.this.finish();
+                    dialog.dismiss();
                 }
+
+               // Get Login ID and Password From Server Using Volley
 
                 RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
                 StringRequest stringRequest = new StringRequest(Request.Method.GET, loginurl,
-                        new Response.Listener<String>() {
+                        new Response.Listener<String>()
+                        {
                             @Override
                             public void onResponse(String response) {
-                                parseJsonData(response);
+
+                                parseJsonData(response); // User define Function For parsing JSON data
 
                                 LoginId = takeId.getText().toString();
                                 LoginPassword = takePassword.getText().toString();
+
+                            // Login For User
+
                                 if(UserID.length()>0)
                                 {
+
                                     Intent mainIntent = new Intent(LoginScreen.this,StudentMainScreen.class);
                                     LoginScreen.this.startActivity(mainIntent);
                                     LoginScreen.this.finish();
                                 }
+                                // Login For Teacher
                                 else if((LoginId.equals("22"))&&(LoginPassword.equals("22")))
                                 {
                                     Intent mainIntent = new Intent(LoginScreen.this,TeacherMainScreen.class);
@@ -94,9 +117,11 @@ public class LoginScreen extends AppCompatActivity {
                                 }
 
                             }
-                        }, new Response.ErrorListener() {
+                        }, new Response.ErrorListener()
+                {
                     @Override
-                    public void onErrorResponse(VolleyError error) {
+                    public void onErrorResponse(VolleyError error)
+                    {
 
                         dialog.dismiss();
                     }
@@ -104,13 +129,19 @@ public class LoginScreen extends AppCompatActivity {
 
                 queue.add(stringRequest);
 
+                // Get Login ID and Password From Server Using Volley END
+
 
             }
         });
     }
 
-    void parseJsonData(String jsonString) {
-        try {
+    void parseJsonData(String jsonString)
+    {
+        try
+        {
+            // Parse Json data From API
+
             JSONArray jsonArray = new JSONArray(jsonString);
             UserID=jsonArray.getJSONObject(0).getString("UserID");
             Password=jsonArray.getJSONObject(0).getString("Password");
@@ -136,8 +167,15 @@ public class LoginScreen extends AppCompatActivity {
             ShiftID =jsonArray.getJSONObject(0).getInt("ShiftID");
             ClassID =jsonArray.getJSONObject(0).getInt("ClassID");
             StudentNo=jsonArray.getJSONObject(0).getString("StudentNo");
+
+            // Parse Json data From API END
+
+
+            // Using SharedPreferences For save Internal Data
+
             SharedPreferences sharedPre = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
             SharedPreferences.Editor editor = sharedPre.edit();
+
             editor.putString("UserID", UserID);
             editor.putString("Password",Password);
             editor.putInt("UserTypeID",UserTypeID);
@@ -164,8 +202,12 @@ public class LoginScreen extends AppCompatActivity {
             editor.putString("StudentNo",StudentNo);
             editor.commit();
 
+
+        // Using SharedPreferences For save Internal Data  End
+
         }
-        catch (JSONException e) {
+        catch (JSONException e)
+        {
             Toast.makeText(this,"Json : "+e,Toast.LENGTH_LONG).show();
         }
 

@@ -1,4 +1,4 @@
-package onair.onems.mainactivities;
+package onair.onems.mainactivities.TeacherAttendanceShow;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -31,6 +31,7 @@ import java.util.ArrayList;
 
 import de.codecrafters.tableview.TableView;
 import onair.onems.R;
+import onair.onems.mainactivities.StudentAttendanceShow;
 
 /**
  * Created by User on 12/26/2017.
@@ -58,7 +59,7 @@ public class ShowAttendance extends AppCompatActivity {
         classSpinner = (MaterialSpinner) findViewById(R.id.spinner_Class);
         shiftSpinner = (MaterialSpinner) findViewById(R.id.spinner_Shift);
         mediumSpinner= (MaterialSpinner) findViewById(R.id.spinner_medium);
-        sectionSpinner = (MaterialSpinner) findViewById(R.id.spinner_Section);
+        sectionSpinner =(MaterialSpinner) findViewById(R.id.spinner_Section);
         monthSpinner = (MaterialSpinner) findViewById(R.id.spinner_Month);
         sharedPre = PreferenceManager.getDefaultSharedPreferences(this);
         classUrl=getString(R.string.baseUrl)+"getInsClass/1";
@@ -82,7 +83,7 @@ public class ShowAttendance extends AppCompatActivity {
                 editor.putInt("MonthSelectID",MonthSelectID);
                 editor.commit();
                 //Toast.makeText(getActivity(),"ShiftID="+ShiftSelectID+" ClassID= "+ClassSelectID+ "MediumID= "+MediumSelectID+" MonthID="+MediumSelectID+" SectionID= "+SectionSelectID+"MonthID= "+MonthSelectID,Toast.LENGTH_LONG).show();
-                Intent i = new Intent(ShowAttendance.this, StudentAttendanceShow.class);
+                Intent i = new Intent(ShowAttendance.this, ShowAllStudent.class);
                 startActivity(i);
 
 

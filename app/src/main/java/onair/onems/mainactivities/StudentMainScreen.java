@@ -23,11 +23,16 @@ public class StudentMainScreen extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main_student);
+
         InstituteName=(TextView) findViewById(R.id.InstituteName);
+
         SharedPreferences sharedPre = PreferenceManager.getDefaultSharedPreferences(this);
+
         String name=sharedPre.getString("InstituteName","");
         InstituteName.setText(name);
+
         takeAttendance = (Button)findViewById(R.id.attendance);
 
         takeAttendance.setOnClickListener(new View.OnClickListener() {
