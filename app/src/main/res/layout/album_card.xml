@@ -81,6 +81,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
+                    android:inputType="numberDecimal"
                     android:background="@drawable/inputtext"
                     android:hint="     "
                     android:padding="10dp"

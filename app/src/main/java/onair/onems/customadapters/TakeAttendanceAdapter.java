@@ -61,7 +61,7 @@ public class TakeAttendanceAdapter extends RecyclerView.Adapter<TakeAttendanceAd
     @Override
     public void onBindViewHolder(final MyViewHolder holder, final int position) {
         AttendanceStudentModel attendanceStudentModel = attendanceSheetList.get(position);
-        holder.name.setText("Everyone is same");
+        holder.name.setText("Md Yamin");
         holder.roll.setText("Roll: "+attendanceStudentModel.getRollNo());
         holder.isPresent = 1;
         if(holder.late.isChecked())

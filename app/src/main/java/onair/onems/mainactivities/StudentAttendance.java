@@ -1,5 +1,6 @@
 package onair.onems.mainactivities;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -53,6 +54,9 @@ public class StudentAttendance extends AppCompatActivity implements NavigationVi
     HashMap<ExpandedMenuModel, List<String>> listDataChild;
     private TabLayout tabLayout;
     private ViewPager viewPager;
+
+    public static final String MyPREFERENCES = "LogInKey";
+    public static SharedPreferences sharedPreferences;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -227,7 +231,11 @@ public class StudentAttendance extends AppCompatActivity implements NavigationVi
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_logout) {
+            sharedPreferences  = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putBoolean("LogInState", false);
+            editor.commit();
             Intent intent = new Intent(StudentAttendance.this, LoginScreen.class);
             startActivity(intent);
             finish();

@@ -10,16 +10,6 @@
     android:paddingTop="16dp"
     android:background="#ffffff">
 
-    <!-- Login progress -->
-    <ProgressBar
-        android:id="@+id/login_progress"
-        style="?android:attr/progressBarStyleLarge"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:visibility="gone"
-        android:layout_gravity="center"/>
-
     <ScrollView
         android:id="@+id/login_form"
         android:layout_width="match_parent"
@@ -91,6 +81,7 @@
                 android:layout_marginBottom="20dp"
                 android:layout_marginTop="10dp"
                 android:textColor="#F44336"
+                android:gravity="center"
                 android:id="@+id/error"/>
 
         </LinearLayout>

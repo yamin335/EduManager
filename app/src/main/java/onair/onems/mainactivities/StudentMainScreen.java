@@ -29,8 +29,7 @@ public class StudentMainScreen extends AppCompatActivity {
         InstituteName=(TextView) findViewById(R.id.InstituteName);
 
         SharedPreferences sharedPre = PreferenceManager.getDefaultSharedPreferences(this);
-
-        String name=sharedPre.getString("InstituteName","");
+        String name=sharedPre.getString("InstituteName","School Name");
         InstituteName.setText(name);
 
         takeAttendance = (Button)findViewById(R.id.attendance);
