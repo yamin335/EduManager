@@ -97,24 +97,7 @@ public class ShowAttendance extends AppCompatActivity {
                     public void onResponse(String response) {
 
                         parseClassJsonData(response);
-                        RequestQueue queueSection = Volley.newRequestQueue(getApplicationContext());
-                        sectionUrl=getString(R.string.baseUrl)+"getInsSection/"+sharedPre.getInt("InstituteID",0)+"/"+ClassSelectID;
-                        StringRequest stringSectionRequest = new StringRequest(Request.Method.GET, sectionUrl,
-                                new Response.Listener<String>() {
-                                    @Override
-                                    public void onResponse(String response) {
 
-                                        parseSectionJsonData(response);
-
-                                    }
-                                }, new Response.ErrorListener() {
-                            @Override
-                            public void onErrorResponse(VolleyError error) {
-
-                                dialog.dismiss();
-                            }
-                        });
-                        queueSection.add(stringSectionRequest);
                     }
                 }, new Response.ErrorListener() {
             @Override
@@ -210,6 +193,43 @@ public class ShowAttendance extends AppCompatActivity {
 
             }
         });
+        classSpinner.setOnItemSelectedListener(new MaterialSpinner.OnItemSelectedListener<String>()
+        {
+
+            @Override public void onItemSelected(MaterialSpinner view, int position, long id, String item) {
+                if (position > 0) {
+                    ClassSelectID = ClassID[position];
+                    RequestQueue queueSection = Volley.newRequestQueue(getApplicationContext());
+                    sectionUrl = getString(R.string.baseUrl) + "getInsSection/" + sharedPre.getInt("InstituteID", 0) + "/" + ClassSelectID;
+                    StringRequest stringSectionRequest = new StringRequest(Request.Method.GET, sectionUrl,
+                            new Response.Listener<String>() {
+                                @Override
+                                public void onResponse(String response) {
+
+                                    parseSectionJsonData(response);
+
+                                }
+                            }, new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+
+                            dialog.dismiss();
+                        }
+                    });
+
+                    queueSection.add(stringSectionRequest);
+
+                }
+                else
+                {
+                    ArrayList al = new ArrayList();
+                    al.add("Section");
+                    al.add("");
+                    ArrayAdapter adapter = new ArrayAdapter(getApplicationContext(), android.R.layout.simple_list_item_1, al);
+                    sectionSpinner.setAdapter(adapter);
+                }
+            }
+        });
 
 
     }
@@ -219,19 +239,25 @@ public class ShowAttendance extends AppCompatActivity {
         try {
             JSONArray jsonArray = new JSONArray(jsonString);
             ArrayList al = new ArrayList();
-            ClassID=new int[jsonArray.length()];
+            ClassID=new int[jsonArray.length()+1];
+            al.add("Class");
+            ClassID[0]=0;
             for(int i = 0; i < jsonArray.length(); ++i)
             {
                 JSONObject jsonObject=jsonArray.getJSONObject(i);
                 String name=jsonObject.getString("ClassName");
-                ClassID[i]=jsonObject.getInt("ClassID");
+
+                ClassID[i+1]=jsonObject.getInt("ClassID");
                 al.add(name);
             }
             ClassSelectID=ClassID[0];
             ArrayAdapter adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, al);
+
             classSpinner.setAdapter(adapter);
-            //spinner.setSelectedIndex(1);
-        } catch (JSONException e) {
+
+        }
+        catch (JSONException e)
+        {
             Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
             dialog.dismiss();
         }
@@ -275,7 +301,7 @@ public class ShowAttendance extends AppCompatActivity {
             ArrayAdapter adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, al);
             monthSpinner.setAdapter(adapter);
 
-            //spinner.setSelectedIndex(1);
+
         } catch (JSONException e) {
             Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
             dialog.dismiss();

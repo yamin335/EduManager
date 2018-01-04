@@ -67,6 +67,7 @@ public class StudentAttendanceShow extends AppCompatActivity {
         dialog = new ProgressDialog(this);
         dialog.setMessage("Loading....");
         dialog.show();
+
         simpleTableHeaderAdapter = new SimpleTableHeaderAdapter(this, "SI", "Student Name", "ID", "Roll");
         simpleTableHeaderAdapter.setTextColor(ContextCompat.getColor(this, R.color.table_header_text));
         tableView.setHeaderAdapter(simpleTableHeaderAdapter);
@@ -86,6 +87,7 @@ public class StudentAttendanceShow extends AppCompatActivity {
         TableColumnWeightModel columnModel = new TableColumnWeightModel(4);
         columnModel.setColumnWeight(1, 2);
         tableView.setColumnModel(columnModel);
+
 
         RequestQueue queue = Volley.newRequestQueue(this);
 
