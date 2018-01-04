@@ -10,13 +10,11 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.List;
 
 import onair.onems.R;
-import onair.onems.mainactivities.AttendanceSheet;
-import onair.onems.models.Student;
+import onair.onems.models.AttendanceStudentModel;
 import onair.onems.models.StudentModel;
 
 /**
@@ -25,17 +23,14 @@ import onair.onems.models.StudentModel;
 public class TakeAttendanceAdapter extends RecyclerView.Adapter<TakeAttendanceAdapter.MyViewHolder> {
 
     private Context mContext;
-    private List<Student> attendanceSheetList;
+    private List<AttendanceStudentModel> attendanceSheetList;
     //    TakeAttendanceAdapter
     public class MyViewHolder extends RecyclerView.ViewHolder {
         public TextView name, roll;
         public ImageView thumbnail, overflow;
         public CheckBox present, absent, late, leave;
         public EditText lateInput;
-
-        public Boolean isPresent, isAbsent, isLate, isLeave;
-        public int lateTime;
-
+        public int isPresent, isAbsent, isLate, isLeave, lateTime;
 
         public MyViewHolder(View view) {
             super(view);
@@ -52,7 +47,7 @@ public class TakeAttendanceAdapter extends RecyclerView.Adapter<TakeAttendanceAd
     }
 
 
-    public TakeAttendanceAdapter(Context mContext, List<Student> attendanceSheetList) {
+    public TakeAttendanceAdapter(Context mContext, List<AttendanceStudentModel> attendanceSheetList) {
         this.mContext = mContext;
         this.attendanceSheetList = attendanceSheetList;
     }
@@ -65,9 +60,10 @@ public class TakeAttendanceAdapter extends RecyclerView.Adapter<TakeAttendanceAd
 
     @Override
     public void onBindViewHolder(final MyViewHolder holder, final int position) {
-        Student studentModel = attendanceSheetList.get(position);
-        holder.name.setText(studentModel.getUserFullName());
-        holder.roll.setText("Roll"+Integer.toString(studentModel.getRollNo()));
+        AttendanceStudentModel attendanceStudentModel = attendanceSheetList.get(position);
+        holder.name.setText("Md Yamin");
+        holder.roll.setText("Roll: "+attendanceStudentModel.getRollNo());
+        holder.isPresent = 1;
         if(holder.late.isChecked())
         {
             holder.lateInput.setEnabled(true);
@@ -84,6 +80,12 @@ public class TakeAttendanceAdapter extends RecyclerView.Adapter<TakeAttendanceAd
             {
                 if ( isChecked )
                 {
+                    holder.isPresent = 1;
+                    holder.isAbsent = 0;
+                    holder.isLate = 0;
+                    holder.isLeave = 0;
+
+                    holder.lateInput.setText("");
                     holder.absent.setChecked(false);
                     holder.late.setChecked(false);
                     holder.leave.setChecked(false);
@@ -99,6 +101,12 @@ public class TakeAttendanceAdapter extends RecyclerView.Adapter<TakeAttendanceAd
             {
                 if ( isChecked )
                 {
+                    holder.isPresent = 0;
+                    holder.isAbsent = 1;
+                    holder.isLate = 0;
+                    holder.isLeave = 0;
+
+                    holder.lateInput.setText("");
                     holder.present.setChecked(false);
                     holder.late.setChecked(false);
                     holder.leave.setChecked(false);
@@ -113,6 +121,18 @@ public class TakeAttendanceAdapter extends RecyclerView.Adapter<TakeAttendanceAd
             {
                 if ( isChecked )
                 {
+                    holder.isPresent = 0;
+                    holder.isAbsent = 0;
+                    holder.isLate = 1;
+                    holder.isLeave = 0;
+                    if(holder.lateInput.getText().toString().isEmpty())
+                    {
+                        holder.lateTime = 0;
+                    }
+                    else
+                    {
+                        holder.lateTime = Integer.parseInt(holder.lateInput.getText().toString());
+                    }
                     holder.lateInput.setEnabled(true);
                     holder.absent.setChecked(false);
                     holder.present.setChecked(false);
@@ -132,6 +152,12 @@ public class TakeAttendanceAdapter extends RecyclerView.Adapter<TakeAttendanceAd
             {
                 if ( isChecked )
                 {
+                    holder.isPresent = 0;
+                    holder.isAbsent = 0;
+                    holder.isLate = 0;
+                    holder.isLeave = 1;
+
+                    holder.lateInput.setText("");
                     holder.absent.setChecked(false);
                     holder.late.setChecked(false);
                     holder.present.setChecked(false);

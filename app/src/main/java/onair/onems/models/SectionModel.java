@@ -6,18 +6,18 @@ package onair.onems.models;
 
 public class SectionModel {
 
-    private int SectionID;
+    private long SectionID;
     private String SectionName;
 
     public SectionModel(String SectionID, String SectionName)
     {
-        this.SectionID = Integer.parseInt(SectionID);
+        this.SectionID = Long.parseLong(SectionID);
         this.SectionName = SectionName;
     }
 
     public void setSectionID(String SectionID)
     {
-        this.SectionID = Integer.parseInt(SectionID);
+        this.SectionID = Long.parseLong(SectionID);
     }
 
     public void setSectionName(String SectionName)
@@ -25,7 +25,7 @@ public class SectionModel {
         this.SectionName = SectionName;
     }
 
-    public int getSectionID()
+    public long getSectionID()
     {
         return SectionID;
     }

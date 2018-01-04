@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:fontFamily="sans-serif-condensed"
-        android:text="Buruz Bagan High School"
+        android:text="School Name"
         android:textColor="#1031ea"
         android:textSize="25sp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -30,10 +30,10 @@
         android:layout_marginStart="16dp"
         android:background="@drawable/line"
         android:orientation="horizontal"
-        app:layout_constraintBottom_toTopOf="@+id/Establish"
-        app:layout_constraintEnd_toStartOf="@+id/Establish"
+        app:layout_constraintBottom_toTopOf="@+id/userType"
+        app:layout_constraintEnd_toStartOf="@+id/userType"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/Establish"></LinearLayout>
+        app:layout_constraintTop_toBottomOf="@+id/userType"></LinearLayout>
 
     <LinearLayout
         android:id="@+id/SecondLine"
@@ -45,17 +45,17 @@
         android:layout_marginStart="8dp"
         android:background="@drawable/line"
         android:orientation="horizontal"
-        app:layout_constraintBottom_toTopOf="@+id/Establish"
+        app:layout_constraintBottom_toTopOf="@+id/userType"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/Establish"
-        app:layout_constraintTop_toBottomOf="@+id/Establish"></LinearLayout>
+        app:layout_constraintStart_toEndOf="@+id/userType"
+        app:layout_constraintTop_toBottomOf="@+id/userType"></LinearLayout>
 
     <TextView
-        android:id="@+id/Establish"
+        android:id="@+id/userType"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:fontFamily="sans-serif-condensed"
-        android:text="Since 1985"
+        android:text="User Type"
         android:textColor="#1031ea"
         android:textSize="15sp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -81,7 +81,7 @@
         app:layout_constraintHorizontal_bias="0.8"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.16000003" />
+        app:layout_constraintVertical_bias="0.16" />
 
     <Button
         android:id="@+id/notice"
@@ -201,18 +201,26 @@
         app:layout_constraintHorizontal_bias="0.8"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.7" />
+        app:layout_constraintVertical_bias="0.6969" />
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/floatingActionButton"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:clickable="true"
+    <Button
+        android:id="@+id/iCard"
+        android:layout_width="102dp"
+        android:layout_height="102dp"
+        android:background="@drawable/menu_item_icard"
+        android:drawableTop="@drawable/ic_perm_identity"
+        android:elevation="100dp"
+        android:fontFamily="sans-serif-condensed"
+        android:padding="10dp"
+        android:text="iCard"
+        android:textAllCaps="false"
+        android:textColor="@android:color/white"
+        android:textSize="20sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.9"
+        app:layout_constraintHorizontal_bias="0.8"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.95"
-        app:srcCompat="@drawable/floating" />
+        app:layout_constraintVertical_bias="0.967" />
+
 </android.support.constraint.ConstraintLayout>

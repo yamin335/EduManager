@@ -6,9 +6,13 @@ package onair.onems.mainactivities;
 
 import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBar;
+import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -26,6 +30,7 @@ import android.widget.DatePicker;
 import android.widget.ExpandableListView;
 import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -65,9 +70,9 @@ public class TakeAttendance extends AppCompatActivity
     List<ExpandedMenuModel> listDataHeader;
     HashMap<ExpandedMenuModel, List<String>> listDataChild;
     Spinner spinnerClass, spinnerShift,spinnerSection,spinnerMedium,spinnerSubject;
-    Button takeAttendance, datePicker, showAttendance;
+    Button takeAttendance, datePicker;
     ProgressDialog dialog;
-    String classUrl, shiftUrl,sectionUrl,mediumUrl,subjectUrl, selectedDate;
+    String classUrl, shiftUrl,sectionUrl,mediumUrl,subjectUrl, selectedDate = "";
     ArrayList<ClassModel> allClassArrayList;
     ArrayList<ShiftModel> allShiftArrayList;
     ArrayList<SectionModel> allSectionArrayList;
@@ -75,14 +80,17 @@ public class TakeAttendance extends AppCompatActivity
     ArrayList<SubjectModel> allSubjectArrayList;
 
     String[] tempSectionArray = {"Select Section"};
-    String[] tempSubjectArray = {"Select Section"};
-    ClassModel selectedClass;
-    ShiftModel selectedShift;
-    SectionModel selectedSection;
-    MediumModel selectedMedium;
-    SubjectModel selectedSubject;
+    String[] tempSubjectArray = {"Select Subject"};
+    ClassModel selectedClass = null;
+    ShiftModel selectedShift = null;
+    SectionModel selectedSection = null;
+    MediumModel selectedMedium = null;
+    SubjectModel selectedSubject = null;
     private DatePickerDialog datePickerDialog;
     int classSpinnerPosition, shiftSpinnerPosition, sectionSpinnerPosition, mediumSpinnerPosition, subjectSpinnerPosition;
+
+    public static final String MyPREFERENCES = "LogInKey";
+    public static SharedPreferences sharedPreferences;
 
 
     @Override
@@ -96,7 +104,6 @@ public class TakeAttendance extends AppCompatActivity
         spinnerMedium =(Spinner)findViewById(R.id.spinnerMedium);
         spinnerSubject = (Spinner)findViewById(R.id.spinnerSubject);
         takeAttendance = (Button)findViewById(R.id.takeAttendance);
-        showAttendance = (Button)findViewById(R.id.showAttendance);
         datePicker = (Button)findViewById(R.id.pickDate);
         ArrayAdapter<String> section_spinner_adapter = new ArrayAdapter<String>(this, R.layout.spinner_item, tempSectionArray);
         section_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -138,7 +145,8 @@ public class TakeAttendance extends AppCompatActivity
                             public void onDateSet(DatePicker view, int year,
                                                   int monthOfYear, int dayOfMonth) {
                                 // set day of month , month and year value in the edit text
-                                selectedDate = dayOfMonth + "/" + (monthOfYear + 1) + "/" + year;
+//                                selectedDate = dayOfMonth + "/" + (monthOfYear + 1) + "/" + year;
+                                selectedDate = year + "-" + (monthOfYear + 1) + "-" + dayOfMonth;
                                 datePicker.setText(selectedDate);
 
                             }
@@ -207,26 +215,26 @@ public class TakeAttendance extends AppCompatActivity
         takeAttendance.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Bundle bundle = new Bundle();
-                bundle.putInt("InstituteID", 1);
-                bundle.putInt("MediumID",selectedMedium.getMediumID());
-                bundle.putInt("ShiftID",selectedShift.getShiftID());
-                bundle.putInt("ClassID",selectedClass.getClassID());
-                bundle.putInt("SectionID",selectedSection.getSectionID());
-                bundle.putInt("SubjectID",selectedSubject.getSubjectID());
-                bundle.putInt("DepertmentID",selectedSubject.getDepartmentID());
-                bundle.putString("Date",selectedDate);
+                if((selectedClass == null)|| (selectedDate.isEmpty())||(selectedMedium == null)||(selectedSection == null)||(selectedShift == null)||(selectedSubject == null))
+                {
+                    Toast.makeText(TakeAttendance.this,"Please select all options !!! ",Toast.LENGTH_LONG).show();
+                }
+                else
+                {
+                    Bundle bundle = new Bundle();
+                    bundle.putLong("InstituteID", 1);
+                    bundle.putLong("MediumID",selectedMedium.getMediumID());
+                    bundle.putLong("ShiftID",selectedShift.getShiftID());
+                    bundle.putLong("ClassID",selectedClass.getClassID());
+                    bundle.putLong("SectionID",selectedSection.getSectionID());
+                    bundle.putLong("SubjectID",selectedSubject.getSubjectID());
+                    bundle.putLong("DepertmentID",selectedSubject.getDepartmentID());
+                    bundle.putString("Date",selectedDate);
 
-                Intent intent = new Intent(TakeAttendance.this, TakeAttendanceDetails.class);
-                intent.putExtras(bundle);
-                startActivity(intent);
-            }
-        });
-
-        showAttendance.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
+                    Intent intent = new Intent(TakeAttendance.this, TakeAttendanceDetails.class);
+                    intent.putExtras(bundle);
+                    startActivity(intent);
+                }
             }
         });
 
@@ -236,8 +244,10 @@ public class TakeAttendance extends AppCompatActivity
 
                 if(position != classSpinnerPosition)
                 {
+                    selectedSection = null;
+                    selectedSubject = null;
                     selectedClass = allClassArrayList.get(position);
-                    int classId = selectedClass.getClassID();
+                    long classId = selectedClass.getClassID();
                     sectionUrl = getString(R.string.baseUrlLocal)+"getInsSection/1"+"/"+classId;
                     dialog.show();
                     //Preparing section data from server
@@ -323,8 +333,9 @@ public class TakeAttendance extends AppCompatActivity
 
                 if(position != mediumSpinnerPosition)
                 {
+                    selectedSubject = null;
                     selectedMedium = allMediumArrayList.get(position);
-                    int mediumId = selectedMedium.getMediumID();
+                    long mediumId = selectedMedium.getMediumID();
                     subjectUrl = getString(R.string.baseUrlLocal)+"getInsSubject"+"/"+selectedClass.getClassID()+"/"+mediumId;
                     dialog.show();
                     //Preparing subject data from server
@@ -382,7 +393,18 @@ public class TakeAttendance extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         View view = getLayoutInflater().inflate(R.layout.nav_header_main,null);
         ImageView profilePicture = (ImageView)view.findViewById(R.id.profilePicture);
-        Glide.with(this).load(R.drawable.album1).apply(RequestOptions.circleCropTransform()).into(profilePicture);
+        TextView userType = (TextView)view.findViewById(R.id.userType);
+        TextView userName = (TextView)view.findViewById(R.id.userName);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        String imageUrl = prefs.getString("ImageUrl","");
+        String name = prefs.getString("UserFullName","");
+        int user = prefs.getInt("UserTypeID",0);
+        userName.setText(name);
+        if(user == 4)
+        {
+            userType.setText("Teacher");
+        }
+        Glide.with(this).load("http://192.168.1.129:4000/"+imageUrl.replace("\\","/")).apply(RequestOptions.circleCropTransform()).into(profilePicture);
        // profilePicture.setImageDrawable(getResources().getDrawable(R.drawable.album1));
         navigationView.addHeaderView(view);
         if (navigationView != null) {
@@ -410,7 +432,7 @@ public class TakeAttendance extends AppCompatActivity
         expandableList.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
             @Override
             public boolean onGroupClick(ExpandableListView expandableListView, View view, int i, long l) {
-                //Log.d("DEBUG", "heading clicked");
+                Log.d("DEBUG", "heading clicked"+i+"--"+l);
                 return false;
             }
         });
@@ -757,7 +779,14 @@ public class TakeAttendance extends AppCompatActivity
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_logout) {
+            sharedPreferences  = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putBoolean("LogInState", false);
+            editor.commit();
+            Intent intent = new Intent(TakeAttendance.this, LoginScreen.class);
+            startActivity(intent);
+            finish();
             return true;
         }
 

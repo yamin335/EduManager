@@ -20,18 +20,27 @@ public class StudentMainScreen extends AppCompatActivity {
 
     private Button takeAttendance;
     TextView InstituteName;
+    TextView userType;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_main_student);
 
         InstituteName=(TextView) findViewById(R.id.InstituteName);
+        userType = (TextView) findViewById(R.id.userType);
 
         SharedPreferences sharedPre = PreferenceManager.getDefaultSharedPreferences(this);
-
-        String name=sharedPre.getString("InstituteName","");
+        String name=sharedPre.getString("InstituteName","School Name");
+        int user = sharedPre.getInt("UserTypeID",0);
+        if(user == 3)
+        {
+            userType.setText("Student");
+        }
+        else if(user == 5)
+        {
+            userType.setText("Guardian");
+        }
         InstituteName.setText(name);
 
         takeAttendance = (Button)findViewById(R.id.attendance);
