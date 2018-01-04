@@ -94,12 +94,12 @@
         <activity
             android:name="onair.onems.mainactivities.TeacherAttendanceShow.ShowAttendance"
             android:label="Attendance"
-            android:parentActivityName=".mainactivities.TeacherMainScreen"
+            android:parentActivityName=".mainactivities.TakeAttendance"
           >
             <!-- The meta-data element is needed for versions lower than 4.1 -->
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="mainactivities.TeacherMainScreen" />
+                android:value=".mainactivities.TakeAttendance" />
         </activity>
         <activity
             android:name="onair.onems.mainactivities.TeacherAttendanceShow.ShowAllStudent"

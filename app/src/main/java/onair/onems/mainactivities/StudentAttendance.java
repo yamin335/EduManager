@@ -96,7 +96,9 @@ public class StudentAttendance extends AppCompatActivity implements NavigationVi
         }
         Glide.with(this).load("http://192.168.1.129:4000/"+imageUrl.replace("\\","/")).apply(RequestOptions.circleCropTransform()).into(profilePicture);
         navigationView.addHeaderView(view);
-        if (navigationView != null) {
+
+        if (navigationView != null)
+        {
             setupDrawerContent(navigationView);
         }
 
