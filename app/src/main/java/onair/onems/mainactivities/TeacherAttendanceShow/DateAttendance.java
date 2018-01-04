@@ -4,11 +4,13 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -18,6 +20,8 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -31,6 +35,7 @@ import de.codecrafters.tableview.model.TableColumnWeightModel;
 import de.codecrafters.tableview.toolkit.SimpleTableDataAdapter;
 import de.codecrafters.tableview.toolkit.SimpleTableHeaderAdapter;
 import de.codecrafters.tableview.toolkit.TableDataRowBackgroundProviders;
+import de.hdodenhof.circleimageview.CircleImageView;
 import onair.onems.R;
 import onair.onems.mainactivities.AllStudentAttendanceShow;
 import onair.onems.mainactivities.AllStudentSubjectWiseAttendance;
@@ -44,6 +49,7 @@ public class DateAttendance extends AppCompatActivity
 {
     TextView name,roll,id;
     TableView tableView;
+    ImageView image;
     SimpleTableHeaderAdapter simpleTableHeaderAdapter;
     SimpleTableDataAdapter simpleTabledataAdapter;
     String[][] DATA_TO_SHOW;
@@ -61,6 +67,8 @@ public class DateAttendance extends AppCompatActivity
         name=(TextView) findViewById(R.id.name);
         roll=(TextView) findViewById(R.id.roll);
         id=(TextView) findViewById(R.id.Id);
+        image=(ImageView) findViewById(R.id.circleView);
+
 
 
         dialog = new ProgressDialog(this);
@@ -80,11 +88,13 @@ public class DateAttendance extends AppCompatActivity
         RFID=sharedPre.getString("SelectStudentRFID","");
         studentName=sharedPre.getString("SelectStudentName","");
         studentRoll=sharedPre.getString("SelectStudentRoll","");
+        String imageUrl = sharedPre.getString("ImageUrl","");
         // get Internal Data using SharedPreferences end
         name.setText(""+studentName);
         roll.setText("Roll: "+studentRoll);
         id.setText("ID: "+RFID);
 
+        Glide.with(this).load("http://192.168.1.82:4000/"+imageUrl.replace("\\","/")).apply(RequestOptions.circleCropTransform()).into(image);
         monthAttendanceUrl=getString(R.string.baseUrl)+"getStudentMonthlyDeviceAttendance/"+ShiftID+"/"+MediumID+"/"+ClassID+"/"+SectionID+"/"+MonthID+"/"+RFID;
         // Toast.makeText(this,""+monthAttendanceUrl,Toast.LENGTH_LONG).show();
         // Add Header of The Table
@@ -118,8 +128,9 @@ public class DateAttendance extends AppCompatActivity
         {
             simpleTableHeaderAdapter.setTextSize(14);
 
-        } else
-            {
+        }
+        else
+        {
             simpleTableHeaderAdapter.setTextSize(10);
 
         }
@@ -127,6 +138,7 @@ public class DateAttendance extends AppCompatActivity
         // Configure Size of different Mobile Device End
 
         //Table View Click Event
+
         tableView.addDataClickListener(new TableDataClickListener()
         {
             @Override
@@ -151,14 +163,16 @@ public class DateAttendance extends AppCompatActivity
                 new Response.Listener<String>()
                 {
                     @Override
-                    public void onResponse(String response) {
+                    public void onResponse(String response)
+                    {
 
                         parseMonthlyAttendanceJsonData(response);
 
                     }
                 }, new Response.ErrorListener() {
             @Override
-            public void onErrorResponse(VolleyError error) {
+            public void onErrorResponse(VolleyError error)
+            {
 
                 dialog.dismiss();
             }
@@ -170,7 +184,8 @@ public class DateAttendance extends AppCompatActivity
 
     }
     // Back parent Page code
-    public boolean onOptionsItemSelected(MenuItem item){
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
         Intent myIntent = new Intent(getApplicationContext(), ShowAllStudent.class);
         startActivityForResult(myIntent, 0);
         finish();
@@ -180,23 +195,27 @@ public class DateAttendance extends AppCompatActivity
 
     // Back parent Page code end
 
-    void parseMonthlyAttendanceJsonData(String jsonString) {
-        try {
+    void parseMonthlyAttendanceJsonData(String jsonString)
+    {
+        try
+        {
             JSONArray jsonArray = new JSONArray(jsonString);
             ArrayList al = new ArrayList();
             DATA_TO_SHOW = new String[jsonArray.length()][4];
-            for(int i = 0; i < jsonArray.length(); ++i) {
-                JSONObject jsonObject=jsonArray.getJSONObject(i);
+            for(int i = 0; i < jsonArray.length(); ++i)
+            {
 
+                JSONObject jsonObject=jsonArray.getJSONObject(i);
                 DATA_TO_SHOW[i][0]= String.valueOf((i+1));
                 DATA_TO_SHOW [i][1]=jsonObject.getString("Date");
                 int status=jsonObject.getInt("Present");
+
                 if(status==1)
                 {
                     DATA_TO_SHOW[i][2]="YES";
                 }
                 else
-                    DATA_TO_SHOW[i][2]="NO";
+                DATA_TO_SHOW[i][2]="NO";
                 DATA_TO_SHOW [i][3]=jsonObject.getString("Late");
 
                 al.add(DATA_TO_SHOW[i][0]);
@@ -207,17 +226,23 @@ public class DateAttendance extends AppCompatActivity
 
             simpleTabledataAdapter = new SimpleTableDataAdapter(this,DATA_TO_SHOW);
             tableView.setDataAdapter(simpleTabledataAdapter);
-            if (config.smallestScreenWidthDp >320) {
+
+            if (config.smallestScreenWidthDp >320)
+            {
                 simpleTableHeaderAdapter.setTextSize(14);
                 simpleTabledataAdapter.setTextSize(12);
-            } else {
+            }
+            else
+                {
                 simpleTableHeaderAdapter.setTextSize(10);
                 simpleTabledataAdapter.setTextSize(10);
             }
 
 
 
-        } catch (JSONException e) {
+        }
+        catch (JSONException e)
+        {
             Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
         }
 
