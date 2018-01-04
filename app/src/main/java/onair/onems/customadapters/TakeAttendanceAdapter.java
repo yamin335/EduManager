@@ -10,10 +10,12 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.List;
 
 import onair.onems.R;
+import onair.onems.mainactivities.TakeAttendanceDetails;
 import onair.onems.models.AttendanceStudentModel;
 import onair.onems.models.StudentModel;
 
@@ -61,16 +63,19 @@ public class TakeAttendanceAdapter extends RecyclerView.Adapter<TakeAttendanceAd
     @Override
     public void onBindViewHolder(final MyViewHolder holder, final int position) {
         AttendanceStudentModel attendanceStudentModel = attendanceSheetList.get(position);
-        holder.name.setText("Md Yamin");
+        holder.name.setText(attendanceStudentModel.getUserFullName());
         holder.roll.setText("Roll: "+attendanceStudentModel.getRollNo());
         holder.isPresent = 1;
+        holder.isAbsent = 0;
+        holder.isLate = 0;
+        holder.isLeave = 0;
         if(holder.late.isChecked())
         {
-            holder.lateInput.setEnabled(true);
+            holder.lateInput.setEnabled(false);
         }
         else
         {
-            holder.lateInput.setEnabled(false);
+            holder.lateInput.setEnabled(true);
         }
 
         holder.present.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
@@ -84,6 +89,10 @@ public class TakeAttendanceAdapter extends RecyclerView.Adapter<TakeAttendanceAd
                     holder.isAbsent = 0;
                     holder.isLate = 0;
                     holder.isLeave = 0;
+                    attendanceSheetList.get(position).setIsPresent(Integer.toString(holder.isPresent));
+                    attendanceSheetList.get(position).setIsAbsent(Integer.toString(holder.isAbsent));
+                    attendanceSheetList.get(position).setIslate(Integer.toString(holder.isLate));
+                    attendanceSheetList.get(position).setIsLeave(Integer.toString(holder.isLeave));
 
                     holder.lateInput.setText("");
                     holder.absent.setChecked(false);
@@ -105,6 +114,10 @@ public class TakeAttendanceAdapter extends RecyclerView.Adapter<TakeAttendanceAd
                     holder.isAbsent = 1;
                     holder.isLate = 0;
                     holder.isLeave = 0;
+                    attendanceSheetList.get(position).setIsPresent(Integer.toString(holder.isPresent));
+                    attendanceSheetList.get(position).setIsAbsent(Integer.toString(holder.isAbsent));
+                    attendanceSheetList.get(position).setIslate(Integer.toString(holder.isLate));
+                    attendanceSheetList.get(position).setIsLeave(Integer.toString(holder.isLeave));
 
                     holder.lateInput.setText("");
                     holder.present.setChecked(false);
@@ -125,22 +138,33 @@ public class TakeAttendanceAdapter extends RecyclerView.Adapter<TakeAttendanceAd
                     holder.isAbsent = 0;
                     holder.isLate = 1;
                     holder.isLeave = 0;
+                    attendanceSheetList.get(position).setIsPresent(Integer.toString(holder.isPresent));
+                    attendanceSheetList.get(position).setIsAbsent(Integer.toString(holder.isAbsent));
+                    attendanceSheetList.get(position).setIslate(Integer.toString(holder.isLate));
+                    attendanceSheetList.get(position).setIsLeave(Integer.toString(holder.isLeave));
+
+                    holder.lateInput.setEnabled(false);
+
+//                    holder.lateInput.setEnabled(true);
                     if(holder.lateInput.getText().toString().isEmpty())
                     {
                         holder.lateTime = 0;
+                        Toast.makeText(mContext,"Please input first !!!",Toast.LENGTH_LONG).show();
                     }
                     else
                     {
                         holder.lateTime = Integer.parseInt(holder.lateInput.getText().toString());
                     }
-                    holder.lateInput.setEnabled(true);
+                    attendanceSheetList.get(position).setLateTime(Integer.toString(holder.lateTime));
+
+
                     holder.absent.setChecked(false);
                     holder.present.setChecked(false);
                     holder.leave.setChecked(false);
                 }
                 else
                 {
-                    holder.lateInput.setEnabled(false);
+                    holder.lateInput.setEnabled(true);
                 }
 
             }
@@ -156,6 +180,10 @@ public class TakeAttendanceAdapter extends RecyclerView.Adapter<TakeAttendanceAd
                     holder.isAbsent = 0;
                     holder.isLate = 0;
                     holder.isLeave = 1;
+                    attendanceSheetList.get(position).setIsPresent(Integer.toString(holder.isPresent));
+                    attendanceSheetList.get(position).setIsAbsent(Integer.toString(holder.isAbsent));
+                    attendanceSheetList.get(position).setIslate(Integer.toString(holder.isLate));
+                    attendanceSheetList.get(position).setIsLeave(Integer.toString(holder.isLeave));
 
                     holder.lateInput.setText("");
                     holder.absent.setChecked(false);
@@ -175,6 +203,7 @@ public class TakeAttendanceAdapter extends RecyclerView.Adapter<TakeAttendanceAd
 //                showPopupMenu(holder.overflow);
 //            }
 //        });
+
     }
 
     /**
