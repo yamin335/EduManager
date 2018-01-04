@@ -18,6 +18,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -36,6 +37,7 @@ import java.util.List;
 import de.hdodenhof.circleimageview.CircleImageView;
 import onair.onems.R;
 import onair.onems.customadapters.ExpandableListAdapter;
+import onair.onems.customadapters.ExpandableListAdapterStudent;
 import onair.onems.fragment.OneFragment;
 import onair.onems.fragment.TwoFragment;
 import onair.onems.models.ExpandedMenuModel;
@@ -47,7 +49,7 @@ import onair.onems.models.ExpandedMenuModel;
 public class StudentAttendance extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
 
     private DrawerLayout mDrawerLayout;
-    ExpandableListAdapter mMenuAdapter;
+    ExpandableListAdapterStudent mMenuAdapter;
     ExpandableListView expandableList;
     CircleImageView circleImageView;
     List<ExpandedMenuModel> listDataHeader;
@@ -76,22 +78,30 @@ public class StudentAttendance extends AppCompatActivity implements NavigationVi
         expandableList = (ExpandableListView) findViewById(R.id.navigationmenu);
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         View view = getLayoutInflater().inflate(R.layout.nav_header_student_attendance,null);
-        ImageView profilePicture = (ImageView)view.findViewById(R.id.profile);
-        TextView  studentName=(TextView) view.findViewById(R.id.name);
-
-
-        SharedPreferences sharedPre = PreferenceManager.getDefaultSharedPreferences(this);
-        String name=sharedPre.getString("UserFullName","");
-        studentName.setText(name);
-
-        Glide.with(this).load(R.drawable.student1).apply(RequestOptions.circleCropTransform()).into(profilePicture);
+        ImageView profilePicture = (ImageView)view.findViewById(R.id.profilePicture);
+        TextView userType = (TextView)view.findViewById(R.id.userType);
+        TextView userName = (TextView)view.findViewById(R.id.userName);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        String imageUrl = prefs.getString("ImageUrl","");
+        String name = prefs.getString("UserFullName","");
+        int user = prefs.getInt("UserTypeID",0);
+        userName.setText(name);
+        if(user == 3)
+        {
+            userType.setText("Student");
+        }
+        else if(user == 5)
+        {
+            userType.setText("Guardian");
+        }
+        Glide.with(this).load("http://192.168.1.129:4000/"+imageUrl.replace("\\","/")).apply(RequestOptions.circleCropTransform()).into(profilePicture);
         navigationView.addHeaderView(view);
         if (navigationView != null) {
             setupDrawerContent(navigationView);
         }
 
         prepareListData();
-        mMenuAdapter = new ExpandableListAdapter(this, listDataHeader, listDataChild, expandableList);
+        mMenuAdapter = new ExpandableListAdapterStudent(this, listDataHeader, listDataChild, expandableList);
 
         // setting list adapter
         expandableList.setAdapter(mMenuAdapter);
@@ -106,7 +116,14 @@ public class StudentAttendance extends AppCompatActivity implements NavigationVi
         expandableList.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
             @Override
             public boolean onGroupClick(ExpandableListView expandableListView, View view, int i, long l) {
-                //Log.d("DEBUG", "heading clicked");
+//                Log.d("DEBUG", "heading clicked"+i+"--"+l);
+                if((i == 2) && (l == 2) )
+                {
+                    DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                    if (drawer.isDrawerOpen(GravityCompat.START)) {
+                        drawer.closeDrawer(GravityCompat.START);
+                    }
+                }
                 return false;
             }
         });

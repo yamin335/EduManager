@@ -30,10 +30,10 @@
         android:layout_marginStart="16dp"
         android:background="@drawable/line"
         android:orientation="horizontal"
-        app:layout_constraintBottom_toTopOf="@+id/Establish"
-        app:layout_constraintEnd_toStartOf="@+id/Establish"
+        app:layout_constraintBottom_toTopOf="@+id/userType"
+        app:layout_constraintEnd_toStartOf="@+id/userType"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/Establish"></LinearLayout>
+        app:layout_constraintTop_toBottomOf="@+id/userType"></LinearLayout>
 
     <LinearLayout
         android:id="@+id/SecondLine"
@@ -45,17 +45,17 @@
         android:layout_marginStart="8dp"
         android:background="@drawable/line"
         android:orientation="horizontal"
-        app:layout_constraintBottom_toTopOf="@+id/Establish"
+        app:layout_constraintBottom_toTopOf="@+id/userType"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/Establish"
-        app:layout_constraintTop_toBottomOf="@+id/Establish"></LinearLayout>
+        app:layout_constraintStart_toEndOf="@+id/userType"
+        app:layout_constraintTop_toBottomOf="@+id/userType"></LinearLayout>
 
     <TextView
-        android:id="@+id/Establish"
+        android:id="@+id/userType"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:fontFamily="sans-serif-condensed"
-        android:text="Teacher"
+        android:text="User Type"
         android:textColor="#1031ea"
         android:textSize="15sp"
         app:layout_constraintEnd_toEndOf="parent"

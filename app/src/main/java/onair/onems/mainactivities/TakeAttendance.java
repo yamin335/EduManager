@@ -12,6 +12,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBar;
+import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -29,6 +30,7 @@ import android.widget.DatePicker;
 import android.widget.ExpandableListView;
 import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -391,8 +393,17 @@ public class TakeAttendance extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         View view = getLayoutInflater().inflate(R.layout.nav_header_main,null);
         ImageView profilePicture = (ImageView)view.findViewById(R.id.profilePicture);
+        TextView userType = (TextView)view.findViewById(R.id.userType);
+        TextView userName = (TextView)view.findViewById(R.id.userName);
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        String imageUrl = prefs.getString("ImageUrl",null);
+        String imageUrl = prefs.getString("ImageUrl","");
+        String name = prefs.getString("UserFullName","");
+        int user = prefs.getInt("UserTypeID",0);
+        userName.setText(name);
+        if(user == 4)
+        {
+            userType.setText("Teacher");
+        }
         Glide.with(this).load("http://192.168.1.129:4000/"+imageUrl.replace("\\","/")).apply(RequestOptions.circleCropTransform()).into(profilePicture);
        // profilePicture.setImageDrawable(getResources().getDrawable(R.drawable.album1));
         navigationView.addHeaderView(view);
@@ -421,7 +432,7 @@ public class TakeAttendance extends AppCompatActivity
         expandableList.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
             @Override
             public boolean onGroupClick(ExpandableListView expandableListView, View view, int i, long l) {
-                //Log.d("DEBUG", "heading clicked");
+                Log.d("DEBUG", "heading clicked"+i+"--"+l);
                 return false;
             }
         });
