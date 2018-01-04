@@ -26,6 +26,7 @@ import android.widget.ExpandableListView;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
@@ -61,7 +62,8 @@ public class StudentAttendance extends AppCompatActivity implements NavigationVi
     public static SharedPreferences sharedPreferences;
 
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
+    protected void onCreate(@Nullable Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_student_attendance);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -84,7 +86,11 @@ public class StudentAttendance extends AppCompatActivity implements NavigationVi
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         String imageUrl = prefs.getString("ImageUrl","");
         String name = prefs.getString("UserFullName","");
+
         int user = prefs.getInt("UserTypeID",0);
+
+
+
         userName.setText(name);
         if(user == 3)
         {
@@ -211,7 +217,8 @@ public class StudentAttendance extends AppCompatActivity implements NavigationVi
 
     }
 
-    private void setupDrawerContent(NavigationView navigationView) {
+    private void setupDrawerContent(NavigationView navigationView)
+    {
 
         navigationView.setNavigationItemSelectedListener(
                 new NavigationView.OnNavigationItemSelectedListener() {
@@ -243,7 +250,8 @@ public class StudentAttendance extends AppCompatActivity implements NavigationVi
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
@@ -261,7 +269,8 @@ public class StudentAttendance extends AppCompatActivity implements NavigationVi
             return true;
         }
 
-        switch (item.getItemId()) {
+        switch (item.getItemId())
+        {
             case android.R.id.home:
                 mDrawerLayout.openDrawer(GravityCompat.START);
                 return true;
@@ -295,24 +304,33 @@ public class StudentAttendance extends AppCompatActivity implements NavigationVi
         return true;
     }
 
-    private void setupViewPager(ViewPager viewPager) {
+    private void setupViewPager(ViewPager viewPager)
+    {
+
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
-        adapter.addFragment(new OneFragment(), "SELF ATTENDANCE");
-        adapter.addFragment(new TwoFragment(), "OTHERS ATTENDANCE");
+
+
+            adapter.addFragment(new OneFragment(), "SELF ATTENDANCE");
+            adapter.addFragment(new TwoFragment(), "OTHERS ATTENDANCE");
+
+
 
         viewPager.setAdapter(adapter);
     }
 
-    class ViewPagerAdapter extends FragmentPagerAdapter {
+    class ViewPagerAdapter extends FragmentPagerAdapter
+    {
         private final List<Fragment> mFragmentList = new ArrayList<>();
         private final List<String> mFragmentTitleList = new ArrayList<>();
 
-        public ViewPagerAdapter(FragmentManager manager) {
+        public ViewPagerAdapter(FragmentManager manager)
+        {
             super(manager);
         }
 
         @Override
-        public Fragment getItem(int position) {
+        public Fragment getItem(int position)
+        {
             return mFragmentList.get(position);
         }
 
@@ -328,7 +346,8 @@ public class StudentAttendance extends AppCompatActivity implements NavigationVi
         }
 
         @Override
-        public CharSequence getPageTitle(int position) {
+        public CharSequence getPageTitle(int position)
+        {
             return mFragmentTitleList.get(position);
         }
     }

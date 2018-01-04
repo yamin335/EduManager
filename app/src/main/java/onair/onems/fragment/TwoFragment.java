@@ -109,6 +109,7 @@ public class TwoFragment extends Fragment {
                 editor.putInt("MediumSelectID",MediumSelectID);
                 editor.putInt("SectionSelectID",SectionSelectID);
                 editor.putInt("MonthSelectID",MonthSelectID);
+
                 editor.commit();
                //Toast.makeText(getActivity(),"ShiftID="+ShiftSelectID+" ClassID= "+ClassSelectID+ "MediumID= "+MediumSelectID+" MonthID="+MediumSelectID+" SectionID= "+SectionSelectID+"MonthID= "+MonthSelectID,Toast.LENGTH_LONG).show();
                 Intent i = new Intent(getActivity(), StudentAttendanceShow.class);
@@ -301,7 +302,8 @@ public class TwoFragment extends Fragment {
 
 
     }
-    void parseMediumJsonData(String jsonString) {
+    void parseMediumJsonData(String jsonString)
+    {
         try {
             JSONArray jsonArray = new JSONArray(jsonString);
             ArrayList al = new ArrayList();

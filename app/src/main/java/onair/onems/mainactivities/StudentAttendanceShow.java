@@ -170,13 +170,13 @@ public class StudentAttendanceShow extends AppCompatActivity {
 
         dialog.dismiss();
     }
-    public boolean onOptionsItemSelected(MenuItem item){
-        Intent myIntent = new Intent(getApplicationContext(), StudentAttendance.class);
-        startActivityForResult(myIntent, 0);
-        finish();
-        return true;
-
-    }
+//    public boolean onOptionsItemSelected(MenuItem item){
+//        Intent myIntent = new Intent(getApplicationContext(), StudentAttendance.class);
+//        startActivityForResult(myIntent, 0);
+//        finish();
+//        return true;
+//
+//    }
 
 
 }

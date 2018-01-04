@@ -32,6 +32,10 @@ public class StudentMainScreen extends AppCompatActivity {
 
         SharedPreferences sharedPre = PreferenceManager.getDefaultSharedPreferences(this);
         String name=sharedPre.getString("InstituteName","School Name");
+        SharedPreferences.Editor editor = sharedPre.edit();
+        editor.putInt("monthselectindex",0);
+
+        editor.commit();
         int user = sharedPre.getInt("UserTypeID",0);
         if(user == 3)
         {
