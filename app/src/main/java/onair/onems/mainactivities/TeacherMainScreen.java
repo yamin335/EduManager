@@ -1,5 +1,6 @@
 package onair.onems.mainactivities;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -21,8 +22,46 @@ public class TeacherMainScreen extends AppCompatActivity {
     private Button takeAttendance;
     TextView InstituteName;
     TextView userType;
+    public static final String MyPREFERENCES = "LogInKey";
+    public static SharedPreferences sharedPreferences;
+
+//    @Override
+//    protected void onRestart() {
+//        sharedPreferences  = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
+//        if(sharedPreferences.getBoolean("LogInState", false))
+//        {
+//            finish();
+//        }
+//        super.onRestart();
+//    }
+
+//    @Override
+//    protected void onStart() {
+//        sharedPreferences  = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
+//        if(sharedPreferences.getBoolean("LogInState", false))
+//        {
+//            finish();
+//        }
+//        super.onStart();
+//    }
+//
+//    @Override
+//    protected void onResume() {
+//        sharedPreferences  = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
+//        if(sharedPreferences.getBoolean("LogInState", false))
+//        {
+//            finish();
+//        }
+//        super.onResume();
+//    }
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
+//        sharedPreferences  = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
+//        if(sharedPreferences.getBoolean("LogInState", false))
+//        {
+//            finish();
+//        }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_teacher);
 
@@ -31,7 +70,8 @@ public class TeacherMainScreen extends AppCompatActivity {
         userType = (TextView) findViewById(R.id.userType);
 
         SharedPreferences sharedPre = PreferenceManager.getDefaultSharedPreferences(this);
-        String name=sharedPre.getString("InstituteName","");
+        String InstituteName = sharedPre.getString("InstituteName","");
+        this.InstituteName.setText(InstituteName);
         int user = sharedPre.getInt("UserTypeID",0);
         if(user == 4)
         {
@@ -44,7 +84,6 @@ public class TeacherMainScreen extends AppCompatActivity {
             public void onClick(View v) {
                 Intent mainIntent = new Intent(TeacherMainScreen.this,TakeAttendance.class);
                 TeacherMainScreen.this.startActivity(mainIntent);
-                finish();
             }
         });
 
