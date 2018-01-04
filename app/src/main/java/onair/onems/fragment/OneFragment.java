@@ -51,11 +51,12 @@ public class OneFragment extends Fragment {
     ProgressDialog dialog;
     Configuration config;
     SharedPreferences sharedPre;
-    int sectionID,classID,shiftID,mediumID;
+    int sectionID,classID,shiftID,mediumID,monthselectindex;
     JSONArray monthJsonArray;
     SimpleTableHeaderAdapter simpleTableHeaderAdapter;
     SimpleTableDataAdapter simpleTabledataAdapter;
 
+    int MonthID[];
     String[][] DATA_TO_SHOW;
 
     public OneFragment()
@@ -64,7 +65,8 @@ public class OneFragment extends Fragment {
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
     }
 
@@ -86,7 +88,7 @@ public class OneFragment extends Fragment {
          mediumID=sharedPre.getInt("MediumID",0);
          classID=sharedPre.getInt("ClassID",0);
          sectionID=sharedPre.getInt("SectionID",0);
-
+         monthselectindex=sharedPre.getInt("monthselectindex",0);
 
         dialog = new ProgressDialog(getActivity());
         dialog.setMessage("Loading....");
@@ -117,6 +119,7 @@ public class OneFragment extends Fragment {
             {
                 SharedPreferences.Editor editor = sharedPre.edit();
                 editor.putString("Date", DATA_TO_SHOW[rowIndex][1]);
+                editor.putInt("monthselectindex",monthselectindex);
                 editor.commit();
                 //Toast.makeText(getActivity(),""+DATA_TO_SHOW[rowIndex][1],Toast.LENGTH_LONG).show();
                 Intent i = new Intent(getActivity(), SubjectWiseAttendance.class);
@@ -131,9 +134,10 @@ public class OneFragment extends Fragment {
                 new Response.Listener<String>()
                 {
                     @Override
-                    public void onResponse(String response) {
+                    public void onResponse(String response)
+                    {
 
-                     parseJsonData(response);
+                        parseMonthJsonData(response);
 
                     }
                 }, new Response.ErrorListener() {
@@ -153,8 +157,11 @@ public class OneFragment extends Fragment {
 
             @Override public void onItemSelected(MaterialSpinner view, int position, long id, String item)
             {
-                int monthid=position+1;
-
+                int monthid=MonthID[position];
+                monthselectindex=position;
+                SharedPreferences.Editor editor = sharedPre.edit();
+                editor.putInt("monthselectindex",monthselectindex);
+                editor.commit();
                 monthAttendanceUrl=getString(R.string.baseUrl)+"getStudentMonthlyDeviceAttendance/"+shiftID+"/"+mediumID+"/"+classID+"/"+sectionID+"/"+monthid+"/"+RFID;
                 RequestQueue queue = Volley.newRequestQueue(getActivity());
 
@@ -181,24 +188,50 @@ public class OneFragment extends Fragment {
 
         return rootView;
     }
-    void parseJsonData(String jsonString) {
+    void parseMonthJsonData(String jsonString) {
         try {
-
             JSONArray jsonArray = new JSONArray(jsonString);
             ArrayList al = new ArrayList();
-            for(int i = 0; i < jsonArray.length(); ++i) {
+            MonthID=new int[jsonArray.length()];
+            for(int i = 0; i < jsonArray.length(); ++i)
+            {
                 JSONObject jsonObject=jsonArray.getJSONObject(i);
                 String name=jsonObject.getString("MonthName");
+                MonthID[i]=jsonObject.getInt("MonthID");
                 al.add(name);
             }
+
             ArrayAdapter adapter = new ArrayAdapter(getActivity(), android.R.layout.simple_list_item_1, al);
             spinner.setAdapter(adapter);
-        }
-        catch (JSONException e) {
+            spinner.setSelectedIndex(monthselectindex);
+
+            monthAttendanceUrl=getString(R.string.baseUrl)+"getStudentMonthlyDeviceAttendance/"+shiftID+"/"+mediumID+"/"+classID+"/"+sectionID+"/"+ MonthID[monthselectindex]+"/"+RFID;
+            RequestQueue queue = Volley.newRequestQueue(getActivity());
+
+            StringRequest stringRequest = new StringRequest(Request.Method.GET, monthAttendanceUrl,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+
+                            parseMonthlyAttendanceJsonData(response);
+
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+
+                    dialog.dismiss();
+                }
+            });
+
+            queue.add(stringRequest);
+            dialog.dismiss();
+        } catch (JSONException e) {
             Toast.makeText(getActivity(),""+e,Toast.LENGTH_LONG).show();
+            dialog.dismiss();
+
         }
 
-        dialog.dismiss();
     }
     void parseMonthlyAttendanceJsonData(String jsonString) {
         try {
@@ -236,7 +269,9 @@ public class OneFragment extends Fragment {
 
 
 
-        } catch (JSONException e) {
+        }
+        catch (JSONException e)
+        {
             Toast.makeText(getActivity(),""+e,Toast.LENGTH_LONG).show();
         }
 
