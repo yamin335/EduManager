@@ -9,6 +9,8 @@ import com.google.gson.annotations.SerializedName;
  */
 
 public class AttendanceStudentModel {
+
+    private String UserFullName;
     @SerializedName("UserID")
     @Expose
     private String UserID;
@@ -69,12 +71,13 @@ public class AttendanceStudentModel {
 
     }
 
-    public AttendanceStudentModel(String UserID, String RFID, String RollNo, String SubjectID,
+    public AttendanceStudentModel(String UserFullName, String UserID, String RFID, String RollNo, String SubjectID,
                                   String DepartmentID, String SectionID, String MediumID, String ShiftID,
                                   String Remarks, String ClassID, String BoardID, String BrunchID,
                                   String SessionID, String IsPresent, String Islate, String LateTime,
                                   String IsLeave, String IsAbsent)
     {
+        this.UserFullName = UserFullName;
         this.UserID = UserID;
         this.RFID = RFID;
         this.RollNo = RollNo;
@@ -93,6 +96,11 @@ public class AttendanceStudentModel {
         this.LateTime = Integer.parseInt(LateTime);
         this.IsLeave = Integer.parseInt(IsLeave);
         this.IsAbsent = Integer.parseInt(IsAbsent);
+    }
+
+    public void setUserFullName(String UserFullName)
+    {
+        this.UserFullName = UserFullName;
     }
 
     public void setUserID(String UserID)
@@ -183,6 +191,11 @@ public class AttendanceStudentModel {
     public void setIsAbsent(String IsAbsent)
     {
         this.IsAbsent = Integer.parseInt(IsAbsent);
+    }
+
+    public String getUserFullName()
+    {
+        return UserFullName;
     }
 
     public String getUserID()

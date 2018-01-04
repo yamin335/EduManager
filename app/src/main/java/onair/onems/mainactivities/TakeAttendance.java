@@ -425,6 +425,13 @@ public class TakeAttendance extends AppCompatActivity
                     Intent intent = new Intent(TakeAttendance.this, ShowAttendance.class);
                     startActivity(intent);
                 }
+                if((i == 2) && (i1 == 0) && (l == 0))
+                {
+                    DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                    if (drawer.isDrawerOpen(GravityCompat.START)) {
+                        drawer.closeDrawer(GravityCompat.START);
+                    }
+                }
 
                 return false;
             }

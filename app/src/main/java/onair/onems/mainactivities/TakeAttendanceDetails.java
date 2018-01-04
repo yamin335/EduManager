@@ -138,7 +138,7 @@ public class TakeAttendanceDetails extends AppCompatActivity {
 //                {
 //                    strings[j] = InstituteIDJsonArray.getString(j);
 //                }
-                AttendanceStudentModel attendanceStudentModel = new AttendanceStudentModel(
+                AttendanceStudentModel attendanceStudentModel = new AttendanceStudentModel(studentJsonObject.getString("UserFullName"),
                         studentJsonObject.getString("UserID"), studentJsonObject.getString("RFID"),
                         studentJsonObject.getString("RollNo"), studentJsonObject.getString("SubjectID"),
                         studentJsonObject.getString("DepartmentID"), studentJsonObject.getString("SectionID"),
