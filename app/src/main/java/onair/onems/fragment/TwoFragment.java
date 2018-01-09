@@ -87,10 +87,10 @@ public class TwoFragment extends Fragment {
 
         sharedPre = PreferenceManager.getDefaultSharedPreferences(getActivity());
 
-        classUrl=getString(R.string.baseUrl)+"getInsClass/"+sharedPre.getInt("InstituteID",0);
-        mediumUrl=getString(R.string.baseUrl)+"getInsMedium/"+sharedPre.getInt("InstituteID",0);
+        classUrl=getString(R.string.baseUrl)+"getInsClass/"+sharedPre.getLong("InstituteID",0);
+        mediumUrl=getString(R.string.baseUrl)+"getInsMedium/"+sharedPre.getLong("InstituteID",0);
         monthUrl=getString(R.string.baseUrl)+"getMonth";
-        shiftUrl=getString(R.string.baseUrl)+"getInsShift/"+sharedPre.getInt("InstituteID",0);
+        shiftUrl=getString(R.string.baseUrl)+"getInsShift/"+sharedPre.getLong("InstituteID",0);
 
         dialog = new ProgressDialog(getActivity());
         dialog.setMessage("Loading....");
@@ -239,7 +239,7 @@ public class TwoFragment extends Fragment {
                 if (position > 0) {
                     ClassSelectID = ClassID[position];
                     RequestQueue queueSection = Volley.newRequestQueue(getActivity());
-                    sectionUrl = getString(R.string.baseUrl) + "getInsSection/" + sharedPre.getInt("InstituteID", 0) + "/" + ClassSelectID;
+                    sectionUrl = getString(R.string.baseUrl) + "getInsSection/" + sharedPre.getLong("InstituteID", 0) + "/" + ClassSelectID;
                     StringRequest stringSectionRequest = new StringRequest(Request.Method.GET, sectionUrl,
                             new Response.Listener<String>() {
                                 @Override

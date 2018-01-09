@@ -52,6 +52,7 @@ public class ShowAttendance extends AppCompatActivity {
     private static int SPLASH_TIME_OUT = 1000;
     Runnable refresh;
     int SectionSelectID=0,ShiftSelectID=0,MediumSelectID=0,ClassSelectID=0,MonthSelectID=0;
+    long InstituteID;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,10 +63,11 @@ public class ShowAttendance extends AppCompatActivity {
         sectionSpinner =(MaterialSpinner) findViewById(R.id.spinner_Section);
         monthSpinner = (MaterialSpinner) findViewById(R.id.spinner_Month);
         sharedPre = PreferenceManager.getDefaultSharedPreferences(this);
-        classUrl=getString(R.string.baseUrl)+"getInsClass/1";
-        mediumUrl=getString(R.string.baseUrl)+"getInsMedium/1";
+        InstituteID = sharedPre.getLong("InstituteID",0);
+        classUrl=getString(R.string.baseUrl)+"getInsClass/"+InstituteID;
+        mediumUrl=getString(R.string.baseUrl)+"getInsMedium/"+InstituteID;
         monthUrl=getString(R.string.baseUrl)+"getMonth";
-        shiftUrl=getString(R.string.baseUrl)+"getInsShift/1";
+        shiftUrl=getString(R.string.baseUrl)+"getInsShift/"+InstituteID;
         dialog = new ProgressDialog(this);
         dialog.setMessage("Loading....");
         dialog.show();
@@ -200,7 +202,7 @@ public class ShowAttendance extends AppCompatActivity {
                 if (position > 0) {
                     ClassSelectID = ClassID[position];
                     RequestQueue queueSection = Volley.newRequestQueue(getApplicationContext());
-                    sectionUrl = getString(R.string.baseUrl) + "getInsSection/" + sharedPre.getInt("InstituteID", 0) + "/" + ClassSelectID;
+                    sectionUrl = getString(R.string.baseUrl) + "getInsSection/" + sharedPre.getLong("InstituteID", 0) + "/" + ClassSelectID;
                     StringRequest stringSectionRequest = new StringRequest(Request.Method.GET, sectionUrl,
                             new Response.Listener<String>() {
                                 @Override

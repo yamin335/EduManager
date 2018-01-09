@@ -47,7 +47,8 @@ public class StudentAttendanceShow extends AppCompatActivity {
     String studentNameList[],studentRFIDList[],studentRollList[], studentUserList[];;
     String selectStudentName="",selectStudentRFID="",getSelectRoll="";
     double percent[];
-    int InstituteID=0,SectionID=0,ClassID=0,MediumID=0,ShiftID=0;
+    long InstituteID=0;
+    int SectionID=0,ClassID=0,MediumID=0,ShiftID=0;
     SimpleTableHeaderAdapter simpleTableHeaderAdapter;
     SimpleTableDataAdapter simpleTabledataAdapter;
     @Override
@@ -57,7 +58,7 @@ public class StudentAttendanceShow extends AppCompatActivity {
         tableView = (TableView) findViewById(R.id.tableView);
 
         sharedPre = PreferenceManager.getDefaultSharedPreferences(this);
-        InstituteID=sharedPre.getInt("InstituteID",0);
+        InstituteID=sharedPre.getLong("InstituteID",0);
         ShiftID=sharedPre.getInt("ShiftSelectID",0);
         MediumID=sharedPre.getInt("MediumSelectID",0);
         ClassID=sharedPre.getInt("ClassSelectID",0);

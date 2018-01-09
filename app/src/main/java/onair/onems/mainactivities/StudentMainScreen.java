@@ -25,18 +25,18 @@ public class StudentMainScreen extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main_student);
+        setContentView(R.layout.student_dashboard);
 
         InstituteName=(TextView) findViewById(R.id.InstituteName);
         userType = (TextView) findViewById(R.id.userType);
 
         SharedPreferences sharedPre = PreferenceManager.getDefaultSharedPreferences(this);
-        String name=sharedPre.getString("InstituteName","School Name");
+        String name = sharedPre.getString("InstituteName","School Name");
         SharedPreferences.Editor editor = sharedPre.edit();
         editor.putInt("monthselectindex",0);
 
         editor.commit();
-        int user = sharedPre.getInt("UserTypeID",0);
+        long user = sharedPre.getLong("UserTypeID",0);
         if(user == 3)
         {
             userType.setText("Student");

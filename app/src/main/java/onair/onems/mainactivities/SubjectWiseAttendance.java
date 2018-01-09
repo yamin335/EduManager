@@ -37,7 +37,7 @@ public class SubjectWiseAttendance extends AppCompatActivity
     ProgressDialog dialog;
     Configuration config;
     SharedPreferences sharedPre;
-    int sectionID,classID,shiftID,mediumID;
+    long sectionID,classID,shiftID,mediumID;
     String userID,day,subjectWiseAttendanceUrl;
     SimpleTableDataAdapter simpleTabledataAdapter;
     SimpleTableHeaderAdapter simpleTableHeaderAdapter;
@@ -50,10 +50,10 @@ public class SubjectWiseAttendance extends AppCompatActivity
         tableView = (TableView) findViewById(R.id.tableView);
         sharedPre = PreferenceManager.getDefaultSharedPreferences(this);
         userID=sharedPre.getString("UserID","");
-        shiftID=sharedPre.getInt("ShiftID",0);
-        mediumID=sharedPre.getInt("MediumID",0);
-        classID=sharedPre.getInt("ClassID",0);
-        sectionID=sharedPre.getInt("SectionID",0);
+        shiftID=sharedPre.getLong("ShiftID",0);
+        mediumID=sharedPre.getLong("MediumID",0);
+        classID=sharedPre.getLong("ClassID",0);
+        sectionID=sharedPre.getLong("SectionID",0);
         day=sharedPre.getString("Date","");
 
         subjectWiseAttendanceUrl=getString(R.string.baseUrl)+"getHrmSubWiseAtdByStudentID/"+shiftID+"/"+mediumID+"/"+classID+"/"+sectionID+"/"+userID+"/"+day;

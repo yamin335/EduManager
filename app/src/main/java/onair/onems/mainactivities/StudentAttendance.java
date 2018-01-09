@@ -87,7 +87,7 @@ public class StudentAttendance extends AppCompatActivity implements NavigationVi
         String imageUrl = prefs.getString("ImageUrl","");
         String name = prefs.getString("UserFullName","");
 
-        int user = prefs.getInt("UserTypeID",0);
+        long user = prefs.getLong("UserTypeID",0);
 
 
 
@@ -100,7 +100,7 @@ public class StudentAttendance extends AppCompatActivity implements NavigationVi
         {
             userType.setText("Guardian");
         }
-        Glide.with(this).load("http://192.168.1.129:4000/"+imageUrl.replace("\\","/")).apply(RequestOptions.circleCropTransform()).into(profilePicture);
+        Glide.with(this).load(getString(R.string.baseUrlRaw)+imageUrl.replace("\\","/")).apply(RequestOptions.circleCropTransform()).into(profilePicture);
         navigationView.addHeaderView(view);
 
         if (navigationView != null)

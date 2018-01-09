@@ -8,52 +8,44 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.view.KeyEvent;
 import android.view.View;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
-
 import onair.onems.R;
-
 
 public class LoginScreen extends AppCompatActivity
 {
-
     private Button loginButton;
     private AutoCompleteTextView takeId;
     private EditText takePassword;
-    TextView errorView;
-    private String UserID = "", LoginId = "", LoginPassword = "", Password = "", UserFullName = "", ImageUrl = "", InstituteName = "", DepartmentName = "",
-                            DesignationName = "", BrunchName = "", RFID = "", RollNo = "", StudentNo = "", DepartmentID = "", DesignationID = "", BrunchID = "";
+    private TextView errorView;
+    private String UserID = "", LoginId = "", LoginPassword = "", Password = "", UserFullName = "",
+            ImageUrl = "", InstituteName = "", DepartmentName = "",
+            DesignationName = "", BrunchName = "", RFID = "", RollNo = "",
+            StudentNo = "";
 
-    int UserTypeID = 0, InstituteID = 0, SBrunchID = 0, BoardID, SDepartmentID, MediumID = 0, SectionID = 0, SessionID = 0, ShiftID = 0, ClassID = 0;
-    String loginurl = "";
-
-    ProgressDialog dialog;
-
+    private long UserTypeID = 0, InstituteID = 0, SBrunchID = 0, BoardID = 0, SDepartmentID = 0,
+            DepartmentID = 0, MediumID = 0, SectionID = 0, SessionID = 0, ShiftID = 0, ClassID = 0,
+            DesignationID = 0, BrunchID = 0;
+    private String loginurl = "";
+    private ProgressDialog dialog;
     public static final String MyPREFERENCES = "LogInKey";
     public static SharedPreferences sharedPreferences;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState)
     {
-
         super.onCreate(savedInstanceState);
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
@@ -73,7 +65,7 @@ public class LoginScreen extends AppCompatActivity
         sharedPreferences  = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
         if(sharedPreferences.getBoolean("LogInState", true))
         {
-            int UserTypeID = prefs.getInt("UserTypeID",0);
+            long UserTypeID = prefs.getLong("UserTypeID",0);
             if((UserTypeID == 3)||(UserTypeID == 5))
             {
                 Intent intent = new Intent(LoginScreen.this, StudentMainScreen.class);
@@ -87,6 +79,7 @@ public class LoginScreen extends AppCompatActivity
                 finish();
             }
         }
+
         setContentView(R.layout.activity_login);
 
         dialog = new ProgressDialog(this);
@@ -108,14 +101,7 @@ public class LoginScreen extends AppCompatActivity
                 LoginId = takeId.getText().toString();
                 LoginPassword = takePassword.getText().toString();
 
-                if((LoginId.equals("22"))&&(LoginPassword.equals("22")))
-                {
-                    Intent mainIntent = new Intent(LoginScreen.this,TeacherMainScreen.class);
-                    LoginScreen.this.startActivity(mainIntent);
-                    LoginScreen.this.finish();
-                    dialog.dismiss();
-                }
-                else if(takeId.getText().toString().isEmpty())
+                if(takeId.getText().toString().isEmpty())
                 {
                     takeId.setError("This field is required");
                     takeId.requestFocus();
@@ -143,7 +129,7 @@ public class LoginScreen extends AppCompatActivity
 
                                     // Login For User
 
-                                    if((UserID.length()>0) && (UserID.equals("1")) && (UserTypeID == 3))
+                                    if((UserID.length()>0) && (UserTypeID == 3))
                                     {
                                         Intent mainIntent = new Intent(LoginScreen.this,StudentMainScreen.class);
                                         LoginScreen.this.startActivity(mainIntent);
@@ -151,7 +137,7 @@ public class LoginScreen extends AppCompatActivity
                                         dialog.dismiss();
                                     }
                                     // Login For Teacher
-                                    else if((UserID.length()>0) && (UserID.equals("150")) && (UserTypeID == 4))
+                                    else if((UserID.length()>0) && (UserTypeID == 4))
                                     {
                                         Intent mainIntent = new Intent(LoginScreen.this,TeacherMainScreen.class);
                                         LoginScreen.this.startActivity(mainIntent);
@@ -181,11 +167,7 @@ public class LoginScreen extends AppCompatActivity
                     queue.add(stringRequest);
                 }
 
-
-
                 // Get Login ID and Password From Server Using Volley END
-
-
             }
         });
     }
@@ -195,7 +177,6 @@ public class LoginScreen extends AppCompatActivity
         try
         {
             // Parse Json data From API
-
             JSONArray jsonArray = new JSONArray(jsonString);
             UserID = jsonArray.getJSONObject(0).getString("UserID");
             Password = jsonArray.getJSONObject(0).getString("Password");
@@ -220,9 +201,33 @@ public class LoginScreen extends AppCompatActivity
                 InstituteID = Integer.parseInt(InstituteIDTemp);
             }
             ImageUrl = jsonArray.getJSONObject(0).getString("ImageUrl");
-            DepartmentID = jsonArray.getJSONObject(0).getString("DepartmentID");
-            DesignationID = jsonArray.getJSONObject(0).getString("DesignationID");
-            BrunchID = jsonArray.getJSONObject(0).getString("BrunchID");
+            String DepartmentIDTemp = jsonArray.getJSONObject(0).getString("DepartmentID");
+            if(DepartmentIDTemp.equals("null"))
+            {
+                DepartmentID = 0;
+            }
+            else
+            {
+                DepartmentID = Integer.parseInt(DepartmentIDTemp);
+            }
+            String DesignationIDTemp = jsonArray.getJSONObject(0).getString("DesignationID");
+            if(DesignationIDTemp.equals("null"))
+            {
+                DesignationID = 0;
+            }
+            else
+            {
+                DesignationID = Integer.parseInt(DesignationIDTemp);
+            }
+            String BrunchIDTemp = jsonArray.getJSONObject(0).getString("BrunchID");
+            if(BrunchIDTemp.equals("null"))
+            {
+                BrunchID = 0;
+            }
+            else
+            {
+                BrunchID = Integer.parseInt(BrunchIDTemp);
+            }
             DepartmentName = jsonArray.getJSONObject(0).getString("DepartmentName");
             DesignationName = jsonArray.getJSONObject(0).getString("DesignationName");
             BrunchName = jsonArray.getJSONObject(0).getString("BrunchName");
@@ -308,27 +313,27 @@ public class LoginScreen extends AppCompatActivity
             SharedPreferences.Editor editor = prefs.edit();
             editor.putString("UserID", UserID);
             editor.putString("Password",Password);
-            editor.putInt("UserTypeID",UserTypeID);
+            editor.putLong("UserTypeID",UserTypeID);
             editor.putString("UserFullName",UserFullName);
-            editor.putInt("InstituteID",InstituteID);
+            editor.putLong("InstituteID",InstituteID);
             editor.putString("InstituteName",InstituteName);
             editor.putString("ImageUrl",ImageUrl);
-            editor.putString("DepartmentID",DepartmentID);
-            editor.putString("DesignationID",DesignationID);
-            editor.putString("BrunchID",BrunchID);
+            editor.putLong("DepartmentID",DepartmentID);
+            editor.putLong("DesignationID",DesignationID);
+            editor.putLong("BrunchID",BrunchID);
             editor.putString("DepartmentName",DepartmentName);
             editor.putString("DesignationName",DesignationName);
             editor.putString("BrunchName",BrunchName);
-            editor.putInt("SBrunchID",SBrunchID);
-            editor.putInt(" BoardID", BoardID);
-            editor.putInt("SDepartmentID",SDepartmentID);
-            editor.putInt("MediumID",MediumID);
+            editor.putLong("SBrunchID",SBrunchID);
+            editor.putLong(" BoardID", BoardID);
+            editor.putLong("SDepartmentID",SDepartmentID);
+            editor.putLong("MediumID",MediumID);
             editor.putString("RFID",RFID);
             editor.putString("RollNo",RollNo);
-            editor.putInt("SectionID",SectionID);
-            editor.putInt("SessionID",SessionID);
-            editor.putInt("ShiftID",ShiftID);
-            editor.putInt("ClassID",ClassID );
+            editor.putLong("SectionID",SectionID);
+            editor.putLong("SessionID",SessionID);
+            editor.putLong("ShiftID",ShiftID);
+            editor.putLong("ClassID",ClassID );
             editor.putString("StudentNo",StudentNo);
             editor.commit();
 

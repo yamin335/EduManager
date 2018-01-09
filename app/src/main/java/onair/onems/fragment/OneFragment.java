@@ -51,7 +51,8 @@ public class OneFragment extends Fragment {
     ProgressDialog dialog;
     Configuration config;
     SharedPreferences sharedPre;
-    int sectionID,classID,shiftID,mediumID,monthselectindex;
+    long sectionID,classID,shiftID,mediumID;
+    int monthselectindex;
     JSONArray monthJsonArray;
     SimpleTableHeaderAdapter simpleTableHeaderAdapter;
     SimpleTableDataAdapter simpleTabledataAdapter;
@@ -84,10 +85,10 @@ public class OneFragment extends Fragment {
          sharedPre = PreferenceManager.getDefaultSharedPreferences(getActivity());
 
          RFID=sharedPre.getString("RFID","");
-         shiftID=sharedPre.getInt("ShiftID",0);
-         mediumID=sharedPre.getInt("MediumID",0);
-         classID=sharedPre.getInt("ClassID",0);
-         sectionID=sharedPre.getInt("SectionID",0);
+         shiftID=sharedPre.getLong("ShiftID",0);
+         mediumID=sharedPre.getLong("MediumID",0);
+         classID=sharedPre.getLong("ClassID",0);
+         sectionID=sharedPre.getLong("SectionID",0);
          monthselectindex=sharedPre.getInt("monthselectindex",0);
 
         dialog = new ProgressDialog(getActivity());
@@ -158,11 +159,11 @@ public class OneFragment extends Fragment {
             @Override public void onItemSelected(MaterialSpinner view, int position, long id, String item)
             {
                 int monthid=MonthID[position];
-                monthselectindex=position;
+                monthselectindex = position;
                 SharedPreferences.Editor editor = sharedPre.edit();
                 editor.putInt("monthselectindex",monthselectindex);
                 editor.commit();
-                monthAttendanceUrl=getString(R.string.baseUrl)+"getStudentMonthlyDeviceAttendance/"+shiftID+"/"+mediumID+"/"+classID+"/"+sectionID+"/"+monthid+"/"+RFID;
+                monthAttendanceUrl = getString(R.string.baseUrl)+"getStudentMonthlyDeviceAttendance/"+shiftID+"/"+mediumID+"/"+classID+"/"+sectionID+"/"+monthid+"/"+RFID;
                 RequestQueue queue = Volley.newRequestQueue(getActivity());
 
                 StringRequest stringRequest = new StringRequest(Request.Method.GET, monthAttendanceUrl,

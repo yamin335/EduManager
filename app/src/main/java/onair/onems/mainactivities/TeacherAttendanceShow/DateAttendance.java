@@ -57,7 +57,8 @@ public class DateAttendance extends AppCompatActivity
     Configuration config;
     ProgressDialog dialog;
     String RFID="",monthAttendanceUrl="",studentName="",studentRoll="";
-    int InstituteID=0,SectionID=0,ClassID=0,MediumID=0,ShiftID=0,MonthID=0;
+    long InstituteID=0;
+    int SectionID=0,ClassID=0,MediumID=0,ShiftID=0,MonthID=0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,7 +80,7 @@ public class DateAttendance extends AppCompatActivity
         // get Internal Data using SharedPreferences
 
         sharedPre = PreferenceManager.getDefaultSharedPreferences(this);
-        InstituteID=sharedPre.getInt("InstituteID",0);
+        InstituteID=sharedPre.getLong("InstituteID",0);
         ShiftID=sharedPre.getInt("ShiftSelectID",0);
         MediumID=sharedPre.getInt("MediumSelectID",0);
         ClassID=sharedPre.getInt("ClassSelectID",0);
@@ -94,7 +95,7 @@ public class DateAttendance extends AppCompatActivity
         roll.setText("Roll: "+studentRoll);
         id.setText("ID: "+RFID);
 
-        Glide.with(this).load("http://192.168.1.82:4000/"+imageUrl.replace("\\","/")).apply(RequestOptions.circleCropTransform()).into(image);
+        Glide.with(this).load(getString(R.string.baseUrlRaw)+imageUrl.replace("\\","/")).apply(RequestOptions.circleCropTransform()).into(image);
         monthAttendanceUrl=getString(R.string.baseUrl)+"getStudentMonthlyDeviceAttendance/"+ShiftID+"/"+MediumID+"/"+ClassID+"/"+SectionID+"/"+MonthID+"/"+RFID;
         // Toast.makeText(this,""+monthAttendanceUrl,Toast.LENGTH_LONG).show();
         // Add Header of The Table

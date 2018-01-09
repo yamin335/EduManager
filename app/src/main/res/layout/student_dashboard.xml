@@ -3,10 +3,21 @@
     android:layout_width="match_parent"
     android:orientation="vertical"
     android:background="#ffffff"
+    android:padding="10dp"
     xmlns:android="http://schemas.android.com/apk/res/android" >
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <TextView
+            android:id="@+id/InstituteName"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fontFamily="sans-serif-condensed"
+            android:text="School Name"
+            android:gravity="center_horizontal"
+            android:textColor="#1031ea"
+            android:textSize="25sp" />
 
     </LinearLayout>
     <LinearLayout
@@ -16,18 +27,32 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1">
+            android:layout_weight="1"
+            android:background="@drawable/line"
+            android:layout_gravity="center_vertical">
 
         </LinearLayout>
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content">
+            <TextView
+                android:id="@+id/userType"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-condensed"
+                android:text="User Type"
+                android:textColor="#1031ea"
+                android:textSize="15sp"
+                android:paddingLeft="4dp"
+                android:paddingRight="4dp"/>
 
         </LinearLayout>
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1">
+            android:layout_weight="1"
+            android:background="@drawable/line"
+            android:layout_gravity="center_vertical">
 
         </LinearLayout>
 
@@ -40,12 +65,45 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="1">
+            android:layout_weight="1"
+            android:gravity="center">
+            <Button
+                android:id="@+id/notice"
+                android:layout_width="match_parent"
+                android:layout_height="105dp"
+                android:background="@drawable/menu_item_notice"
+                android:drawableTop="@drawable/notices"
+                android:elevation="100dp"
+                android:fontFamily="sans-serif-condensed"
+                android:padding="10dp"
+                android:text="Notice"
+                android:textAllCaps="false"
+                android:textColor="@android:color/white"
+                android:textSize="20sp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"/>
+
         </LinearLayout>
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="1">
+            android:layout_weight="1"
+            android:gravity="center">
+            <Button
+                android:id="@+id/routine"
+                android:layout_width="match_parent"
+                android:layout_height="105dp"
+                android:background="@drawable/menu_item_routine"
+                android:drawableTop="@drawable/daily_routine"
+                android:elevation="100dp"
+                android:fontFamily="sans-serif-condensed"
+                android:padding="10dp"
+                android:text="Routine"
+                android:textAllCaps="false"
+                android:textColor="@android:color/white"
+                android:textSize="20sp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"/>
         </LinearLayout>
     </LinearLayout>
     <LinearLayout
@@ -56,12 +114,44 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="1">
+            android:layout_weight="1"
+            android:gravity="center">
+            <Button
+                android:id="@+id/attendance"
+                android:layout_width="match_parent"
+                android:layout_height="105dp"
+                android:background="@drawable/menu_item_attendance"
+                android:drawableTop="@drawable/attendance"
+                android:elevation="100dp"
+                android:fontFamily="sans-serif-condensed"
+                android:padding="10dp"
+                android:text="Attendance"
+                android:textAllCaps="false"
+                android:textColor="@android:color/white"
+                android:textSize="18sp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"/>
         </LinearLayout>
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="1">
+            android:layout_weight="1"
+            android:gravity="center">
+            <Button
+                android:id="@+id/syllebus"
+                android:layout_width="match_parent"
+                android:layout_height="105dp"
+                android:background="@drawable/menu_item_syllebus"
+                android:drawableTop="@drawable/syllebus"
+                android:elevation="100dp"
+                android:fontFamily="sans-serif-condensed"
+                android:padding="10dp"
+                android:text="Syllabus"
+                android:textAllCaps="false"
+                android:textColor="@android:color/white"
+                android:textSize="20sp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"/>
         </LinearLayout>
     </LinearLayout>
     <LinearLayout
@@ -72,12 +162,44 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="1">
+            android:layout_weight="1"
+            android:gravity="center">
+            <Button
+                android:id="@+id/exam"
+                android:layout_width="match_parent"
+                android:layout_height="105dp"
+                android:background="@drawable/menu_item_exam"
+                android:drawableTop="@drawable/routine"
+                android:elevation="100dp"
+                android:fontFamily="sans-serif-condensed"
+                android:padding="10dp"
+                android:text="Exam"
+                android:textAllCaps="false"
+                android:textColor="@android:color/white"
+                android:textSize="20sp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"/>
         </LinearLayout>
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="1">
+            android:layout_weight="1"
+            android:gravity="center">
+            <Button
+                android:id="@+id/result"
+                android:layout_width="match_parent"
+                android:layout_height="105dp"
+                android:background="@drawable/menu_item_result"
+                android:drawableTop="@drawable/result"
+                android:elevation="100dp"
+                android:fontFamily="sans-serif-condensed"
+                android:padding="10dp"
+                android:text="Result"
+                android:textAllCaps="false"
+                android:textColor="@android:color/white"
+                android:textSize="20sp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"/>
         </LinearLayout>
     </LinearLayout>
     <LinearLayout
@@ -88,12 +210,44 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="1">
+            android:layout_weight="1"
+            android:gravity="center">
+            <Button
+                android:id="@+id/fee"
+                android:layout_width="match_parent"
+                android:layout_height="105dp"
+                android:background="@drawable/menu_item_fee"
+                android:drawableTop="@drawable/fee"
+                android:elevation="100dp"
+                android:fontFamily="sans-serif-condensed"
+                android:padding="10dp"
+                android:text="Fee"
+                android:textAllCaps="false"
+                android:textColor="@android:color/white"
+                android:textSize="20sp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"/>
         </LinearLayout>
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="1">
+            android:layout_weight="1"
+            android:gravity="center">
+            <Button
+                android:id="@+id/contact"
+                android:layout_width="match_parent"
+                android:layout_height="105dp"
+                android:background="@drawable/menu_item_contact"
+                android:drawableTop="@drawable/contact"
+                android:elevation="100dp"
+                android:fontFamily="sans-serif-condensed"
+                android:padding="10dp"
+                android:text="Contact"
+                android:textAllCaps="false"
+                android:textColor="@android:color/white"
+                android:textSize="20sp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"/>
         </LinearLayout>
     </LinearLayout>
 </LinearLayout>

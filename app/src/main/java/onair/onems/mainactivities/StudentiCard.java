@@ -1,9 +1,5 @@
 package onair.onems.mainactivities;
 
-/**
- * Created by User on 12/3/2017.
- */
-
 import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -11,22 +7,22 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.v7.app.ActionBar;
-import android.util.Log;
-import android.view.View;
+import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.DatePicker;
 import android.widget.ExpandableListView;
 import android.widget.ImageView;
 import android.widget.Spinner;
@@ -47,7 +43,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 
@@ -59,67 +54,69 @@ import onair.onems.models.ExpandedMenuModel;
 import onair.onems.models.MediumModel;
 import onair.onems.models.SectionModel;
 import onair.onems.models.ShiftModel;
+import onair.onems.models.StudentInformation;
 import onair.onems.models.SubjectModel;
 
-public class TakeAttendance extends AppCompatActivity {
+/**
+ * Created by User on 1/7/2018.
+ */
+
+public class StudentiCard extends AppCompatActivity {
 
     private DrawerLayout mDrawerLayout;
     ExpandableListAdapter mMenuAdapter;
     ExpandableListView expandableList;
     List<ExpandedMenuModel> listDataHeader;
     HashMap<ExpandedMenuModel, List<String>> listDataChild;
-    Spinner spinnerClass, spinnerShift,spinnerSection,spinnerMedium,spinnerSubject;
-    Button takeAttendance, datePicker;
+    Spinner spinnerClass, spinnerShift,spinnerSection,spinnerMedium,spinnerStudent;
+    Button showStudentData;
     ProgressDialog dialog;
-    String classUrl, shiftUrl,sectionUrl,mediumUrl,subjectUrl, selectedDate = "";
+    String classUrl, shiftUrl, sectionUrl, mediumUrl, studentUrl;
     ArrayList<ClassModel> allClassArrayList;
     ArrayList<ShiftModel> allShiftArrayList;
     ArrayList<SectionModel> allSectionArrayList;
     ArrayList<MediumModel> allMediumArrayList;
-    ArrayList<SubjectModel> allSubjectArrayList;
+    ArrayList<StudentInformation> allStudentArrayList;
 
     String[] tempSectionArray = {"Select Section"};
-    String[] tempSubjectArray = {"Select Subject"};
+    String[] tempStudentArray = {"Select Roll"};
     ClassModel selectedClass = null;
     ShiftModel selectedShift = null;
     SectionModel selectedSection = null;
     MediumModel selectedMedium = null;
-    SubjectModel selectedSubject = null;
+    StudentInformation selectedStudent = null;
+    int classSpinnerPosition, shiftSpinnerPosition, sectionSpinnerPosition, mediumSpinnerPosition, studentSpinnerPosition;
 
     long InstituteID;
-
-    private DatePickerDialog datePickerDialog;
-    int classSpinnerPosition, shiftSpinnerPosition, sectionSpinnerPosition, mediumSpinnerPosition, subjectSpinnerPosition;
 
     public static final String MyPREFERENCES = "LogInKey";
     public static SharedPreferences sharedPreferences;
 
-
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_take_attendance);
+        setContentView(R.layout.icard_activity_main);
 
         spinnerClass = (Spinner)findViewById(R.id.spinnerClass);
         spinnerShift = (Spinner)findViewById(R.id.spinnerShift);
         spinnerSection = (Spinner)findViewById(R.id.spinnerSection);
         spinnerMedium =(Spinner)findViewById(R.id.spinnerMedium);
-        spinnerSubject = (Spinner)findViewById(R.id.spinnerSubject);
-        takeAttendance = (Button)findViewById(R.id.takeAttendance);
-        datePicker = (Button)findViewById(R.id.pickDate);
+        spinnerStudent = (Spinner)findViewById(R.id.spinnerStudent);
+        showStudentData = (Button)findViewById(R.id.showStudentData);
+
         ArrayAdapter<String> section_spinner_adapter = new ArrayAdapter<String>(this, R.layout.spinner_item, tempSectionArray);
         section_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerSection.setAdapter(section_spinner_adapter);
 
-        ArrayAdapter<String> subject_spinner_adapter = new ArrayAdapter<String>(this, R.layout.spinner_item, tempSubjectArray);
-        subject_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerSubject.setAdapter(subject_spinner_adapter);
+        ArrayAdapter<String> student_spinner_adapter = new ArrayAdapter<String>(this, R.layout.spinner_item, tempStudentArray);
+        student_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerStudent.setAdapter(student_spinner_adapter);
 
         allClassArrayList = new ArrayList<ClassModel>();
         allShiftArrayList = new ArrayList<ShiftModel>();
         allSectionArrayList = new ArrayList<SectionModel>();
         allMediumArrayList = new ArrayList<MediumModel>();
-        allSubjectArrayList = new ArrayList<SubjectModel>();
+        allStudentArrayList = new ArrayList<StudentInformation>();
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         InstituteID = prefs.getLong("InstituteID",0);
@@ -133,32 +130,6 @@ public class TakeAttendance extends AppCompatActivity {
         dialog.setMessage("Please Wait...");
         dialog.setCancelable(false);
         dialog.show();
-
-        datePicker.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // calender class's instance and get current date , month and year from calender
-                final Calendar c = Calendar.getInstance();
-                int mYear = c.get(Calendar.YEAR); // current year
-                int mMonth = c.get(Calendar.MONTH); // current month
-                int mDay = c.get(Calendar.DAY_OF_MONTH); // current day
-                // date picker dialog
-                datePickerDialog = new DatePickerDialog(TakeAttendance.this,
-                        new DatePickerDialog.OnDateSetListener() {
-
-                            @Override
-                            public void onDateSet(DatePicker view, int year,
-                                                  int monthOfYear, int dayOfMonth) {
-                                // set day of month , month and year value in the edit text
-//                                selectedDate = dayOfMonth + "/" + (monthOfYear + 1) + "/" + year;
-                                selectedDate = year + "-" + (monthOfYear + 1) + "-" + dayOfMonth;
-                                datePicker.setText(selectedDate);
-
-                            }
-                        }, mYear, mMonth, mDay);
-                datePickerDialog.show();
-            }
-        });
 
         //Preparing claas data from server
         RequestQueue queueClass = Volley.newRequestQueue(this);
@@ -217,32 +188,6 @@ public class TakeAttendance extends AppCompatActivity {
         });
         queueMedium.add(stringMediumRequest);
 
-        takeAttendance.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if((selectedClass == null)|| (selectedDate.isEmpty())||(selectedMedium == null)||(selectedSection == null)||(selectedShift == null)||(selectedSubject == null))
-                {
-                    Toast.makeText(TakeAttendance.this,"Please select all options !!! ",Toast.LENGTH_LONG).show();
-                }
-                else
-                {
-                    Bundle bundle = new Bundle();
-                    bundle.putLong("InstituteID", InstituteID);
-                    bundle.putLong("MediumID",selectedMedium.getMediumID());
-                    bundle.putLong("ShiftID",selectedShift.getShiftID());
-                    bundle.putLong("ClassID",selectedClass.getClassID());
-                    bundle.putLong("SectionID",selectedSection.getSectionID());
-                    bundle.putLong("SubjectID",selectedSubject.getSubjectID());
-                    bundle.putLong("DepertmentID",selectedSubject.getDepartmentID());
-                    bundle.putString("Date",selectedDate);
-
-                    Intent intent = new Intent(TakeAttendance.this, TakeAttendanceDetails.class);
-                    intent.putExtras(bundle);
-                    startActivity(intent);
-                }
-            }
-        });
-
         spinnerClass.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -250,13 +195,13 @@ public class TakeAttendance extends AppCompatActivity {
                 if(position != classSpinnerPosition)
                 {
                     selectedSection = null;
-                    selectedSubject = null;
+                    selectedStudent = null;
                     selectedClass = allClassArrayList.get(position);
                     long classId = selectedClass.getClassID();
                     sectionUrl = getString(R.string.baseUrlLocal)+"getInsSection/"+InstituteID+"/"+classId;
                     dialog.show();
                     //Preparing section data from server
-                    RequestQueue queueSection = Volley.newRequestQueue(TakeAttendance.this);
+                    RequestQueue queueSection = Volley.newRequestQueue(StudentiCard.this);
                     StringRequest stringSectionRequest = new StringRequest(Request.Method.GET, sectionUrl,
                             new Response.Listener<String>() {
                                 @Override
@@ -298,24 +243,6 @@ public class TakeAttendance extends AppCompatActivity {
             }
         });
 
-//        spinnerClass.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-//            @Override
-//            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-//
-//                if(position != classSpinnerPosition)
-//                {
-//
-//                }
-//            }
-//
-//            @Override
-//            public void onNothingSelected(AdapterView<?> parent) {
-//
-//            }
-//        });
-
-
-
         spinnerSection.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -338,19 +265,21 @@ public class TakeAttendance extends AppCompatActivity {
 
                 if(position != mediumSpinnerPosition)
                 {
-                    selectedSubject = null;
+                    selectedStudent = null;
                     selectedMedium = allMediumArrayList.get(position);
                     long mediumId = selectedMedium.getMediumID();
-                    subjectUrl = getString(R.string.baseUrlLocal)+"getInsSubject"+"/"+selectedClass.getClassID()+"/"+mediumId;
+                    studentUrl = getString(R.string.baseUrlLocal)+"getStudent"+"/"+InstituteID+"/"+
+                            selectedClass.getClassID()+"/"+selectedSection.getSectionID()+"/"+
+                            "0"+"/"+mediumId+"/"+selectedShift.getShiftID()+"/"+"0";
                     dialog.show();
                     //Preparing subject data from server
-                    RequestQueue queueSubject = Volley.newRequestQueue(TakeAttendance.this);
-                    StringRequest stringSubjectRequest = new StringRequest(Request.Method.GET, subjectUrl,
+                    RequestQueue queueStudent = Volley.newRequestQueue(StudentiCard.this);
+                    StringRequest stringStudentRequest = new StringRequest(Request.Method.GET, studentUrl,
                             new Response.Listener<String>() {
                                 @Override
                                 public void onResponse(String response) {
 
-                                    parseSubjectJsonData(response);
+                                    parseStudentJsonData(response);
 
                                 }
                             }, new Response.ErrorListener() {
@@ -360,7 +289,7 @@ public class TakeAttendance extends AppCompatActivity {
                             dialog.dismiss();
                         }
                     });
-                    queueSubject.add(stringSubjectRequest);
+                    queueStudent.add(stringStudentRequest);
                 }
             }
 
@@ -370,19 +299,53 @@ public class TakeAttendance extends AppCompatActivity {
             }
         });
 
-        spinnerSubject.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        spinnerStudent.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
-                if(position != subjectSpinnerPosition)
+                if(position != studentSpinnerPosition)
                 {
-                    selectedSubject = allSubjectArrayList.get(position);
+                    selectedStudent = allStudentArrayList.get(position);
                 }
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
 
+            }
+        });
+
+        showStudentData.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if((selectedClass == null)||(selectedMedium == null)||(selectedSection == null)||(selectedShift == null)||(selectedStudent == null))
+                {
+                    Toast.makeText(StudentiCard.this,"Please select all options !!! ",Toast.LENGTH_LONG).show();
+                }
+                else
+                {
+                    Bundle bundle = new Bundle();
+                    bundle.putString("UserName", selectedStudent.getUserName());
+                    bundle.putString("RollNo", selectedStudent.getRollNo());
+                    bundle.putString("ImageUrl", selectedStudent.getImageUrl());
+                    bundle.putString("ClassName", selectedStudent.getClassName());
+                    bundle.putString("SectionName", selectedStudent.getSectionName());
+                    bundle.putString("MameName", selectedStudent.getMameName());
+                    bundle.putString("DepartmentName", selectedStudent.getDepartmentName());
+                    bundle.putString("SessionName", selectedStudent.getSessionName());
+                    bundle.putString("BoardName", selectedStudent.getBoardName());
+                    bundle.putString("Guardian", selectedStudent.getGuardian());
+                    bundle.putString("GuardianPhone", selectedStudent.getGuardianPhone());
+                    bundle.putString("GuardianEmailID", selectedStudent.getGuardianEmailID());
+                    bundle.putString("DOB", selectedStudent.getDOB());
+                    bundle.putString("Gender", selectedStudent.getGender());
+                    bundle.putString("Religion", selectedStudent.getReligion());
+                    bundle.putString("PreAddress", selectedStudent.getPreAddress());
+
+                    Intent intent = new Intent(StudentiCard.this, StudentDetails.class);
+                    intent.putExtras(bundle);
+                    startActivity(intent);
+                }
             }
         });
 
@@ -396,7 +359,7 @@ public class TakeAttendance extends AppCompatActivity {
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         expandableList = (ExpandableListView) findViewById(R.id.navigationmenu);
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        View view = getLayoutInflater().inflate(R.layout.nav_header_main,null);
+        View view = getLayoutInflater().inflate(R.layout.icard_nav_header_main,null);
         ImageView profilePicture = (ImageView)view.findViewById(R.id.profilePicture);
         TextView userType = (TextView)view.findViewById(R.id.userType);
         TextView userName = (TextView)view.findViewById(R.id.userName);
@@ -408,13 +371,13 @@ public class TakeAttendance extends AppCompatActivity {
         {
             userType.setText("Teacher");
         }
-        Glide.with(this).load(getString(R.string.baseUrlRaw)+imageUrl.replace("\\","/")).apply(RequestOptions.circleCropTransform()).into(profilePicture);
-       // profilePicture.setImageDrawable(getResources().getDrawable(R.drawable.album1));
+        Glide.with(this).load(getString(R.string.baseUrlRaw)+imageUrl.replace("\\","/"))
+                .apply(RequestOptions.circleCropTransform()).into(profilePicture);
+        // profilePicture.setImageDrawable(getResources().getDrawable(R.drawable.album1));
         navigationView.addHeaderView(view);
         if (navigationView != null) {
             setupDrawerContent(navigationView);
         }
-
         prepareListData();
         mMenuAdapter = new ExpandableListAdapter(this, listDataHeader, listDataChild, expandableList);
 
@@ -426,15 +389,18 @@ public class TakeAttendance extends AppCompatActivity {
             public boolean onChildClick(ExpandableListView expandableListView, View view, int i, int i1, long l) {
                 if((i == 2) && (i1 == 1) && (l == 1))
                 {
-                    Intent intent = new Intent(TakeAttendance.this, ShowAttendance.class);
+                    Intent intent = new Intent(StudentiCard.this, ShowAttendance.class);
                     startActivity(intent);
                 }
                 if((i == 2) && (i1 == 0) && (l == 0))
                 {
-                    DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-                    if (drawer.isDrawerOpen(GravityCompat.START)) {
-                        drawer.closeDrawer(GravityCompat.START);
-                    }
+                    Intent intent = new Intent(StudentiCard.this, TakeAttendance.class);
+                    startActivity(intent);
+                    finish();
+//                    DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+//                    if (drawer.isDrawerOpen(GravityCompat.START)) {
+//                        drawer.closeDrawer(GravityCompat.START);
+//                    }
                 }
 
                 return false;
@@ -446,9 +412,10 @@ public class TakeAttendance extends AppCompatActivity {
 //                Log.d("DEBUG", "heading clicked"+i+"--"+l);
                 if((i == 7) && (l == 7))
                 {
-                    Intent intent = new Intent(TakeAttendance.this, StudentiCard.class);
-                    startActivity(intent);
-                    finish();
+                    DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                    if (drawer.isDrawerOpen(GravityCompat.START)) {
+                        drawer.closeDrawer(GravityCompat.START);
+                    }
                 }
                 return false;
             }
@@ -458,7 +425,6 @@ public class TakeAttendance extends AppCompatActivity {
                 this, mDrawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         mDrawerLayout.addDrawerListener(toggle);
         toggle.syncState();
-//        navigationView.setNavigationItemSelectedListener(this);
     }
 
     void parseClassJsonData(String jsonString) {
@@ -641,25 +607,37 @@ public class TakeAttendance extends AppCompatActivity {
         }
     }
 
-    void parseSubjectJsonData(String jsonString) {
+    void parseStudentJsonData(String jsonString) {
         try {
-            JSONArray subjectJsonArray = new JSONArray(jsonString);
-            ArrayList subjectArrayList = new ArrayList();
-            for(int i = 0; i < subjectJsonArray.length(); ++i) {
-                JSONObject subjectJsonObject = subjectJsonArray.getJSONObject(i);
-                SubjectModel subjectModel = new SubjectModel(subjectJsonObject.getString("SubjectID"), subjectJsonObject.getString("SubjectNo"),
-                        subjectJsonObject.getString("SubjectName"), subjectJsonObject.getString("InsSubjectID"), subjectJsonObject.getString("InstituteID"),
-                        subjectJsonObject.getString("DepartmentID"), subjectJsonObject.getString("MediumID"), subjectJsonObject.getString("ClassID"),
-                        subjectJsonObject.getString("IsActive"), subjectJsonObject.getString("IsCombined"), subjectJsonObject.getString("ParentID"),
-                        subjectJsonObject.getString("ParentSubject"));
+            JSONArray studentJsonArray = new JSONArray(jsonString);
+            ArrayList studentArrayList = new ArrayList();
+            for(int i = 0; i < studentJsonArray.length(); ++i) {
+                JSONObject studentJsonObject = studentJsonArray.getJSONObject(i);
+                StudentInformation studentInformation = new StudentInformation();
+                studentInformation.setRollNo(studentJsonObject.getString("RollNo"));
+                studentInformation.setUserName(studentJsonObject.getString("UserName"));
+                studentInformation.setImageUrl(studentJsonObject.getString("ImageUrl"));
+                studentInformation.setClassName(studentJsonObject.getString("ClassName"));
+                studentInformation.setSectionName(studentJsonObject.getString("SectionName"));
+                studentInformation.setMameName(studentJsonObject.getString("MameName"));
+                studentInformation.setDepartmentName(studentJsonObject.getString("DepartmentName"));
+                studentInformation.setSessionName(studentJsonObject.getString("SessionName"));
+                studentInformation.setBoardName(studentJsonObject.getString("BoardName"));
+                studentInformation.setGuardian(studentJsonObject.getString("Guardian"));
+                studentInformation.setGuardianPhone(studentJsonObject.getString("GuardianPhone"));
+                studentInformation.setGuardianEmailID(studentJsonObject.getString("GuardianEmailID"));
+                studentInformation.setDOB(studentJsonObject.getString("DOB"));
+                studentInformation.setGender(studentJsonObject.getString("Gender"));
+                studentInformation.setReligion(studentJsonObject.getString("Religion"));
+                studentInformation.setPreAddress(studentJsonObject.getString("PreAddress"));
 //                Toast.makeText(this,classJsonObject.getString("ClassID")+classJsonObject.getString("ClassName"),Toast.LENGTH_LONG).show();
-                allSubjectArrayList.add(subjectModel);
-                subjectArrayList.add(subjectModel.getSubjectName());
+                allStudentArrayList.add(studentInformation);
+                studentArrayList.add("Roll: "+studentInformation.getRollNo()+" ( "+studentInformation.getUserName()+" )");
             }
-            subjectArrayList.add("Select Subject");
-            subjectSpinnerPosition = subjectArrayList.indexOf("Select Subject");
-            selectedSubject = allSubjectArrayList.get(0);
-            ArrayAdapter<ArrayList> subject_spinner_adapter = new ArrayAdapter<ArrayList>(this,R.layout.spinner_item, subjectArrayList){
+            studentArrayList.add("Select Roll");
+            studentSpinnerPosition = studentArrayList.indexOf("Select Roll");
+            selectedStudent = allStudentArrayList.get(0);
+            ArrayAdapter<ArrayList> student_spinner_adapter = new ArrayAdapter<ArrayList>(this,R.layout.spinner_item, studentArrayList){
 
                 @Override
                 public View getView(int position, View convertView, ViewGroup parent) {
@@ -679,9 +657,9 @@ public class TakeAttendance extends AppCompatActivity {
                 }
 
             };
-            subject_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-            spinnerSubject.setAdapter(subject_spinner_adapter);
-            spinnerSubject.setSelection(subject_spinner_adapter.getCount());
+            student_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            spinnerStudent.setAdapter(student_spinner_adapter);
+            spinnerStudent.setSelection(student_spinner_adapter.getCount());
             dialog.dismiss();
             //spinner.setSelectedIndex(1);
         } catch (JSONException e) {
@@ -808,7 +786,7 @@ public class TakeAttendance extends AppCompatActivity {
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putBoolean("LogInState", false);
             editor.commit();
-            Intent intent = new Intent(TakeAttendance.this, LoginScreen.class);
+            Intent intent = new Intent(StudentiCard.this, LoginScreen.class);
             startActivity(intent);
             finish();
             return true;
@@ -822,29 +800,4 @@ public class TakeAttendance extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
-
-//    @SuppressWarnings("StatementWithEmptyBody")
-//    @Override
-//    public boolean onNavigationItemSelected(MenuItem item) {
-//        // Handle navigation view item clicks here.
-//        int id = item.getItemId();
-//
-//        if (id == R.id.nav_camera) {
-//            // Handle the camera action
-//        } else if (id == R.id.nav_gallery) {
-//
-//        } else if (id == R.id.nav_slideshow) {
-//
-//        } else if (id == R.id.nav_manage) {
-//
-//        } else if (id == R.id.nav_share) {
-//
-//        } else if (id == R.id.nav_send) {
-//
-//        }
-//
-//        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-//        drawer.closeDrawer(GravityCompat.START);
-//        return true;
-//    }
 }

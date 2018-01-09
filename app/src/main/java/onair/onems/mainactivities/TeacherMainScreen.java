@@ -19,7 +19,7 @@ import onair.onems.R;
 
 public class TeacherMainScreen extends AppCompatActivity {
 
-    private Button takeAttendance;
+    private Button takeAttendance, iCard;
     TextView InstituteName;
     TextView userType;
     public static final String MyPREFERENCES = "LogInKey";
@@ -63,16 +63,17 @@ public class TeacherMainScreen extends AppCompatActivity {
 //            finish();
 //        }
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main_teacher);
+        setContentView(R.layout.teacher_dashboard);
 
         takeAttendance = (Button)findViewById(R.id.attendance);
+        iCard = (Button)findViewById(R.id.iCard);
         InstituteName = (TextView) findViewById(R.id.InstituteName);
         userType = (TextView) findViewById(R.id.userType);
 
         SharedPreferences sharedPre = PreferenceManager.getDefaultSharedPreferences(this);
         String InstituteName = sharedPre.getString("InstituteName","");
         this.InstituteName.setText(InstituteName);
-        int user = sharedPre.getInt("UserTypeID",0);
+        long user = sharedPre.getLong("UserTypeID",0);
         if(user == 4)
         {
             userType.setText("Teacher");
@@ -84,6 +85,16 @@ public class TeacherMainScreen extends AppCompatActivity {
             public void onClick(View v) {
                 Intent mainIntent = new Intent(TeacherMainScreen.this,TakeAttendance.class);
                 TeacherMainScreen.this.startActivity(mainIntent);
+                finish();
+            }
+        });
+
+        iCard.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent mainIntent = new Intent(TeacherMainScreen.this,StudentiCard.class);
+                TeacherMainScreen.this.startActivity(mainIntent);
+                finish();
             }
         });
 

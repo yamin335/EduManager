@@ -46,7 +46,8 @@ public class AllStudentSubjectWiseAttendance extends AppCompatActivity {
     String[][] DATA_TO_SHOW;
     String subjectWiseAttendanceUrl;
     String RFID = "", monthUrl = "", monthAttendanceUrl = "", studentName = "", studentRFID = "", studentRoll = "", UserID = "", day = "";
-    int InstituteID = 0, SectionID = 0, ClassID = 0, MediumID = 0, ShiftID = 0, MonthID = 0;
+    long InstituteID = 0;
+    int  SectionID = 0, ClassID = 0, MediumID = 0, ShiftID = 0, MonthID = 0;
 
 
     @Override
@@ -68,7 +69,7 @@ public class AllStudentSubjectWiseAttendance extends AppCompatActivity {
         // get Internal Data using SharedPreferences
 
         sharedPre = PreferenceManager.getDefaultSharedPreferences(this);
-        InstituteID = sharedPre.getInt("InstituteID", 0);
+        InstituteID = sharedPre.getLong("InstituteID", 0);
         ShiftID = sharedPre.getInt("ShiftSelectID", 0);
         MediumID = sharedPre.getInt("MediumSelectID", 0);
         ClassID = sharedPre.getInt("ClassSelectID", 0);
