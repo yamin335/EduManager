@@ -112,38 +112,12 @@
         app:layout_constraintVertical_bias="0.478">
 
         <Spinner
-            android:id="@+id/spinnerMedium"
+            android:id="@+id/spinnerStudent"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:backgroundTint="#ffffff"
             android:popupBackground="@drawable/drop_down_menu"
             android:spinnerMode="dropdown" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="0dp"
-        android:layout_height="40dp"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:background="@drawable/button"
-        android:elevation="5dp"
-        android:paddingLeft="20dp"
-        android:paddingRight="10dp"
-        app:layout_constraintBottom_toTopOf="@+id/guideline9"
-        app:layout_constraintEnd_toStartOf="@+id/guideline6"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@+id/guideline5"
-        app:layout_constraintTop_toTopOf="@+id/guideline8"
-        app:layout_constraintVertical_bias="0.62">
-
-        <Spinner
-            android:id="@+id/spinnerStudent"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:backgroundTint="#ffffff"
-            android:spinnerMode="dropdown"
-            android:popupBackground="@drawable/drop_down_menu"/>
     </LinearLayout>
 
     <android.support.constraint.Guideline

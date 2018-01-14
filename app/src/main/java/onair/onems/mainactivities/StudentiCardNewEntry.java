@@ -351,22 +351,22 @@ public class StudentiCardNewEntry extends AppCompatActivity {
                     {
                         Toast.makeText(StudentiCardNewEntry.this,"Please enter student address!!!",Toast.LENGTH_LONG).show();
                     }
-                    else if(selectedClass.equals(null))
+                    else if(selectedClass == null)
                     {
                         Toast.makeText(StudentiCardNewEntry.this,"Please select class!!!",Toast.LENGTH_LONG).show();
                     }
-                    else if(selectedShift.equals(null))
+                    else if(selectedShift == null)
                     {
                         Toast.makeText(StudentiCardNewEntry.this,"Please select shift!!!",Toast.LENGTH_LONG).show();
                     }
-                    else if(selectedSection.equals(null))
+                    else if(selectedSection == null)
                     {
                         Toast.makeText(StudentiCardNewEntry.this,"Please select section!!!",Toast.LENGTH_LONG).show();
                     }
-                    else if((!(editname.getText().toString().equals(""))) || (!(editroll.getText().toString().equals("")))
-                            || (!(editparent.getText().toString().equals(""))) || (!(editparentnumber.getText().toString().equals("")))
-                            || (!(editaddress.getText().toString().equals(""))) || (!(selectedClass.equals(null)))
-                            || (!(selectedShift.equals(null))) || (!(selectedSection.equals(null))))
+                    else if((!(editname.getText().toString().equals("")))&&(!(editroll.getText().toString().equals("")))
+                            && (!(editparent.getText().toString().equals(""))) && (!(editparentnumber.getText().toString().equals("")))
+                            && (!(editaddress.getText().toString().equals(""))) && (!(selectedClass == null))
+                            && (!(selectedShift == null)) && (!(selectedSection == null)))
                     {
                         dialog.show();
                         if(checkBox.isChecked())
