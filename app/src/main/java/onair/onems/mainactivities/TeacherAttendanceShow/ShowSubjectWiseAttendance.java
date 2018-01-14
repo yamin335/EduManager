@@ -105,7 +105,8 @@ public class ShowSubjectWiseAttendance extends AppCompatActivity
 
         RequestQueue queueSubjectWiseAttendance = Volley.newRequestQueue(this);
         StringRequest stringSubjectWiseAttendanceRequest = new StringRequest(Request.Method.GET, subjectWiseAttendanceUrl,
-                new Response.Listener<String>() {
+                new Response.Listener<String>()
+                {
                     @Override
                     public void onResponse(String response) {
 

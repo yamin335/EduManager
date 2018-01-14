@@ -9,6 +9,7 @@ import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -96,7 +97,8 @@ public class ShowAttendance extends AppCompatActivity {
         StringRequest stringClassRequest = new StringRequest(Request.Method.GET, classUrl,
                 new Response.Listener<String>() {
                     @Override
-                    public void onResponse(String response) {
+                    public void onResponse(String response)
+                    {
 
                         parseClassJsonData(response);
 
@@ -236,7 +238,11 @@ public class ShowAttendance extends AppCompatActivity {
 
     }
 
-
+    @Override
+    public void onBackPressed() {
+        NavUtils.navigateUpFromSameTask(this);
+        super.onBackPressed();
+    }
     void parseClassJsonData(String jsonString) {
         try {
             JSONArray jsonArray = new JSONArray(jsonString);
@@ -338,7 +344,8 @@ public class ShowAttendance extends AppCompatActivity {
             JSONArray jsonArray = new JSONArray(jsonString);
             ShiftID=new int[jsonArray.length()];
             ArrayList al = new ArrayList();
-            for(int i = 0; i < jsonArray.length(); ++i) {
+            for(int i = 0; i < jsonArray.length(); ++i)
+            {
                 JSONObject jsonObject=jsonArray.getJSONObject(i);
                 String name=jsonObject.getString("ShiftName");
                 ShiftID[i]=jsonObject.getInt("ShiftID");
@@ -348,7 +355,8 @@ public class ShowAttendance extends AppCompatActivity {
             ArrayAdapter adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, al);
             shiftSpinner.setAdapter(adapter);
             //spinner.setSelectedIndex(1);
-        } catch (JSONException e) {
+        }
+        catch (JSONException e) {
             Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
 
 

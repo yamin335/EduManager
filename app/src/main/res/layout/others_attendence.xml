@@ -16,21 +16,21 @@
 
         android:weightSum="5">
 
-           <com.jaredrummler.materialspinner.MaterialSpinner
+        <com.jaredrummler.materialspinner.MaterialSpinner
             android:id="@+id/spinner_Shift"
             android:layout_width="144dp"
             android:layout_height="wrap_content"
             android:layout_marginRight="10dp"
             android:textAlignment="center"
-               android:text="Shift"
+            table:ms_background_color="#FFEBEE"
+            android:text="Shift"
             android:textSize="14dp"
             android:textStyle="bold"
             android:layout_weight="2"
-               table:ms_dropdown_max_height="250dp"
-               table:ms_background_color="#FFEBEE"
-
-               android:elevation="5dp"
+            table:ms_dropdown_max_height="200dp"
             table:ms_text_color="#000000" />
+
+
 
 
         <Space

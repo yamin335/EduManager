@@ -566,4 +566,5 @@ public class StudentiCardDetails extends AppCompatActivity {
         return Bitmap.createScaledBitmap(image, width, height, true);
     }
 
+
 }

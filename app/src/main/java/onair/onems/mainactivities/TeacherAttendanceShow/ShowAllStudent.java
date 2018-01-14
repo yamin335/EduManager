@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.app.NavUtils;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
@@ -111,7 +112,8 @@ public class ShowAllStudent extends AppCompatActivity
         });
 
         queue.add(stringRequest);
-        tableView.addDataClickListener(new TableDataClickListener() {
+        tableView.addDataClickListener(new TableDataClickListener()
+        {
             @Override
             public void onDataClicked(int rowIndex, Object clickedData)
             {
@@ -127,9 +129,15 @@ public class ShowAllStudent extends AppCompatActivity
         });
 
     }
+    @Override
+    public void onBackPressed() {
+        NavUtils.navigateUpFromSameTask(this);
+        super.onBackPressed();
+    }
     void parseAllStudentShowJsonData(String jsonString)
     {
-        try {
+        try
+        {
             JSONArray jsonArray = new JSONArray(jsonString);
             ArrayList al = new ArrayList();
             DATA_TO_SHOW = new String[jsonArray.length()][4];
@@ -174,7 +182,8 @@ public class ShowAllStudent extends AppCompatActivity
 
         dialog.dismiss();
     }
-    public boolean onOptionsItemSelected(MenuItem item){
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
         Intent myIntent = new Intent(getApplicationContext(), ShowAttendance.class);
         startActivityForResult(myIntent, 0);
         finish();
