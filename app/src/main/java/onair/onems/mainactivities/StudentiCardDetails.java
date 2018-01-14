@@ -20,6 +20,7 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
+import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.system.ErrnoException;
 import android.util.Base64;
@@ -488,9 +489,17 @@ public class StudentiCardDetails extends AppCompatActivity {
         return chooserIntent;
     }
 
+    @Override
+    public void onBackPressed() {
+        NavUtils.navigateUpFromSameTask(this);
+        super.onBackPressed();
+    }
+
     /**
      * Get URI to image received from capture by camera.
      */
+
+
 
     private Uri getCaptureImageOutputUri() {
         Uri outputFileUri = null;

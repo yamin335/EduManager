@@ -521,7 +521,14 @@ public class StudentiCardMain extends AppCompatActivity {
             }
             classArrayList.add("Select Class");
             classSpinnerPosition = classArrayList.indexOf("Select Class");
-            selectedClass = allClassArrayList.get(0);
+            try {
+                selectedClass = allClassArrayList.get(0);
+            }
+            catch (IndexOutOfBoundsException e)
+            {
+                Toast.makeText(this,"No class found !!!",Toast.LENGTH_LONG).show();
+                Toast.makeText(this,"Please select all options again !!!",Toast.LENGTH_LONG).show();
+            }
             ArrayAdapter<ArrayList> class_spinner_adapter = new ArrayAdapter<ArrayList>(this,R.layout.spinner_item, classArrayList){
 
                 @Override
@@ -565,7 +572,14 @@ public class StudentiCardMain extends AppCompatActivity {
             }
             shiftArrayList.add("Select Shift");
             shiftSpinnerPosition = shiftArrayList.indexOf("Select Shift");
-            selectedShift = allShiftArrayList.get(0);
+            try {
+                selectedShift = allShiftArrayList.get(0);
+            }
+            catch (IndexOutOfBoundsException e)
+            {
+                Toast.makeText(this,"No shift found !!!",Toast.LENGTH_LONG).show();
+                Toast.makeText(this,"Please select all options again !!!",Toast.LENGTH_LONG).show();
+            }
             ArrayAdapter<ArrayList> shift_spinner_adapter = new ArrayAdapter<ArrayList>(this,R.layout.spinner_item, shiftArrayList){
 
                 @Override
@@ -610,7 +624,15 @@ public class StudentiCardMain extends AppCompatActivity {
             }
             sectionArrayList.add("Select Section");
             sectionSpinnerPosition = sectionArrayList.indexOf("Select Section");
-            selectedSection = allSectionArrayList.get(0);
+            try {
+                selectedSection = allSectionArrayList.get(0);
+            }
+            catch (IndexOutOfBoundsException e)
+            {
+                Toast.makeText(this,"No section found !!!",Toast.LENGTH_LONG).show();
+                Toast.makeText(this,"Please select all options again !!!",Toast.LENGTH_LONG).show();
+            }
+
             ArrayAdapter<ArrayList> section_spinner_adapter = new ArrayAdapter<ArrayList>(this,R.layout.spinner_item, sectionArrayList){
 
                 @Override
@@ -656,7 +678,14 @@ public class StudentiCardMain extends AppCompatActivity {
             }
             mediumnArrayList.add("Select Medium");
             mediumSpinnerPosition = mediumnArrayList.indexOf("Select Medium");
-            selectedMedium = allMediumArrayList.get(0);
+            try {
+                selectedMedium = allMediumArrayList.get(0);
+            }
+            catch (IndexOutOfBoundsException e)
+            {
+                Toast.makeText(this,"No medium found !!!",Toast.LENGTH_LONG).show();
+                Toast.makeText(this,"Please select all options again !!!",Toast.LENGTH_LONG).show();
+            }
             ArrayAdapter<ArrayList> medium_spinner_adapter = new ArrayAdapter<ArrayList>(this,R.layout.spinner_item, mediumnArrayList){
 
                 @Override
@@ -734,7 +763,14 @@ public class StudentiCardMain extends AppCompatActivity {
             }
             studentArrayList.add("Select Roll");
             studentSpinnerPosition = studentArrayList.indexOf("Select Roll");
-            selectedStudent = allStudentArrayList.get(0);
+            try {
+                selectedStudent = allStudentArrayList.get(0);
+            }
+            catch (IndexOutOfBoundsException e)
+            {
+                Toast.makeText(this,"No student found !!!",Toast.LENGTH_LONG).show();
+                Toast.makeText(this,"Please select all options again !!!",Toast.LENGTH_LONG).show();
+            }
             ArrayAdapter<ArrayList> student_spinner_adapter = new ArrayAdapter<ArrayList>(this,R.layout.spinner_item, studentArrayList){
 
                 @Override
