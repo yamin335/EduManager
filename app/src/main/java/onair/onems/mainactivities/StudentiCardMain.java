@@ -99,7 +99,7 @@ public class StudentiCardMain extends AppCompatActivity {
         spinnerClass = (Spinner)findViewById(R.id.spinnerClass);
         spinnerShift = (Spinner)findViewById(R.id.spinnerShift);
         spinnerSection = (Spinner)findViewById(R.id.spinnerSection);
-        spinnerMedium =(Spinner)findViewById(R.id.spinnerMedium);
+//        spinnerMedium =(Spinner)findViewById(R.id.spinnerMedium);
         spinnerStudent = (Spinner)findViewById(R.id.spinnerStudent);
 
         showStudentData = (Button)findViewById(R.id.showStudentData);
@@ -131,6 +131,11 @@ public class StudentiCardMain extends AppCompatActivity {
         dialog.setMessage("Please Wait...");
         dialog.setCancelable(false);
         dialog.show();
+
+        if(!isNetworkAvailable())
+        {
+            Toast.makeText(StudentiCardMain.this,"Please check your internet connection and open app again!!! ",Toast.LENGTH_LONG).show();
+        }
 
         //Preparing claas data from server
         RequestQueue queueClass = Volley.newRequestQueue(this);
@@ -170,24 +175,24 @@ public class StudentiCardMain extends AppCompatActivity {
         });
         queueShift.add(stringShiftRequest);
 
-        //Preparing Medium data from server
-        RequestQueue queueMedium = Volley.newRequestQueue(this);
-        StringRequest stringMediumRequest = new StringRequest(Request.Method.GET, mediumUrl,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-
-                        parseMediumJsonData(response);
-
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-
-                dialog.dismiss();
-            }
-        });
-        queueMedium.add(stringMediumRequest);
+//        //Preparing Medium data from server
+//        RequestQueue queueMedium = Volley.newRequestQueue(this);
+//        StringRequest stringMediumRequest = new StringRequest(Request.Method.GET, mediumUrl,
+//                new Response.Listener<String>() {
+//                    @Override
+//                    public void onResponse(String response) {
+//
+//                        parseMediumJsonData(response);
+//
+//                    }
+//                }, new Response.ErrorListener() {
+//            @Override
+//            public void onErrorResponse(VolleyError error) {
+//
+//                dialog.dismiss();
+//            }
+//        });
+//        queueMedium.add(stringMediumRequest);
 
         spinnerClass.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -283,45 +288,45 @@ public class StudentiCardMain extends AppCompatActivity {
             }
         });
 
-        spinnerMedium.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
-                if(position != mediumSpinnerPosition)
-                {
-                    selectedStudent = null;
-                    selectedMedium = allMediumArrayList.get(position);
-                    long mediumId = selectedMedium.getMediumID();
-                    studentUrl = getString(R.string.baseUrlLocal)+"getStudent"+"/"+InstituteID+"/"+
-                            selectedClass.getClassID()+"/"+selectedSection.getSectionID()+"/"+
-                            "0"+"/"+mediumId+"/"+selectedShift.getShiftID()+"/"+"0";
-                    dialog.show();
-                    //Preparing subject data from server
-                    RequestQueue queueStudent = Volley.newRequestQueue(StudentiCardMain.this);
-                    StringRequest stringStudentRequest = new StringRequest(Request.Method.GET, studentUrl,
-                            new Response.Listener<String>() {
-                                @Override
-                                public void onResponse(String response) {
-
-                                    parseStudentJsonData(response);
-
-                                }
-                            }, new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-
-                            dialog.dismiss();
-                        }
-                    });
-                    queueStudent.add(stringStudentRequest);
-                }
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
+//        spinnerMedium.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+//            @Override
+//            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+//
+//                if(position != mediumSpinnerPosition)
+//                {
+//                    selectedStudent = null;
+//                    selectedMedium = allMediumArrayList.get(position);
+//                    long mediumId = selectedMedium.getMediumID();
+//                    studentUrl = getString(R.string.baseUrlLocal)+"getStudent"+"/"+InstituteID+"/"+
+//                            selectedClass.getClassID()+"/"+selectedSection.getSectionID()+"/"+
+//                            "0"+"/"+mediumId+"/"+selectedShift.getShiftID()+"/"+"0";
+//                    dialog.show();
+//                    //Preparing subject data from server
+//                    RequestQueue queueStudent = Volley.newRequestQueue(StudentiCardMain.this);
+//                    StringRequest stringStudentRequest = new StringRequest(Request.Method.GET, studentUrl,
+//                            new Response.Listener<String>() {
+//                                @Override
+//                                public void onResponse(String response) {
+//
+//                                    parseStudentJsonData(response);
+//
+//                                }
+//                            }, new Response.ErrorListener() {
+//                        @Override
+//                        public void onErrorResponse(VolleyError error) {
+//
+//                            dialog.dismiss();
+//                        }
+//                    });
+//                    queueStudent.add(stringStudentRequest);
+//                }
+//            }
+//
+//            @Override
+//            public void onNothingSelected(AdapterView<?> parent) {
+//
+//            }
+//        });
 
         spinnerStudent.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -342,19 +347,22 @@ public class StudentiCardMain extends AppCompatActivity {
         newEntry.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(StudentiCardMain.this, StudentiCardNewEntry.class);
-                startActivity(intent);
+                if(isNetworkAvailable())
+                {
+                    Intent intent = new Intent(StudentiCardMain.this, StudentiCardNewEntry.class);
+                    startActivity(intent);
+                }
+                else
+                {
+                    Toast.makeText(StudentiCardMain.this,"Please check your internet connection !!! ",Toast.LENGTH_LONG).show();
+                }
             }
         });
 
         showStudentData.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if((selectedClass == null)||(selectedMedium == null)||(selectedSection == null)||(selectedShift == null)||(selectedStudent == null))
-                {
-                    Toast.makeText(StudentiCardMain.this,"Please select all options !!! ",Toast.LENGTH_LONG).show();
-                }
-                else
+                if((!(selectedClass == null))&&(!(selectedSection == null))&&(!(selectedShift == null))&&(!(selectedStudent == null)))
                 {
                     Bundle bundle = new Bundle();
                     bundle.putString("UserName", selectedStudent.getUserName());
@@ -392,7 +400,32 @@ public class StudentiCardMain extends AppCompatActivity {
 
                     Intent intent = new Intent(StudentiCardMain.this, StudentiCardDetails.class);
                     intent.putExtras(bundle);
+                    selectedClass = null;
+                    selectedShift = null;
+                    selectedSection = null;
+                    selectedMedium = null;
+                    selectedStudent = null;
                     startActivity(intent);
+                }
+                else if(selectedClass == null)
+                {
+                    Toast.makeText(StudentiCardMain.this,"Please select class !!! ",Toast.LENGTH_LONG).show();
+                }
+                else if(selectedSection == null)
+                {
+                    Toast.makeText(StudentiCardMain.this,"Please select section !!! ",Toast.LENGTH_LONG).show();
+                }
+                else if(selectedShift == null)
+                {
+                    Toast.makeText(StudentiCardMain.this,"Please select shift !!! ",Toast.LENGTH_LONG).show();
+                }
+                else if(selectedStudent == null)
+                {
+                    Toast.makeText(StudentiCardMain.this,"Please select a student !!! ",Toast.LENGTH_LONG).show();
+                }
+                else
+                {
+                    Toast.makeText(StudentiCardMain.this,"Please select all options !!! ",Toast.LENGTH_LONG).show();
                 }
             }
         });
