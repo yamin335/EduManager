@@ -19,9 +19,9 @@
             android:padding="10dp"
             android:weightSum="1">
             <com.theartofdev.edmodo.cropper.CropImageView
-                android:id="@+id/cropImageView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:id="@+id/CropImageView"
+                android:layout_width="2in"
+                android:layout_height="2.5in"
                 android:layout_gravity="center"
                 android:background="@drawable/inputtext"/>
             <LinearLayout

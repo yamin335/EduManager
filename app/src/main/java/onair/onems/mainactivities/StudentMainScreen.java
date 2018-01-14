@@ -18,7 +18,7 @@ import onair.onems.R;
 
 public class StudentMainScreen extends AppCompatActivity {
 
-    private Button takeAttendance;
+    private Button Attendance;
     TextView InstituteName;
     TextView userType;
     @Override
@@ -47,13 +47,14 @@ public class StudentMainScreen extends AppCompatActivity {
         }
         InstituteName.setText(name);
 
-        takeAttendance = (Button)findViewById(R.id.attendance);
+        Attendance = (Button)findViewById(R.id.attendance);
 
-        takeAttendance.setOnClickListener(new View.OnClickListener() {
+        Attendance.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent mainIntent = new Intent(StudentMainScreen.this,StudentAttendance.class);
                 StudentMainScreen.this.startActivity(mainIntent);
+                finish();
             }
         });
 

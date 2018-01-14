@@ -1,6 +1,5 @@
 package onair.onems.mainactivities;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -92,7 +91,7 @@ public class TeacherMainScreen extends AppCompatActivity {
         iCard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent mainIntent = new Intent(TeacherMainScreen.this,StudentiCard.class);
+                Intent mainIntent = new Intent(TeacherMainScreen.this,StudentiCardMain.class);
                 TeacherMainScreen.this.startActivity(mainIntent);
                 finish();
             }

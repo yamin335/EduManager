@@ -1,10 +1,11 @@
 package onair.onems.mainactivities;
 
-import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
@@ -15,7 +16,6 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -55,13 +55,12 @@ import onair.onems.models.MediumModel;
 import onair.onems.models.SectionModel;
 import onair.onems.models.ShiftModel;
 import onair.onems.models.StudentInformation;
-import onair.onems.models.SubjectModel;
 
 /**
  * Created by User on 1/7/2018.
  */
 
-public class StudentiCard extends AppCompatActivity {
+public class StudentiCardMain extends AppCompatActivity {
 
     private DrawerLayout mDrawerLayout;
     ExpandableListAdapter mMenuAdapter;
@@ -69,7 +68,7 @@ public class StudentiCard extends AppCompatActivity {
     List<ExpandedMenuModel> listDataHeader;
     HashMap<ExpandedMenuModel, List<String>> listDataChild;
     Spinner spinnerClass, spinnerShift,spinnerSection,spinnerMedium,spinnerStudent;
-    Button showStudentData;
+    Button showStudentData, newEntry;
     ProgressDialog dialog;
     String classUrl, shiftUrl, sectionUrl, mediumUrl, studentUrl;
     ArrayList<ClassModel> allClassArrayList;
@@ -102,7 +101,9 @@ public class StudentiCard extends AppCompatActivity {
         spinnerSection = (Spinner)findViewById(R.id.spinnerSection);
         spinnerMedium =(Spinner)findViewById(R.id.spinnerMedium);
         spinnerStudent = (Spinner)findViewById(R.id.spinnerStudent);
+
         showStudentData = (Button)findViewById(R.id.showStudentData);
+        newEntry = (Button)findViewById(R.id.newEntry);
 
         ArrayAdapter<String> section_spinner_adapter = new ArrayAdapter<String>(this, R.layout.spinner_item, tempSectionArray);
         section_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -201,7 +202,7 @@ public class StudentiCard extends AppCompatActivity {
                     sectionUrl = getString(R.string.baseUrlLocal)+"getInsSection/"+InstituteID+"/"+classId;
                     dialog.show();
                     //Preparing section data from server
-                    RequestQueue queueSection = Volley.newRequestQueue(StudentiCard.this);
+                    RequestQueue queueSection = Volley.newRequestQueue(StudentiCardMain.this);
                     StringRequest stringSectionRequest = new StringRequest(Request.Method.GET, sectionUrl,
                             new Response.Listener<String>() {
                                 @Override
@@ -250,6 +251,29 @@ public class StudentiCard extends AppCompatActivity {
                 if(position != sectionSpinnerPosition)
                 {
                     selectedSection = allSectionArrayList.get(position);
+                    selectedStudent = null;
+                    studentUrl = getString(R.string.baseUrlLocal)+"getStudent"+"/"+InstituteID+"/"+
+                            selectedClass.getClassID()+"/"+selectedSection.getSectionID()+"/"+
+                            "0"+"/"+"0"+"/"+selectedShift.getShiftID()+"/"+"0";
+                    dialog.show();
+                    //Preparing subject data from server
+                    RequestQueue queueStudent = Volley.newRequestQueue(StudentiCardMain.this);
+                    StringRequest stringStudentRequest = new StringRequest(Request.Method.GET, studentUrl,
+                            new Response.Listener<String>() {
+                                @Override
+                                public void onResponse(String response) {
+
+                                    parseStudentJsonData(response);
+
+                                }
+                            }, new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+
+                            dialog.dismiss();
+                        }
+                    });
+                    queueStudent.add(stringStudentRequest);
                 }
             }
 
@@ -273,7 +297,7 @@ public class StudentiCard extends AppCompatActivity {
                             "0"+"/"+mediumId+"/"+selectedShift.getShiftID()+"/"+"0";
                     dialog.show();
                     //Preparing subject data from server
-                    RequestQueue queueStudent = Volley.newRequestQueue(StudentiCard.this);
+                    RequestQueue queueStudent = Volley.newRequestQueue(StudentiCardMain.this);
                     StringRequest stringStudentRequest = new StringRequest(Request.Method.GET, studentUrl,
                             new Response.Listener<String>() {
                                 @Override
@@ -315,12 +339,20 @@ public class StudentiCard extends AppCompatActivity {
             }
         });
 
+        newEntry.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(StudentiCardMain.this, StudentiCardNewEntry.class);
+                startActivity(intent);
+            }
+        });
+
         showStudentData.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if((selectedClass == null)||(selectedMedium == null)||(selectedSection == null)||(selectedShift == null)||(selectedStudent == null))
                 {
-                    Toast.makeText(StudentiCard.this,"Please select all options !!! ",Toast.LENGTH_LONG).show();
+                    Toast.makeText(StudentiCardMain.this,"Please select all options !!! ",Toast.LENGTH_LONG).show();
                 }
                 else
                 {
@@ -340,9 +372,25 @@ public class StudentiCard extends AppCompatActivity {
                     bundle.putString("DOB", selectedStudent.getDOB());
                     bundle.putString("Gender", selectedStudent.getGender());
                     bundle.putString("Religion", selectedStudent.getReligion());
+                    bundle.putString("UserClassID", selectedStudent.getUserClassID());
+                    bundle.putString("UserID", selectedStudent.getUserID());
+                    bundle.putString("RFID", selectedStudent.getRFID());
+                    bundle.putString("StudentNo", selectedStudent.getStudentNo());
+                    bundle.putString("SectionID", Long.toString(selectedStudent.getSectionID()));
+                    bundle.putString("ClassID", Long.toString(selectedStudent.getClassID()));
+                    bundle.putString("BrunchID", Long.toString(selectedStudent.getBrunchID()));
+                    bundle.putString("ShiftID", Long.toString(selectedStudent.getShiftID()));
+                    bundle.putString("Remarks", selectedStudent.getRemarks());
+                    bundle.putString("InstituteID", Long.toString(selectedStudent.getInstituteID()));
+                    bundle.putString("UserTypeID", Long.toString(selectedStudent.getUserTypeID()));
+                    bundle.putString("GenderID", Long.toString(selectedStudent.getGenderID()));
+                    bundle.putString("PhoneNo", selectedStudent.getPhoneNo());
+                    bundle.putString("EmailID", selectedStudent.getEmailID());
+                    bundle.putString("FingerUrl", selectedStudent.getFingerUrl());
+                    bundle.putString("SignatureUrl", selectedStudent.getSignatureUrl());
                     bundle.putString("PreAddress", selectedStudent.getPreAddress());
 
-                    Intent intent = new Intent(StudentiCard.this, StudentDetails.class);
+                    Intent intent = new Intent(StudentiCardMain.this, StudentiCardDetails.class);
                     intent.putExtras(bundle);
                     startActivity(intent);
                 }
@@ -389,12 +437,12 @@ public class StudentiCard extends AppCompatActivity {
             public boolean onChildClick(ExpandableListView expandableListView, View view, int i, int i1, long l) {
                 if((i == 2) && (i1 == 1) && (l == 1))
                 {
-                    Intent intent = new Intent(StudentiCard.this, ShowAttendance.class);
+                    Intent intent = new Intent(StudentiCardMain.this, ShowAttendance.class);
                     startActivity(intent);
                 }
                 if((i == 2) && (i1 == 0) && (l == 0))
                 {
-                    Intent intent = new Intent(StudentiCard.this, TakeAttendance.class);
+                    Intent intent = new Intent(StudentiCardMain.this, TakeAttendance.class);
                     startActivity(intent);
                     finish();
 //                    DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -630,6 +678,23 @@ public class StudentiCard extends AppCompatActivity {
                 studentInformation.setGender(studentJsonObject.getString("Gender"));
                 studentInformation.setReligion(studentJsonObject.getString("Religion"));
                 studentInformation.setPreAddress(studentJsonObject.getString("PreAddress"));
+                studentInformation.setUserClassID(studentJsonObject.getString("UserClassID"));
+                studentInformation.setUserID(studentJsonObject.getString("UserID"));
+                studentInformation.setRFID(studentJsonObject.getString("RFID"));
+                studentInformation.setStudentNo(studentJsonObject.getString("StudentNo"));
+                studentInformation.setSectionID(studentJsonObject.getString("SectionID"));
+                studentInformation.setClassID(studentJsonObject.getString("ClassID"));
+                studentInformation.setBrunchID(studentJsonObject.getString("BrunchID"));
+                studentInformation.setShiftID(studentJsonObject.getString("ShiftID"));
+                studentInformation.setRemarks(studentJsonObject.getString("Remarks"));
+                studentInformation.setInstituteID(studentJsonObject.getString("InstituteID"));
+                studentInformation.setUserTypeID(studentJsonObject.getString("UserTypeID"));
+                studentInformation.setGenderID(studentJsonObject.getString("GenderID"));
+                studentInformation.setPhoneNo(studentJsonObject.getString("PhoneNo"));
+                studentInformation.setEmailID(studentJsonObject.getString("EmailID"));
+                studentInformation.setFingerUrl(studentJsonObject.getString("FingerUrl"));
+                studentInformation.setSignatureUrl(studentJsonObject.getString("SignatureUrl"));
+
 //                Toast.makeText(this,classJsonObject.getString("ClassID")+classJsonObject.getString("ClassName"),Toast.LENGTH_LONG).show();
                 allStudentArrayList.add(studentInformation);
                 studentArrayList.add("Roll: "+studentInformation.getRollNo()+" ( "+studentInformation.getUserName()+" )");
@@ -786,7 +851,7 @@ public class StudentiCard extends AppCompatActivity {
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putBoolean("LogInState", false);
             editor.commit();
-            Intent intent = new Intent(StudentiCard.this, LoginScreen.class);
+            Intent intent = new Intent(StudentiCardMain.this, LoginScreen.class);
             startActivity(intent);
             finish();
             return true;
@@ -799,5 +864,11 @@ public class StudentiCard extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager = (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 }

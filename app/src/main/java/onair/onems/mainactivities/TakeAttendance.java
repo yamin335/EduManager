@@ -12,7 +12,6 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBar;
-import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -446,7 +445,7 @@ public class TakeAttendance extends AppCompatActivity {
 //                Log.d("DEBUG", "heading clicked"+i+"--"+l);
                 if((i == 7) && (l == 7))
                 {
-                    Intent intent = new Intent(TakeAttendance.this, StudentiCard.class);
+                    Intent intent = new Intent(TakeAttendance.this, StudentiCardMain.class);
                     startActivity(intent);
                     finish();
                 }
