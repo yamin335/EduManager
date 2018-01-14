@@ -5,11 +5,11 @@ package onair.onems.models;
  */
 
 public class MediumModel {
-    private long MediumID;
-    private String MameName;
-    private long InstMediumID;
-    private long InstituteID;
-    private int IsActive;
+    private long MediumID = 0;
+    private String MameName = "";
+    private long InstMediumID = 0;
+    private long InstituteID = 0;
+    private int IsActive = 0;
 
     public MediumModel(String MediumID, String MameName, String InstMediumID, String InstituteID, String IsActive)
     {

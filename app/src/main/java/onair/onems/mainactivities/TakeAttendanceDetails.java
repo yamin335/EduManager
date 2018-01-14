@@ -240,7 +240,7 @@ public class TakeAttendanceDetails extends AppCompatActivity {
                     public void onResponse(JSONArray response) {
                         dialog.dismiss();
                         try {
-                            Toast.makeText(TakeAttendanceDetails.this,"Response: "+response.getJSONObject(0).get("ReturnValue"),Toast.LENGTH_LONG).show();
+                            Toast.makeText(TakeAttendanceDetails.this,"Data Successfully Updated with Response: "+response.getJSONObject(0).get("ReturnValue"),Toast.LENGTH_LONG).show();
                         }
                         catch (Exception e)
                         {
