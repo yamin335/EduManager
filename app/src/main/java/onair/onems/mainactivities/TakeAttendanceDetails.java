@@ -241,6 +241,7 @@ public class TakeAttendanceDetails extends AppCompatActivity {
                         dialog.dismiss();
                         try {
                             Toast.makeText(TakeAttendanceDetails.this,"Data Successfully Updated with Response: "+response.getJSONObject(0).get("ReturnValue"),Toast.LENGTH_LONG).show();
+                            finish();
                         }
                         catch (Exception e)
                         {
