@@ -68,6 +68,7 @@ import java.util.List;
 
 import onair.onems.R;
 import onair.onems.customadapters.CustomRequest;
+import onair.onems.mainactivities.TeacherAttendanceShow.ShowAttendance;
 import onair.onems.models.ClassModel;
 import onair.onems.models.SectionModel;
 import onair.onems.models.ShiftModel;
@@ -180,9 +181,11 @@ public class StudentiCardNewEntry extends AppCompatActivity {
         editparentnumber=(EditText) findViewById(R.id.edit_parentPhone);
 
         //Preparing claas data from server
+
         RequestQueue queueClass = Volley.newRequestQueue(this);
         StringRequest stringClassRequest = new StringRequest(Request.Method.GET, classUrl,
-                new Response.Listener<String>() {
+                new Response.Listener<String>()
+                {
                     @Override
                     public void onResponse(String response) {
 
@@ -201,9 +204,11 @@ public class StudentiCardNewEntry extends AppCompatActivity {
         //Preparing Shift data from server
         RequestQueue queueShift = Volley.newRequestQueue(this);
         StringRequest stringShiftRequest = new StringRequest(Request.Method.GET, shiftUrl,
-                new Response.Listener<String>() {
+                new Response.Listener<String>()
+                {
                     @Override
-                    public void onResponse(String response) {
+                    public void onResponse(String response)
+                    {
 
                         parseShiftJsonData(response);
 
@@ -219,7 +224,8 @@ public class StudentiCardNewEntry extends AppCompatActivity {
 
         spinnerClass.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id)
+            {
 
                 if(position != classSpinnerPosition)
                 {
@@ -234,11 +240,13 @@ public class StudentiCardNewEntry extends AppCompatActivity {
                     }
                     long classId = selectedClass.getClassID();
                     sectionUrl = getString(R.string.baseUrlLocal)+"getInsSection/"+InstituteID+"/"+classId;
+
                     dialog.show();
                     //Preparing section data from server
                     RequestQueue queueSection = Volley.newRequestQueue(StudentiCardNewEntry.this);
                     StringRequest stringSectionRequest = new StringRequest(Request.Method.GET, sectionUrl,
-                            new Response.Listener<String>() {
+                            new Response.Listener<String>()
+                            {
                                 @Override
                                 public void onResponse(String response) {
 
@@ -287,7 +295,9 @@ public class StudentiCardNewEntry extends AppCompatActivity {
 
         spinnerSection.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id)
+            {
+
 
                 if(position != sectionSpinnerPosition)
                 {
@@ -352,22 +362,22 @@ public class StudentiCardNewEntry extends AppCompatActivity {
                     {
                         Toast.makeText(StudentiCardNewEntry.this,"Please enter student address!!!",Toast.LENGTH_LONG).show();
                     }
-                    else if(selectedClass == null)
+                    else if(selectedClass.equals(null))
                     {
                         Toast.makeText(StudentiCardNewEntry.this,"Please select class!!!",Toast.LENGTH_LONG).show();
                     }
-                    else if(selectedShift == null)
+                    else if(selectedShift.equals(null))
                     {
                         Toast.makeText(StudentiCardNewEntry.this,"Please select shift!!!",Toast.LENGTH_LONG).show();
                     }
-                    else if(selectedSection == null)
+                    else if(selectedSection.equals(null))
                     {
                         Toast.makeText(StudentiCardNewEntry.this,"Please select section!!!",Toast.LENGTH_LONG).show();
                     }
-                    else if((!(editname.getText().toString().equals("")))&&(!(editroll.getText().toString().equals("")))
-                            && (!(editparent.getText().toString().equals(""))) && (!(editparentnumber.getText().toString().equals("")))
-                            && (!(editaddress.getText().toString().equals(""))) && (!(selectedClass == null))
-                            && (!(selectedShift == null)) && (!(selectedSection == null)))
+                    else if((!(editname.getText().toString().equals(""))) || (!(editroll.getText().toString().equals("")))
+                            || (!(editparent.getText().toString().equals(""))) || (!(editparentnumber.getText().toString().equals("")))
+                            || (!(editaddress.getText().toString().equals(""))) || (!(selectedClass.equals(null)))
+                            || (!(selectedShift.equals(null))) || (!(selectedSection.equals(null))))
                     {
                         dialog.show();
                         if(checkBox.isChecked())
@@ -878,5 +888,13 @@ public class StudentiCardNewEntry extends AppCompatActivity {
         }
         return Bitmap.createScaledBitmap(image, width, height, true);
     }
+    @Override
+    public void onBackPressed()
+    {
+        Intent myIntent = new Intent(getApplicationContext(), StudentiCardMain.class);
+        startActivityForResult(myIntent, 0);
+        finish();
 
+        // your code.
+    }
 }
