@@ -1,8 +1,12 @@
 package onair.onems.mainactivities;
 
 import android.app.ProgressDialog;
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -195,32 +199,30 @@ public class TakeAttendanceDetails extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.done) {
-            AttendanceSheetModel attendanceSheetModel = new AttendanceSheetModel();
-            attendanceSheetModel.setSubAtdID("0");
-            attendanceSheetModel.setSubjectID(Long.toString(SubjectID));
-            attendanceSheetModel.setSectionID(Long.toString(SectionID));
-            attendanceSheetModel.setDepartmentID(Long.toString(DepertmentID));
-            attendanceSheetModel.setMediumID(Long.toString(MediumID));
-            attendanceSheetModel.setShiftID(Long.toString(ShiftID));
-            attendanceSheetModel.setClassID(Long.toString(ClassID));
-            attendanceSheetModel.setAtdUserID("1");
-            attendanceSheetModel.setAtdDate(date);
-            attendanceSheetModel.setInstituteID(Long.toString(InstituteID));
-            attendanceSheetModel.setattendenceArr(attendanceSheetArrayList);
-            Gson gson = new Gson();
-            String json = gson.toJson(attendanceSheetModel);
-            dialog.show();
-            postUsingVolley(json);
-//            Toast.makeText(this,json,Toast.LENGTH_LONG).show();
-//            postAttendanceSheetData(json);
-//            sharedPreferences  = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
-//            SharedPreferences.Editor editor = sharedPreferences.edit();
-//            editor.putBoolean("LogInState", false);
-//            editor.commit();
-//            Intent intent = new Intent(MainActivity.this, LoginActivity.class);
-//            startActivity(intent);
-//            finish();
-            return true;
+            if(isNetworkAvailable())
+            {
+                AttendanceSheetModel attendanceSheetModel = new AttendanceSheetModel();
+                attendanceSheetModel.setSubAtdID("0");
+                attendanceSheetModel.setSubjectID(Long.toString(SubjectID));
+                attendanceSheetModel.setSectionID(Long.toString(SectionID));
+                attendanceSheetModel.setDepartmentID(Long.toString(DepertmentID));
+                attendanceSheetModel.setMediumID(Long.toString(MediumID));
+                attendanceSheetModel.setShiftID(Long.toString(ShiftID));
+                attendanceSheetModel.setClassID(Long.toString(ClassID));
+                attendanceSheetModel.setAtdUserID("1");
+                attendanceSheetModel.setAtdDate(date);
+                attendanceSheetModel.setInstituteID(Long.toString(InstituteID));
+                attendanceSheetModel.setattendenceArr(attendanceSheetArrayList);
+                Gson gson = new Gson();
+                String json = gson.toJson(attendanceSheetModel);
+                dialog.show();
+                postUsingVolley(json);
+                return true;
+            }
+            else
+            {
+                Toast.makeText(TakeAttendanceDetails.this,"Please check your internet connection!!!",Toast.LENGTH_LONG).show();
+            }
         }
 
         return super.onOptionsItemSelected(item);
@@ -241,7 +243,7 @@ public class TakeAttendanceDetails extends AppCompatActivity {
                         dialog.dismiss();
                         try {
                             Toast.makeText(TakeAttendanceDetails.this,"Data Successfully Updated with Response: "+response.getJSONObject(0).get("ReturnValue"),Toast.LENGTH_LONG).show();
-                            finish();
+                            NavUtils.navigateUpFromSameTask(TakeAttendanceDetails.this);
                         }
                         catch (Exception e)
                         {
@@ -256,5 +258,11 @@ public class TakeAttendanceDetails extends AppCompatActivity {
             }
         });
         queuePost.add(customRequest);
+    }
+
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager = (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 }

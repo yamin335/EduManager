@@ -4,11 +4,15 @@ package onair.onems.mainactivities;
  * Created by User on 12/3/2017.
  */
 
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBar;
@@ -219,25 +223,32 @@ public class TakeAttendance extends AppCompatActivity {
         takeAttendance.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if((selectedClass == null)|| (selectedDate.isEmpty())||(selectedMedium == null)||(selectedSection == null)||(selectedShift == null)||(selectedSubject == null))
+                if(isNetworkAvailable())
                 {
-                    Toast.makeText(TakeAttendance.this,"Please select all options !!! ",Toast.LENGTH_LONG).show();
+                    if((selectedClass == null)|| (selectedDate.isEmpty())||(selectedMedium == null)||(selectedSection == null)||(selectedShift == null)||(selectedSubject == null))
+                    {
+                        Toast.makeText(TakeAttendance.this,"Please select all options !!! ",Toast.LENGTH_LONG).show();
+                    }
+                    else
+                    {
+                        Bundle bundle = new Bundle();
+                        bundle.putLong("InstituteID", InstituteID);
+                        bundle.putLong("MediumID",selectedMedium.getMediumID());
+                        bundle.putLong("ShiftID",selectedShift.getShiftID());
+                        bundle.putLong("ClassID",selectedClass.getClassID());
+                        bundle.putLong("SectionID",selectedSection.getSectionID());
+                        bundle.putLong("SubjectID",selectedSubject.getSubjectID());
+                        bundle.putLong("DepertmentID",selectedSubject.getDepartmentID());
+                        bundle.putString("Date",selectedDate);
+
+                        Intent intent = new Intent(TakeAttendance.this, TakeAttendanceDetails.class);
+                        intent.putExtras(bundle);
+                        startActivity(intent);
+                    }
                 }
                 else
                 {
-                    Bundle bundle = new Bundle();
-                    bundle.putLong("InstituteID", InstituteID);
-                    bundle.putLong("MediumID",selectedMedium.getMediumID());
-                    bundle.putLong("ShiftID",selectedShift.getShiftID());
-                    bundle.putLong("ClassID",selectedClass.getClassID());
-                    bundle.putLong("SectionID",selectedSection.getSectionID());
-                    bundle.putLong("SubjectID",selectedSubject.getSubjectID());
-                    bundle.putLong("DepertmentID",selectedSubject.getDepartmentID());
-                    bundle.putString("Date",selectedDate);
-
-                    Intent intent = new Intent(TakeAttendance.this, TakeAttendanceDetails.class);
-                    intent.putExtras(bundle);
-                    startActivity(intent);
+                    Toast.makeText(TakeAttendance.this,"Please check your internet connection!!!",Toast.LENGTH_LONG).show();
                 }
             }
         });
@@ -250,7 +261,14 @@ public class TakeAttendance extends AppCompatActivity {
                 {
                     selectedSection = null;
                     selectedSubject = null;
-                    selectedClass = allClassArrayList.get(position);
+                    try {
+                        selectedClass = allClassArrayList.get(position);
+                    }
+                    catch (IndexOutOfBoundsException e)
+                    {
+                        Toast.makeText(TakeAttendance.this,"No class found !!!",Toast.LENGTH_LONG).show();
+                        Toast.makeText(TakeAttendance.this,"Please select all options again !!!",Toast.LENGTH_LONG).show();
+                    }
                     long classId = selectedClass.getClassID();
                     sectionUrl = getString(R.string.baseUrlLocal)+"getInsSection/"+InstituteID+"/"+classId;
                     dialog.show();
@@ -287,7 +305,14 @@ public class TakeAttendance extends AppCompatActivity {
 
                 if(position != shiftSpinnerPosition)
                 {
-                    selectedShift = allShiftArrayList.get(position);
+                    try {
+                        selectedShift = allShiftArrayList.get(position);
+                    }
+                    catch (IndexOutOfBoundsException e)
+                    {
+                        Toast.makeText(TakeAttendance.this,"No shift found !!!",Toast.LENGTH_LONG).show();
+                        Toast.makeText(TakeAttendance.this,"Please select all options again !!!",Toast.LENGTH_LONG).show();
+                    }
                 }
             }
 
@@ -321,7 +346,14 @@ public class TakeAttendance extends AppCompatActivity {
 
                 if(position != sectionSpinnerPosition)
                 {
-                    selectedSection = allSectionArrayList.get(position);
+                    try {
+                        selectedSection = allSectionArrayList.get(position);
+                    }
+                    catch (IndexOutOfBoundsException e)
+                    {
+                        Toast.makeText(TakeAttendance.this,"No section found !!!",Toast.LENGTH_LONG).show();
+                        Toast.makeText(TakeAttendance.this,"Please select all options again !!!",Toast.LENGTH_LONG).show();
+                    }
                 }
             }
 
@@ -338,7 +370,14 @@ public class TakeAttendance extends AppCompatActivity {
                 if(position != mediumSpinnerPosition)
                 {
                     selectedSubject = null;
-                    selectedMedium = allMediumArrayList.get(position);
+                    try {
+                        selectedMedium = allMediumArrayList.get(position);
+                    }
+                    catch (IndexOutOfBoundsException e)
+                    {
+                        Toast.makeText(TakeAttendance.this,"No medium found !!!",Toast.LENGTH_LONG).show();
+                        Toast.makeText(TakeAttendance.this,"Please select all options again !!!",Toast.LENGTH_LONG).show();
+                    }
                     long mediumId = selectedMedium.getMediumID();
                     subjectUrl = getString(R.string.baseUrlLocal)+"getInsSubject"+"/"+selectedClass.getClassID()+"/"+mediumId;
                     dialog.show();
@@ -375,7 +414,14 @@ public class TakeAttendance extends AppCompatActivity {
 
                 if(position != subjectSpinnerPosition)
                 {
-                    selectedSubject = allSubjectArrayList.get(position);
+                    try {
+                        selectedSubject = allSubjectArrayList.get(position);
+                    }
+                    catch (IndexOutOfBoundsException e)
+                    {
+                        Toast.makeText(TakeAttendance.this,"No subject found !!!",Toast.LENGTH_LONG).show();
+                        Toast.makeText(TakeAttendance.this,"Please select all options again !!!",Toast.LENGTH_LONG).show();
+                    }
                 }
             }
 
@@ -473,7 +519,14 @@ public class TakeAttendance extends AppCompatActivity {
             }
             classArrayList.add("Select Class");
             classSpinnerPosition = classArrayList.indexOf("Select Class");
-            selectedClass = allClassArrayList.get(0);
+            try {
+                selectedClass = allClassArrayList.get(0);
+            }
+            catch (IndexOutOfBoundsException e)
+            {
+                Toast.makeText(TakeAttendance.this,"No class found !!!",Toast.LENGTH_LONG).show();
+                Toast.makeText(TakeAttendance.this,"Please select all options again !!!",Toast.LENGTH_LONG).show();
+            }
             ArrayAdapter<ArrayList> class_spinner_adapter = new ArrayAdapter<ArrayList>(this,R.layout.spinner_item, classArrayList){
 
                 @Override
@@ -517,7 +570,14 @@ public class TakeAttendance extends AppCompatActivity {
             }
             shiftArrayList.add("Select Shift");
             shiftSpinnerPosition = shiftArrayList.indexOf("Select Shift");
-            selectedShift = allShiftArrayList.get(0);
+            try {
+                selectedShift = allShiftArrayList.get(0);
+            }
+            catch (IndexOutOfBoundsException e)
+            {
+                Toast.makeText(TakeAttendance.this,"No shift found !!!",Toast.LENGTH_LONG).show();
+                Toast.makeText(TakeAttendance.this,"Please select all options again !!!",Toast.LENGTH_LONG).show();
+            }
             ArrayAdapter<ArrayList> shift_spinner_adapter = new ArrayAdapter<ArrayList>(this,R.layout.spinner_item, shiftArrayList){
 
                 @Override
@@ -562,7 +622,14 @@ public class TakeAttendance extends AppCompatActivity {
             }
             sectionArrayList.add("Select Section");
             sectionSpinnerPosition = sectionArrayList.indexOf("Select Section");
-            selectedSection = allSectionArrayList.get(0);
+            try {
+                selectedSection = allSectionArrayList.get(0);
+            }
+            catch (IndexOutOfBoundsException e)
+            {
+                Toast.makeText(TakeAttendance.this,"No section found !!!",Toast.LENGTH_LONG).show();
+                Toast.makeText(TakeAttendance.this,"Please select all options again !!!",Toast.LENGTH_LONG).show();
+            }
             ArrayAdapter<ArrayList> section_spinner_adapter = new ArrayAdapter<ArrayList>(this,R.layout.spinner_item, sectionArrayList){
 
                 @Override
@@ -608,7 +675,14 @@ public class TakeAttendance extends AppCompatActivity {
             }
             mediumnArrayList.add("Select Medium");
             mediumSpinnerPosition = mediumnArrayList.indexOf("Select Medium");
-            selectedMedium = allMediumArrayList.get(0);
+            try {
+                selectedMedium = allMediumArrayList.get(0);
+            }
+            catch (IndexOutOfBoundsException e)
+            {
+                Toast.makeText(TakeAttendance.this,"No medium found !!!",Toast.LENGTH_LONG).show();
+                Toast.makeText(TakeAttendance.this,"Please select all options again !!!",Toast.LENGTH_LONG).show();
+            }
             ArrayAdapter<ArrayList> medium_spinner_adapter = new ArrayAdapter<ArrayList>(this,R.layout.spinner_item, mediumnArrayList){
 
                 @Override
@@ -657,7 +731,14 @@ public class TakeAttendance extends AppCompatActivity {
             }
             subjectArrayList.add("Select Subject");
             subjectSpinnerPosition = subjectArrayList.indexOf("Select Subject");
-            selectedSubject = allSubjectArrayList.get(0);
+            try {
+                selectedSubject = allSubjectArrayList.get(0);
+            }
+            catch (IndexOutOfBoundsException e)
+            {
+                Toast.makeText(TakeAttendance.this,"No subject found !!!",Toast.LENGTH_LONG).show();
+                Toast.makeText(TakeAttendance.this,"Please select all options again !!!",Toast.LENGTH_LONG).show();
+            }
             ArrayAdapter<ArrayList> subject_spinner_adapter = new ArrayAdapter<ArrayList>(this,R.layout.spinner_item, subjectArrayList){
 
                 @Override
@@ -783,7 +864,24 @@ public class TakeAttendance extends AppCompatActivity {
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            super.onBackPressed();
+            AlertDialog.Builder builder = new AlertDialog.Builder(TakeAttendance.this);
+            builder.setTitle(R.string.app_name);
+            builder.setIcon(R.drawable.onair);
+            builder.setMessage("Do you want to exit?")
+                    .setCancelable(false)
+                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            finish();
+                        }
+                    })
+                    .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            dialog.cancel();
+                        }
+                    });
+            AlertDialog alert = builder.create();
+            alert.show();
+//            super.onBackPressed();
         }
     }
 
@@ -820,6 +918,12 @@ public class TakeAttendance extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager = (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
 //    @SuppressWarnings("StatementWithEmptyBody")

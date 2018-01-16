@@ -26,6 +26,7 @@ import android.os.Parcelable;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
+import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.system.ErrnoException;
 import android.util.Base64;
@@ -81,35 +82,14 @@ public class StudentiCardNewEntry extends AppCompatActivity {
     private Button cameraButton,searchButton,doneButton;
     private int PICK_IMAGE_REQUEST = 1;
     private String encImage;
-    private String instituteID = "";
-    private String authenticationID = "";
-    private String className = "";
-    private String sectionName = "";
-    private String classId = "";
-    private String sectionId = "";
-    private int index;
-    private String classID[] = {};
-    private String sectionID[] = {};
-    private String myClassArray[] = {};
-    private String mySectionArray[] = {};
-    private String sexArray[]={"Male","Female","Gender"};
-    private String religionArray[]={"Islam","Hinduism","Christian","Buddhism","Others","Religion"};
-    private ArrayList<String> roll_code_array;
     private EditText editname,editroll,editaddress,editparent,editparentnumber;
-    private Spinner s_class, s_section,s_sex,s_religion;
-    private static final String url = "jdbc:mysql://182.160.100.36:3306/ems";
-    private static final String user = "yamin";
-    private static final String pass = "yamin";
     private String name,roll,address,parentName,parentNumber;
     private String ImagePath;
-    private DatePickerDialog datePickerDialog;
     private Uri URI;
-    private File mediaStorageDir;
     private CropImageView mCropImageView;
     private CheckBox checkBox;
     private Uri mCropImageUri;
-    ProgressDialog dialog;
-    int state;
+    private ProgressDialog dialog;
     private long InstituteID;
     private Spinner spinnerClass, spinnerShift,spinnerSection;
     private String classUrl, shiftUrl, sectionUrl, studentDataPostUrl;
@@ -117,20 +97,20 @@ public class StudentiCardNewEntry extends AppCompatActivity {
     private ArrayList<ShiftModel> allShiftArrayList;
     private ArrayList<SectionModel> allSectionArrayList;
 
-    String[] tempSectionArray = {"Select Section"};
-    ClassModel selectedClass = null;
-    ShiftModel selectedShift = null;
-    SectionModel selectedSection = null;
+    private String[] tempSectionArray = {"Select Section"};
+    private ClassModel selectedClass = null;
+    private ShiftModel selectedShift = null;
+    private SectionModel selectedSection = null;
 
-    int classSpinnerPosition, shiftSpinnerPosition, sectionSpinnerPosition;
+    private int classSpinnerPosition, shiftSpinnerPosition, sectionSpinnerPosition;
 
-    JSONObject jsonObjectStudentData;
+    private JSONObject jsonObjectStudentData;
 
-    File file;
+    private File file;
 
-    Bitmap originalBitmap;
+    private Bitmap originalBitmap;
 
-    FileFromBitmap fileFromBitmap = null;
+    private FileFromBitmap fileFromBitmap = null;
 
 
     @Override
@@ -244,7 +224,14 @@ public class StudentiCardNewEntry extends AppCompatActivity {
                 if(position != classSpinnerPosition)
                 {
                     selectedSection = null;
-                    selectedClass = allClassArrayList.get(position);
+                    try {
+                        selectedClass = allClassArrayList.get(position);
+                    }
+                    catch (IndexOutOfBoundsException e)
+                    {
+                        Toast.makeText(StudentiCardNewEntry.this,"No class found !!!",Toast.LENGTH_LONG).show();
+                        Toast.makeText(StudentiCardNewEntry.this,"Please select all options again !!!",Toast.LENGTH_LONG).show();
+                    }
                     long classId = selectedClass.getClassID();
                     sectionUrl = getString(R.string.baseUrlLocal)+"getInsSection/"+InstituteID+"/"+classId;
                     dialog.show();
@@ -281,7 +268,14 @@ public class StudentiCardNewEntry extends AppCompatActivity {
 
                 if(position != shiftSpinnerPosition)
                 {
-                    selectedShift = allShiftArrayList.get(position);
+                    try {
+                        selectedShift = allShiftArrayList.get(position);
+                    }
+                    catch (IndexOutOfBoundsException e)
+                    {
+                        Toast.makeText(StudentiCardNewEntry.this,"No shift found !!!",Toast.LENGTH_LONG).show();
+                        Toast.makeText(StudentiCardNewEntry.this,"Please select all options again !!!",Toast.LENGTH_LONG).show();
+                    }
                 }
             }
 
@@ -297,7 +291,14 @@ public class StudentiCardNewEntry extends AppCompatActivity {
 
                 if(position != sectionSpinnerPosition)
                 {
-                    selectedSection = allSectionArrayList.get(position);
+                    try {
+                        selectedSection = allSectionArrayList.get(position);
+                    }
+                    catch (IndexOutOfBoundsException e)
+                    {
+                        Toast.makeText(StudentiCardNewEntry.this,"No section found !!!",Toast.LENGTH_LONG).show();
+                        Toast.makeText(StudentiCardNewEntry.this,"Please select all options again !!!",Toast.LENGTH_LONG).show();
+                    }
                 }
             }
 
@@ -377,23 +378,7 @@ public class StudentiCardNewEntry extends AppCompatActivity {
                                 mCropImageView.setImageBitmap(originalBitmap);
                                 fileFromBitmap = new FileFromBitmap(originalBitmap, StudentiCardNewEntry.this);
                                 fileFromBitmap.execute();
-//                            encodeImage(cropped);
                             }
-
-
-//                                Bitmap cropped =  mCropImageView.getCroppedImage(mCropImageView.getWidth(), mCropImageView.getHeight());
-//                                if (cropped != null)
-//                                {
-//                                    mCropImageView.setImageBitmap(cropped);
-//                                    encodeImage(cropped);
-//                                }
-//                                try
-//                                {
-//                                    ImagePath = MediaStore.Images.Media.insertImage(NewEntryActivity.this.getContentResolver(), cropped, "demo_image", "demo_image");
-//                                }
-//                                catch (Exception e)
-//                                {
-//                                }
                         }
                         else
                         {
@@ -414,7 +399,6 @@ public class StudentiCardNewEntry extends AppCompatActivity {
 
         Context context;
         Bitmap bitmap;
-//        String path_external = Environment.getExternalStorageDirectory() + File.separator + "temporary_file.jpg";
 
         public FileFromBitmap(Bitmap bitmap, Context context) {
             this.bitmap = bitmap;
@@ -517,7 +501,7 @@ public class StudentiCardNewEntry extends AppCompatActivity {
                         dialog.dismiss();
                         try {
                             Toast.makeText(StudentiCardNewEntry.this,"Data Successfully Updated with Response: "+response.getJSONObject(0).get("ReturnValue"),Toast.LENGTH_LONG).show();
-                            finish();
+                            NavUtils.navigateUpFromSameTask(StudentiCardNewEntry.this);
                         }
                         catch (Exception e)
                         {
@@ -541,13 +525,19 @@ public class StudentiCardNewEntry extends AppCompatActivity {
             for(int i = 0; i < classJsonArray.length(); ++i) {
                 JSONObject classJsonObject = classJsonArray.getJSONObject(i);
                 ClassModel classModel = new ClassModel(classJsonObject.getString("ClassID"), classJsonObject.getString("ClassName"));
-//                Toast.makeText(this,classJsonObject.getString("ClassID")+classJsonObject.getString("ClassName"),Toast.LENGTH_LONG).show();
                 allClassArrayList.add(classModel);
                 classArrayList.add(classModel.getClassName());
             }
             classArrayList.add("Select Class");
             classSpinnerPosition = classArrayList.indexOf("Select Class");
-            selectedClass = allClassArrayList.get(0);
+            try {
+                selectedClass = allClassArrayList.get(0);
+            }
+            catch (IndexOutOfBoundsException e)
+            {
+                Toast.makeText(StudentiCardNewEntry.this,"No class found !!!",Toast.LENGTH_LONG).show();
+                Toast.makeText(StudentiCardNewEntry.this,"Please select all options again !!!",Toast.LENGTH_LONG).show();
+            }
             ArrayAdapter<ArrayList> class_spinner_adapter = new ArrayAdapter<ArrayList>(this,R.layout.spinner_item, classArrayList){
 
                 @Override
@@ -585,13 +575,19 @@ public class StudentiCardNewEntry extends AppCompatActivity {
             for(int i = 0; i < shiftJsonArray.length(); ++i) {
                 JSONObject shiftJsonObject = shiftJsonArray.getJSONObject(i);
                 ShiftModel shiftModel = new ShiftModel(shiftJsonObject.getString("ShiftID"), shiftJsonObject.getString("ShiftName"));
-//                Toast.makeText(this,classJsonObject.getString("ClassID")+classJsonObject.getString("ClassName"),Toast.LENGTH_LONG).show();
                 allShiftArrayList.add(shiftModel);
                 shiftArrayList.add(shiftModel.getShiftName());
             }
             shiftArrayList.add("Select Shift");
             shiftSpinnerPosition = shiftArrayList.indexOf("Select Shift");
-            selectedShift = allShiftArrayList.get(0);
+            try {
+                selectedShift = allShiftArrayList.get(0);
+            }
+            catch (IndexOutOfBoundsException e)
+            {
+                Toast.makeText(StudentiCardNewEntry.this,"No shift found !!!",Toast.LENGTH_LONG).show();
+                Toast.makeText(StudentiCardNewEntry.this,"Please select all options again !!!",Toast.LENGTH_LONG).show();
+            }
             ArrayAdapter<ArrayList> shift_spinner_adapter = new ArrayAdapter<ArrayList>(this,R.layout.spinner_item, shiftArrayList){
 
                 @Override
@@ -636,7 +632,14 @@ public class StudentiCardNewEntry extends AppCompatActivity {
             }
             sectionArrayList.add("Select Section");
             sectionSpinnerPosition = sectionArrayList.indexOf("Select Section");
-            selectedSection = allSectionArrayList.get(0);
+            try {
+                selectedSection = allSectionArrayList.get(0);
+            }
+            catch (IndexOutOfBoundsException e)
+            {
+                Toast.makeText(StudentiCardNewEntry.this,"No section found !!!",Toast.LENGTH_LONG).show();
+                Toast.makeText(StudentiCardNewEntry.this,"Please select all options again !!!",Toast.LENGTH_LONG).show();
+            }
             ArrayAdapter<ArrayList> section_spinner_adapter = new ArrayAdapter<ArrayList>(this,R.layout.spinner_item, sectionArrayList){
 
                 @Override

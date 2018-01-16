@@ -4,6 +4,8 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
@@ -97,77 +99,84 @@ public class LoginScreen extends AppCompatActivity
             @Override
             public void onClick(View v)
             {
-                loginurl = getString(R.string.baseUrlLocal)+"getLoginInformation"+"/"+takeId.getText().toString()+"/"+takePassword.getText().toString();
-                LoginId = takeId.getText().toString();
-                LoginPassword = takePassword.getText().toString();
+                if(isNetworkAvailable())
+                {
+                    loginurl = getString(R.string.baseUrlLocal)+"getLoginInformation"+"/"+takeId.getText().toString()+"/"+takePassword.getText().toString();
+                    LoginId = takeId.getText().toString();
+                    LoginPassword = takePassword.getText().toString();
 
-                if(takeId.getText().toString().isEmpty())
-                {
-                    takeId.setError("This field is required");
-                    takeId.requestFocus();
-                }
-                else if(takePassword.getText().toString().isEmpty())
-                {
-                    takePassword.setError("This field is required");
-                    takePassword.requestFocus();
+                    if(takeId.getText().toString().isEmpty())
+                    {
+                        takeId.setError("This field is required");
+                        takeId.requestFocus();
+                    }
+                    else if(takePassword.getText().toString().isEmpty())
+                    {
+                        takePassword.setError("This field is required");
+                        takePassword.requestFocus();
+                    }
+                    else
+                    {
+                        dialog.show();
+                        // Get Login ID and Password From Server Using Volley
+                        RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
+                        StringRequest stringRequest = new StringRequest(Request.Method.GET, loginurl,
+                                new Response.Listener<String>()
+                                {
+                                    @Override
+                                    public void onResponse(String response) {
+
+                                        parseJsonData(response); // User define Function For parsing JSON data
+
+                                        LoginId = takeId.getText().toString();
+                                        LoginPassword = takePassword.getText().toString();
+
+                                        // Login For User
+
+                                        if((UserID.length()>0) && (UserTypeID == 3))
+                                        {
+                                            Intent mainIntent = new Intent(LoginScreen.this,StudentMainScreen.class);
+                                            LoginScreen.this.startActivity(mainIntent);
+                                            LoginScreen.this.finish();
+                                            dialog.dismiss();
+                                        }
+                                        // Login For Teacher
+                                        else if((UserID.length()>0) && (UserTypeID == 4))
+                                        {
+                                            Intent mainIntent = new Intent(LoginScreen.this,TeacherMainScreen.class);
+                                            LoginScreen.this.startActivity(mainIntent);
+                                            LoginScreen.this.finish();
+                                            dialog.dismiss();
+                                        }
+                                        else
+                                        {
+                                            errorView.setText("Invalid Login ID or Password !!!");
+                                            takeId.setText("");
+                                            takePassword.setText("");
+                                            takeId.requestFocus();
+                                            dialog.dismiss();
+                                        }
+
+                                    }
+                                }, new Response.ErrorListener()
+                        {
+                            @Override
+                            public void onErrorResponse(VolleyError error)
+                            {
+
+                                dialog.dismiss();
+                            }
+                        });
+
+                        queue.add(stringRequest);
+                    }
+
+                    // Get Login ID and Password From Server Using Volley END
                 }
                 else
                 {
-                    dialog.show();
-                    // Get Login ID and Password From Server Using Volley
-                    RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
-                    StringRequest stringRequest = new StringRequest(Request.Method.GET, loginurl,
-                            new Response.Listener<String>()
-                            {
-                                @Override
-                                public void onResponse(String response) {
-
-                                    parseJsonData(response); // User define Function For parsing JSON data
-
-                                    LoginId = takeId.getText().toString();
-                                    LoginPassword = takePassword.getText().toString();
-
-                                    // Login For User
-
-                                    if((UserID.length()>0) && (UserTypeID == 3))
-                                    {
-                                        Intent mainIntent = new Intent(LoginScreen.this,StudentMainScreen.class);
-                                        LoginScreen.this.startActivity(mainIntent);
-                                        LoginScreen.this.finish();
-                                        dialog.dismiss();
-                                    }
-                                    // Login For Teacher
-                                    else if((UserID.length()>0) && (UserTypeID == 4))
-                                    {
-                                        Intent mainIntent = new Intent(LoginScreen.this,TeacherMainScreen.class);
-                                        LoginScreen.this.startActivity(mainIntent);
-                                        LoginScreen.this.finish();
-                                        dialog.dismiss();
-                                    }
-                                    else
-                                    {
-                                        errorView.setText("Invalid Login ID or Password !!!");
-                                        takeId.setText("");
-                                        takePassword.setText("");
-                                        takeId.requestFocus();
-                                        dialog.dismiss();
-                                    }
-
-                                }
-                            }, new Response.ErrorListener()
-                    {
-                        @Override
-                        public void onErrorResponse(VolleyError error)
-                        {
-
-                            dialog.dismiss();
-                        }
-                    });
-
-                    queue.add(stringRequest);
+                    Toast.makeText(LoginScreen.this,"Please check your internet connection!!!",Toast.LENGTH_LONG).show();
                 }
-
-                // Get Login ID and Password From Server Using Volley END
             }
         });
     }
@@ -349,5 +358,11 @@ public class LoginScreen extends AppCompatActivity
         }
 
        dialog.dismiss();
+    }
+
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager = (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 }

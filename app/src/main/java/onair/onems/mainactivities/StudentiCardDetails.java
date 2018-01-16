@@ -347,7 +347,7 @@ public class StudentiCardDetails extends AppCompatActivity {
                         dialog.dismiss();
                         try {
                             Toast.makeText(StudentiCardDetails.this,"Data Successfully Updated with Response: "+response.getJSONObject(0).get("ReturnValue"),Toast.LENGTH_LONG).show();
-                            finish();
+                            NavUtils.navigateUpFromSameTask(StudentiCardDetails.this);
                         }
                         catch (Exception e)
                         {

@@ -1,7 +1,9 @@
 package onair.onems.mainactivities;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
@@ -202,7 +204,14 @@ public class StudentiCardMain extends AppCompatActivity {
                 {
                     selectedSection = null;
                     selectedStudent = null;
-                    selectedClass = allClassArrayList.get(position);
+                    try {
+                        selectedClass = allClassArrayList.get(position);
+                    }
+                    catch (IndexOutOfBoundsException e)
+                    {
+                        Toast.makeText(StudentiCardMain.this,"No class found !!!",Toast.LENGTH_LONG).show();
+                        Toast.makeText(StudentiCardMain.this,"Please select all options again !!!",Toast.LENGTH_LONG).show();
+                    }
                     long classId = selectedClass.getClassID();
                     sectionUrl = getString(R.string.baseUrlLocal)+"getInsSection/"+InstituteID+"/"+classId;
                     dialog.show();
@@ -239,7 +248,14 @@ public class StudentiCardMain extends AppCompatActivity {
 
                 if(position != shiftSpinnerPosition)
                 {
-                    selectedShift = allShiftArrayList.get(position);
+                    try {
+                        selectedShift = allShiftArrayList.get(position);
+                    }
+                    catch (IndexOutOfBoundsException e)
+                    {
+                        Toast.makeText(StudentiCardMain.this,"No shift found !!!",Toast.LENGTH_LONG).show();
+                        Toast.makeText(StudentiCardMain.this,"Please select all options again !!!",Toast.LENGTH_LONG).show();
+                    }
                 }
             }
 
@@ -255,7 +271,14 @@ public class StudentiCardMain extends AppCompatActivity {
 
                 if(position != sectionSpinnerPosition)
                 {
-                    selectedSection = allSectionArrayList.get(position);
+                    try {
+                        selectedSection = allSectionArrayList.get(position);
+                    }
+                    catch (IndexOutOfBoundsException e)
+                    {
+                        Toast.makeText(StudentiCardMain.this,"No section found !!!",Toast.LENGTH_LONG).show();
+                        Toast.makeText(StudentiCardMain.this,"Please select all options again !!!",Toast.LENGTH_LONG).show();
+                    }
                     selectedStudent = null;
                     studentUrl = getString(R.string.baseUrlLocal)+"getStudent"+"/"+InstituteID+"/"+
                             selectedClass.getClassID()+"/"+selectedSection.getSectionID()+"/"+
@@ -334,7 +357,14 @@ public class StudentiCardMain extends AppCompatActivity {
 
                 if(position != studentSpinnerPosition)
                 {
-                    selectedStudent = allStudentArrayList.get(position);
+                    try {
+                        selectedStudent = allStudentArrayList.get(position);
+                    }
+                    catch (IndexOutOfBoundsException e)
+                    {
+                        Toast.makeText(StudentiCardMain.this,"No student found !!!",Toast.LENGTH_LONG).show();
+                        Toast.makeText(StudentiCardMain.this,"Please select all options again !!!",Toast.LENGTH_LONG).show();
+                    }
                 }
             }
 
@@ -362,70 +392,77 @@ public class StudentiCardMain extends AppCompatActivity {
         showStudentData.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if((!(selectedClass == null))&&(!(selectedSection == null))&&(!(selectedShift == null))&&(!(selectedStudent == null)))
+                if(isNetworkAvailable())
                 {
-                    Bundle bundle = new Bundle();
-                    bundle.putString("UserName", selectedStudent.getUserName());
-                    bundle.putString("RollNo", selectedStudent.getRollNo());
-                    bundle.putString("ImageUrl", selectedStudent.getImageUrl());
-                    bundle.putString("ClassName", selectedStudent.getClassName());
-                    bundle.putString("SectionName", selectedStudent.getSectionName());
-                    bundle.putString("MameName", selectedStudent.getMameName());
-                    bundle.putString("DepartmentName", selectedStudent.getDepartmentName());
-                    bundle.putString("SessionName", selectedStudent.getSessionName());
-                    bundle.putString("BoardName", selectedStudent.getBoardName());
-                    bundle.putString("Guardian", selectedStudent.getGuardian());
-                    bundle.putString("GuardianPhone", selectedStudent.getGuardianPhone());
-                    bundle.putString("GuardianEmailID", selectedStudent.getGuardianEmailID());
-                    bundle.putString("DOB", selectedStudent.getDOB());
-                    bundle.putString("Gender", selectedStudent.getGender());
-                    bundle.putString("Religion", selectedStudent.getReligion());
-                    bundle.putString("UserClassID", selectedStudent.getUserClassID());
-                    bundle.putString("UserID", selectedStudent.getUserID());
-                    bundle.putString("RFID", selectedStudent.getRFID());
-                    bundle.putString("StudentNo", selectedStudent.getStudentNo());
-                    bundle.putString("SectionID", Long.toString(selectedStudent.getSectionID()));
-                    bundle.putString("ClassID", Long.toString(selectedStudent.getClassID()));
-                    bundle.putString("BrunchID", Long.toString(selectedStudent.getBrunchID()));
-                    bundle.putString("ShiftID", Long.toString(selectedStudent.getShiftID()));
-                    bundle.putString("Remarks", selectedStudent.getRemarks());
-                    bundle.putString("InstituteID", Long.toString(selectedStudent.getInstituteID()));
-                    bundle.putString("UserTypeID", Long.toString(selectedStudent.getUserTypeID()));
-                    bundle.putString("GenderID", Long.toString(selectedStudent.getGenderID()));
-                    bundle.putString("PhoneNo", selectedStudent.getPhoneNo());
-                    bundle.putString("EmailID", selectedStudent.getEmailID());
-                    bundle.putString("FingerUrl", selectedStudent.getFingerUrl());
-                    bundle.putString("SignatureUrl", selectedStudent.getSignatureUrl());
-                    bundle.putString("PreAddress", selectedStudent.getPreAddress());
+                    if((!(selectedClass == null))&&(!(selectedSection == null))&&(!(selectedShift == null))&&(!(selectedStudent == null)))
+                    {
+                        Bundle bundle = new Bundle();
+                        bundle.putString("UserName", selectedStudent.getUserName());
+                        bundle.putString("RollNo", selectedStudent.getRollNo());
+                        bundle.putString("ImageUrl", selectedStudent.getImageUrl());
+                        bundle.putString("ClassName", selectedStudent.getClassName());
+                        bundle.putString("SectionName", selectedStudent.getSectionName());
+                        bundle.putString("MameName", selectedStudent.getMameName());
+                        bundle.putString("DepartmentName", selectedStudent.getDepartmentName());
+                        bundle.putString("SessionName", selectedStudent.getSessionName());
+                        bundle.putString("BoardName", selectedStudent.getBoardName());
+                        bundle.putString("Guardian", selectedStudent.getGuardian());
+                        bundle.putString("GuardianPhone", selectedStudent.getGuardianPhone());
+                        bundle.putString("GuardianEmailID", selectedStudent.getGuardianEmailID());
+                        bundle.putString("DOB", selectedStudent.getDOB());
+                        bundle.putString("Gender", selectedStudent.getGender());
+                        bundle.putString("Religion", selectedStudent.getReligion());
+                        bundle.putString("UserClassID", selectedStudent.getUserClassID());
+                        bundle.putString("UserID", selectedStudent.getUserID());
+                        bundle.putString("RFID", selectedStudent.getRFID());
+                        bundle.putString("StudentNo", selectedStudent.getStudentNo());
+                        bundle.putString("SectionID", Long.toString(selectedStudent.getSectionID()));
+                        bundle.putString("ClassID", Long.toString(selectedStudent.getClassID()));
+                        bundle.putString("BrunchID", Long.toString(selectedStudent.getBrunchID()));
+                        bundle.putString("ShiftID", Long.toString(selectedStudent.getShiftID()));
+                        bundle.putString("Remarks", selectedStudent.getRemarks());
+                        bundle.putString("InstituteID", Long.toString(selectedStudent.getInstituteID()));
+                        bundle.putString("UserTypeID", Long.toString(selectedStudent.getUserTypeID()));
+                        bundle.putString("GenderID", Long.toString(selectedStudent.getGenderID()));
+                        bundle.putString("PhoneNo", selectedStudent.getPhoneNo());
+                        bundle.putString("EmailID", selectedStudent.getEmailID());
+                        bundle.putString("FingerUrl", selectedStudent.getFingerUrl());
+                        bundle.putString("SignatureUrl", selectedStudent.getSignatureUrl());
+                        bundle.putString("PreAddress", selectedStudent.getPreAddress());
 
-                    Intent intent = new Intent(StudentiCardMain.this, StudentiCardDetails.class);
-                    intent.putExtras(bundle);
-                    selectedClass = null;
-                    selectedShift = null;
-                    selectedSection = null;
-                    selectedMedium = null;
-                    selectedStudent = null;
-                    startActivity(intent);
-                }
-                else if(selectedClass == null)
-                {
-                    Toast.makeText(StudentiCardMain.this,"Please select class !!! ",Toast.LENGTH_LONG).show();
-                }
-                else if(selectedSection == null)
-                {
-                    Toast.makeText(StudentiCardMain.this,"Please select section !!! ",Toast.LENGTH_LONG).show();
-                }
-                else if(selectedShift == null)
-                {
-                    Toast.makeText(StudentiCardMain.this,"Please select shift !!! ",Toast.LENGTH_LONG).show();
-                }
-                else if(selectedStudent == null)
-                {
-                    Toast.makeText(StudentiCardMain.this,"Please select a student !!! ",Toast.LENGTH_LONG).show();
+                        Intent intent = new Intent(StudentiCardMain.this, StudentiCardDetails.class);
+                        intent.putExtras(bundle);
+                        selectedClass = null;
+                        selectedShift = null;
+                        selectedSection = null;
+                        selectedMedium = null;
+                        selectedStudent = null;
+                        startActivity(intent);
+                    }
+                    else if(selectedClass == null)
+                    {
+                        Toast.makeText(StudentiCardMain.this,"Please select class !!! ",Toast.LENGTH_LONG).show();
+                    }
+                    else if(selectedSection == null)
+                    {
+                        Toast.makeText(StudentiCardMain.this,"Please select section !!! ",Toast.LENGTH_LONG).show();
+                    }
+                    else if(selectedShift == null)
+                    {
+                        Toast.makeText(StudentiCardMain.this,"Please select shift !!! ",Toast.LENGTH_LONG).show();
+                    }
+                    else if(selectedStudent == null)
+                    {
+                        Toast.makeText(StudentiCardMain.this,"Please select a student !!! ",Toast.LENGTH_LONG).show();
+                    }
+                    else
+                    {
+                        Toast.makeText(StudentiCardMain.this,"Please select all options !!! ",Toast.LENGTH_LONG).show();
+                    }
                 }
                 else
                 {
-                    Toast.makeText(StudentiCardMain.this,"Please select all options !!! ",Toast.LENGTH_LONG).show();
+                    Toast.makeText(StudentiCardMain.this,"Please check your internet connection!!!",Toast.LENGTH_LONG).show();
                 }
             }
         });
@@ -896,7 +933,23 @@ public class StudentiCardMain extends AppCompatActivity {
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            super.onBackPressed();
+            AlertDialog.Builder builder = new AlertDialog.Builder(StudentiCardMain.this);
+            builder.setTitle(R.string.app_name);
+            builder.setIcon(R.drawable.onair);
+            builder.setMessage("Do you want to exit?")
+                    .setCancelable(false)
+                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            finish();
+                        }
+                    })
+                    .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            dialog.cancel();
+                        }
+                    });
+            AlertDialog alert = builder.create();
+            alert.show();
         }
     }
 
