@@ -32,7 +32,7 @@ public class LoginScreen extends AppCompatActivity
     private AutoCompleteTextView takeId;
     private EditText takePassword;
     private TextView errorView;
-    private String UserID = "", LoginId = "", LoginPassword = "", Password = "", UserFullName = "",
+    private String UserID = "", Password = "", UserFullName = "",
             ImageUrl = "", InstituteName = "", DepartmentName = "",
             DesignationName = "", BrunchName = "", RFID = "", RollNo = "",
             StudentNo = "";
@@ -102,8 +102,6 @@ public class LoginScreen extends AppCompatActivity
                 if(isNetworkAvailable())
                 {
                     loginurl = getString(R.string.baseUrlLocal)+"getLoginInformation"+"/"+takeId.getText().toString()+"/"+takePassword.getText().toString();
-                    LoginId = takeId.getText().toString();
-                    LoginPassword = takePassword.getText().toString();
 
                     if(takeId.getText().toString().isEmpty())
                     {
@@ -127,10 +125,6 @@ public class LoginScreen extends AppCompatActivity
                                     public void onResponse(String response) {
 
                                         parseJsonData(response); // User define Function For parsing JSON data
-
-                                        LoginId = takeId.getText().toString();
-                                        LoginPassword = takePassword.getText().toString();
-
                                         // Login For User
 
                                         if((UserID.length()>0) && (UserTypeID == 3))
@@ -196,7 +190,7 @@ public class LoginScreen extends AppCompatActivity
             }
             else
             {
-                UserTypeID = Integer.parseInt(UserTypeIDTemp);
+                UserTypeID = Long.parseLong(UserTypeIDTemp);
             }
             UserFullName = jsonArray.getJSONObject(0).getString("UserFullName");
             InstituteName = jsonArray.getJSONObject(0).getString("InstituteName");
@@ -207,7 +201,7 @@ public class LoginScreen extends AppCompatActivity
             }
             else
             {
-                InstituteID = Integer.parseInt(InstituteIDTemp);
+                InstituteID = Long.parseLong(InstituteIDTemp);
             }
             ImageUrl = jsonArray.getJSONObject(0).getString("ImageUrl");
             String DepartmentIDTemp = jsonArray.getJSONObject(0).getString("DepartmentID");
@@ -217,7 +211,7 @@ public class LoginScreen extends AppCompatActivity
             }
             else
             {
-                DepartmentID = Integer.parseInt(DepartmentIDTemp);
+                DepartmentID = Long.parseLong(DepartmentIDTemp);
             }
             String DesignationIDTemp = jsonArray.getJSONObject(0).getString("DesignationID");
             if(DesignationIDTemp.equals("null"))
@@ -226,7 +220,7 @@ public class LoginScreen extends AppCompatActivity
             }
             else
             {
-                DesignationID = Integer.parseInt(DesignationIDTemp);
+                DesignationID = Long.parseLong(DesignationIDTemp);
             }
             String BrunchIDTemp = jsonArray.getJSONObject(0).getString("BrunchID");
             if(BrunchIDTemp.equals("null"))
@@ -235,7 +229,7 @@ public class LoginScreen extends AppCompatActivity
             }
             else
             {
-                BrunchID = Integer.parseInt(BrunchIDTemp);
+                BrunchID = Long.parseLong(BrunchIDTemp);
             }
             DepartmentName = jsonArray.getJSONObject(0).getString("DepartmentName");
             DesignationName = jsonArray.getJSONObject(0).getString("DesignationName");
@@ -247,7 +241,7 @@ public class LoginScreen extends AppCompatActivity
             }
             else
             {
-                SBrunchID = Integer.parseInt(SBrunchIDTemp);
+                SBrunchID = Long.parseLong(SBrunchIDTemp);
             }
             String BoardIDTemp = jsonArray.getJSONObject(0).getString("BoardID");
             if(BoardIDTemp.equals("null"))
@@ -256,7 +250,7 @@ public class LoginScreen extends AppCompatActivity
             }
             else
             {
-                BoardID = Integer.parseInt(BoardIDTemp);
+                BoardID = Long.parseLong(BoardIDTemp);
             }
             String SDepartmentIDTemp = jsonArray.getJSONObject(0).getString("SDepartmentID");
             if(SDepartmentIDTemp.equals("null"))
@@ -265,7 +259,7 @@ public class LoginScreen extends AppCompatActivity
             }
             else
             {
-                SDepartmentID = Integer.parseInt(SDepartmentIDTemp);
+                SDepartmentID = Long.parseLong(SDepartmentIDTemp);
             }
             String MediumIDTemp = jsonArray.getJSONObject(0).getString("MediumID");
             if(MediumIDTemp.equals("null"))
@@ -274,7 +268,7 @@ public class LoginScreen extends AppCompatActivity
             }
             else
             {
-                MediumID = Integer.parseInt(MediumIDTemp);
+                MediumID = Long.parseLong(MediumIDTemp);
             }
             RFID = jsonArray.getJSONObject(0).getString("RFID");
             RollNo = jsonArray.getJSONObject(0).getString("RollNo");
@@ -285,7 +279,7 @@ public class LoginScreen extends AppCompatActivity
             }
             else
             {
-                SectionID = Integer.parseInt(SectionIDTemp);
+                SectionID = Long.parseLong(SectionIDTemp);
             }
             String SessionIDTemp = jsonArray.getJSONObject(0).getString("SessionID");
             if(SessionIDTemp.equals("null"))
@@ -294,7 +288,7 @@ public class LoginScreen extends AppCompatActivity
             }
             else
             {
-                SessionID = Integer.parseInt(SessionIDTemp);
+                SessionID = Long.parseLong(SessionIDTemp);
             }
             String ShiftIDTemp = jsonArray.getJSONObject(0).getString("ShiftID");
             if(ShiftIDTemp.equals("null"))
@@ -303,7 +297,7 @@ public class LoginScreen extends AppCompatActivity
             }
             else
             {
-                ShiftID = Integer.parseInt(ShiftIDTemp);
+                ShiftID = Long.parseLong(ShiftIDTemp);
             }
             String ClassIDTemp = jsonArray.getJSONObject(0).getString("ClassID");
             if(ClassIDTemp.equals("null"))
@@ -312,7 +306,7 @@ public class LoginScreen extends AppCompatActivity
             }
             else
             {
-                ClassID = Integer.parseInt(ClassIDTemp);
+                ClassID = Long.parseLong(ClassIDTemp);
             }
             StudentNo = jsonArray.getJSONObject(0).getString("StudentNo");
             // Parse Json data From API END
