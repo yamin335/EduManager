@@ -27,15 +27,15 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/guideline5"
         app:layout_constraintTop_toTopOf="@+id/guideline8"
-        app:layout_constraintVertical_bias="0.32">
+        app:layout_constraintVertical_bias="0.25">
 
         <Spinner
-            android:id="@+id/spinnerSection"
+            android:id="@+id/spinnerDepartment"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:backgroundTint="#ffffff"
-            android:spinnerMode="dropdown"
-            android:popupBackground="@drawable/drop_down_menu"/>
+            android:popupBackground="@drawable/drop_down_menu"
+            android:spinnerMode="dropdown" />
     </LinearLayout>
 
     <LinearLayout
@@ -54,41 +54,42 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/guideline5"
         app:layout_constraintTop_toTopOf="@+id/guideline8"
-        app:layout_constraintVertical_bias="0.19">
+        app:layout_constraintVertical_bias="0.13">
 
         <Spinner
             android:id="@+id/spinnerShift"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:backgroundTint="#ffffff"
-            android:spinnerMode="dropdown"
-            android:popupBackground="@drawable/drop_down_menu"/>
+            android:popupBackground="@drawable/drop_down_menu"
+            android:spinnerMode="dropdown" />
 
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="40dp"
-        android:orientation="vertical"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:paddingLeft="20dp"
-        android:paddingRight="10dp"
         android:background="@drawable/button"
         android:elevation="5dp"
+        android:orientation="vertical"
+        android:paddingLeft="20dp"
+        android:paddingRight="10dp"
         app:layout_constraintBottom_toTopOf="@+id/guideline9"
         app:layout_constraintEnd_toStartOf="@+id/guideline6"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/guideline5"
         app:layout_constraintTop_toTopOf="@+id/guideline8"
-        app:layout_constraintVertical_bias="0.05" >
+        app:layout_constraintVertical_bias="0.0">
+
         <Spinner
-            android:id="@+id/spinnerClass"
-            android:backgroundTint="#ffffff"
-            android:popupBackground="@drawable/drop_down_menu"
+            android:id="@+id/spinnerMedium"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:backgroundTint="#ffffff"
+            android:popupBackground="@drawable/drop_down_menu"
             android:spinnerMode="dropdown" />
     </LinearLayout>
 
@@ -109,7 +110,63 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/guideline5"
         app:layout_constraintTop_toTopOf="@+id/guideline8"
-        app:layout_constraintVertical_bias="0.478">
+        app:layout_constraintVertical_bias="0.39999998">
+
+        <Spinner
+            android:id="@+id/spinnerClass"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:backgroundTint="#ffffff"
+            android:popupBackground="@drawable/drop_down_menu"
+            android:spinnerMode="dropdown" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/linearLayout5"
+        android:layout_width="0dp"
+        android:layout_height="40dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:background="@drawable/button"
+        android:elevation="5dp"
+        android:orientation="vertical"
+        android:paddingLeft="20dp"
+        android:paddingRight="10dp"
+        app:layout_constraintBottom_toTopOf="@+id/guideline9"
+        app:layout_constraintEnd_toStartOf="@+id/guideline6"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/guideline5"
+        app:layout_constraintTop_toTopOf="@+id/guideline8"
+        app:layout_constraintVertical_bias="0.537">
+
+        <Spinner
+            android:id="@+id/spinnerSection"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:backgroundTint="#ffffff"
+            android:popupBackground="@drawable/drop_down_menu"
+            android:spinnerMode="dropdown" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/linearLayout6"
+        android:layout_width="0dp"
+        android:layout_height="40dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:background="@drawable/button"
+        android:elevation="5dp"
+        android:orientation="vertical"
+        android:paddingLeft="20dp"
+        android:paddingRight="10dp"
+        app:layout_constraintBottom_toTopOf="@+id/guideline9"
+        app:layout_constraintEnd_toStartOf="@+id/guideline6"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/guideline5"
+        app:layout_constraintTop_toTopOf="@+id/guideline8"
+        app:layout_constraintVertical_bias="0.66999996">
 
         <Spinner
             android:id="@+id/spinnerStudent"
@@ -162,7 +219,7 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.98">
+        app:layout_constraintVertical_bias="0.88">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -203,5 +260,26 @@
         </LinearLayout>
 
     </LinearLayout>
+
+    <RelativeLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0"
+        android:background="#000000">
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_action_bell"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="10dp"
+            android:layout_marginEnd="10dp"/>
+    </RelativeLayout>
 
 </android.support.constraint.ConstraintLayout>

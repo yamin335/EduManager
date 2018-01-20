@@ -6,18 +6,38 @@ package onair.onems.models;
 
 public class ShiftModel {
 
-    private long ShiftID;
-    private String ShiftName;
+    private long ShiftID = -2;
+    private String ShiftName = "";
+
+    public ShiftModel()
+    {
+        this.ShiftID = -2;
+        this.ShiftName = "";
+    }
 
     public ShiftModel(String ShiftID, String ShiftName)
     {
-        this.ShiftID = Long.parseLong(ShiftID);
+        if(ShiftID.equals("null"))
+        {
+            this.ShiftID = -2;
+        }
+        else
+        {
+            this.ShiftID = Long.parseLong(ShiftID);
+        }
         this.ShiftName = ShiftName;
     }
 
     public void setShiftID(String ShiftID)
     {
-        this.ShiftID = Long.parseLong(ShiftID);
+        if(ShiftID.equals("null"))
+        {
+            this.ShiftID = -2;
+        }
+        else
+        {
+            this.ShiftID = Long.parseLong(ShiftID);
+        }
     }
 
     public void setShiftName(String ShiftName)

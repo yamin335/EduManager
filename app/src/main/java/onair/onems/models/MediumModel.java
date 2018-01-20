@@ -5,16 +5,34 @@ package onair.onems.models;
  */
 
 public class MediumModel {
-    private long MediumID = 0;
+    private long MediumID = -2;
     private String MameName = "";
     private long InstMediumID = 0;
     private long InstituteID = 0;
     private int IsActive = 0;
 
+    public MediumModel()
+    {
+        this.MediumID = -2;
+        this.MameName = "";
+        this.InstMediumID = 0;
+        this.InstituteID = 0;
+        this.IsActive = 0;
+    }
+
     public MediumModel(String MediumID, String MameName, String InstMediumID, String InstituteID, String IsActive)
     {
-        this.MediumID = Long.parseLong(MediumID);
+        if(MediumID.equals("null"))
+        {
+            this.MediumID = -2;
+        }
+        else
+        {
+            this.MediumID = Long.parseLong(MediumID);
+        }
+
         this.MameName = MameName;
+
         if(InstMediumID.equals("null"))
         {
             this.InstMediumID = 0;
@@ -23,13 +41,36 @@ public class MediumModel {
         {
             this.InstMediumID = Long.parseLong(InstMediumID);
         }
-        this.InstituteID = Long.parseLong(InstituteID);
-        this.IsActive = Integer.parseInt(IsActive);
+
+        if(InstituteID.equals("null"))
+        {
+            this.InstituteID = 0;
+        }
+        else
+        {
+            this.InstituteID = Long.parseLong(InstituteID);
+        }
+
+        if(IsActive.equals("null"))
+        {
+            this.IsActive = 0;
+        }
+        else
+        {
+            this.IsActive = Integer.parseInt(IsActive);
+        }
     }
 
     public void setMediumID(String MediumID)
     {
-        this.MediumID = Long.parseLong(MediumID);
+        if(MediumID.equals("null"))
+        {
+            this.MediumID = -2;
+        }
+        else
+        {
+            this.MediumID = Long.parseLong(MediumID);
+        }
     }
 
     public void setMameName(String MameName)

@@ -11,6 +11,7 @@ import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
@@ -44,6 +45,18 @@ public class LoginScreen extends AppCompatActivity
     private ProgressDialog dialog;
     public static final String MyPREFERENCES = "LogInKey";
     public static SharedPreferences sharedPreferences;
+
+    @Override
+    public void onResume() {
+        this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+        super.onResume();
+    }
+
+    @Override
+    public void onStart() {
+        this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+        super.onStart();
+    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState)
@@ -99,6 +112,7 @@ public class LoginScreen extends AppCompatActivity
             @Override
             public void onClick(View v)
             {
+                LoginScreen.this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
                 if(isNetworkAvailable())
                 {
                     loginurl = getString(R.string.baseUrlLocal)+"getLoginInformation"+"/"+takeId.getText().toString()+"/"+takePassword.getText().toString();

@@ -10,10 +10,10 @@ public class StudentInformationEntry {
     private String RFID = "";
     private String RollNo = "";
     private String StudentNo = "";
-    private long SectionID = 0;
-    private long ClassID = 0;
+    private long SectionID = -2;
+    private long ClassID = -2;
     private long BrunchID = 0;
-    private long ShiftID = 0;
+    private long ShiftID = -2;
     private String Remarks = "";
     private long InstituteID = 0;
     private long UserTypeID = 3;
@@ -40,6 +40,9 @@ public class StudentInformationEntry {
     private long DeleteBy = 0;
     private String DeleteOn = "";
     private String DeletePc = "";
+    private boolean IsImageCaptured = false;
+    private long DepartmentID = -2;
+    private long MediumID = -2;
 
     /**
      * No args constructor for use in serialization
@@ -113,7 +116,7 @@ public class StudentInformationEntry {
 
         if(SectionID.equals("null"))
         {
-            this.SectionID = 0;
+            this.SectionID = -2;
         }
         else
         {
@@ -129,7 +132,7 @@ public class StudentInformationEntry {
 
         if(ClassID.equals("null"))
         {
-            this.ClassID = 0;
+            this.ClassID = -2;
         }
         else
         {
@@ -161,7 +164,7 @@ public class StudentInformationEntry {
 
         if(ShiftID.equals("null"))
         {
-            this.ShiftID = 0;
+            this.ShiftID = -2;
         }
         else
         {
@@ -309,7 +312,7 @@ public class StudentInformationEntry {
         return PreAddress;
     }
 
-    public void setPreAddress(String preAddress) {
+    public void setPreAddress(String PreAddress) {
         this.PreAddress = PreAddress;
     }
 
@@ -439,6 +442,46 @@ public class StudentInformationEntry {
 
     public void setDeletePc(String DeletePc) {
         this.DeletePc = DeletePc;
+    }
+
+    public boolean getIsImageCaptured() {
+        return IsImageCaptured;
+    }
+
+    public void setIsImageCaptured(boolean IsImageCaptured) {
+        this.IsImageCaptured = IsImageCaptured;
+    }
+
+    public long getDepartmentID() {
+        return DepartmentID;
+    }
+
+    public void setDepartmentID(String DepartmentID) {
+
+        if(DepartmentID.equals("null"))
+        {
+            this.DepartmentID = -2;
+        }
+        else
+        {
+            this.DepartmentID = Long.parseLong(DepartmentID);
+        }
+    }
+
+    public long getMediumID() {
+        return MediumID;
+    }
+
+    public void setMediumID(String MediumID) {
+
+        if(MediumID.equals("null"))
+        {
+            this.MediumID = -2;
+        }
+        else
+        {
+            this.MediumID = Long.parseLong(MediumID);
+        }
     }
 
 }

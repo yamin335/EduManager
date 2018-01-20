@@ -29,6 +29,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -72,7 +73,7 @@ import onair.onems.models.StudentInformationEntry;
 public class StudentiCardDetails extends AppCompatActivity {
 
     private TextView t_name, t_class, t_section, t_birthDay, t_email, t_address,
-            t_parent, t_parentsPhone,t_roll,t_department,t_sex,t_religion,t_medium,t_board,t_session;
+            t_parent, t_parentsPhone,t_roll,t_department,t_sex,t_religion,t_medium,t_board,t_session, t_shift;
 
     private Bundle bundle;
 
@@ -88,7 +89,7 @@ public class StudentiCardDetails extends AppCompatActivity {
 
     File file;
 
-    Bitmap originalBitmap;
+    Bitmap originalBitmap = null;
 
     StudentiCardDetails.FileFromBitmap fileFromBitmap = null;
 
@@ -151,6 +152,7 @@ public class StudentiCardDetails extends AppCompatActivity {
         t_medium = (TextView)findViewById(R.id.medium);
         t_session = (TextView)findViewById(R.id.session);
         t_board = (TextView)findViewById(R.id.board);
+        t_shift = (TextView)findViewById(R.id.shift);
 
         Intent intent = getIntent();
         bundle = intent.getExtras();
@@ -169,6 +171,7 @@ public class StudentiCardDetails extends AppCompatActivity {
         t_session.setText(bundle.getString("SessionName"));
         t_board.setText(bundle.getString("BoardName"));
         t_class.setText(bundle.getString("ClassName"));
+        t_shift.setText(bundle.getString("ShiftName"));
 
         studentInformationEntry = new StudentInformationEntry();
         studentInformationEntry.setRollNo(bundle.getString("RollNo"));
@@ -194,6 +197,22 @@ public class StudentiCardDetails extends AppCompatActivity {
         studentInformationEntry.setEmailID(bundle.getString("EmailID"));
         studentInformationEntry.setFingerUrl(bundle.getString("FingerUrl"));
         studentInformationEntry.setSignatureUrl(bundle.getString("SignatureUrl"));
+        studentInformationEntry.setMediumID(bundle.getString("MediumID"));
+        studentInformationEntry.setDepartmentID(bundle.getString("DepartmentID"));
+        studentInformationEntry.setIsImageCaptured(bundle.getBoolean("IsImageCaptured"));
+
+        checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
+        {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
+            {
+                if(isChecked && (originalBitmap == null))
+                {
+                    originalBitmap = mCropImageView.getCroppedImage(500, 500);
+                }
+
+            }
+        });
 
         Glide.with(this)
                 .asBitmap()
@@ -230,20 +249,29 @@ public class StudentiCardDetails extends AppCompatActivity {
             public void onClick(View view) {
                 if(isNetworkAvailable())
                 {
-                    if(checkBox.isChecked())
+                    dialog.show();
+                    if(originalBitmap != null)
                     {
-                        originalBitmap = mCropImageView.getCroppedImage(500, 500);
-                        if (originalBitmap != null)
+                        if(checkBox.isChecked())
                         {
-                            mCropImageView.setImageBitmap(originalBitmap);
+                            originalBitmap = mCropImageView.getCroppedImage(500, 500);
+                            if (originalBitmap != null)
+                            {
+                                mCropImageView.setImageBitmap(originalBitmap);
+                                fileFromBitmap = new StudentiCardDetails.FileFromBitmap(originalBitmap, StudentiCardDetails.this);
+                                fileFromBitmap.execute();
+                            }
+                        }
+                        else
+                        {
                             fileFromBitmap = new StudentiCardDetails.FileFromBitmap(originalBitmap, StudentiCardDetails.this);
                             fileFromBitmap.execute();
                         }
                     }
                     else
                     {
-                        fileFromBitmap = new StudentiCardDetails.FileFromBitmap(originalBitmap, StudentiCardDetails.this);
-                        fileFromBitmap.execute();
+                        dialog.dismiss();
+                        Toast.makeText(StudentiCardDetails.this,"Take a picture to update photo!!!",Toast.LENGTH_LONG).show();
                     }
                 }
                 else
@@ -314,8 +342,9 @@ public class StudentiCardDetails extends AppCompatActivity {
                             //do stuff with result
                             try {
                                 JSONObject jsonObject = new JSONObject(result);
-                                Toast.makeText(StudentiCardDetails.this,jsonObject.getString("path"), Toast.LENGTH_LONG).show();
+//                                Toast.makeText(StudentiCardDetails.this,jsonObject.getString("path"), Toast.LENGTH_LONG).show();
                                 studentInformationEntry.setImageUrl(jsonObject.getString("path"));
+                                studentInformationEntry.setIsImageCaptured(true);
                                 Gson gson = new Gson();
                                 String json = gson.toJson(studentInformationEntry);
                                 postUsingVolley(json);
@@ -346,7 +375,8 @@ public class StudentiCardDetails extends AppCompatActivity {
                     public void onResponse(JSONArray response) {
                         dialog.dismiss();
                         try {
-                            Toast.makeText(StudentiCardDetails.this,"Data Successfully Updated with Response: "+response.getJSONObject(0).get("ReturnValue"),Toast.LENGTH_LONG).show();
+//                            Toast.makeText(StudentiCardDetails.this,"Data Successfully Updated with Response: "+response.getJSONObject(0).get("ReturnValue"),Toast.LENGTH_LONG).show();
+                            Toast.makeText(StudentiCardDetails.this,"Successfully Updated",Toast.LENGTH_LONG).show();
                             NavUtils.navigateUpFromSameTask(StudentiCardDetails.this);
                         }
                         catch (Exception e)
@@ -357,7 +387,8 @@ public class StudentiCardDetails extends AppCompatActivity {
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Toast.makeText(StudentiCardDetails.this,"Not Response: "+error.toString(),Toast.LENGTH_LONG).show();
+//                Toast.makeText(StudentiCardDetails.this,"Not Response: "+error.toString(),Toast.LENGTH_LONG).show();
+                Toast.makeText(StudentiCardDetails.this,"Not Successfully Updated"+error.toString(),Toast.LENGTH_LONG).show();
                 dialog.dismiss();
             }
         });

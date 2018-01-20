@@ -6,44 +6,45 @@ package onair.onems.models;
 
 public class StudentInformation {
 
-    private String UserClassID;
-    private String UserID;
-    private String RFID;
-    private String RollNo;
-    private String StudentNo;
-    private long SectionID;
-    private long ClassID;
-    private long DepartmentID;
-    private long MediumID;
-    private long BrunchID;
-    private long ShiftID;
-    private long SessionID;
-    private long BoardID;
-    private String Remarks;
-    private long InstituteID;
-    private long UserTypeID;
-    private long GenderID;
-    private String UserName;
-    private String PhoneNo;
-    private String EmailID;
-    private String ImageUrl;
-    private String FingerUrl;
-    private String SignatureUrl;
-    private String Guardian;
-    private String GuardianPhone;
-    private String GuardianEmailID;
-    private String SectionName;
-    private String ClassName;
-    private String DepartmentName;
-    private String MameName;
-    private String BrunchName;
-    private String ShiftName;
-    private String SessionName;
-    private String BoardName;
-    private String Gender;
-    private String Religion;
-    private String DOB;
-    private String PreAddress;
+    private String UserClassID = "";
+    private String UserID = "";
+    private String RFID = "";
+    private String RollNo = "";
+    private String StudentNo = "";
+    private long SectionID = -2;
+    private long ClassID = -2;
+    private long DepartmentID = -2;
+    private long MediumID = -2;
+    private long BrunchID = 0;
+    private long ShiftID = -2;
+    private long SessionID = 0;
+    private long BoardID = 0;
+    private String Remarks = "";
+    private long InstituteID = 0;
+    private long UserTypeID = 0;
+    private long GenderID = 0;
+    private String UserName = "";
+    private String PhoneNo = "";
+    private String EmailID = "";
+    private String ImageUrl = "";
+    private String FingerUrl = "";
+    private String SignatureUrl = "";
+    private String Guardian = "";
+    private String GuardianPhone = "";
+    private String GuardianEmailID = "";
+    private String SectionName = "";
+    private String ClassName = "";
+    private String DepartmentName = "";
+    private String MameName = "";
+    private String BrunchName = "";
+    private String ShiftName = "";
+    private String SessionName = "";
+    private String BoardName = "";
+    private String Gender = "";
+    private String Religion = "";
+    private String DOB = "";
+    private String PreAddress = "";
+    private boolean IsImageCaptured = false;
 
     /**
      * No args constructor for use in serialization
@@ -70,7 +71,7 @@ public class StudentInformation {
         this.StudentNo = StudentNo;
         if(SectionID.equals("null"))
         {
-            this.SectionID = 0;
+            this.SectionID = -2;
         }
         else
         {
@@ -79,7 +80,7 @@ public class StudentInformation {
 
         if(ClassID.equals("null"))
         {
-            this.ClassID = 0;
+            this.ClassID = -2;
         }
         else
         {
@@ -88,7 +89,7 @@ public class StudentInformation {
 
         if(DepartmentID.equals("null"))
         {
-            this.DepartmentID = 0;
+            this.DepartmentID = -2;
         }
         else
         {
@@ -97,7 +98,7 @@ public class StudentInformation {
 
         if(MediumID.equals("null"))
         {
-            this.MediumID = 0;
+            this.MediumID = -2;
         }
         else
         {
@@ -115,7 +116,7 @@ public class StudentInformation {
 
         if(ShiftID.equals("null"))
         {
-            this.ShiftID = 0;
+            this.ShiftID = -2;
         }
         else
         {
@@ -237,7 +238,7 @@ public class StudentInformation {
     public void setSectionID(String SectionID) {
         if(SectionID.equals("null"))
         {
-            this.SectionID = 0;
+            this.SectionID = -2;
         }
         else
         {
@@ -252,7 +253,7 @@ public class StudentInformation {
     public void setClassID(String ClassID) {
         if(ClassID.equals("null"))
         {
-            this.ClassID = 0;
+            this.ClassID = -2;
         }
         else
         {
@@ -267,7 +268,7 @@ public class StudentInformation {
     public void setDepartmentID(String DepartmentID) {
         if(DepartmentID.equals("null"))
         {
-            this.DepartmentID = 0;
+            this.DepartmentID = -2;
         }
         else
         {
@@ -282,7 +283,7 @@ public class StudentInformation {
     public void setMediumID(String MediumID) {
         if(MediumID.equals("null"))
         {
-            this.MediumID = 0;
+            this.MediumID = -2;
         }
         else
         {
@@ -312,7 +313,7 @@ public class StudentInformation {
     public void setShiftID(String ShiftID) {
         if(ShiftID.equals("null"))
         {
-            this.ShiftID = 0;
+            this.ShiftID = -2;
         }
         else
         {
@@ -569,6 +570,14 @@ public class StudentInformation {
 
     public void setPreAddress(String PreAddress) {
         this.PreAddress = PreAddress;
+    }
+
+    public boolean getIsImageCaptured() {
+        return IsImageCaptured;
+    }
+
+    public void setIsImageCaptured(boolean IsImageCaptured) {
+        this.IsImageCaptured = IsImageCaptured;
     }
 
 }
