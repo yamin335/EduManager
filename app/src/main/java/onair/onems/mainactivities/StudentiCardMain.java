@@ -257,6 +257,7 @@ public class StudentiCardMain extends AppCompatActivity {
                 if(position != 0)
                 {
                     try {
+                        allStudentArrayList = new ArrayList<>();
                         selectedClass = allClassArrayList.get(position-1);
                     }
                     catch (IndexOutOfBoundsException e)
@@ -348,6 +349,7 @@ public class StudentiCardMain extends AppCompatActivity {
                 if(position != 0)
                 {
                     try {
+                        allStudentArrayList = new ArrayList<>();
                         selectedShift = allShiftArrayList.get(position-1);
                     }
                     catch (IndexOutOfBoundsException e)
@@ -418,6 +420,7 @@ public class StudentiCardMain extends AppCompatActivity {
                 if(position != 0)
                 {
                     try {
+                        allStudentArrayList = new ArrayList<>();
                         selectedSection = allSectionArrayList.get(position-1);
                     }
                     catch (IndexOutOfBoundsException e)
@@ -488,6 +491,7 @@ public class StudentiCardMain extends AppCompatActivity {
                 if(position != 0)
                 {
                     try {
+                        allStudentArrayList = new ArrayList<>();
                         selectedMedium = allMediumArrayList.get(position-1);
                     }
                     catch (IndexOutOfBoundsException e)
@@ -556,6 +560,7 @@ public class StudentiCardMain extends AppCompatActivity {
                 if(position != 0)
                 {
                     try {
+                        allStudentArrayList = new ArrayList<>();
                         selectedDepartment = allDepartmentArrayList.get(position-1);
                     }
                     catch (IndexOutOfBoundsException e)
