@@ -976,6 +976,7 @@ public class StudentiCardMain extends AppCompatActivity {
 
     void parseStudentJsonData(String jsonString) {
         try {
+            allStudentArrayList = new ArrayList<>();
             JSONArray studentJsonArray = new JSONArray(jsonString);
             ArrayList<String> studentArrayList = new ArrayList<>();
             studentArrayList.add("Select Student");
