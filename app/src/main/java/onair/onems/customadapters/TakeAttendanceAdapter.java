@@ -43,8 +43,6 @@ public class TakeAttendanceAdapter extends RecyclerView.Adapter<TakeAttendanceAd
             late = (CheckBox) view.findViewById(R.id.lateCheck);
             leave = (CheckBox) view.findViewById(R.id.leave);
             lateInput = (EditText) view.findViewById(R.id.lateInput);
-            //thumbnail = (ImageView) view.findViewById(R.id.thumbnail);
-            //overflow = (ImageView) view.findViewById(R.id.overflow);
         }
     }
 

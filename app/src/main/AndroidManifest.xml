@@ -54,6 +54,7 @@
         <activity
             android:screenOrientation="portrait"
             android:name=".mainactivities.TakeAttendance"
+            android:label="Take Attendance"
             android:theme="@style/AppTheme.NoActionBar">
 
         </activity>
@@ -61,6 +62,7 @@
         <activity
             android:screenOrientation="portrait"
             android:name=".mainactivities.StudentAttendance"
+            android:label="Attendance"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
         <activity
@@ -160,13 +162,24 @@
         <activity
             android:screenOrientation="portrait"
             android:name="onair.onems.mainactivities.StudentiCardMain"
-            android:label="Student Information"
+            android:label="iCard"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
         <activity
             android:screenOrientation="portrait"
             android:name="onair.onems.mainactivities.StudentiCardDetails"
-            android:label="Student Details"
+            android:label="Details Information"
+            android:parentActivityName="onair.onems.mainactivities.StudentiCardMain">
+            <!-- The meta-data element is needed for versions lower than 4.1 -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="onair.onems.mainactivities.StudentiCardMain" />
+        </activity>
+
+        <activity
+            android:screenOrientation="portrait"
+            android:name="onair.onems.mainactivities.StudentiCardDetailsEdit"
+            android:label="Edit Information"
             android:parentActivityName="onair.onems.mainactivities.StudentiCardMain">
             <!-- The meta-data element is needed for versions lower than 4.1 -->
             <meta-data
@@ -177,12 +190,30 @@
         <activity
             android:screenOrientation="portrait"
             android:name="onair.onems.mainactivities.StudentiCardNewEntry"
-            android:label="Student Details"
+            android:label="Entry Student"
             android:parentActivityName="onair.onems.mainactivities.StudentiCardMain">
             <!-- The meta-data element is needed for versions lower than 4.1 -->
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="onair.onems.mainactivities.StudentiCardMain" />
+        </activity>
+
+        <activity
+            android:screenOrientation="portrait"
+            android:name="onair.onems.mainactivities.ReportAllStudentMain"
+            android:label="Student List"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+
+        <activity
+            android:screenOrientation="portrait"
+            android:name="onair.onems.mainactivities.ReportAllStudentList"
+            android:label="Student List"
+            android:parentActivityName="onair.onems.mainactivities.ReportAllStudentMain">
+            <!-- The meta-data element is needed for versions lower than 4.1 -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="onair.onems.mainactivities.ReportAllStudentMain" />
         </activity>
     </application>
 

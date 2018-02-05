@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:padding="2dp">
+    <ImageButton
+        android:id="@+id/notificationBell"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="3dp"
+        android:background="@drawable/ic_action_bell"/>
+
+    <TextView
+        android:id="@+id/notificationCounter"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/notificationBell"
+        android:layout_marginLeft="-17dp"
+        android:layout_marginTop="-3dp"
+        android:layout_toRightOf="@+id/notificationBell"
+        android:background="@drawable/notification_badge"
+        android:text="0"
+        android:textColor="#000000"
+        android:gravity="center"/>
+
+</RelativeLayout>

@@ -5,19 +5,19 @@ package onair.onems.models;
  */
 
 public class StudentInformationEntry {
-    private long UserClassID = 0;
+    private long UserClassID = -2;
     private long UserID = 0;
     private String RFID = "";
     private String RollNo = "";
     private String StudentNo = "";
     private long SectionID = -2;
     private long ClassID = -2;
-    private long BrunchID = 0;
+    private long BrunchID = -2;
     private long ShiftID = -2;
     private String Remarks = "";
     private long InstituteID = 0;
     private long UserTypeID = 3;
-    private long GenderID = 0;
+    private long GenderID = -2;
     private String UserName = "";
     private String PhoneNo = "";
     private String EmailID = "";
@@ -29,7 +29,7 @@ public class StudentInformationEntry {
     private String GuardianEmailID = "";
     private String DOB = "";
     private String PreAddress = "";
-    private long ReligionID = 0;
+    private long ReligionID = -2;
     private long CreateBy = 0;
     private String CreateOn = "";
     private String CreatePc = "";
@@ -43,6 +43,53 @@ public class StudentInformationEntry {
     private boolean IsImageCaptured = false;
     private long DepartmentID = -2;
     private long MediumID = -2;
+    private String UserNo = "";
+    private long UserTitleID = -2;
+    private String UserFirstName = "";
+    private String UserMiddleName = "";
+    private String UserLastName = "";
+    private String NickName = "";
+    private String SkypeID = "";
+    private String FacebookID = "";
+    private String WhatsApp = "";
+    private String Viber = "";
+    private String LinkedIN = "";
+    private String ParAddress = "";
+    private String ParThana = "";
+    private String ParPostCode = "";
+    private long ParCountryID = -2;
+    private long ParStateID = -2;
+    private long ParCityID = -2;
+    private String PreThana = "";
+    private String PrePostCode = "";
+    private long PreCountryID = -2;
+    private long PreStateID = -2;
+    private long PreCityID = -2;
+    private String MobileNo = "";
+    private String UniqueIdentity = "";
+    private long BloodGroupID = -2;
+    private int Weigth = 0;
+    private int Height = 0;
+    private String BirthCertificate = "";
+    private String PassportNO = "";
+    private String NID = "";
+    private boolean IsActive = true;
+    private long StatusID = -2;
+    private String GuardianMobileNo = "";
+    private String GuardianUserFirstName = "";
+    private String GuardianUserMiddleName = "";
+    private String GuardianUserLastName = "";
+    private String GuardianNickName = "";
+    private String GuardianUniqueIdentity = "";
+    private long GuardianBloodGroupID = -2;
+    private String GuardianPassportNO = "";
+    private String GuardianNID = "";
+    private long RelationID = -2;
+    private boolean IsLocalGuardian = true;
+    private boolean IsActiveFamily = true;
+    private long SessionID = -2;
+    private long BoardID = -2;
+    private boolean IsActiveStudent = true;
 
     /**
      * No args constructor for use in serialization
@@ -50,6 +97,7 @@ public class StudentInformationEntry {
      */
 
     public StudentInformationEntry() {
+
     }
 
     public long getUserClassID() {
@@ -60,7 +108,7 @@ public class StudentInformationEntry {
 
         if(UserClassID.equals("null"))
         {
-            this.UserClassID = 0;
+            this.UserClassID = -2;
         }
         else
         {
@@ -148,7 +196,7 @@ public class StudentInformationEntry {
 
         if(BrunchID.equals("null"))
         {
-            this.BrunchID = 0;
+            this.BrunchID = -2;
         }
         else
         {
@@ -204,7 +252,7 @@ public class StudentInformationEntry {
 
         if(UserTypeID.equals("null"))
         {
-            this.UserTypeID = 0;
+            this.UserTypeID = -2;
         }
         else
         {
@@ -220,7 +268,7 @@ public class StudentInformationEntry {
 
         if(GenderID.equals("null"))
         {
-            this.GenderID = 0;
+            this.GenderID = -2;
         }
         else
         {
@@ -324,7 +372,7 @@ public class StudentInformationEntry {
 
         if(ReligionID.equals("null"))
         {
-            this.ReligionID = 0;
+            this.ReligionID = -2;
         }
         else
         {
@@ -482,6 +530,23 @@ public class StudentInformationEntry {
         {
             this.MediumID = Long.parseLong(MediumID);
         }
+    }
+
+    public void setBloodGroupID(String BloodGroupID)
+    {
+        if(BloodGroupID.equals("null"))
+        {
+            this.BloodGroupID = -2;
+        }
+        else
+        {
+            this.BloodGroupID = Long.parseLong(BloodGroupID);
+        }
+    }
+
+    public long getBloodGroupID()
+    {
+        return BloodGroupID;
     }
 
 }

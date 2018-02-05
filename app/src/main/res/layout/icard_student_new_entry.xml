@@ -21,12 +21,16 @@
                 android:layout_height="2.5in"
                 android:layout_gravity="center"
                 android:background="@drawable/inputtext"/>
-
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"
+                android:background="@drawable/lineborder">
+            </LinearLayout>
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginTop="10dp"
-                android:layout_marginBottom="10dp"
                 android:orientation="horizontal">
 
                 <Button
@@ -37,7 +41,7 @@
                     android:layout_weight="1"
                     android:background="@drawable/button"
                     android:drawableTop="@drawable/ic_camera_alt"
-                    android:padding="5dp"
+                    android:paddingTop="5dp"
                     android:text="Open Camera"
                     android:textAllCaps="false"
                     android:textColor="#ffffff"
@@ -62,7 +66,7 @@
                     android:id="@+id/browse"
                     android:layout_width="wrap_content"
                     android:layout_height="60dp"
-                    android:padding="5dp"
+                    android:paddingTop="5dp"
                     android:layout_weight="1"
                     android:layout_gravity="center"
                     android:background="@drawable/button"
@@ -73,6 +77,63 @@
                     android:layout_margin="4dp"/>
 
             </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/rotateLeft"
+                    android:layout_width="wrap_content"
+                    android:layout_height="55dp"
+                    android:layout_gravity="center"
+                    android:layout_weight="1"
+                    android:background="@drawable/button"
+                    android:drawableTop="@drawable/ic_rotate_left"
+                    android:paddingTop="5dp"
+                    android:text="Rotate Left"
+                    android:textAllCaps="false"
+                    android:textColor="#ffffff"
+                    android:layout_margin="4dp"
+                    android:enabled="false"/>
+
+                <Button
+                    android:id="@+id/rotateRight"
+                    android:layout_width="wrap_content"
+                    android:layout_height="55dp"
+                    android:paddingTop="5dp"
+                    android:layout_weight="1"
+                    android:layout_gravity="center"
+                    android:background="@drawable/button"
+                    android:drawableTop="@drawable/ic_rotate_right"
+                    android:text="Rotate Right"
+                    android:textAllCaps="false"
+                    android:textColor="#ffffff"
+                    android:layout_margin="4dp"
+                    android:enabled="false"/>
+
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Control Brightness:"
+                android:layout_marginRight="7dp"
+                android:layout_marginLeft="7dp"
+                android:layout_marginBottom="2dp"/>
+
+            <onair.onems.customadapters.CustomSeekBar
+                android:id="@+id/brightness"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:max="200"
+                android:thumb="@drawable/ic_touch_app"
+                android:progressDrawable="@android:color/transparent"
+                android:background="@drawable/inputtext"
+                android:layout_marginBottom="4dp"
+                android:layout_marginLeft="7dp"
+                android:layout_marginRight="7dp"/>
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -197,8 +258,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
-                    android:inputType="text"
-                    android:textAllCaps="true"
+                    android:inputType="textCapWords|textMultiLine"
                     android:textColor="#000000" />
             </LinearLayout>
 
@@ -246,7 +306,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
-                    android:inputType="text"
+                    android:inputType="textCapWords|textMultiLine"
                     android:textAllCaps="true"
                     android:textColor="#000000" />
             </LinearLayout>
@@ -291,7 +351,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
-                    android:inputType="text"
+                    android:inputType="textCapWords|textMultiLine"
                     android:textAllCaps="true"
                     android:textColor="#000000" />
             </LinearLayout>

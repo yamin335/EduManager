@@ -204,11 +204,11 @@ public class TakeAttendanceDetails extends AppCompatActivity {
                 AttendanceSheetModel attendanceSheetModel = new AttendanceSheetModel();
                 attendanceSheetModel.setSubAtdID("0");
                 attendanceSheetModel.setSubjectID(Long.toString(SubjectID));
-                attendanceSheetModel.setSectionID(Long.toString(SectionID));
-                attendanceSheetModel.setDepartmentID(Long.toString(DepertmentID));
-                attendanceSheetModel.setMediumID(Long.toString(MediumID));
-                attendanceSheetModel.setShiftID(Long.toString(ShiftID));
-                attendanceSheetModel.setClassID(Long.toString(ClassID));
+                attendanceSheetModel.setSectionID(Long.toString(SectionID==0 ? -2 : SectionID));
+                attendanceSheetModel.setDepartmentID(Long.toString(DepertmentID==0 ? -2 : DepertmentID));
+                attendanceSheetModel.setMediumID(Long.toString(MediumID==0 ? -2 : MediumID));
+                attendanceSheetModel.setShiftID(Long.toString(ShiftID==0 ? -2 : ShiftID));
+                attendanceSheetModel.setClassID(Long.toString(ClassID==0 ? -2 : ClassID));
                 attendanceSheetModel.setAtdUserID("1");
                 attendanceSheetModel.setAtdDate(date);
                 attendanceSheetModel.setInstituteID(Long.toString(InstituteID));
@@ -264,5 +264,11 @@ public class TakeAttendanceDetails extends AppCompatActivity {
         ConnectivityManager connectivityManager = (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+    }
+
+    @Override
+    public void onBackPressed() {
+        NavUtils.navigateUpFromSameTask(this);
+        super.onBackPressed();
     }
 }

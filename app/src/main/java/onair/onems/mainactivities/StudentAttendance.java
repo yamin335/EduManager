@@ -29,6 +29,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 
 import java.util.ArrayList;
@@ -37,6 +38,7 @@ import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import onair.onems.R;
+import onair.onems.Services.GlideApp;
 import onair.onems.customadapters.ExpandableListAdapter;
 import onair.onems.customadapters.ExpandableListAdapterStudent;
 import onair.onems.fragment.OneFragment;
@@ -100,7 +102,11 @@ public class StudentAttendance extends AppCompatActivity implements NavigationVi
         {
             userType.setText("Guardian");
         }
-        Glide.with(this).load(getString(R.string.baseUrlRaw)+imageUrl.replace("\\","/")).apply(RequestOptions.circleCropTransform()).into(profilePicture);
+        GlideApp.with(this)
+                .load(getString(R.string.baseUrlRaw)+imageUrl.replace("\\","/")).apply(RequestOptions.circleCropTransform())
+                .diskCacheStrategy(DiskCacheStrategy.NONE)
+                .skipMemoryCache(true)
+                .into(profilePicture);
         navigationView.addHeaderView(view);
 
         if (navigationView != null)
@@ -237,7 +243,9 @@ public class StudentAttendance extends AppCompatActivity implements NavigationVi
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            super.onBackPressed();
+            Intent mainIntent = new Intent(StudentAttendance.this,StudentMainScreen.class);
+            startActivity(mainIntent);
+            finish();
         }
 
     }
