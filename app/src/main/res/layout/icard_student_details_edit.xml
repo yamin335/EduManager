@@ -161,7 +161,7 @@
                     android:layout_height="wrap_content"
                     android:textColor="#000000"
                     android:background="@drawable/inputtext"
-                    android:inputType="textCapWords|textMultiLine"
+                    android:inputType="text"
                     />
             </LinearLayout>
 
@@ -783,7 +783,7 @@
                     android:layout_height="wrap_content"
                     android:textColor="#000000"
                     android:background="@drawable/inputtext"
-                    android:inputType="textCapWords|textMultiLine"
+                    android:inputType="text"
                     />
             </LinearLayout>
 
@@ -840,7 +840,7 @@
                     android:layout_weight="1"
                     android:textColor="#000000"
                     android:background="@drawable/inputtext"
-                    android:inputType="textCapWords|textMultiLine"
+                    android:inputType="text"
                     android:layout_gravity="center_vertical"
 
                     />
@@ -898,7 +898,7 @@
                     android:layout_height="wrap_content"
                     android:textColor="#000000"
                     android:background="@drawable/inputtext"
-                    android:inputType="textCapWords|textMultiLine"
+                    android:inputType="text"
                     android:layout_gravity="center_vertical"/>
             </LinearLayout>
 
@@ -926,7 +926,7 @@
                     android:layout_weight="1"
                     android:textColor="#000000"
                     android:background="@drawable/inputtext"
-                    android:inputType="textCapWords|textMultiLine"/>
+                    android:inputType="text"/>
             </LinearLayout>
 
             <LinearLayout
@@ -954,7 +954,7 @@
                     android:layout_height="wrap_content"
                     android:textColor="#000000"
                     android:background="@drawable/inputtext"
-                    android:inputType="textCapWords|textMultiLine"
+                    android:inputType="text"
                     />
             </LinearLayout>
 
