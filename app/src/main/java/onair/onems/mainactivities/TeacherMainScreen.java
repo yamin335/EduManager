@@ -22,54 +22,21 @@ import onair.onems.R;
 
 public class TeacherMainScreen extends AppCompatActivity {
 
-    private Button takeAttendance, iCard;
-    TextView InstituteName;
-    TextView userType;
+    private Button takeAttendance, iCard, notice;
+    private TextView InstituteName;
+    private TextView userType;
     public static final String MyPREFERENCES = "LogInKey";
     public static SharedPreferences sharedPreferences;
 
-//    @Override
-//    protected void onRestart() {
-//        sharedPreferences  = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
-//        if(sharedPreferences.getBoolean("LogInState", false))
-//        {
-//            finish();
-//        }
-//        super.onRestart();
-//    }
-
-//    @Override
-//    protected void onStart() {
-//        sharedPreferences  = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
-//        if(sharedPreferences.getBoolean("LogInState", false))
-//        {
-//            finish();
-//        }
-//        super.onStart();
-//    }
-//
-//    @Override
-//    protected void onResume() {
-//        sharedPreferences  = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
-//        if(sharedPreferences.getBoolean("LogInState", false))
-//        {
-//            finish();
-//        }
-//        super.onResume();
-//    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
-//        sharedPreferences  = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
-//        if(sharedPreferences.getBoolean("LogInState", false))
-//        {
-//            finish();
-//        }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.teacher_dashboard);
 
         takeAttendance = (Button)findViewById(R.id.attendance);
         iCard = (Button)findViewById(R.id.iCard);
+        notice = (Button)findViewById(R.id.notice);
         InstituteName = (TextView) findViewById(R.id.InstituteName);
         userType = (TextView) findViewById(R.id.userType);
 
@@ -81,7 +48,6 @@ public class TeacherMainScreen extends AppCompatActivity {
         {
             userType.setText("Teacher");
         }
-//        InstituteName.setText(name);
 
         takeAttendance.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -96,6 +62,15 @@ public class TeacherMainScreen extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent mainIntent = new Intent(TeacherMainScreen.this,StudentiCardMain.class);
+                TeacherMainScreen.this.startActivity(mainIntent);
+                finish();
+            }
+        });
+
+        notice.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent mainIntent = new Intent(TeacherMainScreen.this,NoticeMainScreen.class);
                 TeacherMainScreen.this.startActivity(mainIntent);
                 finish();
             }

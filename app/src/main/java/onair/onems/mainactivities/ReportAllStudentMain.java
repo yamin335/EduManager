@@ -81,7 +81,6 @@ public class ReportAllStudentMain extends AppCompatActivity {
     private ArrayList<SectionModel> allSectionArrayList;
     private ArrayList<MediumModel> allMediumArrayList;
     private ArrayList<DepartmentModel> allDepartmentArrayList;
-    private ArrayList<SubjectModel> allSubjectArrayList;
 
     private String[] tempClassArray = {"Select Class"};
     private String[] tempShiftArray = {"Select Shift"};
@@ -94,7 +93,6 @@ public class ReportAllStudentMain extends AppCompatActivity {
     private ShiftModel selectedShift = null;
     private SectionModel selectedSection = null;
     private MediumModel selectedMedium = null;
-    private SubjectModel selectedSubject = null;
     private DepartmentModel selectedDepartment = null;
 
     long InstituteID;
