@@ -218,7 +218,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:textColor="#000000"
-                    android:background="@drawable/inputtext"
+                    android:background="@drawable/custom_textview"
                     />
             </LinearLayout>
 
@@ -246,7 +246,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:textColor="#000000"
-                    android:background="@drawable/inputtext"
+                    android:background="@drawable/custom_textview"
                     />
             </LinearLayout>
 
@@ -273,7 +273,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:textColor="#000000"
-                    android:background="@drawable/inputtext"
+                    android:background="@drawable/custom_textview"
                     />
                 <LinearLayout
                     android:layout_width="50dp"
@@ -321,7 +321,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:textColor="#000000"
-                    android:background="@drawable/inputtext"
+                    android:background="@drawable/custom_textview"
                     />
                 <LinearLayout
                     android:layout_width="50dp"
@@ -368,7 +368,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:textColor="#000000"
-                    android:background="@drawable/inputtext"/>
+                    android:background="@drawable/custom_textview"/>
                 <LinearLayout
                     android:layout_width="50dp"
                     android:layout_height="25dp"
@@ -415,7 +415,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:textColor="#000000"
-                    android:background="@drawable/inputtext"
+                    android:background="@drawable/custom_textview"
 
                     />
                 <LinearLayout
@@ -463,7 +463,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:textColor="#000000"
-                    android:background="@drawable/inputtext"
+                    android:background="@drawable/custom_textview"
                     />
                 <LinearLayout
                     android:layout_width="50dp"
@@ -510,7 +510,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:textColor="#000000"
-                    android:background="@drawable/inputtext"
+                    android:background="@drawable/custom_textview"
                     />
                 <LinearLayout
                     android:layout_width="50dp"
@@ -557,7 +557,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:textColor="#000000"
-                    android:background="@drawable/inputtext"
+                    android:background="@drawable/custom_textview"
                     />
                 <LinearLayout
                     android:layout_width="50dp"
@@ -604,7 +604,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:textColor="#000000"
-                    android:background="@drawable/inputtext"
+                    android:background="@drawable/custom_textview"
                     android:layout_gravity="center_vertical"
                     />
                 <LinearLayout
@@ -643,7 +643,7 @@
                     android:textSize="16sp"
                     android:layout_margin="5dp"
                     android:textColor="#000000"
-
+                    android:gravity="center_vertical"
                     />
                 <TextView
                     android:layout_weight="1"
@@ -653,7 +653,8 @@
                     android:layout_height="wrap_content"
                     android:id="@+id/birthday"
                     android:textColor="#000000"
-                    android:background="@drawable/inputtext"
+                    android:background="@drawable/custom_textview"
+                    android:layout_gravity="center_vertical"
                     />
                 <Button
                     android:id="@+id/pickDate"
@@ -701,7 +702,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:textColor="#000000"
-                    android:background="@drawable/inputtext"
+                    android:background="@drawable/custom_textview"
                     />
             </LinearLayout>
 
@@ -728,7 +729,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:textColor="#000000"
-                    android:background="@drawable/inputtext"
+                    android:background="@drawable/custom_textview"
 
                     />
             </LinearLayout>
@@ -755,7 +756,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:textColor="#000000"
-                    android:background="@drawable/inputtext"/>
+                    android:background="@drawable/custom_textview"/>
             </LinearLayout>
 
             <LinearLayout
