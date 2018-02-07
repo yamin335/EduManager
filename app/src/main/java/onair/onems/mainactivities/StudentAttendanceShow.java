@@ -155,17 +155,21 @@ public class StudentAttendanceShow extends AppCompatActivity {
 
             simpleTabledataAdapter = new SimpleTableDataAdapter(this,DATA_TO_SHOW);
             tableView.setDataAdapter(simpleTabledataAdapter);
-            if (config.smallestScreenWidthDp >320) {
+            if (config.smallestScreenWidthDp >320)
+            {
                 simpleTableHeaderAdapter.setTextSize(14);
                 simpleTabledataAdapter.setTextSize(12);
-            } else {
+            }
+            else
+                {
                 simpleTableHeaderAdapter.setTextSize(10);
                 simpleTabledataAdapter.setTextSize(10);
             }
 
 
 
-        } catch (JSONException e) {
+        } catch (JSONException e)
+        {
             Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
         }
 

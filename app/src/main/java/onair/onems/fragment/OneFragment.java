@@ -153,6 +153,7 @@ public class OneFragment extends Fragment {
 
         spinner = (MaterialSpinner) rootView.findViewById(R.id.spinner);
 
+
         spinner.setOnItemSelectedListener(new MaterialSpinner.OnItemSelectedListener<String>()
         {
 
@@ -190,6 +191,7 @@ public class OneFragment extends Fragment {
         return rootView;
     }
     void parseMonthJsonData(String jsonString) {
+
         try {
             JSONArray jsonArray = new JSONArray(jsonString);
             ArrayList al = new ArrayList();

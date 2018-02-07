@@ -30,7 +30,7 @@ import onair.onems.R;
 public class LoginScreen extends AppCompatActivity
 {
     private Button loginButton;
-    private AutoCompleteTextView takeId;
+    private EditText takeId;
     private EditText takePassword;
     private TextView errorView;
     private String UserID = "", Password = "", UserFullName = "",
@@ -81,7 +81,7 @@ public class LoginScreen extends AppCompatActivity
         if(sharedPreferences.getBoolean("LogInState", true))
         {
             long UserTypeID = prefs.getLong("UserTypeID",0);
-            if((UserTypeID == 3)||(UserTypeID == 5))
+            if((UserTypeID == 3))
             {
                 Intent intent = new Intent(LoginScreen.this, StudentMainScreen.class);
                 startActivity(intent);
@@ -89,11 +89,27 @@ public class LoginScreen extends AppCompatActivity
             }
             else if(UserTypeID == 4)
             {
-                Intent intent = new Intent(LoginScreen.this, TeacherMainScreen.class);
+                Intent intent = new Intent(LoginScreen.this, StudentMainScreen.class);
                 startActivity(intent);
                 finish();
             }
         }
+//        if(sharedPreferences.getBoolean("LogInState", true))
+//        {
+//            long UserTypeID = prefs.getLong("UserTypeID",0);
+//            if((UserTypeID == 3)||(UserTypeID == 5))
+//            {
+//                Intent intent = new Intent(LoginScreen.this, StudentMainScreen.class);
+//                startActivity(intent);
+//                finish();
+//            }
+//            else if(UserTypeID == 4)
+//            {
+//                Intent intent = new Intent(LoginScreen.this, TeacherMainScreen.class);
+//                startActivity(intent);
+//                finish();
+//            }
+//        }
 
         setContentView(R.layout.activity_login);
 
@@ -103,7 +119,7 @@ public class LoginScreen extends AppCompatActivity
         dialog.setCancelable(false);
 
         loginButton = (Button)findViewById(R.id.login_button);
-        takeId = (AutoCompleteTextView)findViewById(R.id.email);
+        takeId = (EditText)findViewById(R.id.email);
         takePassword = (EditText) findViewById(R.id.password);
         errorView = (TextView)findViewById(R.id.error);
 
@@ -151,7 +167,7 @@ public class LoginScreen extends AppCompatActivity
                                         // Login For Teacher
                                         else if((UserID.length()>0) && (UserTypeID == 4))
                                         {
-                                            Intent mainIntent = new Intent(LoginScreen.this,TeacherMainScreen.class);
+                                            Intent mainIntent = new Intent(LoginScreen.this,StudentMainScreen.class);
                                             LoginScreen.this.startActivity(mainIntent);
                                             LoginScreen.this.finish();
                                             dialog.dismiss();

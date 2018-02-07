@@ -94,7 +94,7 @@ public class ExpandableListAdapterStudent extends BaseExpandableListAdapter {
             case 0:
                 indicator.setVisibility(View.VISIBLE);
                 break;
-            case 1:
+                    case 6:
                 indicator.setVisibility(View.VISIBLE);
                 break;
             default:
@@ -132,7 +132,8 @@ public class ExpandableListAdapterStudent extends BaseExpandableListAdapter {
     }
 
     @Override
-    public boolean isChildSelectable(int groupPosition, int childPosition) {
+    public boolean isChildSelectable(int groupPosition, int childPosition)
+    {
         return true;
     }
 }
