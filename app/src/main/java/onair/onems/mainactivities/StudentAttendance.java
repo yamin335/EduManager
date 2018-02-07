@@ -38,6 +38,7 @@ import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import onair.onems.R;
+import onair.onems.Services.GlideApp;
 import onair.onems.customadapters.ExpandableListAdapter;
 import onair.onems.customadapters.ExpandableListAdapterStudent;
 import onair.onems.fragment.OneFragment;
@@ -104,7 +105,12 @@ public class StudentAttendance extends AppCompatActivity {
         {
             userType.setText("Guardian");
         }
-        Glide.with(this).load(getString(R.string.baseUrlRaw)+imageUrl.replace("\\","/")).apply(RequestOptions.circleCropTransform()).into(profilePicture);
+        GlideApp.with(this)
+                .load(getString(R.string.baseUrlRaw)+imageUrl.replace("\\","/"))
+                .diskCacheStrategy(DiskCacheStrategy.NONE)
+                .skipMemoryCache(true)
+                .apply(RequestOptions.circleCropTransform())
+                .into(profilePicture);
         navigationView.addHeaderView(view);
 
         if (navigationView != null)

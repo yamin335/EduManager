@@ -72,12 +72,12 @@ public class LoginScreen extends AppCompatActivity
             sharedPreferences  = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putBoolean("LogInState", false);
-            editor.commit();
+            editor.apply();
 
             // mark first time has runned.
             SharedPreferences.Editor defaultEditor = prefs.edit();
             defaultEditor.putBoolean("firstTime", true);
-            defaultEditor.commit();
+            defaultEditor.apply();
         }
         sharedPreferences  = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
 
@@ -355,12 +355,12 @@ public class LoginScreen extends AppCompatActivity
             editor.putLong("ShiftID",ShiftID);
             editor.putLong("ClassID",ClassID );
             editor.putString("StudentNo",StudentNo);
-            editor.commit();
+            editor.apply();
 
             sharedPreferences  = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
             SharedPreferences.Editor loginEditor = sharedPreferences.edit();
             loginEditor.putBoolean("LogInState", true);
-            loginEditor.commit();
+            loginEditor.apply();
 
         }
         catch (JSONException e)
