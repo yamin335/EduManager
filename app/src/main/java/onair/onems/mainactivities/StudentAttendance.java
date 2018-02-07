@@ -118,22 +118,65 @@ public class StudentAttendance extends AppCompatActivity {
         // setting list adapter
         expandableList.setAdapter(mMenuAdapter);
 
-        expandableList.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
+        expandableList.setOnChildClickListener(new ExpandableListView.OnChildClickListener()
+        {
             @Override
-            public boolean onChildClick(ExpandableListView expandableListView, View view, int i, int i1, long l) {
-                //Log.d("DEBUG", "submenu item clicked");
+            public boolean onChildClick(ExpandableListView expandableListView, View view, int i, int i1, long l)
+            {
+                if(i==6&&i1==0)
+                {
+                    DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                    if (drawer.isDrawerOpen(GravityCompat.START))
+                    {
+                        drawer.closeDrawer(GravityCompat.START);
+                        Intent mainIntent = new Intent(StudentAttendance.this,Fee.class);
+                        StudentAttendance.this.startActivity(mainIntent);
+                        finish();
+
+                    }
+                }
+                if(i==6&&i1==1)
+                {
+                    DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                    if (drawer.isDrawerOpen(GravityCompat.START))
+                    {
+
+                        drawer.closeDrawer(GravityCompat.START);
+                        Intent mainIntent = new Intent(StudentAttendance.this,FeesHistory.class);
+                        StudentAttendance.this.startActivity(mainIntent);
+
+                    }
+                }
                 return false;
             }
         });
-        expandableList.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
+        expandableList.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener()
+        {
             @Override
-            public boolean onGroupClick(ExpandableListView expandableListView, View view, int i, long l) {
-//                Log.d("DEBUG", "heading clicked"+i+"--"+l);
+            public boolean onGroupClick(ExpandableListView expandableListView, View view, int i, long l)
+            {
+//
                 if((i == 2) && (l == 2) )
                 {
                     DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-                    if (drawer.isDrawerOpen(GravityCompat.START)) {
+
+                    if (drawer.isDrawerOpen(GravityCompat.START))
+                    {
                         drawer.closeDrawer(GravityCompat.START);
+
+
+                    }
+                }
+                if((i == 1) )
+                {
+                    DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+
+                    if (drawer.isDrawerOpen(GravityCompat.START))
+                    {
+                        drawer.closeDrawer(GravityCompat.START);
+                        Intent mainIntent = new Intent(StudentAttendance.this,ClassRoutine.class);
+                        StudentAttendance.this.startActivity(mainIntent);
+                        finish();
                     }
                 }
                 return false;
@@ -197,16 +240,17 @@ public class StudentAttendance extends AppCompatActivity {
         List<String> headingNotice = new ArrayList<String>();
         headingNotice.add("New Notice");
         headingNotice.add("Old Notice");
-
         List<String> headingRoutine = new ArrayList<String>();
-        headingRoutine.add("Mid Term Exam");
-        headingRoutine.add("Final Exam");
-
+//        headingRoutine.add("Mid Term Exam");
+//        headingRoutine.add("Final Exam");
+        List<String> headingFees = new ArrayList<String>();
+        headingFees.add("Pay fee");
+        headingFees.add("Fee History");
         List<String> headingAttendance = new ArrayList<String>();
         List<String> headingSyllabus = new ArrayList<String>();
         List<String> headingExam = new ArrayList<String>();
         List<String> headingResult = new ArrayList<String>();
-        List<String> headingFee = new ArrayList<String>();
+//       List<String> headingFee = new ArrayList<String>();
         List<String> headingContact = new ArrayList<String>();
 
         listDataChild.put(listDataHeader.get(0), headingNotice);// Header, Child data
@@ -215,7 +259,7 @@ public class StudentAttendance extends AppCompatActivity {
         listDataChild.put(listDataHeader.get(3), headingSyllabus);
         listDataChild.put(listDataHeader.get(4), headingExam);
         listDataChild.put(listDataHeader.get(5), headingResult);
-        listDataChild.put(listDataHeader.get(6), headingFee);
+        listDataChild.put(listDataHeader.get(6), headingFees);
         listDataChild.put(listDataHeader.get(7), headingContact);
 
     }
@@ -224,9 +268,11 @@ public class StudentAttendance extends AppCompatActivity {
     {
 
         navigationView.setNavigationItemSelectedListener(
-                new NavigationView.OnNavigationItemSelectedListener() {
+                new NavigationView.OnNavigationItemSelectedListener()
+                {
                     @Override
-                    public boolean onNavigationItemSelected(MenuItem menuItem) {
+                    public boolean onNavigationItemSelected(MenuItem menuItem)
+                    {
                         menuItem.setChecked(true);
                         mDrawerLayout.closeDrawers();
                         return true;
@@ -235,14 +281,17 @@ public class StudentAttendance extends AppCompatActivity {
     }
 
     @Override
-    public void onBackPressed() {
+    public void onBackPressed()
+    {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            super.onBackPressed();
-        }
+            Intent mainIntent = new Intent(StudentAttendance.this,StudentMainScreen.class);
+           StudentAttendance.this.startActivity(mainIntent);
+            finish();
 
+        }
     }
 
     @Override
@@ -286,15 +335,10 @@ public class StudentAttendance extends AppCompatActivity {
     private void setupViewPager(ViewPager viewPager)
     {
 
-        ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
-
-
+            ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
             adapter.addFragment(new OneFragment(), "SELF ATTENDANCE");
             adapter.addFragment(new TwoFragment(), "OTHERS ATTENDANCE");
-
-
-
-        viewPager.setAdapter(adapter);
+            viewPager.setAdapter(adapter);
     }
 
     class ViewPagerAdapter extends FragmentPagerAdapter
