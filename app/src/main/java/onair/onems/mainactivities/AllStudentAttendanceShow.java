@@ -60,8 +60,6 @@ public class AllStudentAttendanceShow extends AppCompatActivity
         name=(TextView) findViewById(R.id.name);
         roll=(TextView) findViewById(R.id.roll);
         id=(TextView) findViewById(R.id.Id);
-
-
         dialog = new ProgressDialog(this);
         dialog.setMessage("Loading....");
         dialog.show();

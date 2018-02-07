@@ -44,7 +44,7 @@ public class TwoFragment extends Fragment {
     MaterialSpinner classSpinner,sectionSpinner,mediumSpinner,monthSpinner,shiftSpinner;
     TableView tableView;
     String classUrl = "",mediumUrl="",monthUrl="",sectionUrl="",shiftUrl;
-    int ClassID[],ShiftID[],MediumID[],MonthID[],SectionID[];
+    int ClassID[],ShiftID[]={0},MediumID[],MonthID[],SectionID[];
 
     ProgressDialog dialog;
     Fragment fragment;
@@ -382,7 +382,7 @@ public class TwoFragment extends Fragment {
                 ShiftID[i]=jsonObject.getInt("ShiftID");
                 al.add(name);
             }
-            ShiftSelectID=ShiftID[0];
+            //ShiftSelectID=ShiftID[0];
             ArrayAdapter adapter = new ArrayAdapter(getActivity(), android.R.layout.simple_list_item_1, al);
             shiftSpinner.setAdapter(adapter);
             //spinner.setSelectedIndex(1);

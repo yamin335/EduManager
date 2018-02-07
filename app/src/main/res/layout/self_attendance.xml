@@ -15,7 +15,6 @@
         android:layout_gravity="right"
         table:ms_background_color="#0277BD"
         android:textAlignment="center"
-
         table:ms_dropdown_max_height="250dp"
         table:ms_text_color="#ffffff" />
 

@@ -64,4 +64,6 @@ dependencies {
     implementation 'com.koushikdutta.ion:ion:2.+'
     implementation 'com.nex3z:notification-badge:0.3.0'
     implementation 'com.android.support:appcompat-v7:27.0.2'
+    implementation 'com.craftman.cardform:cardform:0.0.2'
+
 }

@@ -43,13 +43,16 @@ import onair.onems.customadapters.ExpandableListAdapter;
 import onair.onems.customadapters.ExpandableListAdapterStudent;
 import onair.onems.fragment.OneFragment;
 import onair.onems.fragment.TwoFragment;
+import onair.onems.mainactivities.Fees.Fee;
+import onair.onems.mainactivities.Fees.FeesHistory;
+import onair.onems.mainactivities.Routine.ClassRoutine;
 import onair.onems.models.ExpandedMenuModel;
 
 /**
  * Created by User on 12/6/2017.
  */
 
-public class StudentAttendance extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
+public class StudentAttendance extends AppCompatActivity {
 
     private DrawerLayout mDrawerLayout;
     ExpandableListAdapterStudent mMenuAdapter;
@@ -102,11 +105,7 @@ public class StudentAttendance extends AppCompatActivity implements NavigationVi
         {
             userType.setText("Guardian");
         }
-        GlideApp.with(this)
-                .load(getString(R.string.baseUrlRaw)+imageUrl.replace("\\","/")).apply(RequestOptions.circleCropTransform())
-                .diskCacheStrategy(DiskCacheStrategy.NONE)
-                .skipMemoryCache(true)
-                .into(profilePicture);
+        Glide.with(this).load(getString(R.string.baseUrlRaw)+imageUrl.replace("\\","/")).apply(RequestOptions.circleCropTransform()).into(profilePicture);
         navigationView.addHeaderView(view);
 
         if (navigationView != null)
@@ -243,9 +242,7 @@ public class StudentAttendance extends AppCompatActivity implements NavigationVi
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            Intent mainIntent = new Intent(StudentAttendance.this,StudentMainScreen.class);
-            startActivity(mainIntent);
-            finish();
+            super.onBackPressed();
         }
 
     }
