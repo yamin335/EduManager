@@ -6,18 +6,23 @@ package onair.onems.models;
 
 public class SubjectModel {
 
-    private int SubjectID;
-    private int SubjectNo;
+    private int SubjectID = 0;
+    private int SubjectNo = 0;
     private String SubjectName;
-    private int InsSubjectID;
-    private int InstituteID;
-    private int DepartmentID;
-    private int MediumID;
-    private int ClassID;
-    private boolean IsActive;
-    private boolean IsCombined;
-    private int ParentID;
-    private String ParentSubject;
+    private int InsSubjectID = 0;
+    private int InstituteID = 0;
+    private int DepartmentID = 0;
+    private int MediumID = 0;
+    private int ClassID = 0;
+    private boolean IsActive = true;
+    private boolean IsCombined = true;
+    private int ParentID = 0;
+    private String ParentSubject = "";
+
+    public SubjectModel()
+    {
+
+    }
 
     public SubjectModel(String SubjectID, String SubjectNo, String SubjectName, String InsSubjectID,
                         String InstituteID, String DepartmentID, String MediumID, String ClassID, String IsActive,

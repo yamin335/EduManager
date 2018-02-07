@@ -38,6 +38,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 
 import org.json.JSONArray;
@@ -49,6 +50,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import onair.onems.R;
+import onair.onems.Services.GlideApp;
 import onair.onems.customadapters.ExpandableListAdapter;
 import onair.onems.mainactivities.TeacherAttendanceShow.ShowAttendance;
 import onair.onems.models.ClassModel;
@@ -57,6 +59,7 @@ import onair.onems.models.ExpandedMenuModel;
 import onair.onems.models.MediumModel;
 import onair.onems.models.SectionModel;
 import onair.onems.models.ShiftModel;
+import onair.onems.models.SpinnerStudentInformation;
 import onair.onems.models.StudentInformation;
 
 /**
@@ -66,39 +69,42 @@ import onair.onems.models.StudentInformation;
 public class StudentiCardMain extends AppCompatActivity {
 
     private DrawerLayout mDrawerLayout;
-    ExpandableListAdapter mMenuAdapter;
-    ExpandableListView expandableList;
-    List<ExpandedMenuModel> listDataHeader;
-    HashMap<ExpandedMenuModel, List<String>> listDataChild;
-    Spinner spinnerClass, spinnerShift,spinnerSection,spinnerMedium,spinnerDepartment,spinnerStudent;
-    Button showStudentData, newEntry;
-    ProgressDialog dialog;
-    String classUrl, shiftUrl, sectionUrl, mediumUrl, studentUrl,departmentUrl;
-    ArrayList<ClassModel> allClassArrayList;
-    ArrayList<ShiftModel> allShiftArrayList;
-    ArrayList<SectionModel> allSectionArrayList;
-    ArrayList<MediumModel> allMediumArrayList;
-    ArrayList<DepartmentModel> allDepartmentArrayList;
-    ArrayList<StudentInformation> allStudentArrayList;
+    private ExpandableListAdapter mMenuAdapter;
+    private ExpandableListView expandableList;
+    private List<ExpandedMenuModel> listDataHeader;
+    private HashMap<ExpandedMenuModel, List<String>> listDataChild;
+    private Spinner spinnerClass, spinnerShift,spinnerSection,spinnerMedium,spinnerDepartment,spinnerStudent;
+    private Button showStudentData, newEntry, editStudentData;
+    private ProgressDialog dialog;
+    private String classUrl, shiftUrl, sectionUrl, mediumUrl, studentUrl, departmentUrl;
+    private ArrayList<ClassModel> allClassArrayList;
+    private ArrayList<ShiftModel> allShiftArrayList;
+    private ArrayList<SectionModel> allSectionArrayList;
+    private ArrayList<MediumModel> allMediumArrayList;
+    private ArrayList<DepartmentModel> allDepartmentArrayList;
+    private ArrayList<SpinnerStudentInformation> allStudentArrayList;
 
-    String[] tempClassArray = {"Select Class"};
-    String[] tempShiftArray = {"Select Shift"};
-    String[] tempSectionArray = {"Select Section"};
-    String[] tempDepartmentArray = {"Select Department"};
-    String[] tempMediumArray = {"Select Medium"};
-    String[] tempStudentArray = {"Select Student"};
-    ClassModel selectedClass = null;
-    ShiftModel selectedShift = null;
-    SectionModel selectedSection = null;
-    MediumModel selectedMedium = null;
-    DepartmentModel selectedDepartment = null;
-    StudentInformation selectedStudent = null;
-    int classSpinnerPosition, shiftSpinnerPosition, sectionSpinnerPosition, mediumSpinnerPosition,departmentSpinnerPosition, studentSpinnerPosition;
+    private String[] tempClassArray = {"Select Class"};
+    private String[] tempShiftArray = {"Select Shift"};
+    private String[] tempSectionArray = {"Select Section"};
+    private String[] tempDepartmentArray = {"Select Department"};
+    private String[] tempMediumArray = {"Select Medium"};
+    private String[] tempStudentArray = {"Select Student"};
 
-    long InstituteID;
+    private ClassModel selectedClass = null;
+    private ShiftModel selectedShift = null;
+    private SectionModel selectedSection = null;
+    private MediumModel selectedMedium = null;
+    private DepartmentModel selectedDepartment = null;
+    private SpinnerStudentInformation selectedStudent = null;
+
+    private long InstituteID;
 
     public static final String MyPREFERENCES = "LogInKey";
     public static SharedPreferences sharedPreferences;
+
+    private MenuItem notificationBell;
+    private TextView notificationCounter;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -117,8 +123,10 @@ public class StudentiCardMain extends AppCompatActivity {
         selectedSection = new SectionModel();
         selectedMedium = new MediumModel();
         selectedDepartment = new DepartmentModel();
+        selectedStudent = new SpinnerStudentInformation();
 
         showStudentData = (Button)findViewById(R.id.showStudentData);
+        editStudentData = (Button)findViewById(R.id.editStudentInfo);
         newEntry = (Button)findViewById(R.id.newEntry);
 
         ArrayAdapter<String> class_spinner_adapter = new ArrayAdapter<String>(this, R.layout.spinner_item, tempClassArray);
@@ -145,12 +153,12 @@ public class StudentiCardMain extends AppCompatActivity {
         student_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerStudent.setAdapter(student_spinner_adapter);
 
-        allClassArrayList = new ArrayList<ClassModel>();
-        allShiftArrayList = new ArrayList<ShiftModel>();
-        allSectionArrayList = new ArrayList<SectionModel>();
-        allMediumArrayList = new ArrayList<MediumModel>();
-        allDepartmentArrayList = new ArrayList<DepartmentModel>();
-        allStudentArrayList = new ArrayList<StudentInformation>();
+        allClassArrayList = new ArrayList<>();
+        allShiftArrayList = new ArrayList<>();
+        allSectionArrayList = new ArrayList<>();
+        allMediumArrayList = new ArrayList<>();
+        allDepartmentArrayList = new ArrayList<>();
+        allStudentArrayList = new ArrayList<>();
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         InstituteID = prefs.getLong("InstituteID",0);
@@ -257,7 +265,6 @@ public class StudentiCardMain extends AppCompatActivity {
                 if(position != 0)
                 {
                     try {
-                        allStudentArrayList = new ArrayList<>();
                         selectedClass = allClassArrayList.get(position-1);
                     }
                     catch (IndexOutOfBoundsException e)
@@ -305,7 +312,6 @@ public class StudentiCardMain extends AppCompatActivity {
                     {
                         selectedDepartment.setDepartmentID("0");
                     }
-
                     studentUrl = getString(R.string.baseUrlLocal)+"getStudent"+"/"+InstituteID+"/"+
                             selectedClass.getClassID()+"/"+selectedSection.getSectionID()+"/"+
                             selectedDepartment.getDepartmentID()+"/"+selectedMedium.getMediumID()+"/"+selectedShift.getShiftID()+"/"+"0";
@@ -349,7 +355,6 @@ public class StudentiCardMain extends AppCompatActivity {
                 if(position != 0)
                 {
                     try {
-                        allStudentArrayList = new ArrayList<>();
                         selectedShift = allShiftArrayList.get(position-1);
                     }
                     catch (IndexOutOfBoundsException e)
@@ -420,7 +425,6 @@ public class StudentiCardMain extends AppCompatActivity {
                 if(position != 0)
                 {
                     try {
-                        allStudentArrayList = new ArrayList<>();
                         selectedSection = allSectionArrayList.get(position-1);
                     }
                     catch (IndexOutOfBoundsException e)
@@ -491,7 +495,6 @@ public class StudentiCardMain extends AppCompatActivity {
                 if(position != 0)
                 {
                     try {
-                        allStudentArrayList = new ArrayList<>();
                         selectedMedium = allMediumArrayList.get(position-1);
                     }
                     catch (IndexOutOfBoundsException e)
@@ -560,7 +563,6 @@ public class StudentiCardMain extends AppCompatActivity {
                 if(position != 0)
                 {
                     try {
-                        allStudentArrayList = new ArrayList<>();
                         selectedDepartment = allDepartmentArrayList.get(position-1);
                     }
                     catch (IndexOutOfBoundsException e)
@@ -664,6 +666,64 @@ public class StudentiCardMain extends AppCompatActivity {
                 }
             }
         });
+        editStudentData.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(isNetworkAvailable())
+                {
+                    if((selectedClass.getClassID() != -2)&&(selectedStudent != null))
+                    {
+                        Bundle bundle = new Bundle();
+                        bundle.putString("UserName", selectedStudent.getUserName());
+                        bundle.putString("RollNo", selectedStudent.getRollNo());
+                        bundle.putString("UserID", selectedStudent.getUserID());
+                        if(selectedSection.getSectionID() == -2)
+                        {
+                            selectedSection.setSectionID("0");
+                        }
+                        bundle.putString("SectionID", Long.toString(selectedSection.getSectionID()));
+                        if(selectedClass.getClassID() == -2)
+                        {
+                            selectedClass.setClassID("0");
+                        }
+                        bundle.putString("ClassID", Long.toString(selectedClass.getClassID()));
+//                        bundle.putString("BrunchID", Long.toString(selectedStudent.getBrunchID()));
+                        if(selectedShift.getShiftID() == -2)
+                        {
+                            selectedShift.setShiftID("0");
+                        }
+                        bundle.putString("ShiftID", Long.toString(selectedShift.getShiftID()));
+                        if(selectedMedium.getMediumID() == -2)
+                        {
+                            selectedMedium.setMediumID("0");
+                        }
+                        bundle.putString("MediumID", Long.toString(selectedMedium.getMediumID()));
+                        if(selectedDepartment.getDepartmentID() == -2)
+                        {
+                            selectedDepartment.setDepartmentID("0");
+                        }
+                        bundle.putString("DepartmentID", Long.toString(selectedDepartment.getDepartmentID()));
+                        bundle.putBoolean("IsImageCaptured", selectedStudent.getIsImageCaptured());
+
+                        Intent intent = new Intent(StudentiCardMain.this, StudentiCardDetailsEdit.class);
+                        intent.putExtras(bundle);
+                        startActivity(intent);
+                    }
+                    else if(selectedClass == null)
+                    {
+                        Toast.makeText(StudentiCardMain.this,"Please select class !!! ",Toast.LENGTH_LONG).show();
+                    }
+                    else if(selectedStudent == null)
+                    {
+                        Toast.makeText(StudentiCardMain.this,"Please select a student !!! ",Toast.LENGTH_LONG).show();
+                    }
+                }
+                else
+                {
+                    Toast.makeText(StudentiCardMain.this,"Please check your internet connection!!!",Toast.LENGTH_LONG).show();
+                }
+            }
+        });
 
         showStudentData.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -675,48 +735,37 @@ public class StudentiCardMain extends AppCompatActivity {
                         Bundle bundle = new Bundle();
                         bundle.putString("UserName", selectedStudent.getUserName());
                         bundle.putString("RollNo", selectedStudent.getRollNo());
-                        bundle.putString("ImageUrl", selectedStudent.getImageUrl());
-                        bundle.putString("ClassName", selectedStudent.getClassName());
-                        bundle.putString("SectionName", selectedStudent.getSectionName());
-                        bundle.putString("MameName", selectedStudent.getMameName());
-                        bundle.putString("DepartmentName", selectedStudent.getDepartmentName());
-                        bundle.putString("SessionName", selectedStudent.getSessionName());
-                        bundle.putString("BoardName", selectedStudent.getBoardName());
-                        bundle.putString("Guardian", selectedStudent.getGuardian());
-                        bundle.putString("GuardianPhone", selectedStudent.getGuardianPhone());
-                        bundle.putString("GuardianEmailID", selectedStudent.getGuardianEmailID());
-                        bundle.putString("DOB", selectedStudent.getDOB());
-                        bundle.putString("Gender", selectedStudent.getGender());
-                        bundle.putString("Religion", selectedStudent.getReligion());
-                        bundle.putString("UserClassID", selectedStudent.getUserClassID());
                         bundle.putString("UserID", selectedStudent.getUserID());
-                        bundle.putString("RFID", selectedStudent.getRFID());
-                        bundle.putString("StudentNo", selectedStudent.getStudentNo());
-                        bundle.putString("SectionID", Long.toString(selectedStudent.getSectionID()));
-                        bundle.putString("ClassID", Long.toString(selectedStudent.getClassID()));
-                        bundle.putString("BrunchID", Long.toString(selectedStudent.getBrunchID()));
-                        bundle.putString("ShiftID", Long.toString(selectedStudent.getShiftID()));
-                        bundle.putString("Remarks", selectedStudent.getRemarks());
-                        bundle.putString("InstituteID", Long.toString(selectedStudent.getInstituteID()));
-                        bundle.putString("UserTypeID", Long.toString(selectedStudent.getUserTypeID()));
-                        bundle.putString("GenderID", Long.toString(selectedStudent.getGenderID()));
-                        bundle.putString("PhoneNo", selectedStudent.getPhoneNo());
-                        bundle.putString("EmailID", selectedStudent.getEmailID());
-                        bundle.putString("FingerUrl", selectedStudent.getFingerUrl());
-                        bundle.putString("SignatureUrl", selectedStudent.getSignatureUrl());
-                        bundle.putString("PreAddress", selectedStudent.getPreAddress());
-                        bundle.putString("ShiftName", selectedStudent.getShiftName());
-                        bundle.putString("MediumID", Long.toString(selectedStudent.getMediumID()));
-                        bundle.putString("DepartmentID", Long.toString(selectedStudent.getDepartmentID()));
+                        if(selectedSection.getSectionID() == -2)
+                        {
+                            selectedSection.setSectionID("0");
+                        }
+                        bundle.putString("SectionID", Long.toString(selectedSection.getSectionID()));
+                        if(selectedClass.getClassID() == -2)
+                        {
+                            selectedClass.setClassID("0");
+                        }
+                        bundle.putString("ClassID", Long.toString(selectedClass.getClassID()));
+//                        bundle.putString("BrunchID", Long.toString(selectedStudent.getBrunchID()));
+                        if(selectedShift.getShiftID() == -2)
+                        {
+                            selectedShift.setShiftID("0");
+                        }
+                        bundle.putString("ShiftID", Long.toString(selectedShift.getShiftID()));
+                        if(selectedMedium.getMediumID() == -2)
+                        {
+                            selectedMedium.setMediumID("0");
+                        }
+                        bundle.putString("MediumID", Long.toString(selectedMedium.getMediumID()));
+                        if(selectedDepartment.getDepartmentID() == -2)
+                        {
+                            selectedDepartment.setDepartmentID("0");
+                        }
+                        bundle.putString("DepartmentID", Long.toString(selectedDepartment.getDepartmentID()));
                         bundle.putBoolean("IsImageCaptured", selectedStudent.getIsImageCaptured());
 
                         Intent intent = new Intent(StudentiCardMain.this, StudentiCardDetails.class);
                         intent.putExtras(bundle);
-//                        selectedClass = null;
-//                        selectedShift = null;
-//                        selectedSection = null;
-//                        selectedMedium = null;
-//                        selectedStudent = null;
                         startActivity(intent);
                     }
                     else if(selectedClass == null)
@@ -757,7 +806,10 @@ public class StudentiCardMain extends AppCompatActivity {
         {
             userType.setText("Teacher");
         }
-        Glide.with(this).load(getString(R.string.baseUrlRaw)+imageUrl.replace("\\","/"))
+        GlideApp.with(this)
+                .load(getString(R.string.baseUrlRaw)+imageUrl.replace("\\","/"))
+                .diskCacheStrategy(DiskCacheStrategy.NONE)
+                .skipMemoryCache(true)
                 .apply(RequestOptions.circleCropTransform()).into(profilePicture);
         // profilePicture.setImageDrawable(getResources().getDrawable(R.drawable.album1));
         navigationView.addHeaderView(view);
@@ -803,6 +855,14 @@ public class StudentiCardMain extends AppCompatActivity {
                         drawer.closeDrawer(GravityCompat.START);
                     }
                 }
+
+                if((i == 8) && (l == 8))
+                {
+                    Intent intent = new Intent(StudentiCardMain.this, ReportAllStudentMain.class);
+                    startActivity(intent);
+                    finish();
+                }
+
                 return false;
             }
         });
@@ -815,6 +875,7 @@ public class StudentiCardMain extends AppCompatActivity {
 
     void parseClassJsonData(String jsonString) {
         try {
+            allClassArrayList = new ArrayList<>();
             JSONArray classJsonArray = new JSONArray(jsonString);
             ArrayList<String> classArrayList = new ArrayList<>();
             classArrayList.add("Select Class");
@@ -847,6 +908,7 @@ public class StudentiCardMain extends AppCompatActivity {
 
     void parseShiftJsonData(String jsonString) {
         try {
+            allShiftArrayList = new ArrayList<>();
             JSONArray shiftJsonArray = new JSONArray(jsonString);
             ArrayList<String> shiftArrayList = new ArrayList<>();
             shiftArrayList.add("Select Shift");
@@ -879,6 +941,7 @@ public class StudentiCardMain extends AppCompatActivity {
 
     void parseSectionJsonData(String jsonString) {
         try {
+            allSectionArrayList = new ArrayList<>();
             JSONArray sectionJsonArray = new JSONArray(jsonString);
             ArrayList<String> sectionArrayList = new ArrayList<>();
             sectionArrayList.add("Select Section");
@@ -911,6 +974,7 @@ public class StudentiCardMain extends AppCompatActivity {
 
     void parseMediumJsonData(String jsonString) {
         try {
+            allMediumArrayList = new ArrayList<>();
             JSONArray mediumJsonArray = new JSONArray(jsonString);
             ArrayList<String> mediumnArrayList = new ArrayList<>();
             mediumnArrayList.add("Select Medium");
@@ -944,6 +1008,7 @@ public class StudentiCardMain extends AppCompatActivity {
 
     void parseDepartmentJsonData(String jsonString) {
         try {
+            allDepartmentArrayList = new ArrayList<>();
             JSONArray departmentJsonArray = new JSONArray(jsonString);
             ArrayList<String> departmentArrayList = new ArrayList<>();
             departmentArrayList.add("Select Department");
@@ -976,56 +1041,57 @@ public class StudentiCardMain extends AppCompatActivity {
 
     void parseStudentJsonData(String jsonString) {
         try {
+            allStudentArrayList = new ArrayList<>();
             JSONArray studentJsonArray = new JSONArray(jsonString);
             ArrayList<String> studentArrayList = new ArrayList<>();
             studentArrayList.add("Select Student");
             for(int i = 0; i < studentJsonArray.length(); ++i) {
                 JSONObject studentJsonObject = studentJsonArray.getJSONObject(i);
-                StudentInformation studentInformation = new StudentInformation();
-                studentInformation.setRollNo(studentJsonObject.getString("RollNo"));
-                studentInformation.setUserName(studentJsonObject.getString("UserName"));
-                studentInformation.setImageUrl(studentJsonObject.getString("ImageUrl"));
-                studentInformation.setClassName(studentJsonObject.getString("ClassName"));
-                studentInformation.setSectionName(studentJsonObject.getString("SectionName"));
-                studentInformation.setMameName(studentJsonObject.getString("MameName"));
-                studentInformation.setDepartmentName(studentJsonObject.getString("DepartmentName"));
-                studentInformation.setSessionName(studentJsonObject.getString("SessionName"));
-                studentInformation.setBoardName(studentJsonObject.getString("BoardName"));
-                studentInformation.setGuardian(studentJsonObject.getString("Guardian"));
-                studentInformation.setGuardianPhone(studentJsonObject.getString("GuardianPhone"));
-                studentInformation.setGuardianEmailID(studentJsonObject.getString("GuardianEmailID"));
-                studentInformation.setDOB(studentJsonObject.getString("DOB"));
-                studentInformation.setGender(studentJsonObject.getString("Gender"));
-                studentInformation.setReligion(studentJsonObject.getString("Religion"));
-                studentInformation.setPreAddress(studentJsonObject.getString("PreAddress"));
-                studentInformation.setUserClassID(studentJsonObject.getString("UserClassID"));
-                studentInformation.setUserID(studentJsonObject.getString("UserID"));
-                studentInformation.setRFID(studentJsonObject.getString("RFID"));
-                studentInformation.setStudentNo(studentJsonObject.getString("StudentNo"));
-                studentInformation.setSectionID(studentJsonObject.getString("SectionID"));
-                studentInformation.setClassID(studentJsonObject.getString("ClassID"));
-                studentInformation.setBrunchID(studentJsonObject.getString("BrunchID"));
-                studentInformation.setShiftID(studentJsonObject.getString("ShiftID"));
-                studentInformation.setRemarks(studentJsonObject.getString("Remarks"));
-                studentInformation.setInstituteID(studentJsonObject.getString("InstituteID"));
-                studentInformation.setUserTypeID(studentJsonObject.getString("UserTypeID"));
-                studentInformation.setGenderID(studentJsonObject.getString("GenderID"));
-                studentInformation.setPhoneNo(studentJsonObject.getString("PhoneNo"));
-                studentInformation.setEmailID(studentJsonObject.getString("EmailID"));
-                studentInformation.setFingerUrl(studentJsonObject.getString("FingerUrl"));
-                studentInformation.setSignatureUrl(studentJsonObject.getString("SignatureUrl"));
-                studentInformation.setIsImageCaptured(studentJsonObject.getBoolean("IsImageCaptured"));
-                studentInformation.setShiftName(studentJsonObject.getString("ShiftName"));
-                studentInformation.setMediumID(studentJsonObject.getString("MediumID"));
-                studentInformation.setDepartmentID(studentJsonObject.getString("DepartmentID"));
+                SpinnerStudentInformation spinnerStudentInformation = new SpinnerStudentInformation();
+                spinnerStudentInformation.setRollNo(studentJsonObject.getString("RollNo"));
+                spinnerStudentInformation.setUserName(studentJsonObject.getString("UserName"));
+//                studentInformation.setImageUrl(studentJsonObject.getString("ImageUrl"));
+//                studentInformation.setClassName(studentJsonObject.getString("ClassName"));
+//                studentInformation.setSectionName(studentJsonObject.getString("SectionName"));
+//                studentInformation.setMameName(studentJsonObject.getString("MameName"));
+//                studentInformation.setDepartmentName(studentJsonObject.getString("DepartmentName"));
+//                studentInformation.setSessionName(studentJsonObject.getString("SessionName"));
+//                studentInformation.setBoardName(studentJsonObject.getString("BoardName"));
+//                studentInformation.setGuardian(studentJsonObject.getString("Guardian"));
+//                studentInformation.setGuardianPhone(studentJsonObject.getString("GuardianPhone"));
+//                studentInformation.setGuardianEmailID(studentJsonObject.getString("GuardianEmailID"));
+//                studentInformation.setDOB(studentJsonObject.getString("DOB"));
+//                studentInformation.setGender(studentJsonObject.getString("Gender"));
+//                studentInformation.setReligion(studentJsonObject.getString("Religion"));
+//                studentInformation.setPreAddress(studentJsonObject.getString("PreAddress"));
+//                studentInformation.setUserClassID(studentJsonObject.getString("UserClassID"));
+                spinnerStudentInformation.setUserID(studentJsonObject.getString("UserID"));
+//                studentInformation.setRFID(studentJsonObject.getString("RFID"));
+//                studentInformation.setStudentNo(studentJsonObject.getString("StudentNo"));
+//                studentInformation.setSectionID(studentJsonObject.getString("SectionID"));
+//                studentInformation.setClassID(studentJsonObject.getString("ClassID"));
+//                studentInformation.setBrunchID(studentJsonObject.getString("BrunchID"));
+//                studentInformation.setShiftID(studentJsonObject.getString("ShiftID"));
+//                studentInformation.setRemarks(studentJsonObject.getString("Remarks"));
+//                studentInformation.setInstituteID(studentJsonObject.getString("InstituteID"));
+//                studentInformation.setUserTypeID(studentJsonObject.getString("UserTypeID"));
+//                studentInformation.setGenderID(studentJsonObject.getString("GenderID"));
+//                studentInformation.setPhoneNo(studentJsonObject.getString("PhoneNo"));
+//                studentInformation.setEmailID(studentJsonObject.getString("EmailID"));
+//                studentInformation.setFingerUrl(studentJsonObject.getString("FingerUrl"));
+//                studentInformation.setSignatureUrl(studentJsonObject.getString("SignatureUrl"));
+                spinnerStudentInformation.setIsImageCaptured(studentJsonObject.getBoolean("IsImageCaptured"));
+//                studentInformation.setShiftName(studentJsonObject.getString("ShiftName"));
+//                studentInformation.setMediumID(studentJsonObject.getString("MediumID"));
+//                studentInformation.setDepartmentID(studentJsonObject.getString("DepartmentID"));
 //                Toast.makeText(this,classJsonObject.getString("ClassID")+classJsonObject.getString("ClassName"),Toast.LENGTH_LONG).show();
-                allStudentArrayList.add(studentInformation);
+                allStudentArrayList.add(spinnerStudentInformation);
                 String s = "";
-                if(studentInformation.getIsImageCaptured())
+                if(spinnerStudentInformation.getIsImageCaptured())
                 {
                     s = " (Done)";
                 }
-                studentArrayList.add(studentInformation.getRollNo()+" - "+studentInformation.getUserName()+s);
+                studentArrayList.add(spinnerStudentInformation.getRollNo()+" - "+spinnerStudentInformation.getUserName()+s);
             }
             try {
                 String[] strings = new String[studentArrayList.size()];
@@ -1088,28 +1154,34 @@ public class StudentiCardMain extends AppCompatActivity {
         listDataHeader.add(menuContact);
 
         ExpandedMenuModel menuiCard = new ExpandedMenuModel();
-        menuiCard.setIconName("Student Information (iCard)");
-        menuiCard.setIconImg(R.drawable.ic_perm_identity_menu);
+        menuiCard.setIconName("iCard");
+        menuiCard.setIconImg(R.drawable.ic_person);
         listDataHeader.add(menuiCard);
 
+        ExpandedMenuModel menuStudentList = new ExpandedMenuModel();
+        menuStudentList.setIconName("Student List");
+        menuStudentList.setIconImg(R.drawable.ic_action_users);
+        listDataHeader.add(menuStudentList);
+
         // Adding child data
-        List<String> headingNotice = new ArrayList<String>();
+        List<String> headingNotice = new ArrayList<>();
         headingNotice.add("New Notice");
         headingNotice.add("Old Notice");
 
-        List<String> headingRoutine = new ArrayList<String>();
+        List<String> headingRoutine = new ArrayList<>();
         headingRoutine.add("Mid Term Exam");
         headingRoutine.add("Final Exam");
 
-        List<String> headingAttendance = new ArrayList<String>();
+        List<String> headingAttendance = new ArrayList<>();
         headingAttendance.add("Take Attendance");
         headingAttendance.add("Show Attendance");
 
-        List<String> headingSyllabus = new ArrayList<String>();
-        List<String> headingExam = new ArrayList<String>();
-        List<String> headingResult = new ArrayList<String>();
-        List<String> headingContact = new ArrayList<String>();
-        List<String> headingiCard = new ArrayList<String>();
+        List<String> headingSyllabus = new ArrayList<>();
+        List<String> headingExam = new ArrayList<>();
+        List<String> headingResult = new ArrayList<>();
+        List<String> headingContact = new ArrayList<>();
+        List<String> headingiCard = new ArrayList<>();
+        List<String> headingStudentList = new ArrayList<>();
 
         listDataChild.put(listDataHeader.get(0), headingNotice);// Header, Child data
         listDataChild.put(listDataHeader.get(1), headingRoutine);
@@ -1119,6 +1191,7 @@ public class StudentiCardMain extends AppCompatActivity {
         listDataChild.put(listDataHeader.get(5), headingResult);
         listDataChild.put(listDataHeader.get(6), headingContact);
         listDataChild.put(listDataHeader.get(7), headingiCard);
+        listDataChild.put(listDataHeader.get(8), headingStudentList);
 
     }
 
@@ -1141,23 +1214,9 @@ public class StudentiCardMain extends AppCompatActivity {
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            AlertDialog.Builder builder = new AlertDialog.Builder(StudentiCardMain.this);
-            builder.setTitle(R.string.app_name);
-            builder.setIcon(R.drawable.onair);
-            builder.setMessage("Do you want to exit?")
-                    .setCancelable(false)
-                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            finish();
-                        }
-                    })
-                    .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            dialog.cancel();
-                        }
-                    });
-            AlertDialog alert = builder.create();
-            alert.show();
+            Intent mainIntent = new Intent(StudentiCardMain.this,TeacherMainScreen.class);
+            startActivity(mainIntent);
+            finish();
         }
     }
 

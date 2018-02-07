@@ -6,18 +6,25 @@ import android.app.ProgressDialog;
 import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.graphics.Matrix;
+import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Parcelable;
+import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NavUtils;
@@ -27,10 +34,14 @@ import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.SeekBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -38,8 +49,10 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
@@ -62,7 +75,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import onair.onems.R;
+import onair.onems.Services.GlideApp;
 import onair.onems.customadapters.CustomRequest;
+import onair.onems.models.ClassModel;
+import onair.onems.models.DepartmentModel;
+import onair.onems.models.MediumModel;
+import onair.onems.models.SectionModel;
+import onair.onems.models.ShiftModel;
+import onair.onems.models.SpinnerStudentInformation;
 import onair.onems.models.StudentInformationEntry;
 
 
@@ -73,30 +93,40 @@ import onair.onems.models.StudentInformationEntry;
 public class StudentiCardDetails extends AppCompatActivity {
 
     private TextView t_name, t_class, t_section, t_birthDay, t_email, t_address,
-            t_parent, t_parentsPhone,t_roll,t_department,t_sex,t_religion,t_medium,t_board,t_session, t_shift;
+            t_parent, t_parentsPhone,t_roll,t_department,t_sex,t_religion,t_medium,t_board,
+            t_session, t_shift,t_branch, t_stuEmail, t_stuPhone, t_remarks, t_studentNo, t_rfid;
 
     private Bundle bundle;
 
     private CropImageView mCropImageView;
     private CheckBox checkBox;
     private Uri mCropImageUri;
-    ProgressDialog dialog;
+    private ProgressDialog dialog, glideProgress;
 
-    StudentInformationEntry studentInformationEntry;
-    Button updateStudentPhoto, cameraButton,searchButton;
+    private StudentInformationEntry studentInformationEntry;
+    private Button updateStudentPhoto, cameraButton, searchButton, rotateRight, rotateLeft;
 
-    JSONObject jsonObjectStudentData;
+    private JSONObject jsonObjectStudentData;
 
-    File file;
+    private File file;
 
-    Bitmap originalBitmap = null;
+    private Bitmap originalBitmap = null;
+    private Bitmap tempBitmap = null;
 
-    StudentiCardDetails.FileFromBitmap fileFromBitmap = null;
+    private FileFromBitmap fileFromBitmap = null;
 
-    String studentDataPostUrl;
+    private String studentDataGetUrl, studentDataPostUrl, selectedClass, selectedShift,
+            selectedSection, selectedMedium, selectedDepartment, UserID;
     private int PICK_IMAGE_REQUEST = 1;
     private String ImagePath;
     private Uri URI;
+
+    private long InstituteID;
+    private SeekBar brightImageSeekBar;
+    private static int brightnessValue;
+    private BrightnessProcessTask mBrightnessProcessTask = null;
+    private RotateProcessTask mRotateProcessTask = null;
+    private boolean imageChanged = false;
 
     @Override
     public void onResume() {
@@ -115,13 +145,40 @@ public class StudentiCardDetails extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.icard_student_details);
 
+        Intent intent = getIntent();
+        bundle = intent.getExtras();
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        InstituteID = prefs.getLong("InstituteID",0);
+        selectedClass = bundle.getString("ClassID");
+        selectedShift = bundle.getString("ShiftID");
+        selectedSection = bundle.getString("SectionID");
+        selectedMedium = bundle.getString("MediumID");
+        selectedDepartment = bundle.getString("DepartmentID");
+        UserID = bundle.getString("UserID");
+
         dialog = new ProgressDialog(this);
         dialog.setTitle("Loading...");
         dialog.setMessage("Please Wait...");
         dialog.setCancelable(false);
         dialog.show();
 
-//        originalBitmap = BitmapFactory.decodeResource(getResources(),R.drawable.image1);
+        glideProgress = new ProgressDialog(this);
+        glideProgress.setTitle("Loading...");
+        glideProgress.setMessage("Please Wait...");
+        glideProgress.setCancelable(false);
+
+//        glideProgress.setOnCancelListener(new DialogInterface.OnCancelListener() {
+//            @Override
+//            public void onCancel(DialogInterface dialog) {
+//                Toast.makeText(StudentiCardDetails.this,"No image found!!!",Toast.LENGTH_LONG).show();
+//            }
+//        });
+
+        rotateLeft = (Button)findViewById(R.id.rotateLeft);
+        rotateRight = (Button)findViewById(R.id.rotateRight);
+        brightImageSeekBar = (SeekBar)findViewById(R.id.brightness);
+        brightImageSeekBar.setProgress(100);
 
         mCropImageView = (CropImageView)findViewById(R.id.CropImageView);
         mCropImageView.setAspectRatio(1,1);
@@ -136,6 +193,28 @@ public class StudentiCardDetails extends AppCompatActivity {
         searchButton=(Button) findViewById(R.id.browse);
 
         studentDataPostUrl = getString(R.string.baseUrlLocal)+"setStudentBasicInfo";
+        studentDataGetUrl = getString(R.string.baseUrlLocal)+"getStudent"+"/"+InstituteID+"/"+
+                selectedClass+"/"+selectedSection+"/"+
+                selectedDepartment+"/"+selectedMedium+"/"+selectedShift+"/"+UserID;
+
+        //Preparing Student data from server
+        RequestQueue queueStudent = Volley.newRequestQueue(StudentiCardDetails.this);
+        StringRequest stringStudentRequest = new StringRequest(Request.Method.GET, studentDataGetUrl,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+
+                        parseStudentJsonData(response);
+
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+                dialog.dismiss();
+            }
+        });
+        queueStudent.add(stringStudentRequest);
 
         t_roll = (TextView)findViewById(R.id.roll);
         t_name = (TextView)findViewById(R.id.name);
@@ -153,77 +232,12 @@ public class StudentiCardDetails extends AppCompatActivity {
         t_session = (TextView)findViewById(R.id.session);
         t_board = (TextView)findViewById(R.id.board);
         t_shift = (TextView)findViewById(R.id.shift);
-
-        Intent intent = getIntent();
-        bundle = intent.getExtras();
-        t_roll.setText(bundle.getString("RollNo"));
-        t_name.setText(bundle.getString("UserName"));
-        t_section.setText(bundle.getString("SectionName"));
-        t_birthDay.setText(bundle.getString("DOB"));
-        t_email.setText(bundle.getString("GuardianEmailID"));
-        t_address.setText(bundle.getString("PreAddress"));
-        t_parent.setText(bundle.getString("Guardian"));
-        t_parentsPhone.setText(bundle.getString("GuardianPhone"));
-        t_department.setText(bundle.getString("DepartmentName"));
-        t_sex.setText(bundle.getString("Gender"));
-        t_religion.setText(bundle.getString("Religion"));
-        t_medium.setText(bundle.getString("MameName"));
-        t_session.setText(bundle.getString("SessionName"));
-        t_board.setText(bundle.getString("BoardName"));
-        t_class.setText(bundle.getString("ClassName"));
-        t_shift.setText(bundle.getString("ShiftName"));
-
-        studentInformationEntry = new StudentInformationEntry();
-        studentInformationEntry.setRollNo(bundle.getString("RollNo"));
-        studentInformationEntry.setUserName(bundle.getString("UserName"));
-        studentInformationEntry.setGuardian(bundle.getString("Guardian"));
-        studentInformationEntry.setGuardianPhone(bundle.getString("GuardianPhone"));
-        studentInformationEntry.setGuardianEmailID(bundle.getString("GuardianEmailID"));
-        studentInformationEntry.setDOB(bundle.getString("DOB"));
-        studentInformationEntry.setPreAddress(bundle.getString("PreAddress"));
-        studentInformationEntry.setUserClassID(bundle.getString("UserClassID"));
-        studentInformationEntry.setUserID(bundle.getString("UserID"));
-        studentInformationEntry.setRFID(bundle.getString("RFID"));
-        studentInformationEntry.setStudentNo(bundle.getString("StudentNo"));
-        studentInformationEntry.setSectionID(bundle.getString("SectionID"));
-        studentInformationEntry.setClassID(bundle.getString("ClassID"));
-        studentInformationEntry.setBrunchID(bundle.getString("BrunchID"));
-        studentInformationEntry.setShiftID(bundle.getString("ShiftID"));
-        studentInformationEntry.setRemarks(bundle.getString("Remarks"));
-        studentInformationEntry.setInstituteID(bundle.getString("InstituteID"));
-        studentInformationEntry.setUserTypeID(bundle.getString("UserTypeID"));
-        studentInformationEntry.setGenderID(bundle.getString("GenderID"));
-        studentInformationEntry.setPhoneNo(bundle.getString("PhoneNo"));
-        studentInformationEntry.setEmailID(bundle.getString("EmailID"));
-        studentInformationEntry.setFingerUrl(bundle.getString("FingerUrl"));
-        studentInformationEntry.setSignatureUrl(bundle.getString("SignatureUrl"));
-        studentInformationEntry.setMediumID(bundle.getString("MediumID"));
-        studentInformationEntry.setDepartmentID(bundle.getString("DepartmentID"));
-        studentInformationEntry.setIsImageCaptured(bundle.getBoolean("IsImageCaptured"));
-
-        checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
-        {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
-            {
-                if(isChecked && (originalBitmap == null))
-                {
-                    originalBitmap = mCropImageView.getCroppedImage(500, 500);
-                }
-
-            }
-        });
-
-        Glide.with(this)
-                .asBitmap()
-                .load(getString(R.string.baseUrlRaw)+bundle.getString("ImageUrl").replace("\\","/"))
-                .into(new SimpleTarget<Bitmap>() {
-                    @Override
-                    public void onResourceReady(Bitmap resource, Transition<? super Bitmap> transition) {
-                        mCropImageView.setImageBitmap(resource);
-
-                    }
-                });
+        t_branch = (TextView)findViewById(R.id.branch);
+        t_stuEmail = (TextView)findViewById(R.id.stuEmail);
+        t_stuPhone = (TextView)findViewById(R.id.stuPhone);
+        t_remarks = (TextView)findViewById(R.id.remarks);
+        t_studentNo = (TextView)findViewById(R.id.studentNo);
+        t_rfid = (TextView)findViewById(R.id.rfid);
 
         cameraButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -244,34 +258,105 @@ public class StudentiCardDetails extends AppCompatActivity {
             }
         });
 
+        checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
+        {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
+            {
+                if (originalBitmap != null)
+                {
+                    imageChanged = true;
+                }
+
+            }
+        });
+
+        rotateLeft.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(originalBitmap != null)
+                {
+                    dialog.show();
+                    imageChanged = true;
+                    mRotateProcessTask = new RotateProcessTask(originalBitmap, -90);
+                    mRotateProcessTask.execute((Void) null);
+                }
+                else
+                {
+                    Toast.makeText(StudentiCardDetails.this,"No image found!!!",Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+
+        rotateRight.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(originalBitmap != null)
+                {
+                    dialog.show();
+                    imageChanged = true;
+                    mRotateProcessTask = new RotateProcessTask(originalBitmap, 90);
+                    mRotateProcessTask.execute((Void) null);
+                }
+                else
+                {
+                    Toast.makeText(StudentiCardDetails.this,"No image found!!!",Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+
+        brightImageSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                brightnessValue = progress - 100;
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                if(originalBitmap != null)
+                {
+                    dialog.show();
+                    imageChanged = true;
+                    mBrightnessProcessTask = new BrightnessProcessTask(originalBitmap, brightnessValue);
+                    mBrightnessProcessTask.execute((Void) null);
+                }
+                else
+                {
+                    Toast.makeText(StudentiCardDetails.this,"No image found!!!",Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+
         updateStudentPhoto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if(isNetworkAvailable())
                 {
-                    dialog.show();
-                    if(originalBitmap != null)
+                    if(imageChanged)
                     {
+                        dialog.show();
                         if(checkBox.isChecked())
                         {
-                            originalBitmap = mCropImageView.getCroppedImage(500, 500);
-                            if (originalBitmap != null)
-                            {
-                                mCropImageView.setImageBitmap(originalBitmap);
-                                fileFromBitmap = new StudentiCardDetails.FileFromBitmap(originalBitmap, StudentiCardDetails.this);
-                                fileFromBitmap.execute();
-                            }
+                            tempBitmap = mCropImageView.getCroppedImage(500, 500);
+                            mCropImageView.setImageBitmap(tempBitmap);
+                            fileFromBitmap = new StudentiCardDetails.FileFromBitmap(tempBitmap, StudentiCardDetails.this);
+                            fileFromBitmap.execute();
                         }
                         else
                         {
-                            fileFromBitmap = new StudentiCardDetails.FileFromBitmap(originalBitmap, StudentiCardDetails.this);
+                            fileFromBitmap = new StudentiCardDetails.FileFromBitmap(tempBitmap, StudentiCardDetails.this);
                             fileFromBitmap.execute();
                         }
                     }
                     else
                     {
                         dialog.dismiss();
-                        Toast.makeText(StudentiCardDetails.this,"Take a picture to update photo!!!",Toast.LENGTH_LONG).show();
+                        Toast.makeText(StudentiCardDetails.this,"Take or choose a photo to update!!!",Toast.LENGTH_LONG).show();
                     }
                 }
                 else
@@ -305,7 +390,7 @@ public class StudentiCardDetails extends AppCompatActivity {
 
         @Override
         protected String doInBackground(Void... params) {
-            bitmap = getResizedBitmap(bitmap, 500);
+//            bitmap = getResizedBitmap(bitmap, 500);
             ByteArrayOutputStream bytes = new ByteArrayOutputStream();
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
 //            file = new File(Environment.getExternalStorageDirectory() + File.separator + "temporary_file.jpg");
@@ -395,6 +480,102 @@ public class StudentiCardDetails extends AppCompatActivity {
         queuePost.add(customRequest);
     }
 
+    void parseStudentJsonData(String jsonString) {
+        try {
+            JSONArray studentJsonArray = new JSONArray(jsonString);
+            JSONObject studentJsonObject = studentJsonArray.getJSONObject(0);
+            glideProgress.show();
+
+//            Runnable progressRunnable = new Runnable() {
+//                @Override
+//                public void run() {
+//                    glideProgress.dismiss();
+//                }
+//            };
+//
+//            Handler pdCanceller = new Handler();
+//            pdCanceller.postDelayed(progressRunnable, 5000);
+
+            GlideApp.with(this)
+                    .asBitmap()
+                    .load(getString(R.string.baseUrlRaw)+studentJsonObject.getString("ImageUrl").replace("\\","/"))
+                    .diskCacheStrategy(DiskCacheStrategy.NONE)
+                    .skipMemoryCache(true)
+                    .into(new SimpleTarget<Bitmap>() {
+                        @Override
+                        public void onResourceReady(Bitmap resource, Transition<? super Bitmap> transition) {
+                            mCropImageView.setImageBitmap(resource);
+                            originalBitmap = resource;
+                            tempBitmap = resource;
+                            glideProgress.dismiss();
+                        }
+                        @Override
+                        public void onLoadFailed(Drawable errorDrawable) {
+                            super.onLoadFailed(errorDrawable);
+                            glideProgress.dismiss();
+                            Toast.makeText(StudentiCardDetails.this,"No image found!!!",Toast.LENGTH_LONG).show();
+                        }
+                    });
+
+            studentInformationEntry = new StudentInformationEntry();
+            studentInformationEntry.setRollNo(studentJsonObject.getString("RollNo"));
+            studentInformationEntry.setUserName(studentJsonObject.getString("UserName"));
+            studentInformationEntry.setGuardian(studentJsonObject.getString("Guardian"));
+            studentInformationEntry.setGuardianPhone(studentJsonObject.getString("GuardianPhone"));
+            studentInformationEntry.setGuardianEmailID(studentJsonObject.getString("GuardianEmailID"));
+            studentInformationEntry.setDOB(studentJsonObject.getString("DOB"));
+            studentInformationEntry.setPreAddress(studentJsonObject.getString("PreAddress"));
+            studentInformationEntry.setUserClassID(studentJsonObject.getString("UserClassID"));
+            studentInformationEntry.setUserID(studentJsonObject.getString("UserID"));
+            studentInformationEntry.setRFID(studentJsonObject.getString("RFID"));
+            studentInformationEntry.setStudentNo(studentJsonObject.getString("StudentNo"));
+            studentInformationEntry.setSectionID(studentJsonObject.getString("SectionID"));
+            studentInformationEntry.setClassID(studentJsonObject.getString("ClassID"));
+            studentInformationEntry.setBrunchID(studentJsonObject.getString("BrunchID"));
+            studentInformationEntry.setShiftID(studentJsonObject.getString("ShiftID"));
+            studentInformationEntry.setRemarks(studentJsonObject.getString("Remarks"));
+            studentInformationEntry.setInstituteID(studentJsonObject.getString("InstituteID"));
+            studentInformationEntry.setUserTypeID(studentJsonObject.getString("UserTypeID"));
+            studentInformationEntry.setGenderID(studentJsonObject.getString("GenderID"));
+            studentInformationEntry.setPhoneNo(studentJsonObject.getString("PhoneNo"));
+            studentInformationEntry.setEmailID(studentJsonObject.getString("EmailID"));
+            studentInformationEntry.setFingerUrl(studentJsonObject.getString("FingerUrl"));
+            studentInformationEntry.setSignatureUrl(studentJsonObject.getString("SignatureUrl"));
+            studentInformationEntry.setMediumID(studentJsonObject.getString("MediumID"));
+            studentInformationEntry.setDepartmentID(studentJsonObject.getString("DepartmentID"));
+            studentInformationEntry.setIsImageCaptured(studentJsonObject.getBoolean("IsImageCaptured"));
+            studentInformationEntry.setImageUrl(studentJsonObject.getString("ImageUrl"));
+
+            t_roll.setText(studentJsonObject.getString("RollNo"));
+            t_name.setText(studentJsonObject.getString("UserName"));
+            t_section.setText(studentJsonObject.getString("SectionName"));
+            t_birthDay.setText(studentJsonObject.getString("DOB"));
+            t_email.setText(studentJsonObject.getString("GuardianEmailID"));
+            t_address.setText(studentJsonObject.getString("PreAddress"));
+            t_parent.setText(studentJsonObject.getString("Guardian"));
+            t_parentsPhone.setText(studentJsonObject.getString("GuardianPhone"));
+            t_department.setText(studentJsonObject.getString("DepartmentName"));
+            t_sex.setText(studentJsonObject.getString("Gender"));
+            t_religion.setText(studentJsonObject.getString("Religion"));
+            t_medium.setText(studentJsonObject.getString("MameName"));
+            t_session.setText(studentJsonObject.getString("SessionName"));
+            t_board.setText(studentJsonObject.getString("BoardName"));
+            t_class.setText(studentJsonObject.getString("ClassName"));
+            t_shift.setText(studentJsonObject.getString("ShiftName"));
+            t_branch.setText(studentJsonObject.getString("BrunchName"));
+            t_stuEmail.setText(studentJsonObject.getString("EmailID"));
+            t_stuPhone.setText(studentJsonObject.getString("PhoneNo"));
+            t_remarks.setText(studentJsonObject.getString("Remarks"));
+            t_studentNo.setText(studentJsonObject.getString("StudentNo"));
+            t_rfid.setText(studentJsonObject.getString("RFID"));
+            dialog.dismiss();
+
+        } catch (JSONException e) {
+            Toast.makeText(this,"WARNING!!! "+e,Toast.LENGTH_LONG).show();
+            dialog.dismiss();
+        }
+    }
+
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
 
         if (resultCode == Activity.RESULT_OK) {
@@ -413,7 +594,9 @@ public class StudentiCardDetails extends AppCompatActivity {
                 Bitmap bitmap = null;
                 try {
                     bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
-                    originalBitmap = bitmap;
+                    originalBitmap = getResizedBitmap(bitmap, 500);
+                    tempBitmap = originalBitmap;
+                    imageChanged = true;
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -426,7 +609,9 @@ public class StudentiCardDetails extends AppCompatActivity {
                 Bitmap bitmap = null;
                 try {
                     bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
-                    originalBitmap = bitmap;
+                    originalBitmap = getResizedBitmap(bitmap, 500);
+                    tempBitmap = originalBitmap;
+                    imageChanged = true;
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -438,7 +623,9 @@ public class StudentiCardDetails extends AppCompatActivity {
             Uri uri = data.getData();
             try {
                 Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), uri);
-                originalBitmap = bitmap;
+                originalBitmap = getResizedBitmap(bitmap, 500);
+                tempBitmap = originalBitmap;
+                imageChanged = true;
                 try {
                     ImagePath = MediaStore.Images.Media.insertImage(this.getContentResolver(), bitmap, "demo_image", "demo_image");
                     URI = Uri.parse(ImagePath);
@@ -595,6 +782,138 @@ public class StudentiCardDetails extends AppCompatActivity {
             width = (int) (height * bitmapRatio);
         }
         return Bitmap.createScaledBitmap(image, width, height, true);
+    }
+
+    public static Bitmap rotateImage(Bitmap sourceImage, float angle)
+    {
+        Matrix matrix = new Matrix();
+        matrix.postRotate(angle);
+        return Bitmap.createBitmap(sourceImage, 0, 0, sourceImage.getWidth(), sourceImage.getHeight(), matrix, true);
+    }
+
+    public static Bitmap doBrightness(Bitmap src, int value) {
+        // image size
+        int width = src.getWidth();
+        int height = src.getHeight();
+        // create output bitmap
+        Bitmap bmOut = Bitmap.createBitmap(width, height, src.getConfig());
+        // color information
+        int A, R, G, B;
+        int pixel;
+
+        // scan through all pixels
+        for(int x = 0; x < width; ++x) {
+            for(int y = 0; y < height; ++y) {
+                // get pixel color
+                pixel = src.getPixel(x, y);
+                A = Color.alpha(pixel);
+                R = Color.red(pixel);
+                G = Color.green(pixel);
+                B = Color.blue(pixel);
+
+                // increase/decrease each channel
+                R += value;
+                if(R > 255) { R = 255; }
+                else if(R < 0) { R = 0; }
+
+                G += value;
+                if(G > 255) { G = 255; }
+                else if(G < 0) { G = 0; }
+
+                B += value;
+                if(B > 255) { B = 255; }
+                else if(B < 0) { B = 0; }
+
+                // apply new pixel color to output bitmap
+                bmOut.setPixel(x, y, Color.argb(A, R, G, B));
+            }
+        }
+
+        // return final image
+        return bmOut;
+    }
+
+    public class BrightnessProcessTask extends AsyncTask<Void, Void, Boolean> {
+
+        private  Bitmap image;
+        private  int progressValue;
+
+        private BrightnessProcessTask(Bitmap image, int progressValue) {
+            this.image = image;
+            this.progressValue = progressValue;
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            try {
+                tempBitmap = doBrightness(image, progressValue);
+                Thread.sleep(100);
+                return true;
+            } catch (InterruptedException e) {
+                return false;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(final Boolean success) {
+            mBrightnessProcessTask = null;
+            dialog.dismiss();
+            if (success) {
+                mCropImageView.setImageBitmap(tempBitmap);
+            }
+            else{
+                mCropImageView.setImageBitmap(originalBitmap);
+                Toast.makeText(StudentiCardDetails.this,"One ERROR occured!!!",Toast.LENGTH_LONG).show();
+            }
+        }
+
+        @Override
+        protected void onCancelled() {
+            mBrightnessProcessTask = null;
+            dialog.dismiss();
+        }
+    }
+
+    public class RotateProcessTask extends AsyncTask<Void, Void, Boolean> {
+
+        private  Bitmap image;
+        private  int angle;
+
+        private RotateProcessTask(Bitmap image, int angle) {
+            this.image = image;
+            this.angle = angle;
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            try {
+                originalBitmap = rotateImage(image, angle);
+                tempBitmap = rotateImage(tempBitmap, angle);
+                Thread.sleep(100);
+                return true;
+            } catch (InterruptedException e) {
+                return false;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(final Boolean success) {
+            mRotateProcessTask = null;
+            dialog.dismiss();
+            if (success) {
+                mCropImageView.setImageBitmap(tempBitmap);
+            }
+            else{
+                mCropImageView.setImageBitmap(originalBitmap);
+                Toast.makeText(StudentiCardDetails.this,"One ERROR occured!!!",Toast.LENGTH_LONG).show();
+            }
+        }
+
+        @Override
+        protected void onCancelled() {
+            mRotateProcessTask = null;
+            dialog.dismiss();
+        }
     }
 
 

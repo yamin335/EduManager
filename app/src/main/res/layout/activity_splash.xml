@@ -38,17 +38,16 @@
         android:id="@+id/splashText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="42dp"
-        android:layout_marginTop="92dp"
-        android:font="@font/amarante"
-        android:fontFamily="@font/amarante"
-        android:text="Learn and Teach"
+        android:layout_marginBottom="8dp"
+        android:layout_marginTop="8dp"
+        android:text="onEMS"
         android:textColor="#174b92"
-        android:textSize="30sp"
+        android:textSize="45sp"
+        android:textStyle="normal"
         android:visibility="visible"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/splashImage"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/splashImage" />
+        app:layout_constraintTop_toTopOf="@+id/guideline2" />
 
 </android.support.constraint.ConstraintLayout>

@@ -13,6 +13,8 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
@@ -39,6 +41,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -82,7 +85,7 @@ import onair.onems.models.StudentInformationEntry;
 
 public class StudentiCardNewEntry extends AppCompatActivity {
 
-    private Button cameraButton,searchButton,doneButton;
+    private Button cameraButton, searchButton, doneButton, rotateRight, rotateLeft;
     private int PICK_IMAGE_REQUEST = 1;
     private String encImage;
     private EditText editname,editroll,editaddress,editparent,editparentnumber;
@@ -94,7 +97,7 @@ public class StudentiCardNewEntry extends AppCompatActivity {
     private Uri mCropImageUri;
     private ProgressDialog dialog;
     private long InstituteID;
-    private Spinner spinnerClass, spinnerShift,spinnerSection,spinnerMedium,spinnerDepartment;
+    private Spinner spinnerClass, spinnerShift, spinnerSection, spinnerMedium, spinnerDepartment;
     private String classUrl, shiftUrl, sectionUrl, studentDataPostUrl, mediumUrl, departmentUrl;
     private ArrayList<ClassModel> allClassArrayList;
     private ArrayList<ShiftModel> allShiftArrayList;
@@ -119,10 +122,14 @@ public class StudentiCardNewEntry extends AppCompatActivity {
 
     private File file;
 
-    private Bitmap originalBitmap;
+    private Bitmap originalBitmap = null, tempBitmap = null;
 
     private FileFromBitmap fileFromBitmap = null;
-
+    private SeekBar brightImageSeekBar;
+    private static int brightnessValue;
+    private BrightnessProcessTask mBrightnessProcessTask = null;
+    private RotateProcessTask mRotateProcessTask = null;
+    private StudentInformationEntry studentInformationEntry;
 
     @Override
     public void onResume() {
@@ -153,9 +160,16 @@ public class StudentiCardNewEntry extends AppCompatActivity {
 //        Uri uri = Uri.parse("android.resource://onair.camera/drawable/image1");
 //        mCropImageView.setImageUriAsync(uri);
 
-        originalBitmap = BitmapFactory.decodeResource(getResources(),R.drawable.image1);
+//        originalBitmap = BitmapFactory.decodeResource(getResources(),R.drawable.image1);
+//        tempBitmap = originalBitmap;
 
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+
+        rotateLeft = (Button)findViewById(R.id.rotateLeft);
+        rotateRight = (Button)findViewById(R.id.rotateRight);
+        brightImageSeekBar = (SeekBar)findViewById(R.id.brightness);
+        brightImageSeekBar.setProgress(100);
+        brightImageSeekBar.setEnabled(false);
 
         mCropImageView = (CropImageView)findViewById(R.id.CropImageView);
         mCropImageView.setAspectRatio(1,1);
@@ -180,31 +194,31 @@ public class StudentiCardNewEntry extends AppCompatActivity {
         selectedMedium = new MediumModel();
         selectedDepartment = new DepartmentModel();
 
-        ArrayAdapter<String> class_spinner_adapter = new ArrayAdapter<String>(this, R.layout.spinner_item, tempClassArray);
+        ArrayAdapter<String> class_spinner_adapter = new ArrayAdapter<>(this, R.layout.spinner_item, tempClassArray);
         class_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerClass.setAdapter(class_spinner_adapter);
 
-        ArrayAdapter<String> shift_spinner_adapter = new ArrayAdapter<String>(this, R.layout.spinner_item, tempShiftArray);
+        ArrayAdapter<String> shift_spinner_adapter = new ArrayAdapter<>(this, R.layout.spinner_item, tempShiftArray);
         shift_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerShift.setAdapter(shift_spinner_adapter);
 
-        ArrayAdapter<String> section_spinner_adapter = new ArrayAdapter<String>(this, R.layout.spinner_item, tempSectionArray);
+        ArrayAdapter<String> section_spinner_adapter = new ArrayAdapter<>(this, R.layout.spinner_item, tempSectionArray);
         section_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerSection.setAdapter(section_spinner_adapter);
 
-        ArrayAdapter<String> department_spinner_adapter = new ArrayAdapter<String>(this, R.layout.spinner_item, tempDepartmentArray);
+        ArrayAdapter<String> department_spinner_adapter = new ArrayAdapter<>(this, R.layout.spinner_item, tempDepartmentArray);
         department_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerDepartment.setAdapter(department_spinner_adapter);
 
-        ArrayAdapter<String> medium_spinner_adapter = new ArrayAdapter<String>(this, R.layout.spinner_item, tempMediumArray);
+        ArrayAdapter<String> medium_spinner_adapter = new ArrayAdapter<>(this, R.layout.spinner_item, tempMediumArray);
         medium_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerMedium.setAdapter(medium_spinner_adapter);
 
-        allClassArrayList = new ArrayList<ClassModel>();
-        allShiftArrayList = new ArrayList<ShiftModel>();
-        allSectionArrayList = new ArrayList<SectionModel>();
-        allMediumArrayList = new ArrayList<MediumModel>();
-        allDepartmentArrayList = new ArrayList<DepartmentModel>();
+        allClassArrayList = new ArrayList<>();
+        allShiftArrayList = new ArrayList<>();
+        allSectionArrayList = new ArrayList<>();
+        allMediumArrayList = new ArrayList<>();
+        allDepartmentArrayList = new ArrayList<>();
 
         classUrl = getString(R.string.baseUrlLocal)+"getInsClass/"+InstituteID;
         shiftUrl = getString(R.string.baseUrlLocal)+"getInsShift/"+InstituteID;
@@ -217,6 +231,43 @@ public class StudentiCardNewEntry extends AppCompatActivity {
         editaddress=(EditText)findViewById(R.id.edited_address);
         editparent=(EditText)findViewById(R.id.edited_parent);
         editparentnumber=(EditText)findViewById(R.id.edited_parentPhone);
+
+        rotateLeft.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.show();
+                mRotateProcessTask = new RotateProcessTask(originalBitmap, -90);
+                mRotateProcessTask.execute((Void) null);
+            }
+        });
+
+        rotateRight.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.show();
+                mRotateProcessTask = new RotateProcessTask(originalBitmap, 90);
+                mRotateProcessTask.execute((Void) null);
+            }
+        });
+
+        brightImageSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                brightnessValue = progress - 100;
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                dialog.show();
+                mBrightnessProcessTask = new BrightnessProcessTask(originalBitmap, brightnessValue);
+                mBrightnessProcessTask.execute((Void) null);
+            }
+        });
 
         //Preparing claas data from server
         RequestQueue queueClass = Volley.newRequestQueue(this);
@@ -506,21 +557,44 @@ public class StudentiCardNewEntry extends AppCompatActivity {
                             || (!(editparent.getText().toString().equals(""))) || (!(editparentnumber.getText().toString().equals("")))
                             || (!(editaddress.getText().toString().equals(""))) || (!(selectedClass.getClassID() == -2)))
                     {
-                        dialog.show();
-                        if(checkBox.isChecked())
+                        if(tempBitmap == null)
                         {
-                            originalBitmap = mCropImageView.getCroppedImage(500, 500);
-                            if (originalBitmap != null)
-                            {
-                                mCropImageView.setImageBitmap(originalBitmap);
-                                fileFromBitmap = new FileFromBitmap(originalBitmap, StudentiCardNewEntry.this);
-                                fileFromBitmap.execute();
-                            }
+                            dialog.show();
+                            name = editname.getText().toString();
+                            roll = editroll.getText().toString();
+                            parentName = editparent.getText().toString();
+                            parentNumber = editparentnumber.getText().toString();
+                            address = editaddress.getText().toString();
+                            studentInformationEntry = new StudentInformationEntry();
+                            studentInformationEntry.setUserName(name);
+                            studentInformationEntry.setRollNo(roll);
+                            studentInformationEntry.setGuardian(parentName);
+                            studentInformationEntry.setGuardianPhone(parentNumber);
+                            studentInformationEntry.setPreAddress(address);
+                            studentInformationEntry.setInstituteID(Long.toString(InstituteID));
+                            studentInformationEntry.setClassID(Long.toString(selectedClass.getClassID()));
+                            studentInformationEntry.setShiftID(Long.toString(selectedShift.getShiftID()));
+                            studentInformationEntry.setSectionID(Long.toString(selectedSection.getSectionID()));
+                            studentInformationEntry.setDepartmentID(Long.toString(selectedDepartment.getDepartmentID()));
+                            studentInformationEntry.setMediumID(Long.toString(selectedMedium.getMediumID()));
+                            Gson gson = new Gson();
+                            String json = gson.toJson(studentInformationEntry);
+                            postUsingVolley(json);
                         }
                         else
                         {
-                            fileFromBitmap = new FileFromBitmap(originalBitmap, StudentiCardNewEntry.this);
-                            fileFromBitmap.execute();
+                            dialog.show();
+                            if(checkBox.isChecked())
+                            {
+                                tempBitmap = mCropImageView.getCroppedImage(500, 500);
+                                fileFromBitmap = new FileFromBitmap(tempBitmap, StudentiCardNewEntry.this);
+                                fileFromBitmap.execute();
+                            }
+                            else
+                            {
+                                fileFromBitmap = new FileFromBitmap(tempBitmap, StudentiCardNewEntry.this);
+                                fileFromBitmap.execute();
+                            }
                         }
                     }
                 }
@@ -552,7 +626,7 @@ public class StudentiCardNewEntry extends AppCompatActivity {
 
         @Override
         protected String doInBackground(Void... params) {
-            bitmap = getResizedBitmap(bitmap, 500);
+//            bitmap = getResizedBitmap(bitmap, 500);
             ByteArrayOutputStream bytes = new ByteArrayOutputStream();
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
 //            file = new File(Environment.getExternalStorageDirectory() + File.separator + "temporary_file.jpg");
@@ -596,7 +670,7 @@ public class StudentiCardNewEntry extends AppCompatActivity {
                                 parentName = editparent.getText().toString();
                                 parentNumber = editparentnumber.getText().toString();
                                 address = editaddress.getText().toString();
-                                StudentInformationEntry studentInformationEntry = new StudentInformationEntry();
+                                studentInformationEntry = new StudentInformationEntry();
                                 studentInformationEntry.setUserName(name);
                                 studentInformationEntry.setRollNo(roll);
                                 studentInformationEntry.setGuardian(parentName);
@@ -653,7 +727,7 @@ public class StudentiCardNewEntry extends AppCompatActivity {
             @Override
             public void onErrorResponse(VolleyError error) {
 //                Toast.makeText(StudentiCardNewEntry.this,"Not Response: "+error.toString(),Toast.LENGTH_LONG).show();
-                Toast.makeText(StudentiCardNewEntry.this,"Not Successful",Toast.LENGTH_LONG).show();
+                Toast.makeText(StudentiCardNewEntry.this,"Not Successful"+error,Toast.LENGTH_LONG).show();
                 Log.e("VOLLEY POST ERROR:",error.toString());
                 dialog.dismiss();
             }
@@ -663,6 +737,7 @@ public class StudentiCardNewEntry extends AppCompatActivity {
 
     void parseClassJsonData(String jsonString) {
         try {
+            allClassArrayList = new ArrayList<>();
             JSONArray classJsonArray = new JSONArray(jsonString);
             ArrayList<String> classArrayList = new ArrayList<>();
             classArrayList.add("Select Class");
@@ -695,6 +770,7 @@ public class StudentiCardNewEntry extends AppCompatActivity {
 
     void parseShiftJsonData(String jsonString) {
         try {
+            allShiftArrayList = new ArrayList<>();
             JSONArray shiftJsonArray = new JSONArray(jsonString);
             ArrayList<String> shiftArrayList = new ArrayList<>();
             shiftArrayList.add("Select Shift");
@@ -727,6 +803,7 @@ public class StudentiCardNewEntry extends AppCompatActivity {
 
     void parseSectionJsonData(String jsonString) {
         try {
+            allSectionArrayList = new ArrayList<>();
             JSONArray sectionJsonArray = new JSONArray(jsonString);
             ArrayList<String> sectionArrayList = new ArrayList<>();
             sectionArrayList.add("Select Section");
@@ -759,6 +836,7 @@ public class StudentiCardNewEntry extends AppCompatActivity {
 
     void parseMediumJsonData(String jsonString) {
         try {
+            allMediumArrayList = new ArrayList<>();
             JSONArray mediumJsonArray = new JSONArray(jsonString);
             ArrayList<String> mediumnArrayList = new ArrayList<>();
             mediumnArrayList.add("Select Medium");
@@ -792,6 +870,7 @@ public class StudentiCardNewEntry extends AppCompatActivity {
 
     void parseDepartmentJsonData(String jsonString) {
         try {
+            allDepartmentArrayList = new ArrayList<>();
             JSONArray departmentJsonArray = new JSONArray(jsonString);
             ArrayList<String> departmentArrayList = new ArrayList<>();
             departmentArrayList.add("Select Department");
@@ -840,9 +919,13 @@ public class StudentiCardNewEntry extends AppCompatActivity {
                 Bitmap bitmap;
                 try {
                     bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
-                    originalBitmap = bitmap;
+                    originalBitmap = getResizedBitmap(bitmap, 500);
+                    tempBitmap =originalBitmap;
                     IsImageCaptured = true;
                     checkBox.setEnabled(true);
+                    rotateLeft.setEnabled(true);
+                    rotateRight.setEnabled(true);
+                    brightImageSeekBar.setEnabled(true);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -856,9 +939,13 @@ public class StudentiCardNewEntry extends AppCompatActivity {
                 Bitmap bitmap;
                 try {
                     bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
-                    originalBitmap = bitmap;
+                    originalBitmap = getResizedBitmap(bitmap, 500);
+                    tempBitmap =originalBitmap;
                     IsImageCaptured = true;
                     checkBox.setEnabled(true);
+                    rotateLeft.setEnabled(true);
+                    rotateRight.setEnabled(true);
+                    brightImageSeekBar.setEnabled(true);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -871,9 +958,13 @@ public class StudentiCardNewEntry extends AppCompatActivity {
             Uri uri = data.getData();
             try {
                 Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), uri);
-                originalBitmap = bitmap;
+                originalBitmap = getResizedBitmap(bitmap, 500);
+                tempBitmap =originalBitmap;
                 IsImageCaptured = true;
                 checkBox.setEnabled(true);
+                rotateLeft.setEnabled(true);
+                rotateRight.setEnabled(true);
+                brightImageSeekBar.setEnabled(true);
 //                encodeImage(bitmap);
                 try {
                     ImagePath = MediaStore.Images.Media.insertImage(this.getContentResolver(), bitmap, "demo_image", "demo_image");
@@ -1041,10 +1132,141 @@ public class StudentiCardNewEntry extends AppCompatActivity {
     @Override
     public void onBackPressed()
     {
-        Intent myIntent = new Intent(getApplicationContext(), StudentiCardMain.class);
-        startActivityForResult(myIntent, 0);
-        finish();
+        NavUtils.navigateUpFromSameTask(this);
+        super.onBackPressed();
 
         // your code.
+    }
+
+    public static Bitmap rotateImage(Bitmap sourceImage, float angle)
+    {
+        Matrix matrix = new Matrix();
+        matrix.postRotate(angle);
+        return Bitmap.createBitmap(sourceImage, 0, 0, sourceImage.getWidth(), sourceImage.getHeight(), matrix, true);
+    }
+
+    public static Bitmap doBrightness(Bitmap src, int value) {
+        // image size
+        int width = src.getWidth();
+        int height = src.getHeight();
+        // create output bitmap
+        Bitmap bmOut = Bitmap.createBitmap(width, height, src.getConfig());
+        // color information
+        int A, R, G, B;
+        int pixel;
+
+        // scan through all pixels
+        for(int x = 0; x < width; ++x) {
+            for(int y = 0; y < height; ++y) {
+                // get pixel color
+                pixel = src.getPixel(x, y);
+                A = Color.alpha(pixel);
+                R = Color.red(pixel);
+                G = Color.green(pixel);
+                B = Color.blue(pixel);
+
+                // increase/decrease each channel
+                R += value;
+                if(R > 255) { R = 255; }
+                else if(R < 0) { R = 0; }
+
+                G += value;
+                if(G > 255) { G = 255; }
+                else if(G < 0) { G = 0; }
+
+                B += value;
+                if(B > 255) { B = 255; }
+                else if(B < 0) { B = 0; }
+
+                // apply new pixel color to output bitmap
+                bmOut.setPixel(x, y, Color.argb(A, R, G, B));
+            }
+        }
+
+        // return final image
+        return bmOut;
+    }
+
+    public class BrightnessProcessTask extends AsyncTask<Void, Void, Boolean> {
+
+        private  Bitmap image;
+        private  int progressValue;
+
+        private BrightnessProcessTask(Bitmap image, int progressValue) {
+            this.image = image;
+            this.progressValue = progressValue;
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            try {
+                tempBitmap = doBrightness(image, progressValue);
+                Thread.sleep(100);
+                return true;
+            } catch (InterruptedException e) {
+                return false;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(final Boolean success) {
+            mBrightnessProcessTask = null;
+            dialog.dismiss();
+            if (success) {
+                mCropImageView.setImageBitmap(tempBitmap);
+            }
+            else{
+                mCropImageView.setImageBitmap(originalBitmap);
+                Toast.makeText(StudentiCardNewEntry.this,"One ERROR occured!!!",Toast.LENGTH_LONG).show();
+            }
+        }
+
+        @Override
+        protected void onCancelled() {
+            mBrightnessProcessTask = null;
+            dialog.dismiss();
+        }
+    }
+
+    public class RotateProcessTask extends AsyncTask<Void, Void, Boolean> {
+
+        private  Bitmap image;
+        private  int angle;
+
+        private RotateProcessTask(Bitmap image, int angle) {
+            this.image = image;
+            this.angle = angle;
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            try {
+                originalBitmap = rotateImage(image, angle);
+                tempBitmap = rotateImage(tempBitmap, angle);
+                Thread.sleep(100);
+                return true;
+            } catch (InterruptedException e) {
+                return false;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(final Boolean success) {
+            mRotateProcessTask = null;
+            dialog.dismiss();
+            if (success) {
+                mCropImageView.setImageBitmap(tempBitmap);
+            }
+            else{
+                mCropImageView.setImageBitmap(originalBitmap);
+                Toast.makeText(StudentiCardNewEntry.this,"One ERROR occured!!!",Toast.LENGTH_LONG).show();
+            }
+        }
+
+        @Override
+        protected void onCancelled() {
+            mRotateProcessTask = null;
+            dialog.dismiss();
+        }
     }
 }

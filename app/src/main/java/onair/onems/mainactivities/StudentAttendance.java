@@ -29,6 +29,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 
 import java.util.ArrayList;
@@ -37,6 +38,7 @@ import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import onair.onems.R;
+import onair.onems.Services.GlideApp;
 import onair.onems.customadapters.ExpandableListAdapter;
 import onair.onems.customadapters.ExpandableListAdapterStudent;
 import onair.onems.fragment.OneFragment;
@@ -76,7 +78,6 @@ public class StudentAttendance extends AppCompatActivity {
         setupViewPager(viewPager);
         tabLayout = (TabLayout) findViewById(R.id.tabLayout);
         tabLayout.setupWithViewPager(viewPager);
-
         final ActionBar ab = getSupportActionBar();
         ab.setHomeAsUpIndicator(android.R.drawable.ic_menu_add);
         ab.setDisplayHomeAsUpEnabled(true);
@@ -118,33 +119,10 @@ public class StudentAttendance extends AppCompatActivity {
         // setting list adapter
         expandableList.setAdapter(mMenuAdapter);
 
-
-        expandableList.setOnChildClickListener(new ExpandableListView.OnChildClickListener()
-        {
+        expandableList.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
             @Override
             public boolean onChildClick(ExpandableListView expandableListView, View view, int i, int i1, long l) {
-                if(i==6&&i1==0)
-                {
-                    DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-                    if (drawer.isDrawerOpen(GravityCompat.START))
-                    {
-                        drawer.closeDrawer(GravityCompat.START);
-                        Intent mainIntent = new Intent(StudentAttendance.this,Fee.class);
-                        StudentAttendance.this.startActivity(mainIntent);
-
-                    }
-                }
-                if(i==6&&i1==1)
-                {
-                    DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-                    if (drawer.isDrawerOpen(GravityCompat.START))
-                    {
-                        drawer.closeDrawer(GravityCompat.START);
-                        Intent mainIntent = new Intent(StudentAttendance.this,FeesHistory.class);
-                       StudentAttendance.this.startActivity(mainIntent);
-
-                    }
-                }
+                //Log.d("DEBUG", "submenu item clicked");
                 return false;
             }
         });
@@ -152,22 +130,11 @@ public class StudentAttendance extends AppCompatActivity {
             @Override
             public boolean onGroupClick(ExpandableListView expandableListView, View view, int i, long l) {
 //                Log.d("DEBUG", "heading clicked"+i+"--"+l);
-                if((i == 1) )
+                if((i == 2) && (l == 2) )
                 {
                     DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
                     if (drawer.isDrawerOpen(GravityCompat.START)) {
                         drawer.closeDrawer(GravityCompat.START);
-                        Intent mainIntent = new Intent(StudentAttendance.this,ClassRoutine.class);
-                       StudentAttendance.this.startActivity(mainIntent);
-                        finish();
-                    }
-                }
-                if((i == 2) )
-                {
-                    DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-                    if (drawer.isDrawerOpen(GravityCompat.START)) {
-                        drawer.closeDrawer(GravityCompat.START);
-
                     }
                 }
                 return false;
@@ -178,7 +145,7 @@ public class StudentAttendance extends AppCompatActivity {
                 this, mDrawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         mDrawerLayout.addDrawerListener(toggle);
         toggle.syncState();
-
+        navigationView.setNavigationItemSelectedListener(this);
 
     }
 
@@ -241,9 +208,7 @@ public class StudentAttendance extends AppCompatActivity {
         List<String> headingSyllabus = new ArrayList<String>();
         List<String> headingExam = new ArrayList<String>();
         List<String> headingResult = new ArrayList<String>();
-        List<String> headingFees = new ArrayList<String>();
-        headingFees.add("Pay fee");
-        headingFees.add("Fee History");
+        List<String> headingFee = new ArrayList<String>();
         List<String> headingContact = new ArrayList<String>();
 
         listDataChild.put(listDataHeader.get(0), headingNotice);// Header, Child data
@@ -252,7 +217,7 @@ public class StudentAttendance extends AppCompatActivity {
         listDataChild.put(listDataHeader.get(3), headingSyllabus);
         listDataChild.put(listDataHeader.get(4), headingExam);
         listDataChild.put(listDataHeader.get(5), headingResult);
-        listDataChild.put(listDataHeader.get(6), headingFees);
+        listDataChild.put(listDataHeader.get(6), headingFee);
         listDataChild.put(listDataHeader.get(7), headingContact);
 
     }
@@ -277,11 +242,9 @@ public class StudentAttendance extends AppCompatActivity {
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            Intent mainIntent = new Intent(StudentAttendance.this,StudentMainScreen.class);
-            StudentAttendance.this.startActivity(mainIntent);
-            finish();
-
+            super.onBackPressed();
         }
+
     }
 
     @Override
@@ -321,7 +284,30 @@ public class StudentAttendance extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    @SuppressWarnings("StatementWithEmptyBody")
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        // Handle navigation view item clicks here.
+        int id = item.getItemId();
 
+        if (id == R.id.nav_camera) {
+            // Handle the camera action
+        } else if (id == R.id.nav_gallery) {
+
+        } else if (id == R.id.nav_slideshow) {
+
+        } else if (id == R.id.nav_manage) {
+
+        } else if (id == R.id.nav_share) {
+
+        } else if (id == R.id.nav_send) {
+
+        }
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
+    }
 
     private void setupViewPager(ViewPager viewPager)
     {
