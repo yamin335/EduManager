@@ -83,7 +83,7 @@ public class LoginScreen extends AppCompatActivity
         if(sharedPreferences.getBoolean("LogInState", true))
         {
             long UserTypeID = prefs.getLong("UserTypeID",0);
-            if((UserTypeID == 3))
+            if((UserTypeID == 3)||(UserTypeID == 5))
             {
                 Intent intent = new Intent(LoginScreen.this, StudentMainScreen.class);
                 startActivity(intent);
@@ -91,27 +91,11 @@ public class LoginScreen extends AppCompatActivity
             }
             else if(UserTypeID == 4)
             {
-                Intent intent = new Intent(LoginScreen.this, StudentMainScreen.class);
+                Intent intent = new Intent(LoginScreen.this, TeacherMainScreen.class);
                 startActivity(intent);
                 finish();
             }
         }
-//        if(sharedPreferences.getBoolean("LogInState", true))
-//        {
-//            long UserTypeID = prefs.getLong("UserTypeID",0);
-//            if((UserTypeID == 3)||(UserTypeID == 5))
-//            {
-//                Intent intent = new Intent(LoginScreen.this, StudentMainScreen.class);
-//                startActivity(intent);
-//                finish();
-//            }
-//            else if(UserTypeID == 4)
-//            {
-//                Intent intent = new Intent(LoginScreen.this, TeacherMainScreen.class);
-//                startActivity(intent);
-//                finish();
-//            }
-//        }
 
         setContentView(R.layout.activity_login);
 
