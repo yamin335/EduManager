@@ -73,7 +73,6 @@ public class StudentAttendance extends AppCompatActivity {
         setContentView(R.layout.activity_student_attendance);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
         viewPager = (ViewPager) findViewById(R.id.pager);
         setupViewPager(viewPager);
         tabLayout = (TabLayout) findViewById(R.id.tabLayout);
@@ -91,10 +90,7 @@ public class StudentAttendance extends AppCompatActivity {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         String imageUrl = prefs.getString("ImageUrl","");
         String name = prefs.getString("UserFullName","");
-
         long user = prefs.getLong("UserTypeID",0);
-
-
 
         userName.setText(name);
         if(user == 3)

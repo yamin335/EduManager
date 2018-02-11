@@ -56,7 +56,6 @@ public class OneFragment extends Fragment {
     JSONArray monthJsonArray;
     SimpleTableHeaderAdapter simpleTableHeaderAdapter;
     SimpleTableDataAdapter simpleTabledataAdapter;
-
     int MonthID[];
     String[][] DATA_TO_SHOW;
 
@@ -80,17 +79,14 @@ public class OneFragment extends Fragment {
         tableView = (TableView)rootView.findViewById(R.id.tableView);
         tableView.setColumnCount(4);
 
-         monthUrl=getString(R.string.baseUrl)+"getMonth";
-
+         monthUrl=getString(R.string.baseUrlLocal)+"getMonth";
          sharedPre = PreferenceManager.getDefaultSharedPreferences(getActivity());
-
          RFID=sharedPre.getString("RFID","");
          shiftID=sharedPre.getLong("ShiftID",0);
          mediumID=sharedPre.getLong("MediumID",0);
          classID=sharedPre.getLong("ClassID",0);
          sectionID=sharedPre.getLong("SectionID",0);
          monthselectindex=sharedPre.getInt("monthselectindex",0);
-
         dialog = new ProgressDialog(getActivity());
         dialog.setMessage("Loading....");
         dialog.show();
@@ -164,18 +160,20 @@ public class OneFragment extends Fragment {
                 SharedPreferences.Editor editor = sharedPre.edit();
                 editor.putInt("monthselectindex",monthselectindex);
                 editor.commit();
-                monthAttendanceUrl = getString(R.string.baseUrl)+"getStudentMonthlyDeviceAttendance/"+shiftID+"/"+mediumID+"/"+classID+"/"+sectionID+"/"+monthid+"/"+RFID;
+                monthAttendanceUrl = getString(R.string.baseUrlLocal)+"getStudentMonthlyDeviceAttendance/"+shiftID+"/"+mediumID+"/"+classID+"/"+sectionID+"/"+monthid+"/"+RFID;
                 RequestQueue queue = Volley.newRequestQueue(getActivity());
-
                 StringRequest stringRequest = new StringRequest(Request.Method.GET, monthAttendanceUrl,
-                        new Response.Listener<String>() {
+                        new Response.Listener<String>()
+                        {
                             @Override
                             public void onResponse(String response) {
 
                                 parseMonthlyAttendanceJsonData(response);
 
                             }
-                        }, new Response.ErrorListener() {
+                        },
+                        new Response.ErrorListener()
+                        {
                     @Override
                     public void onErrorResponse(VolleyError error) {
 
@@ -207,10 +205,8 @@ public class OneFragment extends Fragment {
             ArrayAdapter adapter = new ArrayAdapter(getActivity(), android.R.layout.simple_list_item_1, al);
             spinner.setAdapter(adapter);
             spinner.setSelectedIndex(monthselectindex);
-
-            monthAttendanceUrl=getString(R.string.baseUrl)+"getStudentMonthlyDeviceAttendance/"+shiftID+"/"+mediumID+"/"+classID+"/"+sectionID+"/"+ MonthID[monthselectindex]+"/"+RFID;
+            monthAttendanceUrl=getString(R.string.baseUrlLocal)+"getStudentMonthlyDeviceAttendance/"+shiftID+"/"+mediumID+"/"+classID+"/"+sectionID+"/"+ MonthID[monthselectindex]+"/"+RFID;
             RequestQueue queue = Volley.newRequestQueue(getActivity());
-
             StringRequest stringRequest = new StringRequest(Request.Method.GET, monthAttendanceUrl,
                     new Response.Listener<String>() {
                         @Override

@@ -69,7 +69,7 @@ public class ShowAllStudent extends AppCompatActivity
         ClassID=sharedPre.getInt("ClassSelectID",0);
         SectionID=sharedPre.getInt("SectionSelectID",0);
 
-        AllStudentUrl=getString(R.string.baseUrl)+"getHrmSubWiseAtdDetail/"+InstituteID+"/"+MediumID+"/"+ShiftID+"/"+ClassID+"/"+SectionID;
+        AllStudentUrl=getString(R.string.baseUrlLocal)+"getHrmSubWiseAtdDetail/"+InstituteID+"/"+MediumID+"/"+ShiftID+"/"+ClassID+"/"+SectionID;
         dialog = new ProgressDialog(this);
         dialog.setMessage("Loading....");
         dialog.show();

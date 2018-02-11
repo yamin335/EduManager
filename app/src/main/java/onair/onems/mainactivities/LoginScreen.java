@@ -49,7 +49,8 @@ public class LoginScreen extends AppCompatActivity
     public static SharedPreferences sharedPreferences;
 
     @Override
-    public void onResume() {
+    public void onResume()
+    {
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
         super.onResume();
     }
@@ -64,11 +65,10 @@ public class LoginScreen extends AppCompatActivity
     protected void onCreate(@Nullable Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        if (!prefs.getBoolean("firstTime", false)) {
+        if (!prefs.getBoolean("firstTime", false))
+        {
             // <---- run your one time code here
-
             sharedPreferences  = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putBoolean("LogInState", false);
@@ -80,7 +80,6 @@ public class LoginScreen extends AppCompatActivity
             defaultEditor.apply();
         }
         sharedPreferences  = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
-
         if(sharedPreferences.getBoolean("LogInState", true))
         {
             long UserTypeID = prefs.getLong("UserTypeID",0);
@@ -97,14 +96,11 @@ public class LoginScreen extends AppCompatActivity
                 finish();
             }
         }
-
         setContentView(R.layout.activity_login);
-
         dialog = new ProgressDialog(this);
         dialog.setTitle("Loading...");
         dialog.setMessage("Please Wait...");
         dialog.setCancelable(false);
-
         loginButton = (Button)findViewById(R.id.login_button);
         takeId = (EditText)findViewById(R.id.email);
         takePassword = (EditText) findViewById(R.id.password);
@@ -119,7 +115,6 @@ public class LoginScreen extends AppCompatActivity
                 if(isNetworkAvailable())
                 {
                     loginurl = getString(R.string.baseUrlLocal)+"getLoginInformation"+"/"+takeId.getText().toString()+"/"+takePassword.getText().toString();
-
                     if(takeId.getText().toString().isEmpty())
                     {
                         takeId.setError("This field is required");
@@ -154,7 +149,7 @@ public class LoginScreen extends AppCompatActivity
                                         // Login For Teacher
                                         else if((UserID.length()>0) && (UserTypeID == 4))
                                         {
-                                            Intent mainIntent = new Intent(LoginScreen.this,StudentMainScreen.class);
+                                            Intent mainIntent = new Intent(LoginScreen.this,TeacherMainScreen.class);
                                             LoginScreen.this.startActivity(mainIntent);
                                             LoginScreen.this.finish();
                                             dialog.dismiss();

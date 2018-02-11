@@ -82,8 +82,8 @@ public class AllStudentAttendanceShow extends AppCompatActivity
         roll.setText("Roll: "+studentRoll);
         id.setText("ID: "+RFID);
 
-        monthAttendanceUrl=getString(R.string.baseUrl)+"getStudentMonthlyDeviceAttendance/"+ShiftID+"/"+MediumID+"/"+ClassID+"/"+SectionID+"/"+MonthID+"/"+RFID;
-       // Toast.makeText(this,""+monthAttendanceUrl,Toast.LENGTH_LONG).show();
+        monthAttendanceUrl=getString(R.string.baseUrlRaw)+"getStudentMonthlyDeviceAttendance/"+ShiftID+"/"+MediumID+"/"+ClassID+"/"+SectionID+"/"+MonthID+"/"+RFID;
+         Toast.makeText(this,""+monthAttendanceUrl,Toast.LENGTH_LONG).show();
         // Add Header of The Table
 
         simpleTableHeaderAdapter = new SimpleTableHeaderAdapter(this, "SI","Date","Present", "Late(m)");

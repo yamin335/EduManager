@@ -1,6 +1,8 @@
 package onair.onems.mainactivities.TeacherAttendanceShow;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -42,7 +44,7 @@ public class ShowAttendance extends AppCompatActivity {
     MaterialSpinner classSpinner,sectionSpinner,mediumSpinner,monthSpinner,shiftSpinner;
     TableView tableView;
     String classUrl = "",mediumUrl="",monthUrl="",sectionUrl="",shiftUrl;
-    int ClassID[],ShiftID[],MediumID[],MonthID[],SectionID[];
+    int ClassID[]={0},ShiftID[]={0},MediumID[]={0},MonthID[]={0},SectionID[]={0};
     ProgressDialog dialog;
     Fragment fragment;
     FragmentManager fragmentManager;
@@ -65,10 +67,10 @@ public class ShowAttendance extends AppCompatActivity {
         monthSpinner = (MaterialSpinner) findViewById(R.id.spinner_Month);
         sharedPre = PreferenceManager.getDefaultSharedPreferences(this);
         InstituteID = sharedPre.getLong("InstituteID",0);
-        classUrl=getString(R.string.baseUrl)+"getInsClass/"+InstituteID;
-        mediumUrl=getString(R.string.baseUrl)+"getInsMedium/"+InstituteID;
-        monthUrl=getString(R.string.baseUrl)+"getMonth";
-        shiftUrl=getString(R.string.baseUrl)+"getInsShift/"+InstituteID;
+        classUrl=getString(R.string.baseUrlLocal)+"getInsClass/"+InstituteID;
+        mediumUrl=getString(R.string.baseUrlLocal)+"getInsMedium/"+InstituteID;
+        monthUrl=getString(R.string.baseUrlLocal)+"getMonth";
+        shiftUrl=getString(R.string.baseUrlLocal)+"getInsShift/"+InstituteID;
         dialog = new ProgressDialog(this);
         dialog.setMessage("Loading....");
         dialog.show();
@@ -77,7 +79,6 @@ public class ShowAttendance extends AppCompatActivity {
         {
             @Override
             public void onClick(View view) {
-                dialog.show();
                 SharedPreferences.Editor editor = sharedPre.edit();
                 editor.putInt("ShiftSelectID",ShiftSelectID);
                 editor.putInt("ClassSelectID",ClassSelectID);
@@ -85,9 +86,29 @@ public class ShowAttendance extends AppCompatActivity {
                 editor.putInt("SectionSelectID",SectionSelectID);
                 editor.putInt("MonthSelectID",MonthSelectID);
                 editor.commit();
-                //Toast.makeText(getActivity(),"ShiftID="+ShiftSelectID+" ClassID= "+ClassSelectID+ "MediumID= "+MediumSelectID+" MonthID="+MediumSelectID+" SectionID= "+SectionSelectID+"MonthID= "+MonthSelectID,Toast.LENGTH_LONG).show();
-                Intent i = new Intent(ShowAttendance.this, ShowAllStudent.class);
-                startActivity(i);
+                // Toast.makeText(getActivity(),"ShiftID="+ShiftSelectID+" ClassID= "+ClassSelectID+ "MediumID= "+MediumSelectID+" MonthID="+MediumSelectID+" SectionID= "+SectionSelectID+"MonthID= "+MonthSelectID,Toast.LENGTH_LONG).show();
+                if(ClassSelectID>0&&MonthSelectID>0)
+                {
+
+                    Intent i = new Intent(ShowAttendance.this, ShowAllStudent.class);
+                    startActivity(i);
+                }
+                else
+                {
+                    final AlertDialog.Builder dlgAlert  = new AlertDialog.Builder(getApplicationContext());
+
+                    dlgAlert.setTitle(" Please Select Class and Month !");
+                    dlgAlert.setIcon(R.drawable.error);
+                    dlgAlert.setPositiveButton("OK", null);
+                    dlgAlert.setCancelable(true);
+                    dlgAlert.create().show();
+                    dlgAlert.setPositiveButton("Ok",
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+
+                                }
+                            });
+                }
 
 
             }
@@ -189,11 +210,17 @@ public class ShowAttendance extends AppCompatActivity {
                 MonthSelectID=MonthID[position];
             }
         });
-        sectionSpinner.setOnItemSelectedListener(new MaterialSpinner.OnItemSelectedListener() {
+        sectionSpinner.setOnItemSelectedListener(new MaterialSpinner.OnItemSelectedListener<String>()
+        {
             @Override
-            public void onItemSelected(MaterialSpinner view, int position, long id, Object item) {
-                SectionSelectID=SectionID[position];
-
+            public void onItemSelected(MaterialSpinner view, int position, long id, String item)
+            {
+                if (position > 0 &&item.length()>0)
+                {
+                    SectionSelectID=SectionID[position] ;
+                }
+                else
+                    SectionSelectID=0;
 
             }
         });
@@ -201,10 +228,12 @@ public class ShowAttendance extends AppCompatActivity {
         {
 
             @Override public void onItemSelected(MaterialSpinner view, int position, long id, String item) {
-                if (position > 0) {
+
+                if (position > 0 &&item.length()>0)
+                {
                     ClassSelectID = ClassID[position];
                     RequestQueue queueSection = Volley.newRequestQueue(getApplicationContext());
-                    sectionUrl = getString(R.string.baseUrl) + "getInsSection/" + sharedPre.getLong("InstituteID", 0) + "/" + ClassSelectID;
+                    sectionUrl = getString(R.string.baseUrlLocal) + "getInsSection/" + sharedPre.getLong("InstituteID", 0) + "/" + ClassSelectID;
                     StringRequest stringSectionRequest = new StringRequest(Request.Method.GET, sectionUrl,
                             new Response.Listener<String>() {
                                 @Override
@@ -226,9 +255,11 @@ public class ShowAttendance extends AppCompatActivity {
                 }
                 else
                 {
+                    ClassSelectID = ClassID[position];
                     ArrayList al = new ArrayList();
                     al.add("Section");
                     al.add("");
+                    SectionSelectID = SectionID[0];
                     ArrayAdapter adapter = new ArrayAdapter(getApplicationContext(), android.R.layout.simple_list_item_1, al);
                     sectionSpinner.setAdapter(adapter);
                 }
@@ -243,25 +274,25 @@ public class ShowAttendance extends AppCompatActivity {
         NavUtils.navigateUpFromSameTask(this);
         super.onBackPressed();
     }
-    void parseClassJsonData(String jsonString) {
+    void parseClassJsonData(String jsonString)
+    {
         try {
             JSONArray jsonArray = new JSONArray(jsonString);
-            ArrayList al = new ArrayList();
-            ClassID=new int[jsonArray.length()+1];
-            al.add("Class");
-            ClassID[0]=0;
-            for(int i = 0; i < jsonArray.length(); ++i)
-            {
-                JSONObject jsonObject=jsonArray.getJSONObject(i);
-                String name=jsonObject.getString("ClassName");
-
-                ClassID[i+1]=jsonObject.getInt("ClassID");
-                al.add(name);
+            if(jsonArray.length()>0) {
+                ArrayList al = new ArrayList();
+                ClassID = new int[jsonArray.length() + 1];
+                al.add("Class");
+                ClassID[0] = 0;
+                for (int i = 0; i < jsonArray.length(); ++i) {
+                    JSONObject jsonObject = jsonArray.getJSONObject(i);
+                    String name = jsonObject.getString("ClassName");
+                    ClassID[i + 1] = jsonObject.getInt("ClassID");
+                    al.add(name);
+                }
+                ClassSelectID = ClassID[0];
+                ArrayAdapter adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, al);
+                classSpinner.setAdapter(adapter);
             }
-            ClassSelectID=ClassID[0];
-            ArrayAdapter adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, al);
-
-            classSpinner.setAdapter(adapter);
 
         }
         catch (JSONException e)
@@ -272,43 +303,55 @@ public class ShowAttendance extends AppCompatActivity {
 
 
     }
-    void parseMediumJsonData(String jsonString) {
+    void parseMediumJsonData(String jsonString)
+    {
         try {
             JSONArray jsonArray = new JSONArray(jsonString);
-            ArrayList al = new ArrayList();
-            MediumID=new int[jsonArray.length()];
-            for(int i = 0; i < jsonArray.length(); ++i) {
-                JSONObject jsonObject=jsonArray.getJSONObject(i);
-                String name=jsonObject.getString("MameName");
-                MediumID[i]=jsonObject.getInt("MediumID");
-                al.add(name);
+            if(jsonArray.length()>0)
+            {
+                ArrayList al = new ArrayList();
+                MediumID = new int[jsonArray.length()+1];
+                MediumID[0]=0;
+                al.add("Medium");
+                for (int i = 0; i < jsonArray.length(); ++i) {
+                    JSONObject jsonObject = jsonArray.getJSONObject(i);
+                    String name = jsonObject.getString("MameName");
+                    MediumID[i+1] = jsonObject.getInt("MediumID");
+                    al.add(name);
+                }
+                MediumSelectID = MediumID[0];
+                ArrayAdapter adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, al);
+                mediumSpinner.setAdapter(adapter);
             }
-            MediumSelectID=MediumID[0];
-            ArrayAdapter adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, al);
-            mediumSpinner.setAdapter(adapter);
             //spinner.setSelectedIndex(1);
-        } catch (JSONException e) {
+        } catch (JSONException e)
+        {
             Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
             dialog.dismiss();
 
         }
 
     }
-    void parseMonthJsonData(String jsonString) {
+    void parseMonthJsonData(String jsonString)
+    {
         try {
             JSONArray jsonArray = new JSONArray(jsonString);
-            ArrayList al = new ArrayList();
-            MonthID=new int[jsonArray.length()];
-            for(int i = 0; i < jsonArray.length(); ++i) {
-                JSONObject jsonObject=jsonArray.getJSONObject(i);
-                String name=jsonObject.getString("MonthName");
-                MonthID[i]=jsonObject.getInt("MonthID");
-                al.add(name);
+            if(jsonArray.length()>0)
+            {
+                ArrayList al = new ArrayList();
+                al.add("Month");
+                MediumID[0]=0;
+                MonthID = new int[jsonArray.length() + 1];
+                for (int i = 0; i < jsonArray.length(); ++i) {
+                    JSONObject jsonObject = jsonArray.getJSONObject(i);
+                    String name = jsonObject.getString("MonthName");
+                    MonthID[i+1] = jsonObject.getInt("MonthID");
+                    al.add(name);
+                }
+                MonthSelectID = MonthID[0];
+                ArrayAdapter adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, al);
+                monthSpinner.setAdapter(adapter);
             }
-            MonthSelectID=MonthID[0];
-            ArrayAdapter adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, al);
-            monthSpinner.setAdapter(adapter);
-
 
         } catch (JSONException e) {
             Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
@@ -320,43 +363,60 @@ public class ShowAttendance extends AppCompatActivity {
     void parseSectionJsonData(String jsonString) {
         try {
             JSONArray jsonArray = new JSONArray(jsonString);
-            ArrayList al = new ArrayList();
-            SectionID=new int[jsonArray.length()];
-            for(int i = 0; i < jsonArray.length(); ++i) {
-                JSONObject jsonObject=jsonArray.getJSONObject(i);
-                String name=jsonObject.getString("SectionName");
-                SectionID[i]=jsonObject.getInt("SectionID");
-                al.add(name);
-            }
-            SectionSelectID= SectionID[0];
-            ArrayAdapter adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, al);
-            sectionSpinner.setAdapter(adapter);
+            if (jsonArray.length() > 0)
+            {
+                ArrayList al = new ArrayList();
+                al.add("Section");
+                SectionID = new int[jsonArray.length()+1];
+                SectionID[0]=0;
+                for (int i = 0; i < jsonArray.length(); ++i) {
+                    JSONObject jsonObject = jsonArray.getJSONObject(i);
+                    String name = jsonObject.getString("SectionName");
+                    SectionID[i+1] = jsonObject.getInt("SectionID");
+                    al.add(name);
+                }
+                SectionSelectID = SectionID[0];
+                ArrayAdapter adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, al);
+                sectionSpinner.setAdapter(adapter);
 
-        } catch (JSONException e) {
+            }
+        }
+        catch (JSONException e) {
             Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
             dialog.dismiss();
 
         }
 
     }
-    void parseShiftJsonData(String jsonString) {
+    void parseShiftJsonData(String jsonString)
+    {
         try {
             JSONArray jsonArray = new JSONArray(jsonString);
-            ShiftID=new int[jsonArray.length()];
-            ArrayList al = new ArrayList();
-            for(int i = 0; i < jsonArray.length(); ++i)
+            if(jsonArray.length()>0)
             {
-                JSONObject jsonObject=jsonArray.getJSONObject(i);
-                String name=jsonObject.getString("ShiftName");
-                ShiftID[i]=jsonObject.getInt("ShiftID");
-                al.add(name);
+                ShiftID = new int[jsonArray.length() + 1];
+                ArrayList al = new ArrayList();
+                al.add("Shift");
+                for (int i = 0; i < jsonArray.length(); ++i)
+                {
+                    JSONObject jsonObject = jsonArray.getJSONObject(i);
+                    String name = jsonObject.getString("ShiftName");
+                    if(jsonObject.getString("ShiftID").equals("null"))
+                    {
+                        ShiftID[i + 1]=0;
+                    }
+                    else
+                        ShiftID[i + 1] = jsonObject.getInt("ShiftID");
+                    al.add(name);
+                }
+                //ShiftSelectID=ShiftID[0];
+                ArrayAdapter adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, al);
+                shiftSpinner.setAdapter(adapter);
             }
-            ShiftSelectID=ShiftID[0];
-            ArrayAdapter adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, al);
-            shiftSpinner.setAdapter(adapter);
             //spinner.setSelectedIndex(1);
         }
-        catch (JSONException e) {
+        catch (JSONException e)
+        {
             Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
 
 

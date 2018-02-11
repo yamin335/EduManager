@@ -41,7 +41,6 @@ public class StudentAttendanceShow extends AppCompatActivity {
     SharedPreferences sharedPre;
     ProgressDialog dialog;
     Configuration config;
-
     String[][] DATA_TO_SHOW;
     String AllStudentUrl = "";
     String studentNameList[],studentRFIDList[],studentRollList[], studentUserList[];;
@@ -64,7 +63,7 @@ public class StudentAttendanceShow extends AppCompatActivity {
         ClassID=sharedPre.getInt("ClassSelectID",0);
         SectionID=sharedPre.getInt("SectionSelectID",0);
 
-        AllStudentUrl=getString(R.string.baseUrl)+"getHrmSubWiseAtdDetail/"+InstituteID+"/"+MediumID+"/"+ShiftID+"/"+ClassID+"/"+SectionID;
+        AllStudentUrl=getString(R.string.baseUrlLocal)+"getHrmSubWiseAtdDetail/"+InstituteID+"/"+MediumID+"/"+ShiftID+"/"+ClassID+"/"+SectionID;
         dialog = new ProgressDialog(this);
         dialog.setMessage("Loading....");
         dialog.show();
@@ -72,16 +71,7 @@ public class StudentAttendanceShow extends AppCompatActivity {
         simpleTableHeaderAdapter = new SimpleTableHeaderAdapter(this, "SI", "Student Name", "ID", "Roll");
         simpleTableHeaderAdapter.setTextColor(ContextCompat.getColor(this, R.color.table_header_text));
         tableView.setHeaderAdapter(simpleTableHeaderAdapter);
-
         config = getResources().getConfiguration();
-        if (config.smallestScreenWidthDp >320) {
-            simpleTableHeaderAdapter.setTextSize(14);
-
-        } else {
-            simpleTableHeaderAdapter.setTextSize(10);
-
-        }
-
         int colorEvenRows = getResources().getColor(R.color.table_data_row_even);
         int colorOddRows = getResources().getColor(R.color.table_data_row_odd);
         tableView.setDataRowBackgroundProvider(TableDataRowBackgroundProviders.alternatingRowColors(colorEvenRows, colorOddRows));
@@ -125,7 +115,8 @@ public class StudentAttendanceShow extends AppCompatActivity {
         });
 
     }
-    void parseAllStudentShowJsonData(String jsonString) {
+    void parseAllStudentShowJsonData(String jsonString)
+    {
         try {
             JSONArray jsonArray = new JSONArray(jsonString);
             ArrayList al = new ArrayList();
