@@ -1,8 +1,6 @@
 package onair.onems.models;
 
-
-import com.google.gson.annotations.Expose;
-import com.google.gson.annotations.SerializedName;
+import java.util.ArrayList;
 
 /**
  * Created by User on 12/21/2017.
@@ -10,73 +8,98 @@ import com.google.gson.annotations.SerializedName;
 
 public class AttendanceStudentModel {
 
+    private String SubAtdDetailID;
+
+    private String SubAtdID;
+
     private String UserFullName;
-    @SerializedName("UserID")
-    @Expose
+
     private String UserID;
-    @SerializedName("RFID")
-    @Expose
+
     private String RFID;
-    @SerializedName("RollNo")
-    @Expose
+
     private String RollNo;
-    @SerializedName("SubjectID")
-    @Expose
+
     private long SubjectID;
-    @SerializedName("DepartmentID")
-    @Expose
+
     private long DepartmentID;
-    @SerializedName("SectionID")
-    @Expose
+
     private long SectionID;
-    @SerializedName("MediumID")
-    @Expose
+
+    private String Section;
+
     private long MediumID;
-    @SerializedName("ShiftID")
-    @Expose
+
     private long ShiftID;
-    @SerializedName("Remarks")
-    @Expose
-    private String Remarks;
-    @SerializedName("ClassID")
-    @Expose
+
     private long ClassID;
-    @SerializedName("BoardID")
-    @Expose
+
     private long BoardID;
-    @SerializedName("BrunchID")
-    @Expose
+
+    private String Board;
+
+    private String Brunch;
+
+    private String Session;
+
     private long BrunchID;
-    @SerializedName("SessionID")
-    @Expose
+
     private long SessionID;
-    @SerializedName("IsPresent")
-    @Expose
+
     private int IsPresent;
-    @SerializedName("Islate")
-    @Expose
+
     private int Islate;
-    @SerializedName("LateTime")
-    @Expose
+
     private int LateTime;
-    @SerializedName("IsLeave")
-    @Expose
+
     private int IsLeave;
-    @SerializedName("IsAbsent")
-    @Expose
+
     private int IsAbsent;
+
+    private String Remarks;
+
+    private String Subject;
+
+    private String Department;
+
+    private String Medium;
+
+    private String Shift;
+
+    private String Class;
 
     public AttendanceStudentModel()
     {
 
     }
 
-    public AttendanceStudentModel(String UserFullName, String UserID, String RFID, String RollNo, String SubjectID,
-                                  String DepartmentID, String SectionID, String MediumID, String ShiftID,
-                                  String Remarks, String ClassID, String BoardID, String BrunchID,
+    public AttendanceStudentModel(String SubAtdDetailID, String SubAtdID, String UserFullName,
+                                  String UserID, String RFID, String RollNo, String SubjectID,
+                                  String DepartmentID, String SectionID, String Section,
+                                  String MediumID, String ShiftID, String ClassID, String BoardID,
+                                  String Board, String Brunch, String Session, String BrunchID,
                                   String SessionID, String IsPresent, String Islate, String LateTime,
-                                  String IsLeave, String IsAbsent)
+                                  String IsLeave, String IsAbsent, String Remarks, String Subject,
+                                  String Department, String Medium, String Shift, String Class)
     {
+        if(SubAtdDetailID.equals("null"))
+        {
+            this.SubAtdDetailID = "0";
+        }
+        else
+        {
+            this.SubAtdDetailID = SubAtdDetailID;
+        }
+
+        if(SubAtdID.equals("null"))
+        {
+            this.SubAtdID = "0";
+        }
+        else
+        {
+            this.SubAtdID = SubAtdID;
+        }
+
         this.UserFullName = UserFullName;
         this.UserID = UserID;
         this.RFID = RFID;
@@ -84,7 +107,7 @@ public class AttendanceStudentModel {
 
         if(SubjectID.equals("null"))
         {
-            this.SubjectID = 0;
+            this.SubjectID = -2;
         }
         else
         {
@@ -93,7 +116,7 @@ public class AttendanceStudentModel {
 
         if(DepartmentID.equals("null"))
         {
-            this.DepartmentID = 0;
+            this.DepartmentID = -2;
         }
         else
         {
@@ -102,16 +125,18 @@ public class AttendanceStudentModel {
 
         if(SectionID.equals("null"))
         {
-            this.SectionID = 0;
+            this.SectionID = -2;
         }
         else
         {
             this.SectionID = Long.parseLong(SectionID);
         }
 
+        this.Section = Section;
+
         if(MediumID.equals("null"))
         {
-            this.MediumID = 0;
+            this.MediumID = -2;
         }
         else
         {
@@ -120,18 +145,16 @@ public class AttendanceStudentModel {
 
         if(ShiftID.equals("null"))
         {
-            this.ShiftID = 0;
+            this.ShiftID = -2;
         }
         else
         {
             this.ShiftID = Long.parseLong(ShiftID);
         }
 
-        this.Remarks = Remarks;
-
         if(ClassID.equals("null"))
         {
-            this.ClassID = 0;
+            this.ClassID = -2;
         }
         else
         {
@@ -140,16 +163,20 @@ public class AttendanceStudentModel {
 
         if(BoardID.equals("null"))
         {
-            this.BoardID = 0;
+            this.BoardID = -2;
         }
         else
         {
             this.BoardID = Long.parseLong(BoardID);
         }
 
+        this.Board = Board;
+        this.Brunch = Brunch;
+        this.Session = Session;
+
         if(BrunchID.equals("null"))
         {
-            this.BrunchID = 0;
+            this.BrunchID = -2;
         }
         else
         {
@@ -158,17 +185,74 @@ public class AttendanceStudentModel {
 
         if(SessionID.equals("null"))
         {
-            this.SessionID = 0;
+            this.SessionID = -2;
         }
         else
         {
             this.SessionID = Long.parseLong(SessionID);
         }
-        this.IsPresent = Integer.parseInt(IsPresent);
-        this.Islate = Integer.parseInt(Islate);
-        this.LateTime = Integer.parseInt(LateTime);
-        this.IsLeave = Integer.parseInt(IsLeave);
-        this.IsAbsent = Integer.parseInt(IsAbsent);
+
+        if(IsPresent.equals("null"))
+        {
+            this.IsPresent = 0;
+        }
+        else
+        {
+            this.IsPresent = Integer.parseInt(IsPresent);
+        }
+
+        if(Islate.equals("null"))
+        {
+            this.Islate = 0;
+        }
+        else
+        {
+            this.Islate = Integer.parseInt(Islate);
+        }
+
+        if(LateTime.equals("null"))
+        {
+            this.LateTime = 0;
+        }
+        else
+        {
+            this.LateTime = Integer.parseInt(LateTime);
+        }
+
+        if(IsLeave.equals("null"))
+        {
+            this.IsLeave = 0;
+        }
+        else
+        {
+            this.IsLeave = Integer.parseInt(IsLeave);
+        }
+
+        if(IsAbsent.equals("null"))
+        {
+            this.IsAbsent = 0;
+        }
+        else
+        {
+            this.IsAbsent = Integer.parseInt(IsAbsent);
+        }
+
+        this.Remarks = Remarks;
+        this.Subject = Subject;
+        this.Department = Department;
+        this.Medium = Medium;
+        this.Shift = Shift;
+        this.Class = Class;
+    }
+
+    public void setSubAtdDetailID(String SubAtdDetailID)
+    {
+        this.SubAtdDetailID = SubAtdDetailID;
+    }
+
+    public void setSubAtdID(String SubAtdID)
+    {
+        this.SubAtdID = SubAtdID;
     }
 
     public void setUserFullName(String UserFullName)
@@ -195,7 +279,7 @@ public class AttendanceStudentModel {
     {
         if(SubjectID.equals("null"))
         {
-            this.SubjectID = 0;
+            this.SubjectID = -2;
         }
         else
         {
@@ -207,7 +291,7 @@ public class AttendanceStudentModel {
     {
         if(DepartmentID.equals("null"))
         {
-            this.DepartmentID = 0;
+            this.DepartmentID = -2;
         }
         else
         {
@@ -219,7 +303,7 @@ public class AttendanceStudentModel {
     {
         if(SectionID.equals("null"))
         {
-            this.SectionID = 0;
+            this.SectionID = -2;
         }
         else
         {
@@ -231,7 +315,7 @@ public class AttendanceStudentModel {
     {
         if(MediumID.equals("null"))
         {
-            this.MediumID = 0;
+            this.MediumID = -2;
         }
         else
         {
@@ -243,7 +327,7 @@ public class AttendanceStudentModel {
     {
         if(ShiftID.equals("null"))
         {
-            this.ShiftID = 0;
+            this.ShiftID = -2;
         }
         else
         {
@@ -251,16 +335,11 @@ public class AttendanceStudentModel {
         }
     }
 
-    public void setRemarks(String Remarks)
-    {
-        this.Remarks = Remarks;
-    }
-
     public void setClassID(String ClassID)
     {
         if(ClassID.equals("null"))
         {
-            this.ClassID = 0;
+            this.ClassID = -2;
         }
         else
         {
@@ -272,7 +351,7 @@ public class AttendanceStudentModel {
     {
         if(BoardID.equals("null"))
         {
-            this.BoardID = 0;
+            this.BoardID = -2;
         }
         else
         {
@@ -280,11 +359,26 @@ public class AttendanceStudentModel {
         }
     }
 
+    public void setBoard(String Board)
+    {
+        this.Board = Board;
+    }
+
+    public void setBrunch(String Brunch)
+    {
+        this.Brunch = Brunch;
+    }
+
+    public void setSession(String Session)
+    {
+        this.Session = Session;
+    }
+
     public void setBrunchID(String BrunchID)
     {
         if(BrunchID.equals("null"))
         {
-            this.BrunchID = 0;
+            this.BrunchID = -2;
         }
         else
         {
@@ -296,7 +390,7 @@ public class AttendanceStudentModel {
     {
         if(SessionID.equals("null"))
         {
-            this.SessionID = 0;
+            this.SessionID = -2;
         }
         else
         {
@@ -306,27 +400,102 @@ public class AttendanceStudentModel {
 
     public void setIsPresent(String IsPresent)
     {
-        this.IsPresent = Integer.parseInt(IsPresent);
+        if(IsPresent.equals("null"))
+        {
+            this.IsPresent = 0;
+        }
+        else
+        {
+            this.IsPresent = Integer.parseInt(IsPresent);
+        }
     }
 
     public void setIslate(String Islate)
     {
-        this.Islate = Integer.parseInt(Islate);
+        if(Islate.equals("null"))
+        {
+            this.Islate = 0;
+        }
+        else
+        {
+            this.Islate = Integer.parseInt(Islate);
+        }
     }
 
     public void setLateTime(String LateTime)
     {
-        this.LateTime = Integer.parseInt(LateTime);
+        if(LateTime.equals("null"))
+        {
+            this.LateTime = 0;
+        }
+        else
+        {
+            this.LateTime = Integer.parseInt(LateTime);
+        }
     }
 
     public void setIsLeave(String IsLeave)
     {
-        this.IsLeave = Integer.parseInt(IsLeave);
+        if(IsLeave.equals("null"))
+        {
+            this.IsLeave = 0;
+        }
+        else
+        {
+            this.IsLeave = Integer.parseInt(IsLeave);
+        }
     }
 
     public void setIsAbsent(String IsAbsent)
     {
-        this.IsAbsent = Integer.parseInt(IsAbsent);
+        if(IsAbsent.equals("null"))
+        {
+            this.IsAbsent = 0;
+        }
+        else
+        {
+            this.IsAbsent = Integer.parseInt(IsAbsent);
+        }
+    }
+
+    public void setRemarks(String Remarks)
+    {
+        this.Remarks = Remarks;
+    }
+
+    public void setSubject(String Subject)
+    {
+        this.Subject = Subject;
+    }
+
+    public void setDepartment(String Department)
+    {
+        this.Department = Department;
+    }
+
+    public void setMedium(String Medium)
+    {
+        this.Medium = Medium;
+    }
+
+    public void setShift(String Shift)
+    {
+        this.Shift = Shift;
+    }
+
+    public void setClass(String Class)
+    {
+        this.Class = Class;
+    }
+
+    public String getSubAtdDetailID()
+    {
+        return this.SubAtdDetailID;
+    }
+
+    public String getSubAtdID()
+    {
+        return this.SubAtdID;
     }
 
     public String getUserFullName()
@@ -364,6 +533,11 @@ public class AttendanceStudentModel {
         return SectionID;
     }
 
+    public String getSection()
+    {
+        return this.Section;
+    }
+
     public long getMediumID()
     {
         return MediumID;
@@ -374,11 +548,6 @@ public class AttendanceStudentModel {
         return ShiftID;
     }
 
-    public String getRemarks()
-    {
-        return Remarks;
-    }
-
     public long getClassID()
     {
         return ClassID;
@@ -387,6 +556,21 @@ public class AttendanceStudentModel {
     public long getBoardID()
     {
         return BoardID;
+    }
+
+    public String getBoard()
+    {
+        return this.Board;
+    }
+
+    public String getBrunch()
+    {
+        return this.Brunch;
+    }
+
+    public String getSession()
+    {
+        return this.Session;
     }
 
     public long getBrunchID()
@@ -422,5 +606,36 @@ public class AttendanceStudentModel {
     public int getIsAbsent()
     {
         return IsAbsent;
+    }
+
+
+    public String getRemarks()
+    {
+        return Remarks;
+    }
+
+    public String getSubject()
+    {
+        return this.Subject;
+    }
+
+    public String getDepartment()
+    {
+        return this.Department;
+    }
+
+    public String getMedium()
+    {
+        return this.Medium;
+    }
+
+    public String getShift()
+    {
+        return this.Shift;
+    }
+
+    public String getClasss()
+    {
+        return this.Class;
     }
 }

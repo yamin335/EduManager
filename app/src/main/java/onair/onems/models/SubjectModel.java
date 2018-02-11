@@ -6,17 +6,17 @@ package onair.onems.models;
 
 public class SubjectModel {
 
-    private int SubjectID = 0;
-    private int SubjectNo = 0;
-    private String SubjectName;
-    private int InsSubjectID = 0;
-    private int InstituteID = 0;
-    private int DepartmentID = 0;
-    private int MediumID = 0;
-    private int ClassID = 0;
+    private long SubjectID = 0;
+    private String SubjectNo = "";
+    private String SubjectName = "";
+    private long InsSubjectID = 0;
+    private long InstituteID = 0;
+    private long DepartmentID = -2;
+    private long MediumID = -2;
+    private long ClassID = -2;
     private boolean IsActive = true;
     private boolean IsCombined = true;
-    private int ParentID = 0;
+    private long ParentID = 0;
     private String ParentSubject = "";
 
     public SubjectModel()
@@ -27,42 +27,108 @@ public class SubjectModel {
     public SubjectModel(String SubjectID, String SubjectNo, String SubjectName, String InsSubjectID,
                         String InstituteID, String DepartmentID, String MediumID, String ClassID, String IsActive,
                         String IsCombined, String ParentID, String ParentSubject) {
-        this.SubjectID = Integer.parseInt(SubjectID);
-        this.SubjectNo = Integer.parseInt(SubjectNo);
+        if(SubjectID.equals("null"))
+        {
+            this.SubjectID = 0;
+        }
+        else
+        {
+            this.SubjectID = Long.parseLong(SubjectID);
+        }
+
+        this.SubjectNo = SubjectNo;
         this.SubjectName = SubjectName;
+
         if(InsSubjectID.equals("null"))
         {
             this.InsSubjectID = 0;
         }
         else
         {
-            this.InsSubjectID = Integer.parseInt(InsSubjectID);
+            this.InsSubjectID = Long.parseLong(InsSubjectID);
         }
-        this.InstituteID = Integer.parseInt(InstituteID);
-        this.DepartmentID = Integer.parseInt(DepartmentID);
-        this.MediumID = Integer.parseInt(MediumID);
-        this.ClassID = Integer.parseInt(ClassID);
-        this.IsActive = Boolean.parseBoolean(IsActive);
-        this.IsCombined = Boolean.parseBoolean(IsCombined);
+
+        if(InstituteID.equals("null"))
+        {
+            this.InstituteID = 0;
+        }
+        else
+        {
+            this.InstituteID = Long.parseLong(InstituteID);
+        }
+
+        if(DepartmentID.equals("null"))
+        {
+            this.DepartmentID = 0;
+        }
+        else
+        {
+            this.DepartmentID = Long.parseLong(DepartmentID);
+        }
+
+        if(MediumID.equals("null"))
+        {
+            this.MediumID = 0;
+        }
+        else
+        {
+            this.MediumID = Long.parseLong(MediumID);
+        }
+
+
+        if(ClassID.equals("null"))
+        {
+            this.ClassID = 0;
+        }
+        else
+        {
+            this.ClassID = Long.parseLong(ClassID);
+        }
+
+        if(IsActive.equals("null"))
+        {
+            this.IsActive = true;
+        }
+        else
+        {
+            this.IsActive = Boolean.parseBoolean(IsActive);
+        }
+
+        if(IsCombined.equals("null"))
+        {
+            this.IsCombined = true;
+        }
+        else
+        {
+            this.IsCombined = Boolean.parseBoolean(IsCombined);
+        }
+
         if(ParentID.equals("null"))
         {
             this.ParentID = 0;
         }
         else
         {
-            this.ParentID = Integer.parseInt(ParentID);
+            this.ParentID = Long.parseLong(ParentID);
         }
 
         this.ParentSubject = ParentSubject;
 
     }
 
-    public void setSubjectID(int SubjectID)
+    public void setSubjectID(String SubjectID)
     {
-        this.SubjectID = SubjectID;
+        if(SubjectID.equals("null"))
+        {
+            this.SubjectID = 0;
+        }
+        else
+        {
+            this.SubjectID = Long.parseLong(SubjectID);
+        }
     }
 
-    public void setSubjectNo(int SubjectNo)
+    public void setSubjectNo(String SubjectNo)
     {
         this.SubjectNo = SubjectNo;
     }
@@ -72,44 +138,100 @@ public class SubjectModel {
         this.SubjectName = SubjectName;
     }
 
-    public void setInsSubjectID(int InsSubjectID)
+    public void setInsSubjectID(String InsSubjectID)
     {
-        this.InsSubjectID = InsSubjectID;
+        if(InsSubjectID.equals("null"))
+        {
+            this.InsSubjectID = 0;
+        }
+        else
+        {
+            this.InsSubjectID = Long.parseLong(InsSubjectID);
+        }
     }
 
-    public void setInstituteID(int InstituteID)
+    public void setInstituteID(String InstituteID)
     {
-        this.InstituteID = InstituteID;
+        if(InstituteID.equals("null"))
+        {
+            this.InstituteID = 0;
+        }
+        else
+        {
+            this.InstituteID = Long.parseLong(InstituteID);
+        }
     }
 
-    public void setDepartmentID(int DepartmentID)
+    public void setDepartmentID(String DepartmentID)
     {
-        this.DepartmentID = DepartmentID;
+        if(DepartmentID.equals("null"))
+        {
+            this.DepartmentID = 0;
+        }
+        else
+        {
+            this.DepartmentID = Long.parseLong(DepartmentID);
+        }
     }
 
-    public void setMediumID(int MediumID)
+    public void setMediumID(String MediumID)
     {
-        this.MediumID = MediumID;
+        if(MediumID.equals("null"))
+        {
+            this.MediumID = 0;
+        }
+        else
+        {
+            this.MediumID = Long.parseLong(MediumID);
+        }
     }
 
-    public void setClassID(int ClassID)
+    public void setClassID(String ClassID)
     {
-        this.ClassID = ClassID;
+        if(ClassID.equals("null"))
+        {
+            this.ClassID = 0;
+        }
+        else
+        {
+            this.ClassID = Long.parseLong(ClassID);
+        }
     }
 
-    public void setIsActive(boolean IsActive)
+    public void setIsActive(String IsActive)
     {
-        this.IsActive = IsActive;
+        if(IsActive.equals("null"))
+        {
+            this.IsActive = true;
+        }
+        else
+        {
+            this.IsActive = Boolean.parseBoolean(IsActive);
+        }
     }
 
-    public void setIsCombined(boolean IsCombined)
+    public void setIsCombined(String IsCombined)
     {
-        this.IsCombined = IsCombined;
+        if(IsCombined.equals("null"))
+        {
+            this.IsCombined = true;
+        }
+        else
+        {
+            this.IsCombined = Boolean.parseBoolean(IsCombined);
+        }
     }
 
-    public void setParentID(int ParentID)
+    public void setParentID(String ParentID)
     {
-        this.ParentID = ParentID;
+        if(ParentID.equals("null"))
+        {
+            this.ParentID = 0;
+        }
+        else
+        {
+            this.ParentID = Long.parseLong(ParentID);
+        }
     }
 
     public void setParentSubject(String ParentSubject)
@@ -117,12 +239,12 @@ public class SubjectModel {
         this.ParentSubject = ParentSubject;
     }
 
-    public int getSubjectID()
+    public long getSubjectID()
     {
         return SubjectID;
     }
 
-    public int getSubjectNo()
+    public String getSubjectNo()
     {
         return SubjectNo;
     }
@@ -132,27 +254,27 @@ public class SubjectModel {
         return SubjectName;
     }
 
-    public int getInsSubjectID()
+    public long getInsSubjectID()
     {
         return InsSubjectID;
     }
 
-    public int getInstituteID()
+    public long getInstituteID()
     {
         return InstituteID;
     }
 
-    public int getDepartmentID()
+    public long getDepartmentID()
     {
         return DepartmentID;
     }
 
-    public int getMediumID()
+    public long getMediumID()
     {
         return MediumID;
     }
 
-    public int getClassID()
+    public long getClassID()
     {
         return ClassID;
     }
@@ -167,7 +289,7 @@ public class SubjectModel {
         return IsCombined;
     }
 
-    public int getParentID()
+    public long getParentID()
     {
         return ParentID;
     }

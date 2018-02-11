@@ -2,9 +2,11 @@ package onair.onems.mainactivities;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
@@ -55,7 +57,7 @@ public class TakeAttendanceDetails extends AppCompatActivity {
     private TakeAttendanceAdapter adapter;
     private ArrayList<AttendanceStudentModel> attendanceSheetArrayList;
     private long InstituteID,MediumID,ShiftID,ClassID,SectionID,SubjectID,DepertmentID;
-    String date, StudentDataGetUrl, postUrl;
+    String date, StudentDataGetUrl, postUrl, UserID, SubAtdID;
     ProgressDialog dialog;
     JSONArray StudentJsonArray, InstituteIDJsonArray;
     JSONObject postDatajsonObject;
@@ -83,6 +85,9 @@ public class TakeAttendanceDetails extends AppCompatActivity {
         dialog.setMessage("Please Wait...");
         dialog.setCancelable(false);
         dialog.show();
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        UserID = prefs.getString("UserID", "0");
 
         Bundle StudentSelection = getIntent().getExtras();
         InstituteID = StudentSelection.getLong("InstituteID",0);
@@ -142,16 +147,37 @@ public class TakeAttendanceDetails extends AppCompatActivity {
 //                {
 //                    strings[j] = InstituteIDJsonArray.getString(j);
 //                }
-                AttendanceStudentModel attendanceStudentModel = new AttendanceStudentModel(studentJsonObject.getString("UserFullName"),
-                        studentJsonObject.getString("UserID"), studentJsonObject.getString("RFID"),
-                        studentJsonObject.getString("RollNo"), studentJsonObject.getString("SubjectID"),
-                        studentJsonObject.getString("DepartmentID"), studentJsonObject.getString("SectionID"),
-                        studentJsonObject.getString("MediumID"), studentJsonObject.getString("ShiftID"),"",
-                        studentJsonObject.getString("ClassID"), studentJsonObject.getString("BoardID"),
-                        studentJsonObject.getString("BrunchID"), studentJsonObject.getString("SessionID"),
-                        studentJsonObject.getString("IsPresent"), studentJsonObject.getString("Islate"),
-                        studentJsonObject.getString("LateTime"), studentJsonObject.getString("IsLeave"),
-                        studentJsonObject.getString("IsAbsent"));
+                AttendanceStudentModel attendanceStudentModel = new AttendanceStudentModel(
+                        studentJsonObject.getString("SubAtdDetailID"),
+                        studentJsonObject.getString("SubAtdID"),
+                        studentJsonObject.getString("UserFullName"),
+                        studentJsonObject.getString("UserID"),
+                        studentJsonObject.getString("RFID"),
+                        studentJsonObject.getString("RollNo"),
+                        studentJsonObject.getString("SubjectID"),
+                        studentJsonObject.getString("DepartmentID"),
+                        studentJsonObject.getString("SectionID"),
+                        studentJsonObject.getString("Section"),
+                        studentJsonObject.getString("MediumID"),
+                        studentJsonObject.getString("ShiftID"),
+                        studentJsonObject.getString("ClassID"),
+                        studentJsonObject.getString("BoardID"),
+                        studentJsonObject.getString("Board"),
+                        studentJsonObject.getString("Brunch"),
+                        studentJsonObject.getString("Session"),
+                        studentJsonObject.getString("BrunchID"),
+                        studentJsonObject.getString("SessionID"),
+                        studentJsonObject.getString("IsPresent"),
+                        studentJsonObject.getString("Islate"),
+                        studentJsonObject.getString("LateTime"),
+                        studentJsonObject.getString("IsLeave"),
+                        studentJsonObject.getString("IsAbsent"),
+                        studentJsonObject.getString("Remarks"),
+                        studentJsonObject.getString("Subject"),
+                        studentJsonObject.getString("Department"),
+                        studentJsonObject.getString("Medium"),
+                        studentJsonObject.getString("Shift"),
+                        studentJsonObject.getString("Class"));
 //                ArrayList<String> arrayList = new ArrayList<String>();
 //                JSONArray jsonArray = studentJsonObject.getJSONArray("InstituteID");
 //                for(int j = 0; j<jsonArray.length(); ++i)
@@ -171,6 +197,7 @@ public class TakeAttendanceDetails extends AppCompatActivity {
 //                Toast.makeText(this,classJsonObject.getString("ClassID")+classJsonObject.getString("ClassName"),Toast.LENGTH_LONG).show();
                 attendanceSheetArrayList.add(attendanceStudentModel);
 //                classArrayList.add(classModel.getClassName());
+                SubAtdID = studentJsonObject.getString("SubAtdID");
             }
             adapter.notifyDataSetChanged();
             dialog.dismiss();
@@ -202,14 +229,14 @@ public class TakeAttendanceDetails extends AppCompatActivity {
             if(isNetworkAvailable())
             {
                 AttendanceSheetModel attendanceSheetModel = new AttendanceSheetModel();
-                attendanceSheetModel.setSubAtdID("0");
+                attendanceSheetModel.setSubAtdID(SubAtdID);
                 attendanceSheetModel.setSubjectID(Long.toString(SubjectID));
                 attendanceSheetModel.setSectionID(Long.toString(SectionID==0 ? -2 : SectionID));
                 attendanceSheetModel.setDepartmentID(Long.toString(DepertmentID==0 ? -2 : DepertmentID));
                 attendanceSheetModel.setMediumID(Long.toString(MediumID==0 ? -2 : MediumID));
                 attendanceSheetModel.setShiftID(Long.toString(ShiftID==0 ? -2 : ShiftID));
                 attendanceSheetModel.setClassID(Long.toString(ClassID==0 ? -2 : ClassID));
-                attendanceSheetModel.setAtdUserID("1");
+                attendanceSheetModel.setAtdUserID(UserID);
                 attendanceSheetModel.setAtdDate(date);
                 attendanceSheetModel.setInstituteID(Long.toString(InstituteID));
                 attendanceSheetModel.setattendenceArr(attendanceSheetArrayList);

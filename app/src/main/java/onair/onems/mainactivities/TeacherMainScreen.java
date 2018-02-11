@@ -15,6 +15,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import onair.onems.R;
+import onair.onems.mainactivities.Result.ResultMainScreen;
 
 /**
  * Created by User on 12/5/2017.
@@ -22,7 +23,7 @@ import onair.onems.R;
 
 public class TeacherMainScreen extends AppCompatActivity {
 
-    private Button takeAttendance, iCard, notice;
+    private Button takeAttendance, iCard, notice, result;
     private TextView InstituteName;
     private TextView userType;
     public static final String MyPREFERENCES = "LogInKey";
@@ -66,11 +67,20 @@ public class TeacherMainScreen extends AppCompatActivity {
                 finish();
             }
         });
-
+        // Result module start point
         notice.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent mainIntent = new Intent(TeacherMainScreen.this,NoticeMainScreen.class);
+                TeacherMainScreen.this.startActivity(mainIntent);
+                finish();
+            }
+        });
+        // Result module start point
+        result.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent mainIntent = new Intent(TeacherMainScreen.this,ResultMainScreen.class);
                 TeacherMainScreen.this.startActivity(mainIntent);
                 finish();
             }

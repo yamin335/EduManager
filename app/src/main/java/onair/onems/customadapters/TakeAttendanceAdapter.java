@@ -63,10 +63,75 @@ public class TakeAttendanceAdapter extends RecyclerView.Adapter<TakeAttendanceAd
         AttendanceStudentModel attendanceStudentModel = attendanceSheetList.get(position);
         holder.name.setText(attendanceStudentModel.getUserFullName());
         holder.roll.setText("Roll: "+attendanceStudentModel.getRollNo());
+
         holder.isPresent = 1;
         holder.isAbsent = 0;
         holder.isLate = 0;
         holder.isLeave = 0;
+
+        if((!attendanceStudentModel.getSubAtdDetailID().equals("0"))&&
+                (!attendanceStudentModel.getSubAtdID().equals("0")))
+        {
+            holder.isPresent = attendanceStudentModel.getIsPresent();
+            holder.isAbsent = attendanceStudentModel.getIsAbsent();
+            holder.isLate = attendanceStudentModel.getIslate();
+            holder.lateTime = attendanceStudentModel.getLateTime();
+            holder.isLeave = attendanceStudentModel.getIsLeave();
+
+            if(holder.isPresent == 1)
+            {
+                holder.present.setChecked(true);
+                holder.lateInput.setText("");
+                holder.absent.setChecked(false);
+                holder.late.setChecked(false);
+                holder.leave.setChecked(false);
+            }
+            else
+            {
+                holder.present.setChecked(false);
+            }
+
+            if(holder.isAbsent == 1)
+            {
+                holder.absent.setChecked(true);
+                holder.lateInput.setText("");
+                holder.present.setChecked(false);
+                holder.late.setChecked(false);
+                holder.leave.setChecked(false);
+            }
+            else
+            {
+                holder.absent.setChecked(false);
+            }
+
+            if(holder.isLate == 1)
+            {
+                holder.late.setChecked(true);
+                holder.lateInput.setText(Integer.toString(holder.lateTime));
+                holder.absent.setChecked(false);
+                holder.present.setChecked(false);
+                holder.leave.setChecked(false);
+            }
+            else
+            {
+                holder.late.setChecked(false);
+                holder.lateInput.setText("");
+            }
+
+            if(holder.isLeave == 1)
+            {
+                holder.leave.setChecked(true);
+                holder.lateInput.setText("");
+                holder.absent.setChecked(false);
+                holder.late.setChecked(false);
+                holder.present.setChecked(false);
+            }
+            else
+            {
+                holder.leave.setChecked(false);
+            }
+        }
+
         if(holder.late.isChecked())
         {
             holder.lateInput.setEnabled(false);
