@@ -105,7 +105,7 @@ public class LoginScreen extends AppCompatActivity
         takeId = (EditText)findViewById(R.id.email);
         takePassword = (EditText) findViewById(R.id.password);
         errorView = (TextView)findViewById(R.id.error);
-//
+////
         loginButton.setOnClickListener(new View.OnClickListener()
         {
             @Override
