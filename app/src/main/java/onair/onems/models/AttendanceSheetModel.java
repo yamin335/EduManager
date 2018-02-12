@@ -1,9 +1,6 @@
 package onair.onems.models;
 
 import java.util.ArrayList;
-import java.util.List;
-import com.google.gson.annotations.Expose;
-import com.google.gson.annotations.SerializedName;
 
 /**
  * Created by User on 12/30/2017.
@@ -11,68 +8,46 @@ import com.google.gson.annotations.SerializedName;
 
 public class AttendanceSheetModel {
 
-    @SerializedName("SubAtdID")
-    @Expose
     private long SubAtdID;
-    @SerializedName("SubjectID")
-    @Expose
+
     private long SubjectID;
-    @SerializedName("SectionID")
-    @Expose
+
     private long SectionID;
-    @SerializedName("DepartmentID")
-    @Expose
+
     private long DepartmentID;
-    @SerializedName("MediumID")
-    @Expose
+
     private long MediumID;
-    @SerializedName("ShiftID")
-    @Expose
+
     private long ShiftID;
-    @SerializedName("ClassID")
-    @Expose
+
     private long ClassID;
-    @SerializedName("AtdUserID")
-    @Expose
+
     private long AtdUserID;
-    @SerializedName("AtdDate")
-    @Expose
+
     private String AtdDate;
-    @SerializedName("InstituteID")
-    @Expose
+
     private long InstituteID;
-    @SerializedName("CreateBy")
-    @Expose
+
     private long CreateBy;
-    @SerializedName("CreateOn")
-    @Expose
+
     private String CreateOn;
-    @SerializedName("CreatePc")
-    @Expose
+
     private String CreatePc;
-    @SerializedName("UpdateBy")
-    @Expose
+
     private long UpdateBy;
-    @SerializedName("UpdateOn")
-    @Expose
+
     private String UpdateOn;
-    @SerializedName("UpdatePc")
-    @Expose
+
     private String UpdatePc;
-    @SerializedName("IsDeleted")
-    @Expose
+
     private int IsDeleted;
-    @SerializedName("DeleteBy")
-    @Expose
+
     private long DeleteBy;
-    @SerializedName("DeleteOn")
-    @Expose
+
     private String DeleteOn;
-    @SerializedName("DeletePc")
-    @Expose
+
     private String DeletePc;
-    @SerializedName("attendenceArr")
-    @Expose
+
     private ArrayList<AttendanceStudentModel> attendenceArr;
 
     public AttendanceSheetModel()
@@ -95,24 +70,131 @@ public class AttendanceSheetModel {
                                 String UpdateBy, String UpdateOn, String UpdatePc, String IsDeleted,
                                 String DeleteBy, String DeleteOn, String DeletePc, ArrayList<AttendanceStudentModel> attendenceArr)
     {
-        this.SubAtdID = Long.parseLong(SubAtdID);
-        this.SubjectID = Long.parseLong(SubjectID);
-        this.SectionID = Long.parseLong(SectionID);
-        this.DepartmentID = Long.parseLong(DepartmentID);
-        this.MediumID = Long.parseLong(MediumID);
-        this.ShiftID = Long.parseLong(ShiftID);
-        this.ClassID = Long.parseLong(ClassID);
-        this.AtdUserID = Long.parseLong(AtdUserID);
+        if(SubAtdID.equals("null"))
+        {
+            this.SubAtdID = 0;
+        }
+        else
+        {
+            this.SubAtdID = Long.parseLong(SubAtdID);
+        }
+
+        if(SubjectID.equals("null"))
+        {
+            this.SubjectID = 0;
+        }
+        else
+        {
+            this.SubjectID = Long.parseLong(SubjectID);
+        }
+
+        if(SectionID.equals("null"))
+        {
+            this.SectionID = -2;
+        }
+        else
+        {
+            this.SectionID = Long.parseLong(SectionID);
+        }
+
+        if(DepartmentID.equals("null"))
+        {
+            this.DepartmentID = -2;
+        }
+        else
+        {
+            this.DepartmentID = Long.parseLong(DepartmentID);
+        }
+
+        if(MediumID.equals("null"))
+        {
+            this.MediumID = -2;
+        }
+        else
+        {
+            this.MediumID = Long.parseLong(MediumID);
+        }
+
+        if(ShiftID.equals("null"))
+        {
+            this.ShiftID = -2;
+        }
+        else
+        {
+            this.ShiftID = Long.parseLong(ShiftID);
+        }
+
+        if(ClassID.equals("null"))
+        {
+            this.ClassID = -2;
+        }
+        else
+        {
+            this.ClassID = Long.parseLong(ClassID);
+        }
+
+        if(AtdUserID.equals("null"))
+        {
+            this.AtdUserID = 0;
+        }
+        else
+        {
+            this.AtdUserID = Long.parseLong(AtdUserID);
+        }
+
         this.AtdDate = AtdDate;
-        this.InstituteID = Long.parseLong(InstituteID);
-        this.CreateBy = Long.parseLong(CreateBy);
+
+        if(InstituteID.equals("null"))
+        {
+            this.InstituteID = 0;
+        }
+        else
+        {
+            this.InstituteID = Long.parseLong(InstituteID);
+        }
+
+        if(CreateBy.equals("null"))
+        {
+            this.CreateBy = 0;
+        }
+        else
+        {
+            this.CreateBy = Long.parseLong(CreateBy);
+        }
+
         this.CreateOn = CreateOn;
         this.CreatePc = CreatePc;
-        this.UpdateBy = Long.parseLong(UpdateBy);
+
+        if(UpdateBy.equals("null"))
+        {
+            this.UpdateBy = 0;
+        }
+        else
+        {
+            this.UpdateBy = Long.parseLong(UpdateBy);
+        }
+
         this.UpdateOn = UpdateOn;
         this.UpdatePc = UpdatePc;
-        this.IsDeleted = Integer.parseInt(IsDeleted);
-        this.DeleteBy = Long.parseLong(DeleteBy);
+
+        if(IsDeleted.equals("null"))
+        {
+            this.IsDeleted = 0;
+        }
+        else
+        {
+            this.IsDeleted = Integer.parseInt(IsDeleted);
+        }
+
+        if(DeleteBy.equals("null"))
+        {
+            this.DeleteBy = 0;
+        }
+        else
+        {
+            this.DeleteBy = Long.parseLong(DeleteBy);
+        }
+
         this.DeleteOn = DeleteOn;
         this.DeletePc = DeletePc;
         this.attendenceArr = attendenceArr;
@@ -120,42 +202,98 @@ public class AttendanceSheetModel {
 
     public void setSubAtdID(String SubAtdID)
     {
-        this.SubAtdID = Long.parseLong(SubAtdID);
+        if(SubAtdID.equals("null"))
+        {
+            this.SubAtdID = 0;
+        }
+        else
+        {
+            this.SubAtdID = Long.parseLong(SubAtdID);
+        }
     }
 
     public void setSubjectID(String SubjectID)
     {
-        this.SubjectID = Long.parseLong(SubjectID);
+        if(SubjectID.equals("null"))
+        {
+            this.SubjectID = 0;
+        }
+        else
+        {
+            this.SubjectID = Long.parseLong(SubjectID);
+        }
     }
 
     public void setSectionID(String SectionID)
     {
-        this.SectionID = Long.parseLong(SectionID);
+        if(SectionID.equals("null"))
+        {
+            this.SectionID = -2;
+        }
+        else
+        {
+            this.SectionID = Long.parseLong(SectionID);
+        }
     }
 
     public void setDepartmentID(String DepartmentID)
     {
-        this.DepartmentID = Long.parseLong(DepartmentID);
+        if(DepartmentID.equals("null"))
+        {
+            this.DepartmentID = -2;
+        }
+        else
+        {
+            this.DepartmentID = Long.parseLong(DepartmentID);
+        }
     }
 
     public void setMediumID(String MediumID)
     {
-        this.MediumID = Long.parseLong(MediumID);
+        if(MediumID.equals("null"))
+        {
+            this.MediumID = -2;
+        }
+        else
+        {
+            this.MediumID = Long.parseLong(MediumID);
+        }
     }
 
     public void setShiftID(String ShiftID)
     {
-        this.ShiftID = Long.parseLong(ShiftID);
+        if(ShiftID.equals("null"))
+        {
+            this.ShiftID = -2;
+        }
+        else
+        {
+            this.ShiftID = Long.parseLong(ShiftID);
+        }
     }
 
     public void setClassID(String ClassID)
     {
-        this.ClassID = Long.parseLong(ClassID);
+        if(ClassID.equals("null"))
+        {
+            this.ClassID = -2;
+        }
+        else
+        {
+            this.ClassID = Long.parseLong(ClassID);
+        }
     }
 
     public void setAtdUserID(String AtdUserID)
     {
-        this.AtdUserID = Long.parseLong(AtdUserID);
+        if(AtdUserID.equals("null"))
+        {
+            this.AtdUserID = 0;
+        }
+        else
+        {
+            this.AtdUserID = Long.parseLong(AtdUserID);
+        }
     }
 
     public void setAtdDate(String AtdDate)
@@ -165,12 +303,26 @@ public class AttendanceSheetModel {
 
     public void setInstituteID(String InstituteID)
     {
-        this.InstituteID = Long.parseLong(InstituteID);
+        if(InstituteID.equals("null"))
+        {
+            this.InstituteID = 0;
+        }
+        else
+        {
+            this.InstituteID = Long.parseLong(InstituteID);
+        }
     }
 
     public void setCreateBy(String CreateBy)
     {
-        this.CreateBy = Long.parseLong(CreateBy);
+        if(CreateBy.equals("null"))
+        {
+            this.CreateBy = 0;
+        }
+        else
+        {
+            this.CreateBy = Long.parseLong(CreateBy);
+        }
     }
 
     public void setCreateOn(String CreateOn)
@@ -185,7 +337,14 @@ public class AttendanceSheetModel {
 
     public void setUpdateBy(String UpdateBy)
     {
-        this.UpdateBy = Long.parseLong(UpdateBy);
+        if(UpdateBy.equals("null"))
+        {
+            this.UpdateBy = 0;
+        }
+        else
+        {
+            this.UpdateBy = Long.parseLong(UpdateBy);
+        }
     }
 
     public void setUpdateOn(String UpdateOn)
@@ -200,12 +359,26 @@ public class AttendanceSheetModel {
 
     public void setIsDeleted(String IsDeleted)
     {
-        this.IsDeleted = Integer.parseInt(IsDeleted);
+        if(IsDeleted.equals("null"))
+        {
+            this.IsDeleted = 0;
+        }
+        else
+        {
+            this.IsDeleted = Integer.parseInt(IsDeleted);
+        }
     }
 
     public void setDeleteBy(String DeleteBy)
     {
-        this.DeleteBy = Long.parseLong(DeleteBy);
+        if(DeleteBy.equals("null"))
+        {
+            this.DeleteBy = 0;
+        }
+        else
+        {
+            this.DeleteBy = Long.parseLong(DeleteBy);
+        }
     }
 
     public void setDeleteOn(String DeleteOn)

@@ -142,19 +142,20 @@ public class LoginScreen extends AppCompatActivity
                                     public void onResponse(String response) {
 
                                         parseJsonData(response); // User define Function For parsing JSON data
-                                        // Login For User
 
-                                        if((UserID.length()>0) && (UserTypeID == 3))
+                                        // Login For User
+                                        if((UserID.length()>0) && (UserTypeID == 3)||(UserID.length()>0) && (UserTypeID == 5))
                                         {
                                             Intent mainIntent = new Intent(LoginScreen.this,StudentMainScreen.class);
                                             LoginScreen.this.startActivity(mainIntent);
                                             LoginScreen.this.finish();
                                             dialog.dismiss();
                                         }
+
                                         // Login For Teacher
                                         else if((UserID.length()>0) && (UserTypeID == 4))
                                         {
-                                            Intent mainIntent = new Intent(LoginScreen.this,StudentMainScreen.class);
+                                            Intent mainIntent = new Intent(LoginScreen.this,TeacherMainScreen.class);
                                             LoginScreen.this.startActivity(mainIntent);
                                             LoginScreen.this.finish();
                                             dialog.dismiss();

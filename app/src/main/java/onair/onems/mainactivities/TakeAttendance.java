@@ -1151,23 +1151,23 @@ public class TakeAttendance extends AppCompatActivity {
         listDataHeader.add(menuStudentList);
 
         // Adding child data
-        List<String> headingNotice = new ArrayList<String>();
+        List<String> headingNotice = new ArrayList<>();
         headingNotice.add("New Notice");
         headingNotice.add("Old Notice");
 
-        List<String> headingRoutine = new ArrayList<String>();
+        List<String> headingRoutine = new ArrayList<>();
         headingRoutine.add("Mid Term Exam");
         headingRoutine.add("Final Exam");
 
-        List<String> headingAttendance = new ArrayList<String>();
+        List<String> headingAttendance = new ArrayList<>();
         headingAttendance.add("Take Attendance");
         headingAttendance.add("Show Attendance");
 
-        List<String> headingSyllabus = new ArrayList<String>();
-        List<String> headingExam = new ArrayList<String>();
-        List<String> headingResult = new ArrayList<String>();
-        List<String> headingContact = new ArrayList<String>();
-        List<String> headingiCard = new ArrayList<String>();
+        List<String> headingSyllabus = new ArrayList<>();
+        List<String> headingExam = new ArrayList<>();
+        List<String> headingResult = new ArrayList<>();
+        List<String> headingContact = new ArrayList<>();
+        List<String> headingiCard = new ArrayList<>();
         List<String> headingStudentList = new ArrayList<>();
 
         listDataChild.put(listDataHeader.get(0), headingNotice);// Header, Child data
@@ -1247,29 +1247,4 @@ public class TakeAttendance extends AppCompatActivity {
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
-
-//    @SuppressWarnings("StatementWithEmptyBody")
-//    @Override
-//    public boolean onNavigationItemSelected(MenuItem item) {
-//        // Handle navigation view item clicks here.
-//        int id = item.getItemId();
-//
-//        if (id == R.id.nav_camera) {
-//            // Handle the camera action
-//        } else if (id == R.id.nav_gallery) {
-//
-//        } else if (id == R.id.nav_slideshow) {
-//
-//        } else if (id == R.id.nav_manage) {
-//
-//        } else if (id == R.id.nav_share) {
-//
-//        } else if (id == R.id.nav_send) {
-//
-//        }
-//
-//        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-//        drawer.closeDrawer(GravityCompat.START);
-//        return true;
-//    }
 }

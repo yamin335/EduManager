@@ -309,6 +309,13 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="onair.onems.mainactivities.ReportAllStudentMain" />
+            <meta-data
+                android:name="android.app.searchable"
+                android:resource="@xml/searchable" />
+
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH" />
+            </intent-filter>
         </activity>
 
         <activity
@@ -316,6 +323,28 @@
             android:name="onair.onems.mainactivities.NoticeMainScreen"
             android:label="Notice"
             android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.app.searchable"
+                android:resource="@xml/searchable" />
+
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:screenOrientation="portrait"
+            android:name="onair.onems.mainactivities.Result.ResultMainScreen"
+            android:label="Result"
+            android:theme="@style/AppTheme.NoActionBar">
+
+            <meta-data
+                android:name="android.app.searchable"
+                android:resource="@xml/searchable" />
+
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH" />
+            </intent-filter>
         </activity>
 
     </application>
