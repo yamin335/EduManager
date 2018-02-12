@@ -76,7 +76,7 @@ public class TeacherMainScreen extends AppCompatActivity {
                 finish();
             }
         });
-
+        // Result module start point
         result.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
