@@ -180,23 +180,13 @@
         <activity
             android:screenOrientation="portrait"
             android:name="onair.onems.mainactivities.StudentiCardDetails"
-            android:label="Details Information"
-            android:parentActivityName="onair.onems.mainactivities.StudentiCardMain">
-            <!-- The meta-data element is needed for versions lower than 4.1 -->
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="onair.onems.mainactivities.StudentiCardMain" />
+            android:label="Details Information">
         </activity>
 
         <activity
             android:screenOrientation="portrait"
             android:name="onair.onems.mainactivities.StudentiCardDetailsEdit"
-            android:label="Edit Information"
-            android:parentActivityName="onair.onems.mainactivities.StudentiCardMain">
-            <!-- The meta-data element is needed for versions lower than 4.1 -->
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="onair.onems.mainactivities.StudentiCardMain" />
+            android:label="Edit Information">
         </activity>
 
         <activity

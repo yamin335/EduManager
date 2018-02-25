@@ -731,6 +731,7 @@ public class StudentiCardNewEntry extends AppCompatActivity {
                             tempBitmap = null;
                             originalBitmap = null;
                             mCropImageView.clearImage();
+                            checkBox.setChecked(false);
 
                         }
                         catch (Exception e)

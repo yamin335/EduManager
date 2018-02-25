@@ -1313,7 +1313,8 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
                         try {
 //                            Toast.makeText(StudentiCardDetails.this,"Data Successfully Updated with Response: "+response.getJSONObject(0).get("ReturnValue"),Toast.LENGTH_LONG).show();
                             Toast.makeText(StudentiCardDetailsEdit.this,"Successfully Updated",Toast.LENGTH_LONG).show();
-                            NavUtils.navigateUpFromSameTask(StudentiCardDetailsEdit.this);
+//                            NavUtils.navigateUpFromSameTask(StudentiCardDetailsEdit.this);
+                            StudentiCardDetailsEdit.super.onBackPressed();
                         }
                         catch (Exception e)
                         {
@@ -1584,7 +1585,7 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        NavUtils.navigateUpFromSameTask(this);
+//        NavUtils.navigateUpFromSameTask(this);
         super.onBackPressed();
     }
 

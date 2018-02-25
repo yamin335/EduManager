@@ -114,6 +114,7 @@ public class LoginScreen extends AppCompatActivity
                 LoginScreen.this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
                 if(isNetworkAvailable())
                 {
+
                     loginurl = getString(R.string.baseUrlLocal)+"getLoginInformation"+"/"+takeId.getText().toString()+"/"+takePassword.getText().toString();
                     if(takeId.getText().toString().isEmpty())
                     {
@@ -135,7 +136,6 @@ public class LoginScreen extends AppCompatActivity
                                 {
                                     @Override
                                     public void onResponse(String response) {
-
                                         parseJsonData(response); // User define Function For parsing JSON data
 
                                         // Login For User
@@ -170,7 +170,7 @@ public class LoginScreen extends AppCompatActivity
                             @Override
                             public void onErrorResponse(VolleyError error)
                             {
-
+                                Toast.makeText(LoginScreen.this,"Debugging:"+error,Toast.LENGTH_LONG).show();
                                 dialog.dismiss();
                             }
                         });

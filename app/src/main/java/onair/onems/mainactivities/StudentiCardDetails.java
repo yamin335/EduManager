@@ -462,7 +462,8 @@ public class StudentiCardDetails extends AppCompatActivity {
                         try {
 //                            Toast.makeText(StudentiCardDetails.this,"Data Successfully Updated with Response: "+response.getJSONObject(0).get("ReturnValue"),Toast.LENGTH_LONG).show();
                             Toast.makeText(StudentiCardDetails.this,"Successfully Updated",Toast.LENGTH_LONG).show();
-                            NavUtils.navigateUpFromSameTask(StudentiCardDetails.this);
+//                            NavUtils.navigateUpFromSameTask(StudentiCardDetails.this);
+                            StudentiCardDetails.super.onBackPressed();
                         }
                         catch (Exception e)
                         {
@@ -709,7 +710,7 @@ public class StudentiCardDetails extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        NavUtils.navigateUpFromSameTask(this);
+//        NavUtils.navigateUpFromSameTask(this);
         super.onBackPressed();
     }
 
