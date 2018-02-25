@@ -150,6 +150,15 @@ public class NoticeMainScreen extends AppCompatActivity implements NoticeAdapter
             @Override
             public boolean onGroupClick(ExpandableListView expandableListView, View view, int i, long l) {
 //                Log.d("DEBUG", "heading clicked"+i+"--"+l);
+
+                if((i == 0) && (l == 0))
+                {
+                    DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                    if (drawer.isDrawerOpen(GravityCompat.START)) {
+                        drawer.closeDrawer(GravityCompat.START);
+                    }
+                }
+
                 if((i == 7) && (l == 7))
                 {
                     Intent intent = new Intent(NoticeMainScreen.this, StudentiCardMain.class);
@@ -162,14 +171,6 @@ public class NoticeMainScreen extends AppCompatActivity implements NoticeAdapter
                     Intent intent = new Intent(NoticeMainScreen.this, ReportAllStudentMain.class);
                     startActivity(intent);
                     finish();
-                }
-
-                if((i == 0) && (l == 0))
-                {
-                    DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-                    if (drawer.isDrawerOpen(GravityCompat.START)) {
-                        drawer.closeDrawer(GravityCompat.START);
-                    }
                 }
                 return false;
             }

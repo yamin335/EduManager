@@ -6,13 +6,13 @@ package onair.onems.models;
 
 public class ResultModel {
 
-    private String ExamName = "";
-    private String PublishDate = "";
+    private String ExamName = "Exam Name";
+    private String PublishDate = "3-3-2055";
 
     public ResultModel()
     {
-        this.ExamName = "";
-        this.PublishDate = "";
+        this.ExamName = "Exam Name";
+        this.PublishDate = "3-3-2055";
     }
 
     public ResultModel(String ExamName, String PublishDate)

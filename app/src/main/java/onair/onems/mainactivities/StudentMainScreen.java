@@ -16,6 +16,7 @@ import onair.onems.R;
 import onair.onems.mainactivities.Fees.Fee;
 import onair.onems.mainactivities.Fees.StudentList;
 import onair.onems.mainactivities.Result.ClassResult;
+import onair.onems.mainactivities.Result.ResultMainScreen;
 import onair.onems.mainactivities.Routine.ClassRoutine;
 
 
@@ -25,7 +26,7 @@ import onair.onems.mainactivities.Routine.ClassRoutine;
 
 public class StudentMainScreen extends AppCompatActivity {
 
-    private Button Attendance,Fees,Class_routine,Result;
+    private Button Attendance,Fees,Class_routine,result, notice, contact;
     TextView InstituteName;
     TextView userType;
     long user;
@@ -53,10 +54,45 @@ public class StudentMainScreen extends AppCompatActivity {
         }
 
         InstituteName.setText(name);
+
+        notice = (Button)findViewById(R.id.notice);
         Attendance = (Button)findViewById(R.id.attendance);
         Fees=(Button) findViewById(R.id.fee);
         Class_routine=(Button) findViewById(R.id.routine);
-        Result=(Button) findViewById(R.id.result);
+        result = (Button)findViewById(R.id.result);
+        contact = (Button)findViewById(R.id.contact);
+
+
+//        // Notice module start point
+//        notice.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Intent mainIntent = new Intent(StudentMainScreen.this,NoticeMainScreen.class);
+//                StudentMainScreen.this.startActivity(mainIntent);
+//                finish();
+//            }
+//        });
+
+        Class_routine.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                if(user == 3)
+                {
+                    Intent mainIntent = new Intent(StudentMainScreen.this,ClassRoutine.class);
+                    StudentMainScreen.this.startActivity(mainIntent);
+                    finish();
+                }
+                else
+                {
+                    Intent mainIntent = new Intent(StudentMainScreen.this,StudentList.class);
+                    StudentMainScreen.this.startActivity(mainIntent);
+                    finish();
+                }
+            }
+        });
+
         Attendance.setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -66,6 +102,28 @@ public class StudentMainScreen extends AppCompatActivity {
                 finish();
             }
         });
+
+        // Result module start point
+        result.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                if(user == 3)
+                {
+                    Intent mainIntent = new Intent(StudentMainScreen.this,ResultMainScreen.class);
+                    StudentMainScreen.this.startActivity(mainIntent);
+                    finish();
+                }
+                else
+                {
+                    Intent mainIntent = new Intent(StudentMainScreen.this,StudentList.class);
+                    StudentMainScreen.this.startActivity(mainIntent);
+                    finish();
+                }
+            }
+        });
+
         Fees.setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -85,44 +143,17 @@ public class StudentMainScreen extends AppCompatActivity {
                 }
             }
         });
-      Class_routine.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                if(user == 3)
-                {
-                    Intent mainIntent = new Intent(StudentMainScreen.this,ClassRoutine.class);
-                    StudentMainScreen.this.startActivity(mainIntent);
-                    finish();
-                }
-                else
-                {
-                    Intent mainIntent = new Intent(StudentMainScreen.this,StudentList.class);
-                    StudentMainScreen.this.startActivity(mainIntent);
-                    finish();
-                }
-            }
-        });
-        Result.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                if(user == 3)
-                {
-                    Intent mainIntent = new Intent(StudentMainScreen.this,ClassResult.class);
-                    StudentMainScreen.this.startActivity(mainIntent);
-                    finish();
-                }
-                else
-                {
-                    Intent mainIntent = new Intent(StudentMainScreen.this,StudentList.class);
-                    StudentMainScreen.this.startActivity(mainIntent);
-                    finish();
-                }
-            }
-        });
+
+//        // Contact module start point
+//        contact.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Intent mainIntent = new Intent(StudentMainScreen.this,ContactsMainScreen.class);
+//                StudentMainScreen.this.startActivity(mainIntent);
+//                finish();
+//            }
+//        });
+
     }
     @Override
     public void onBackPressed() {

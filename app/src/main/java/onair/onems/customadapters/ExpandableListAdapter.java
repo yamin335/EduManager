@@ -92,9 +92,6 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
         ImageView headerIcon = (ImageView) convertView.findViewById(R.id.iconimage);
         ImageView indicator = (ImageView) convertView.findViewById(R.id.arrow);
         switch (groupPosition) {
-            case 1:
-                indicator.setVisibility(View.VISIBLE);
-                break;
             case 2:
                 indicator.setVisibility(View.VISIBLE);
                 break;

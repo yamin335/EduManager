@@ -1,14 +1,20 @@
-package onair.onems.mainactivities.Result;
+package onair.onems.mainactivities;
 
+import android.Manifest;
+import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
@@ -37,28 +43,14 @@ import java.util.List;
 
 import onair.onems.R;
 import onair.onems.Services.GlideApp;
+import onair.onems.customadapters.ContactsAdapter;
 import onair.onems.customadapters.ExpandableListAdapter;
 import onair.onems.customadapters.MyDividerItemDecoration;
-import onair.onems.customadapters.ResultAdapter;
-import onair.onems.mainactivities.LoginScreen;
-import onair.onems.mainactivities.NoticeMainScreen;
-import onair.onems.mainactivities.ReportAllStudentMain;
-import onair.onems.mainactivities.StudentAttendance;
-import onair.onems.mainactivities.StudentMainScreen;
-import onair.onems.mainactivities.StudentiCardMain;
-import onair.onems.mainactivities.TakeAttendance;
 import onair.onems.mainactivities.TeacherAttendanceShow.ShowAttendance;
-import onair.onems.mainactivities.TeacherMainScreen;
+import onair.onems.models.Contact;
 import onair.onems.models.ExpandedMenuModel;
-import onair.onems.models.NoticeModel;
-import onair.onems.models.ResultModel;
 
-/**
- * Created by User on 2/11/2018.
- */
-
-public class ResultMainScreen extends AppCompatActivity implements ResultAdapter.ResultsAdapterListener{
-
+public class ContactsMainScreen extends AppCompatActivity implements ContactsAdapter.ContactsAdapterListener {
     private DrawerLayout mDrawerLayout;
     private ExpandableListAdapter mMenuAdapter;
     private ExpandableListView expandableList;
@@ -67,26 +59,40 @@ public class ResultMainScreen extends AppCompatActivity implements ResultAdapter
     public static final String MyPREFERENCES = "LogInKey";
     public static SharedPreferences sharedPreferences;
     long InstituteID;
+    private static final String TAG = ContactsMainScreen.class.getSimpleName();
     private RecyclerView recyclerView;
-    private List<ResultModel> resultList;
-    private ResultAdapter mAdapter;
+    private ArrayList<Contact> contactList;
+    private ContactsAdapter mAdapter;
     private SearchView searchView;
 
+    // url to fetch contacts json
+    private static final String URL = "https://api.androidhive.info/json/contacts.json";
+
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.result_activity_main);
+        setContentView(R.layout.notice_activity_main);
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         InstituteID = prefs.getLong("InstituteID",0);
 
         if(!isNetworkAvailable())
         {
-            Toast.makeText(this,"Please check your internet connection and open app again!!! ",Toast.LENGTH_LONG).show();
+            Toast.makeText(ContactsMainScreen.this,"Please check your internet connection and open app again!!! ",Toast.LENGTH_LONG).show();
         }
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        // toolbar fancy stuff
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setTitle(R.string.toolbar_title);
+
         recyclerView = findViewById(R.id.recycler_view);
-        resultList = new ArrayList<>();
-        mAdapter = new ResultAdapter(this, resultList, this);
+        contactList = new ArrayList<>();
+        mAdapter = new ContactsAdapter(this, contactList, this);
+
+        // white background notification bar
+        whiteNotificationBar(recyclerView);
 
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(mLayoutManager);
@@ -94,10 +100,8 @@ public class ResultMainScreen extends AppCompatActivity implements ResultAdapter
         recyclerView.addItemDecoration(new MyDividerItemDecoration(this, DividerItemDecoration.VERTICAL, 20));
         recyclerView.setAdapter(mAdapter);
 
-        prepareResultList();
+        fetchContacts();
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
 
         final ActionBar ab = getSupportActionBar();
         /* to set the menu icon image*/
@@ -140,12 +144,12 @@ public class ResultMainScreen extends AppCompatActivity implements ResultAdapter
             public boolean onChildClick(ExpandableListView expandableListView, View view, int i, int i1, long l) {
                 if((i == 2) && (i1 == 1) && (l == 1))
                 {
-                    Intent intent = new Intent(ResultMainScreen.this, ShowAttendance.class);
+                    Intent intent = new Intent(ContactsMainScreen.this, ShowAttendance.class);
                     startActivity(intent);
                 }
                 if((i == 2) && (i1 == 0) && (l == 0))
                 {
-                    Intent intent = new Intent(ResultMainScreen.this, TakeAttendance.class);
+                    Intent intent = new Intent(ContactsMainScreen.this, TakeAttendance.class);
                     startActivity(intent);
                     finish();
                 }
@@ -160,14 +164,14 @@ public class ResultMainScreen extends AppCompatActivity implements ResultAdapter
 //                Log.d("DEBUG", "heading clicked"+i+"--"+l);
                 if((i == 7) && (l == 7))
                 {
-                    Intent intent = new Intent(ResultMainScreen.this, StudentiCardMain.class);
+                    Intent intent = new Intent(ContactsMainScreen.this, StudentiCardMain.class);
                     startActivity(intent);
                     finish();
                 }
 
                 if((i == 8) && (l == 8))
                 {
-                    Intent intent = new Intent(ResultMainScreen.this, ReportAllStudentMain.class);
+                    Intent intent = new Intent(ContactsMainScreen.this, ReportAllStudentMain.class);
                     startActivity(intent);
                     finish();
                 }
@@ -189,17 +193,64 @@ public class ResultMainScreen extends AppCompatActivity implements ResultAdapter
         toggle.syncState();
     }
 
-
-    private void prepareResultList() {
-        for(int i = 0; i < 500; ++i) {
-            ResultModel resultModel = new ResultModel();
-            resultModel.setExamName(resultModel.getExamName()+"--"+i);
-            resultList.add(resultModel);
+    /**
+     * fetches json by making http calls
+     */
+    private void fetchContacts() {
+        for(int i = 0; i < 20; ++i) {
+            Contact contact = new Contact();
+            contact.setName("Person"+"--"+i);
+            contactList.add(contact);
         }
         // refreshing recycler view
         mAdapter.notifyDataSetChanged();
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+
+        // Associate searchable configuration with the SearchView
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        searchView = (SearchView) menu.findItem(R.id.action_search)
+                .getActionView();
+        searchView.setSearchableInfo(searchManager
+                .getSearchableInfo(getComponentName()));
+        searchView.setMaxWidth(Integer.MAX_VALUE);
+
+        // listening to search query text change
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                // filter recycler view when query submitted
+                mAdapter.getFilter().filter(query);
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String query) {
+                // filter recycler view when text is changed
+                mAdapter.getFilter().filter(query);
+                return false;
+            }
+        });
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_search) {
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
     private void prepareListData() {
         listDataHeader = new ArrayList<ExpandedMenuModel>();
         listDataChild = new HashMap<ExpandedMenuModel, List<String>>();
@@ -294,62 +345,45 @@ public class ResultMainScreen extends AppCompatActivity implements ResultAdapter
 
     @Override
     public void onBackPressed() {
+        // close search view on back button pressed
+        if (!searchView.isIconified()) {
+            searchView.setIconified(true);
+            return;
+        }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            Intent mainIntent = new Intent(ResultMainScreen.this, TeacherMainScreen.class);
+            Intent mainIntent = new Intent(ContactsMainScreen.this, TeacherMainScreen.class);
             startActivity(mainIntent);
             finish();
         }
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
+    private void whiteNotificationBar(View view) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            int flags = view.getSystemUiVisibility();
+            flags |= View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
+            view.setSystemUiVisibility(flags);
+            getWindow().setStatusBarColor(Color.WHITE);
+        }
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_logout) {
-            sharedPreferences  = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
-            SharedPreferences.Editor editor = sharedPreferences.edit();
-            editor.putBoolean("LogInState", false);
-            editor.apply();
-            Intent intent = new Intent(ResultMainScreen.this, LoginScreen.class);
-            startActivity(intent);
-            finish();
-            return true;
+    public void onContactSelected(Contact contact) {
+        Toast.makeText(getApplicationContext(), "Selected: " +
+                contact.getName() + ", " + contact.getPhone(), Toast.LENGTH_LONG).show();
+        Intent callintent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + "01721847998"));
+        if (ActivityCompat.checkSelfPermission(ContactsMainScreen.this,
+                Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+            return;
         }
-
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                mDrawerLayout.openDrawer(GravityCompat.START);
-                return true;
-        }
-
-        return super.onOptionsItemSelected(item);
+        startActivity(callintent);
     }
 
     private boolean isNetworkAvailable() {
         ConnectivityManager connectivityManager = (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
-    }
-
-    @Override
-    public void onResultSelected(ResultModel resultModel) {
-        Toast.makeText(getApplicationContext(), "Selected: " + resultModel.getExamName()
-                +", " + resultModel.getPublishDate(), Toast.LENGTH_LONG).show();
-        Intent mainIntent = new Intent(ResultMainScreen.this,SubjectWiseResult.class);
-        ResultMainScreen.this.startActivity(mainIntent);
     }
 }

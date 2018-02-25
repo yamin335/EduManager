@@ -716,7 +716,22 @@ public class StudentiCardNewEntry extends AppCompatActivity {
                         try {
 //                            Toast.makeText(StudentiCardNewEntry.this,"Data Successfully Updated with Response: "+response.getJSONObject(0).get("ReturnValue"),Toast.LENGTH_LONG).show();
                             Toast.makeText(StudentiCardNewEntry.this,"Successful",Toast.LENGTH_LONG).show();
-                            NavUtils.navigateUpFromSameTask(StudentiCardNewEntry.this);
+//                            NavUtils.navigateUpFromSameTask(StudentiCardNewEntry.this);
+                            editname.setText("");
+                            editroll.setText("");
+                            editparent.setText("");
+                            editparentnumber.setText("");
+                            editaddress.setText("");
+                            IsImageCaptured = false;
+                            checkBox.setEnabled(false);
+                            rotateLeft.setEnabled(false);
+                            rotateRight.setEnabled(false);
+                            brightImageSeekBar.setProgress(100);
+                            brightImageSeekBar.setEnabled(false);
+                            tempBitmap = null;
+                            originalBitmap = null;
+                            mCropImageView.clearImage();
+
                         }
                         catch (Exception e)
                         {

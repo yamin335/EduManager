@@ -4,19 +4,16 @@ android:layout_width="fill_parent"
 android:layout_height="fill_parent"
 android:fitsSystemWindows="true">
 <LinearLayout
-    android:layout_gravity="center_vertical"
+    android:layout_gravity="center"
+    android:layout_marginBottom="40dp"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginTop="20dp"
     android:paddingLeft="24dp"
     android:paddingRight="24dp">
     <ImageView
         android:layout_width="150dp"
         android:layout_height="100dp"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_centerVertical="true"
         android:paddingTop="5dp"
         android:layout_gravity="center_horizontal"
         android:src="@drawable/onair_main"
@@ -24,13 +21,12 @@ android:fitsSystemWindows="true">
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
         android:layout_gravity="center_horizontal"
         android:text="OnEMS"
-        android:textColor="#000000"
-        android:textSize="18dp"
-        android:textStyle="bold" />
+        android:textColor="#174b92"
+        android:textSize="20dp"
+        android:textStyle="bold"
+        android:layout_marginBottom="30dp"/>
 
     <android.support.design.widget.TextInputLayout
         android:layout_width="match_parent"
@@ -76,7 +72,8 @@ android:fitsSystemWindows="true">
         android:layout_marginBottom="10dp"
         android:textColor="#F44336"
         android:gravity="center"
-        android:id="@+id/error"/>
+        android:id="@+id/error"
+        android:paddingBottom="35dp"/>
 
 </LinearLayout>
 
