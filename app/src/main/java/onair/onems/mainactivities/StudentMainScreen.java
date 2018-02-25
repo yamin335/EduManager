@@ -78,18 +78,18 @@ public class StudentMainScreen extends AppCompatActivity {
             @Override
             public void onClick(View v)
             {
-                if(user == 3)
-                {
-                    Intent mainIntent = new Intent(StudentMainScreen.this,ClassRoutine.class);
-                    StudentMainScreen.this.startActivity(mainIntent);
-                    finish();
-                }
-                else
-                {
-                    Intent mainIntent = new Intent(StudentMainScreen.this,StudentList.class);
-                    StudentMainScreen.this.startActivity(mainIntent);
-                    finish();
-                }
+//                if(user == 3)
+//                {
+//                    Intent mainIntent = new Intent(StudentMainScreen.this,ClassRoutine.class);
+//                    StudentMainScreen.this.startActivity(mainIntent);
+//                    finish();
+//                }
+//                else
+//                {
+//                    Intent mainIntent = new Intent(StudentMainScreen.this,StudentList.class);
+//                    StudentMainScreen.this.startActivity(mainIntent);
+//                    finish();
+//                }
             }
         });
 
@@ -109,18 +109,18 @@ public class StudentMainScreen extends AppCompatActivity {
             @Override
             public void onClick(View v)
             {
-                if(user == 3)
-                {
-                    Intent mainIntent = new Intent(StudentMainScreen.this,ResultMainScreen.class);
-                    StudentMainScreen.this.startActivity(mainIntent);
-                    finish();
-                }
-                else
-                {
-                    Intent mainIntent = new Intent(StudentMainScreen.this,StudentList.class);
-                    StudentMainScreen.this.startActivity(mainIntent);
-                    finish();
-                }
+//                if(user == 3)
+//                {
+//                    Intent mainIntent = new Intent(StudentMainScreen.this,ResultMainScreen.class);
+//                    StudentMainScreen.this.startActivity(mainIntent);
+//                    finish();
+//                }
+//                else
+//                {
+//                    Intent mainIntent = new Intent(StudentMainScreen.this,StudentList.class);
+//                    StudentMainScreen.this.startActivity(mainIntent);
+//                    finish();
+//                }
             }
         });
 

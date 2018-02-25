@@ -58,9 +58,9 @@ public class TeacherMainScreen extends AppCompatActivity {
         notice.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent mainIntent = new Intent(TeacherMainScreen.this,NoticeMainScreen.class);
-                TeacherMainScreen.this.startActivity(mainIntent);
-                finish();
+//                Intent mainIntent = new Intent(TeacherMainScreen.this,NoticeMainScreen.class);
+//                TeacherMainScreen.this.startActivity(mainIntent);
+//                finish();
             }
         });
 
@@ -88,9 +88,9 @@ public class TeacherMainScreen extends AppCompatActivity {
         result.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent mainIntent = new Intent(TeacherMainScreen.this,ResultMainScreen.class);
-                TeacherMainScreen.this.startActivity(mainIntent);
-                finish();
+//                Intent mainIntent = new Intent(TeacherMainScreen.this,ResultMainScreen.class);
+//                TeacherMainScreen.this.startActivity(mainIntent);
+//                finish();
             }
         });
 
@@ -98,9 +98,9 @@ public class TeacherMainScreen extends AppCompatActivity {
         contact.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent mainIntent = new Intent(TeacherMainScreen.this,ContactsMainScreen.class);
-                TeacherMainScreen.this.startActivity(mainIntent);
-                finish();
+//                Intent mainIntent = new Intent(TeacherMainScreen.this,ContactsMainScreen.class);
+//                TeacherMainScreen.this.startActivity(mainIntent);
+//                finish();
             }
         });
 
