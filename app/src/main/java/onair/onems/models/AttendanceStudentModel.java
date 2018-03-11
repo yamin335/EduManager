@@ -68,6 +68,12 @@ public class AttendanceStudentModel {
 
     private String Class;
 
+    private String DisplayDate;
+
+    private boolean isReadOnly;
+
+    private int IsPresentID;
+
     public AttendanceStudentModel()
     {
 
@@ -80,7 +86,8 @@ public class AttendanceStudentModel {
                                   String Board, String Brunch, String Session, String BrunchID,
                                   String SessionID, String IsPresent, String Islate, String LateTime,
                                   String IsLeave, String IsAbsent, String Remarks, String Subject,
-                                  String Department, String Medium, String Shift, String Class)
+                                  String Department, String Medium, String Shift, String Class,
+                                  String DisplayDate, String isReadOnly, String IsPresentID)
     {
         if(SubAtdDetailID.equals("null"))
         {
@@ -243,6 +250,25 @@ public class AttendanceStudentModel {
         this.Medium = Medium;
         this.Shift = Shift;
         this.Class = Class;
+        this.DisplayDate = DisplayDate;
+
+        if(isReadOnly.equals("null"))
+        {
+            this.isReadOnly = false;
+        }
+        else
+        {
+            this.isReadOnly = Boolean.parseBoolean(isReadOnly);
+        }
+
+        if(IsPresentID.equals("null"))
+        {
+            this.IsPresentID = 0;
+        }
+        else
+        {
+            this.IsPresentID = Integer.parseInt(IsPresentID);
+        }
     }
 
     public void setSubAtdDetailID(String SubAtdDetailID)
@@ -486,6 +512,48 @@ public class AttendanceStudentModel {
     public void setClass(String Class)
     {
         this.Class = Class;
+    }
+
+    public void setDisplayDate(String DisplayDate)
+    {
+        this.DisplayDate = DisplayDate;
+    }
+
+    public void setisReadOnly(String isReadOnly)
+    {
+        if(isReadOnly.equals("null"))
+        {
+            this.isReadOnly = false;
+        }
+        else
+        {
+            this.isReadOnly = Boolean.parseBoolean(isReadOnly);
+        }
+    }
+
+    public void setIsPresentID(String IsPresentID)
+    {
+        if(IsPresentID.equals("null"))
+        {
+            this.IsPresentID = 0;
+        }
+        else
+        {
+            this.IsPresentID = Integer.parseInt(IsPresentID);
+        }
+    }
+
+    public String getDisplayDate()
+    {
+        return this.DisplayDate;
+    }
+    public boolean getisReadOnly()
+    {
+        return this.isReadOnly;
+    }
+    public int getIsPresentID()
+    {
+        return this.IsPresentID;
     }
 
     public String getSubAtdDetailID()

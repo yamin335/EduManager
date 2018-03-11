@@ -28,40 +28,43 @@ public class AttendanceSheetModel {
 
     private long InstituteID;
 
-    private long CreateBy;
+//    private long CreateBy;
 
-    private String CreateOn;
+//    private String CreateOn;
+//
+//    private String CreatePc;
+//
+//    private long UpdateBy;
+//
+//    private String UpdateOn;
+//
+//    private String UpdatePc;
+//
+//    private int IsDeleted;
+//
+//    private long DeleteBy;
+//
+//    private String DeleteOn;
+//
+//    private String DeletePc;
 
-    private String CreatePc;
-
-    private long UpdateBy;
-
-    private String UpdateOn;
-
-    private String UpdatePc;
-
-    private int IsDeleted;
-
-    private long DeleteBy;
-
-    private String DeleteOn;
-
-    private String DeletePc;
+    private long LoggedUserID;
 
     private ArrayList<AttendanceStudentModel> attendenceArr;
 
     public AttendanceSheetModel()
     {
-        this.CreateBy = 0;
-        this.CreateOn = "";
-        this.CreatePc = "";
-        this.UpdateBy = 0;
-        this.UpdateOn = "";
-        this.UpdatePc = "";
-        this.IsDeleted = 0;
-        this.DeleteBy = 0;
-        this.DeleteOn = "";
-        this.DeletePc = "";
+//        this.CreateBy = 0;
+//        this.CreateOn = "";
+//        this.CreatePc = "";
+//        this.UpdateBy = 0;
+//        this.UpdateOn = "";
+//        this.UpdatePc = "";
+//        this.IsDeleted = 0;
+//        this.DeleteBy = 0;
+//        this.DeleteOn = "";
+//        this.DeletePc = "";
+        this.LoggedUserID = 0;
     }
 
     public AttendanceSheetModel(String SubAtdID, String SubjectID, String SectionID, String DepartmentID,
@@ -152,51 +155,51 @@ public class AttendanceSheetModel {
         {
             this.InstituteID = Long.parseLong(InstituteID);
         }
-
-        if(CreateBy.equals("null"))
-        {
-            this.CreateBy = 0;
-        }
-        else
-        {
-            this.CreateBy = Long.parseLong(CreateBy);
-        }
-
-        this.CreateOn = CreateOn;
-        this.CreatePc = CreatePc;
-
-        if(UpdateBy.equals("null"))
-        {
-            this.UpdateBy = 0;
-        }
-        else
-        {
-            this.UpdateBy = Long.parseLong(UpdateBy);
-        }
-
-        this.UpdateOn = UpdateOn;
-        this.UpdatePc = UpdatePc;
-
-        if(IsDeleted.equals("null"))
-        {
-            this.IsDeleted = 0;
-        }
-        else
-        {
-            this.IsDeleted = Integer.parseInt(IsDeleted);
-        }
-
-        if(DeleteBy.equals("null"))
-        {
-            this.DeleteBy = 0;
-        }
-        else
-        {
-            this.DeleteBy = Long.parseLong(DeleteBy);
-        }
-
-        this.DeleteOn = DeleteOn;
-        this.DeletePc = DeletePc;
+//
+//        if(CreateBy.equals("null"))
+//        {
+//            this.CreateBy = 0;
+//        }
+//        else
+//        {
+//            this.CreateBy = Long.parseLong(CreateBy);
+//        }
+//
+//        this.CreateOn = CreateOn;
+//        this.CreatePc = CreatePc;
+//
+//        if(UpdateBy.equals("null"))
+//        {
+//            this.UpdateBy = 0;
+//        }
+//        else
+//        {
+//            this.UpdateBy = Long.parseLong(UpdateBy);
+//        }
+//
+//        this.UpdateOn = UpdateOn;
+//        this.UpdatePc = UpdatePc;
+//
+//        if(IsDeleted.equals("null"))
+//        {
+//            this.IsDeleted = 0;
+//        }
+//        else
+//        {
+//            this.IsDeleted = Integer.parseInt(IsDeleted);
+//        }
+//
+//        if(DeleteBy.equals("null"))
+//        {
+//            this.DeleteBy = 0;
+//        }
+//        else
+//        {
+//            this.DeleteBy = Long.parseLong(DeleteBy);
+//        }
+//
+//        this.DeleteOn = DeleteOn;
+//        this.DeletePc = DeletePc;
         this.attendenceArr = attendenceArr;
     }
 
@@ -313,83 +316,88 @@ public class AttendanceSheetModel {
         }
     }
 
-    public void setCreateBy(String CreateBy)
+    public void setLoggedUserID(String LoggedUserID)
     {
-        if(CreateBy.equals("null"))
-        {
-            this.CreateBy = 0;
-        }
-        else
-        {
-            this.CreateBy = Long.parseLong(CreateBy);
-        }
+        this.LoggedUserID = Long.parseLong(LoggedUserID);
     }
-
-    public void setCreateOn(String CreateOn)
-    {
-        this.CreateOn = CreateOn;
-    }
-
-    public void setCreatePc(String CreatePc)
-    {
-        this.CreatePc = CreatePc;
-    }
-
-    public void setUpdateBy(String UpdateBy)
-    {
-        if(UpdateBy.equals("null"))
-        {
-            this.UpdateBy = 0;
-        }
-        else
-        {
-            this.UpdateBy = Long.parseLong(UpdateBy);
-        }
-    }
-
-    public void setUpdateOn(String UpdateOn)
-    {
-        this.UpdateOn = UpdateOn;
-    }
-
-    public void setUpdatePc(String UpdatePc)
-    {
-        this.UpdatePc = UpdatePc;
-    }
-
-    public void setIsDeleted(String IsDeleted)
-    {
-        if(IsDeleted.equals("null"))
-        {
-            this.IsDeleted = 0;
-        }
-        else
-        {
-            this.IsDeleted = Integer.parseInt(IsDeleted);
-        }
-    }
-
-    public void setDeleteBy(String DeleteBy)
-    {
-        if(DeleteBy.equals("null"))
-        {
-            this.DeleteBy = 0;
-        }
-        else
-        {
-            this.DeleteBy = Long.parseLong(DeleteBy);
-        }
-    }
-
-    public void setDeleteOn(String DeleteOn)
-    {
-        this.DeleteOn = DeleteOn;
-    }
-
-    public void setDeletePc(String DeletePc)
-    {
-        this.DeletePc = DeletePc;
-    }
+//
+//    public void setCreateBy(String CreateBy)
+//    {
+//        if(CreateBy.equals("null"))
+//        {
+//            this.CreateBy = 0;
+//        }
+//        else
+//        {
+//            this.CreateBy = Long.parseLong(CreateBy);
+//        }
+//    }
+//
+//    public void setCreateOn(String CreateOn)
+//    {
+//        this.CreateOn = CreateOn;
+//    }
+//
+//    public void setCreatePc(String CreatePc)
+//    {
+//        this.CreatePc = CreatePc;
+//    }
+//
+//    public void setUpdateBy(String UpdateBy)
+//    {
+//        if(UpdateBy.equals("null"))
+//        {
+//            this.UpdateBy = 0;
+//        }
+//        else
+//        {
+//            this.UpdateBy = Long.parseLong(UpdateBy);
+//        }
+//    }
+//
+//    public void setUpdateOn(String UpdateOn)
+//    {
+//        this.UpdateOn = UpdateOn;
+//    }
+//
+//    public void setUpdatePc(String UpdatePc)
+//    {
+//        this.UpdatePc = UpdatePc;
+//    }
+//
+//    public void setIsDeleted(String IsDeleted)
+//    {
+//        if(IsDeleted.equals("null"))
+//        {
+//            this.IsDeleted = 0;
+//        }
+//        else
+//        {
+//            this.IsDeleted = Integer.parseInt(IsDeleted);
+//        }
+//    }
+//
+//    public void setDeleteBy(String DeleteBy)
+//    {
+//        if(DeleteBy.equals("null"))
+//        {
+//            this.DeleteBy = 0;
+//        }
+//        else
+//        {
+//            this.DeleteBy = Long.parseLong(DeleteBy);
+//        }
+//    }
+//
+//    public void setDeleteOn(String DeleteOn)
+//    {
+//        this.DeleteOn = DeleteOn;
+//    }
+//
+//    public void setDeletePc(String DeletePc)
+//    {
+//        this.DeletePc = DeletePc;
+//    }
 
     public void setattendenceArr(ArrayList<AttendanceStudentModel> attendenceArr)
     {
@@ -446,55 +454,60 @@ public class AttendanceSheetModel {
         return InstituteID;
     }
 
-    public long getCreateBy()
+    public long getLoggedUserID()
     {
-        return CreateBy;
+        return LoggedUserID;
     }
 
-    public String getCreateOn()
-    {
-        return CreateOn;
-    }
-
-    public String getCreatePc()
-    {
-        return CreatePc;
-    }
-
-    public long getUpdateBy()
-    {
-        return UpdateBy;
-    }
-
-    public String getUpdateOn()
-    {
-        return UpdateOn;
-    }
-
-    public String getUpdatePc()
-    {
-        return UpdatePc;
-    }
-
-    public int getIsDeleted()
-    {
-        return IsDeleted;
-    }
-
-    public long getDeleteBy()
-    {
-        return DeleteBy;
-    }
-
-    public String getDeleteOn()
-    {
-        return DeleteOn;
-    }
-
-    public String getDeletePc()
-    {
-        return DeletePc;
-    }
+//    public long getCreateBy()
+//    {
+//        return CreateBy;
+//    }
+//
+//    public String getCreateOn()
+//    {
+//        return CreateOn;
+//    }
+//
+//    public String getCreatePc()
+//    {
+//        return CreatePc;
+//    }
+//
+//    public long getUpdateBy()
+//    {
+//        return UpdateBy;
+//    }
+//
+//    public String getUpdateOn()
+//    {
+//        return UpdateOn;
+//    }
+//
+//    public String getUpdatePc()
+//    {
+//        return UpdatePc;
+//    }
+//
+//    public int getIsDeleted()
+//    {
+//        return IsDeleted;
+//    }
+//
+//    public long getDeleteBy()
+//    {
+//        return DeleteBy;
+//    }
+//
+//    public String getDeleteOn()
+//    {
+//        return DeleteOn;
+//    }
+//
+//    public String getDeletePc()
+//    {
+//        return DeletePc;
+//    }
 
     public ArrayList<AttendanceStudentModel> getattendenceArr()
     {

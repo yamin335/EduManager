@@ -8,6 +8,7 @@ import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NavUtils;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -44,12 +45,22 @@ public class ReportAllStudentList extends AppCompatActivity implements ReportAll
     private ReportAllStudentShowListAdapter mAdapter;
     private static String studentUrl = "";
     private SearchView searchView;
-
+    private SwipeRefreshLayout mSwipeRefreshLayout;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.report_all_student_list_activity_main);
+
+        mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.activity_main_swipe_refresh_layout);
+        mSwipeRefreshLayout.setColorSchemeColors(getResources().getColor(R.color.colorAccent));
+
+        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                RefreshStudentList();
+            }
+        });
 
         if(!isNetworkAvailable())
         {
@@ -187,12 +198,40 @@ public class ReportAllStudentList extends AppCompatActivity implements ReportAll
             searchView.setIconified(true);
             return;
         }
-        NavUtils.navigateUpFromSameTask(this);
+//        NavUtils.navigateUpFromSameTask(this);
         super.onBackPressed();
     }
 
     @Override
     public void onStudentSelected(ReportAllStudentRowModel reportAllStudentRowModel) {
         Toast.makeText(getApplicationContext(), "Selected: " + reportAllStudentRowModel.getUserName() + ", " + reportAllStudentRowModel.getRollNo(), Toast.LENGTH_LONG).show();
+    }
+
+    public void RefreshStudentList(){
+        ClearStudentList();
+        //Preparing Student data from server
+        RequestQueue queueStudent = Volley.newRequestQueue(ReportAllStudentList.this);
+        StringRequest stringStudentRequest = new StringRequest(Request.Method.GET, studentUrl,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+
+                        parseStudentJsonData(response);
+                        mSwipeRefreshLayout.setRefreshing(false);
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+                mSwipeRefreshLayout.setRefreshing(false);
+            }
+        });
+        queueStudent.add(stringStudentRequest);
+    }
+
+    public void ClearStudentList(){
+        int size = studentList.size();
+        studentList.clear();
+        mAdapter.notifyItemRangeRemoved(0, size+0);
     }
 }

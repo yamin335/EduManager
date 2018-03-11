@@ -31,7 +31,7 @@
         app:layout_constraintVertical_bias="0.248">
 
         <Spinner
-            android:id="@+id/spinnerDepartment"
+            android:id="@+id/spinnerClass"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:backgroundTint="#ffffff"
@@ -58,7 +58,7 @@
         app:layout_constraintVertical_bias="0.13">
 
         <Spinner
-            android:id="@+id/spinnerShift"
+            android:id="@+id/spinnerMedium"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:backgroundTint="#ffffff"
@@ -86,7 +86,7 @@
         app:layout_constraintVertical_bias="0.0">
 
         <Spinner
-            android:id="@+id/spinnerMedium"
+            android:id="@+id/spinnerShift"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:backgroundTint="#ffffff"
@@ -113,7 +113,7 @@
         app:layout_constraintVertical_bias="0.397">
 
         <Spinner
-            android:id="@+id/spinnerClass"
+            android:id="@+id/spinnerDepartment"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:backgroundTint="#ffffff"

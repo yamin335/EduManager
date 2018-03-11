@@ -40,6 +40,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -101,7 +102,7 @@ public class StudentiCardDetails extends AppCompatActivity {
     private CropImageView mCropImageView;
     private CheckBox checkBox;
     private Uri mCropImageUri;
-    private ProgressDialog dialog, glideProgress;
+    private ProgressDialog dialog;
 
     private StudentInformationEntry studentInformationEntry;
     private Button updateStudentPhoto, cameraButton, searchButton, rotateRight, rotateLeft;
@@ -127,6 +128,7 @@ public class StudentiCardDetails extends AppCompatActivity {
     private BrightnessProcessTask mBrightnessProcessTask = null;
     private RotateProcessTask mRotateProcessTask = null;
     private boolean imageChanged = false;
+    private ProgressBar progressBar;
 
     @Override
     public void onResume() {
@@ -163,11 +165,6 @@ public class StudentiCardDetails extends AppCompatActivity {
         dialog.setCancelable(false);
         dialog.show();
 
-        glideProgress = new ProgressDialog(this);
-        glideProgress.setTitle("Loading...");
-        glideProgress.setMessage("Please Wait...");
-        glideProgress.setCancelable(false);
-
 //        glideProgress.setOnCancelListener(new DialogInterface.OnCancelListener() {
 //            @Override
 //            public void onCancel(DialogInterface dialog) {
@@ -179,6 +176,7 @@ public class StudentiCardDetails extends AppCompatActivity {
         rotateRight = (Button)findViewById(R.id.rotateRight);
         brightImageSeekBar = (SeekBar)findViewById(R.id.brightness);
         brightImageSeekBar.setProgress(100);
+        progressBar = (ProgressBar)findViewById(R.id.spin_kit);
 
         mCropImageView = (CropImageView)findViewById(R.id.CropImageView);
         mCropImageView.setAspectRatio(1,1);
@@ -485,7 +483,6 @@ public class StudentiCardDetails extends AppCompatActivity {
         try {
             JSONArray studentJsonArray = new JSONArray(jsonString);
             JSONObject studentJsonObject = studentJsonArray.getJSONObject(0);
-            glideProgress.show();
 
 //            Runnable progressRunnable = new Runnable() {
 //                @Override
@@ -508,12 +505,12 @@ public class StudentiCardDetails extends AppCompatActivity {
                             mCropImageView.setImageBitmap(resource);
                             originalBitmap = resource;
                             tempBitmap = resource;
-                            glideProgress.dismiss();
+                            progressBar.setVisibility(View.GONE);
                         }
                         @Override
                         public void onLoadFailed(Drawable errorDrawable) {
                             super.onLoadFailed(errorDrawable);
-                            glideProgress.dismiss();
+                            progressBar.setVisibility(View.GONE);
                             Toast.makeText(StudentiCardDetails.this,"No image found!!!",Toast.LENGTH_LONG).show();
                         }
                     });

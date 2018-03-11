@@ -101,7 +101,7 @@ public class TakeAttendanceDetails extends AppCompatActivity {
 
         postUrl = getString(R.string.baseUrlLocal)+"setHrmSubWiseAtd";
 
-        StudentDataGetUrl = getString(R.string.baseUrlLocal)+"getHrmSubWiseAtdDetail/"+InstituteID+"/"+MediumID+"/"+ShiftID+"/"+ClassID+"/"+SectionID+"/"+SubjectID+"/"+DepertmentID;
+        StudentDataGetUrl = getString(R.string.baseUrlLocal)+"getHrmSubWiseAtdDetail/"+InstituteID+"/"+MediumID+"/"+ShiftID+"/"+ClassID+"/"+SectionID+"/"+SubjectID+"/"+DepertmentID+"/"+date;
 
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
 
@@ -177,7 +177,10 @@ public class TakeAttendanceDetails extends AppCompatActivity {
                         studentJsonObject.getString("Department"),
                         studentJsonObject.getString("Medium"),
                         studentJsonObject.getString("Shift"),
-                        studentJsonObject.getString("Class"));
+                        studentJsonObject.getString("Class"),
+                        studentJsonObject.getString("DisplayDate"),
+                        "true",
+                        "0");
 //                ArrayList<String> arrayList = new ArrayList<String>();
 //                JSONArray jsonArray = studentJsonObject.getJSONArray("InstituteID");
 //                for(int j = 0; j<jsonArray.length(); ++i)
@@ -239,6 +242,7 @@ public class TakeAttendanceDetails extends AppCompatActivity {
                 attendanceSheetModel.setAtdUserID(UserID);
                 attendanceSheetModel.setAtdDate(date);
                 attendanceSheetModel.setInstituteID(Long.toString(InstituteID));
+                attendanceSheetModel.setLoggedUserID(UserID);
                 attendanceSheetModel.setattendenceArr(attendanceSheetArrayList);
                 Gson gson = new Gson();
                 String json = gson.toJson(attendanceSheetModel);

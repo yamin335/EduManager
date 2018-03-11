@@ -17,7 +17,7 @@ public class SubjectModel {
     private boolean IsActive = true;
     private boolean IsCombined = true;
     private long ParentID = 0;
-    private String ParentSubject = "";
+//    private String ParentSubject = "";
 
     public SubjectModel()
     {
@@ -26,7 +26,7 @@ public class SubjectModel {
 
     public SubjectModel(String SubjectID, String SubjectNo, String SubjectName, String InsSubjectID,
                         String InstituteID, String DepartmentID, String MediumID, String ClassID, String IsActive,
-                        String IsCombined, String ParentID, String ParentSubject) {
+                        String IsCombined, String ParentID) {
         if(SubjectID.equals("null"))
         {
             this.SubjectID = 0;
@@ -112,7 +112,7 @@ public class SubjectModel {
             this.ParentID = Long.parseLong(ParentID);
         }
 
-        this.ParentSubject = ParentSubject;
+//        this.ParentSubject = ParentSubject;
 
     }
 
@@ -234,10 +234,10 @@ public class SubjectModel {
         }
     }
 
-    public void setParentSubject(String ParentSubject)
-    {
-        this.ParentSubject = ParentSubject;
-    }
+//    public void setParentSubject(String ParentSubject)
+//    {
+//        this.ParentSubject = ParentSubject;
+//    }
 
     public long getSubjectID()
     {
@@ -294,8 +294,8 @@ public class SubjectModel {
         return ParentID;
     }
 
-    public String getParentSubject()
-    {
-        return ParentSubject;
-    }
+//    public String getParentSubject()
+//    {
+//        return ParentSubject;
+//    }
 }

@@ -151,10 +151,8 @@ public class ReportAllStudentMain extends AppCompatActivity {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         InstituteID = prefs.getLong("InstituteID",0);
 
-        classUrl = getString(R.string.baseUrlLocal)+"getInsClass/"+InstituteID;
         shiftUrl = getString(R.string.baseUrlLocal)+"getInsShift/"+InstituteID;
         mediumUrl = getString(R.string.baseUrlLocal)+"getInsMedium/"+InstituteID;
-        departmentUrl = getString(R.string.baseUrlLocal)+"getInsDepertment/"+InstituteID;
 
         dialog = new ProgressDialog(this);
         dialog.setTitle("Loading...");
@@ -167,85 +165,10 @@ public class ReportAllStudentMain extends AppCompatActivity {
             Toast.makeText(ReportAllStudentMain.this,"Please check your internet connection and open app again!!! ",Toast.LENGTH_LONG).show();
         }
 
+        ShiftDataGetRequest(this, shiftUrl);
 
-        //Preparing claas data from server
-        RequestQueue queueClass = Volley.newRequestQueue(this);
-        StringRequest stringClassRequest = new StringRequest(Request.Method.GET, classUrl,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
+        MediumDataGetRequest(this, mediumUrl);
 
-                        parseClassJsonData(response);
-
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-
-                dialog.dismiss();
-            }
-        });
-        queueClass.add(stringClassRequest);
-
-        dialog.show();
-        //Preparing Shift data from server
-        RequestQueue queueShift = Volley.newRequestQueue(this);
-        StringRequest stringShiftRequest = new StringRequest(Request.Method.GET, shiftUrl,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-
-                        parseShiftJsonData(response);
-
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-
-                dialog.dismiss();
-            }
-        });
-        queueShift.add(stringShiftRequest);
-
-        dialog.show();
-        //Preparing Medium data from server
-        RequestQueue queueMedium = Volley.newRequestQueue(this);
-        StringRequest stringMediumRequest = new StringRequest(Request.Method.GET, mediumUrl,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-
-                        parseMediumJsonData(response);
-
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-
-                dialog.dismiss();
-            }
-        });
-        queueMedium.add(stringMediumRequest);
-
-        dialog.show();
-        //Preparing Department data from server
-        RequestQueue queueDepartment = Volley.newRequestQueue(this);
-        StringRequest stringDepartmentRequest = new StringRequest(Request.Method.GET, departmentUrl,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-
-                        parseDepartmentJsonData(response);
-
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-
-                dialog.dismiss();
-            }
-        });
-        queueDepartment.add(stringDepartmentRequest);
 
         showAll.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -299,51 +222,6 @@ public class ReportAllStudentMain extends AppCompatActivity {
             }
         });
 
-        spinnerClass.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
-                if(position != 0)
-                {
-                    try {
-                        selectedClass = allClassArrayList.get(position-1);
-                    }
-                    catch (IndexOutOfBoundsException e)
-                    {
-                        Toast.makeText(ReportAllStudentMain.this,"No class found !!!",Toast.LENGTH_LONG).show();
-                    }
-                    sectionUrl = getString(R.string.baseUrlLocal)+"getInsSection/"+InstituteID+"/"+selectedClass.getClassID();
-                    dialog.show();
-                    //Preparing section data from server
-                    RequestQueue queueSection = Volley.newRequestQueue(ReportAllStudentMain.this);
-                    StringRequest stringSectionRequest = new StringRequest(Request.Method.GET, sectionUrl,
-                            new Response.Listener<String>() {
-                                @Override
-                                public void onResponse(String response) {
-
-                                    parseSectionJsonData(response);
-
-                                }
-                            }, new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-
-                            dialog.dismiss();
-                        }
-                    });
-                    queueSection.add(stringSectionRequest);
-                }
-                else
-                {
-                    selectedClass = new ClassModel();
-                }
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
 
         spinnerShift.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -371,23 +249,29 @@ public class ReportAllStudentMain extends AppCompatActivity {
             }
         });
 
-        spinnerSection.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        spinnerMedium.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
                 if(position != 0)
                 {
                     try {
-                        selectedSection = allSectionArrayList.get(position-1);
+                        selectedMedium = allMediumArrayList.get(position-1);
+                        selectedClass = new ClassModel();
+                        selectedDepartment = new DepartmentModel();
+                        selectedSection = new SectionModel();
                     }
                     catch (IndexOutOfBoundsException e)
                     {
-                        Toast.makeText(ReportAllStudentMain.this,"No section found !!!",Toast.LENGTH_LONG).show();
+                        Toast.makeText(ReportAllStudentMain.this,"No medium found !!!",Toast.LENGTH_LONG).show();
                     }
+                    CheckSelectedData();
+                    classUrl = getString(R.string.baseUrlLocal)+"MediumWiseClassDDL/"+InstituteID+"/"+selectedMedium.getMediumID();
+                    ClassDataGetRequest(ReportAllStudentMain.this, classUrl);
                 }
                 else
                 {
-                    selectedSection = new SectionModel();
+                    selectedMedium = new MediumModel();
                 }
             }
 
@@ -397,23 +281,29 @@ public class ReportAllStudentMain extends AppCompatActivity {
             }
         });
 
-        spinnerMedium.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        spinnerClass.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
                 if(position != 0)
                 {
                     try {
-                        selectedMedium = allMediumArrayList.get(position-1);
+                        selectedClass = allClassArrayList.get(position-1);
+                        selectedDepartment = new DepartmentModel();
+                        selectedSection = new SectionModel();
                     }
                     catch (IndexOutOfBoundsException e)
                     {
-                        Toast.makeText(ReportAllStudentMain.this,"No medium found !!!",Toast.LENGTH_LONG).show();
+                        Toast.makeText(ReportAllStudentMain.this,"No class found !!!",Toast.LENGTH_LONG).show();
                     }
+                    CheckSelectedData();
+                    departmentUrl = getString(R.string.baseUrlLocal)+"ClassWiseDepartmentDDL/"+InstituteID+"/"+
+                            selectedClass.getClassID()+"/"+selectedMedium.getMediumID();
+                    DepartmentDataGetRequest(ReportAllStudentMain.this, departmentUrl);
                 }
                 else
                 {
-                    selectedMedium = new MediumModel();
+                    selectedClass = new ClassModel();
                 }
             }
 
@@ -431,15 +321,46 @@ public class ReportAllStudentMain extends AppCompatActivity {
                 {
                     try {
                         selectedDepartment = allDepartmentArrayList.get(position-1);
+                        selectedSection = new SectionModel();
                     }
                     catch (IndexOutOfBoundsException e)
                     {
                         Toast.makeText(ReportAllStudentMain.this,"No department found !!!",Toast.LENGTH_LONG).show();
                     }
+                    CheckSelectedData();
+                    sectionUrl = getString(R.string.baseUrlLocal)+"getInsSection/"+InstituteID+"/"+
+                            selectedClass.getClassID()+"/"+selectedDepartment.getDepartmentID();
+                    SectionDataGetRequest(ReportAllStudentMain.this, sectionUrl);
                 }
                 else
                 {
                     selectedDepartment = new DepartmentModel();
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+        spinnerSection.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                if(position != 0)
+                {
+                    try {
+                        selectedSection = allSectionArrayList.get(position-1);
+                    }
+                    catch (IndexOutOfBoundsException e)
+                    {
+                        Toast.makeText(ReportAllStudentMain.this,"No section found !!!",Toast.LENGTH_LONG).show();
+                    }
+                }
+                else
+                {
+                    selectedSection = new SectionModel();
                 }
             }
 
@@ -548,6 +469,9 @@ public class ReportAllStudentMain extends AppCompatActivity {
                 allClassArrayList.add(classModel);
                 classArrayList.add(classModel.getClassName());
             }
+            if(allClassArrayList.size() == 1){
+                selectedClass = allClassArrayList.get(1);
+            }
             try {
                 String[] strings = new String[classArrayList.size()];
                 strings = classArrayList.toArray(strings);
@@ -581,6 +505,9 @@ public class ReportAllStudentMain extends AppCompatActivity {
                 allShiftArrayList.add(shiftModel);
                 shiftArrayList.add(shiftModel.getShiftName());
             }
+            if(allShiftArrayList.size() == 1){
+                selectedShift = allShiftArrayList.get(1);
+            }
             try {
                 String[] strings = new String[shiftArrayList.size()];
                 strings = shiftArrayList.toArray(strings);
@@ -613,6 +540,9 @@ public class ReportAllStudentMain extends AppCompatActivity {
 //                Toast.makeText(this,classJsonObject.getString("ClassID")+classJsonObject.getString("ClassName"),Toast.LENGTH_LONG).show();
                 allSectionArrayList.add(sectionModel);
                 sectionArrayList.add(sectionModel.getSectionName());
+            }
+            if(allSectionArrayList.size() == 1){
+                selectedSection = allSectionArrayList.get(1);
             }
             try {
                 String[] strings = new String[sectionArrayList.size()];
@@ -648,6 +578,9 @@ public class ReportAllStudentMain extends AppCompatActivity {
                 allMediumArrayList.add(mediumModel);
                 mediumnArrayList.add(mediumModel.getMameName());
             }
+            if(allMediumArrayList.size() == 1){
+                selectedMedium = allMediumArrayList.get(1);
+            }
             try {
                 String[] strings = new String[mediumnArrayList.size()];
                 strings = mediumnArrayList.toArray(strings);
@@ -680,6 +613,15 @@ public class ReportAllStudentMain extends AppCompatActivity {
 //                Toast.makeText(this,classJsonObject.getString("ClassID")+classJsonObject.getString("ClassName"),Toast.LENGTH_LONG).show();
                 allDepartmentArrayList.add(departmentModel);
                 departmentArrayList.add(departmentModel.getDepartmentName());
+            }
+            if(allDepartmentArrayList.size() == 1){
+                selectedDepartment = allDepartmentArrayList.get(1);
+            }
+            if(allDepartmentArrayList.size() == 0){
+                CheckSelectedData();
+                sectionUrl = getString(R.string.baseUrlLocal)+"getInsSection/"+InstituteID+"/"+
+                        selectedClass.getClassID()+"/"+selectedDepartment.getDepartmentID();
+                SectionDataGetRequest(ReportAllStudentMain.this, sectionUrl);
             }
             try {
                 String[] strings = new String[departmentArrayList.size()];
@@ -847,5 +789,143 @@ public class ReportAllStudentMain extends AppCompatActivity {
         ConnectivityManager connectivityManager = (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+    }
+
+    private void ShiftDataGetRequest(Context context, String url)
+    {
+        dialog.show();
+        //Preparing Shift data from server
+        RequestQueue queueShift = Volley.newRequestQueue(context);
+        StringRequest stringShiftRequest = new StringRequest(Request.Method.GET, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+
+                        parseShiftJsonData(response);
+
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+                dialog.dismiss();
+            }
+        });
+        queueShift.add(stringShiftRequest);
+    }
+
+    private void MediumDataGetRequest(Context context, String url)
+    {
+        dialog.show();
+        //Preparing Medium data from server
+        RequestQueue queueMedium = Volley.newRequestQueue(context);
+        StringRequest stringMediumRequest = new StringRequest(Request.Method.GET, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+
+                        parseMediumJsonData(response);
+
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+                dialog.dismiss();
+            }
+        });
+        queueMedium.add(stringMediumRequest);
+    }
+
+    private void ClassDataGetRequest(Context context, String url)
+    {
+        dialog.show();
+        //Preparing claas data from server
+        RequestQueue queueClass = Volley.newRequestQueue(context);
+        StringRequest stringClassRequest = new StringRequest(Request.Method.GET, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+
+                        parseClassJsonData(response);
+
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+                dialog.dismiss();
+            }
+        });
+        queueClass.add(stringClassRequest);
+    }
+
+    private void DepartmentDataGetRequest(Context context, String url)
+    {
+        dialog.show();
+        //Preparing Department data from server
+        RequestQueue queueDepartment = Volley.newRequestQueue(context);
+        StringRequest stringDepartmentRequest = new StringRequest(Request.Method.GET, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+
+                        parseDepartmentJsonData(response);
+
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+                dialog.dismiss();
+            }
+        });
+        queueDepartment.add(stringDepartmentRequest);
+    }
+
+    private void SectionDataGetRequest(Context context, String url)
+    {
+        dialog.show();
+        //Preparing section data from server
+        RequestQueue queueSection = Volley.newRequestQueue(context);
+        StringRequest stringSectionRequest = new StringRequest(Request.Method.GET, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+
+                        parseSectionJsonData(response);
+
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+                dialog.dismiss();
+            }
+        });
+        queueSection.add(stringSectionRequest);
+    }
+
+    private void CheckSelectedData(){
+        if(selectedClass.getClassID() == -2)
+        {
+            selectedClass.setClassID("0");
+        }
+        if(selectedShift.getShiftID() == -2)
+        {
+            selectedShift.setShiftID("0");
+        }
+        if(selectedSection.getSectionID() == -2)
+        {
+            selectedSection.setSectionID("0");
+        }
+        if(selectedMedium.getMediumID() == -2)
+        {
+            selectedMedium.setMediumID("0");
+        }
+        if(selectedDepartment.getDepartmentID() == -2)
+        {
+            selectedDepartment.setDepartmentID("0");
+        }
     }
 }

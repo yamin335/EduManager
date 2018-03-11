@@ -7,7 +7,7 @@
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="id_124">ID : 124</string>
-    <string name="baseUrl">http://182.160.100.36:4000/api/onEms/</string>
-    <string name="baseUrlLocal">http://182.160.100.36:4000/api/onEms/</string>
-    <string name="baseUrlRaw">http://182.160.100.36:4000/</string>
+    <string name="baseUrl">http://172.16.1.11:4000/api/onEms/</string>
+    <string name="baseUrlLocal">http://172.16.1.11:4000/api/onEms/</string>
+    <string name="baseUrlRaw">http://172.16.1.11:4000/</string>
 </resources>

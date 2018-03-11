@@ -294,16 +294,11 @@
         <activity
             android:screenOrientation="portrait"
             android:name="onair.onems.mainactivities.ReportAllStudentList"
-            android:label="Student List"
-            android:parentActivityName="onair.onems.mainactivities.ReportAllStudentMain">
+            android:label="Student List">
             <!-- The meta-data element is needed for versions lower than 4.1 -->
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="onair.onems.mainactivities.ReportAllStudentMain" />
             <meta-data
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable" />
-
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>

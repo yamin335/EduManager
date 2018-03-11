@@ -97,7 +97,7 @@ public class StudentMainScreen extends AppCompatActivity {
         {
             @Override
             public void onClick(View v) {
-                Intent mainIntent = new Intent(StudentMainScreen.this,StudentAttendance.class);
+                Intent mainIntent = new Intent(StudentMainScreen.this, StudentAttendance.class);
                 StudentMainScreen.this.startActivity(mainIntent);
                 finish();
             }
