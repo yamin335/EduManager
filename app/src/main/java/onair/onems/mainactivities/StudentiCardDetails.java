@@ -6,13 +6,11 @@ import android.app.ProgressDialog;
 import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.drawable.Drawable;
@@ -22,50 +20,40 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.Parcelable;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
-import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.system.ErrnoException;
-import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
-import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.SeekBar;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.google.gson.Gson;
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
 import com.theartofdev.edmodo.cropper.CropImageView;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -73,18 +61,14 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-
+import java.util.Map;
 import onair.onems.R;
 import onair.onems.Services.GlideApp;
 import onair.onems.customadapters.CustomRequest;
-import onair.onems.models.ClassModel;
-import onair.onems.models.DepartmentModel;
-import onair.onems.models.MediumModel;
-import onair.onems.models.SectionModel;
-import onair.onems.models.ShiftModel;
-import onair.onems.models.SpinnerStudentInformation;
 import onair.onems.models.StudentInformationEntry;
+import onair.onems.network.MySingleton;
 
 
 /**
@@ -194,25 +178,7 @@ public class StudentiCardDetails extends AppCompatActivity {
         studentDataGetUrl = getString(R.string.baseUrlLocal)+"getStudent"+"/"+InstituteID+"/"+
                 selectedClass+"/"+selectedSection+"/"+
                 selectedDepartment+"/"+selectedMedium+"/"+selectedShift+"/"+UserID;
-
-        //Preparing Student data from server
-        RequestQueue queueStudent = Volley.newRequestQueue(StudentiCardDetails.this);
-        StringRequest stringStudentRequest = new StringRequest(Request.Method.GET, studentDataGetUrl,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-
-                        parseStudentJsonData(response);
-
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-
-                dialog.dismiss();
-            }
-        });
-        queueStudent.add(stringStudentRequest);
+        StudentDataGetRequest();
 
         t_roll = (TextView)findViewById(R.id.roll);
         t_name = (TextView)findViewById(R.id.name);
@@ -451,7 +417,6 @@ public class StudentiCardDetails extends AppCompatActivity {
             dialog.dismiss();
             e.printStackTrace();
         }
-        RequestQueue queuePost = Volley.newRequestQueue(this);
         CustomRequest customRequest = new CustomRequest (Request.Method.POST, studentDataPostUrl, jsonObjectStudentData,
                 new Response.Listener<JSONArray>() {
                     @Override
@@ -475,8 +440,16 @@ public class StudentiCardDetails extends AppCompatActivity {
                 Toast.makeText(StudentiCardDetails.this,"Not Successfully Updated"+error.toString(),Toast.LENGTH_LONG).show();
                 dialog.dismiss();
             }
-        });
-        queuePost.add(customRequest);
+        })
+        {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String>  params = new HashMap<String, String>();
+                params.put("Authorization", "Request_From_onEMS_Android_app");
+                return params;
+            }
+        };
+        MySingleton.getInstance(this).addToRequestQueue(customRequest);
     }
 
     void parseStudentJsonData(String jsonString) {
@@ -493,7 +466,10 @@ public class StudentiCardDetails extends AppCompatActivity {
 //
 //            Handler pdCanceller = new Handler();
 //            pdCanceller.postDelayed(progressRunnable, 5000);
-
+            if(studentJsonObject.getString("ImageUrl").equals("null")){
+                progressBar.setVisibility(View.GONE);
+                Toast.makeText(StudentiCardDetails.this,"No image found!!!",Toast.LENGTH_LONG).show();
+            }
             GlideApp.with(this)
                     .asBitmap()
                     .load(getString(R.string.baseUrlRaw)+studentJsonObject.getString("ImageUrl").replace("\\","/"))
@@ -873,7 +849,6 @@ public class StudentiCardDetails extends AppCompatActivity {
     }
 
     public class RotateProcessTask extends AsyncTask<Void, Void, Boolean> {
-
         private  Bitmap image;
         private  int angle;
 
@@ -914,5 +889,31 @@ public class StudentiCardDetails extends AppCompatActivity {
         }
     }
 
+    public void StudentDataGetRequest(){
+        //Preparing Student data from server
+        StringRequest stringStudentRequest = new StringRequest(Request.Method.GET, studentDataGetUrl,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
 
+                        parseStudentJsonData(response);
+
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+                dialog.dismiss();
+            }
+        })
+        {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String>  params = new HashMap<String, String>();
+                params.put("Authorization", "Request_From_onEMS_Android_app");
+                return params;
+            }
+        };
+        MySingleton.getInstance(this).addToRequestQueue(stringStudentRequest);
+    }
 }

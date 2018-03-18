@@ -80,22 +80,12 @@
         <activity
             android:screenOrientation="portrait"
             android:name="onair.onems.mainactivities.StudentAttendanceShow"
-            android:label="Attendance"
-            android:parentActivityName="onair.onems.mainactivities.StudentAttendance">
-            <!-- The meta-data element is needed for versions lower than 4.1 -->
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="onair.onems.mainactivities.StudentAttendance" />
+            android:label="Attendance">
         </activity>
         <activity
             android:screenOrientation="portrait"
             android:name="onair.onems.mainactivities.TakeAttendanceDetails"
-            android:label="Take Attendance"
-            android:parentActivityName="onair.onems.mainactivities.TakeAttendance">
-            <!-- The meta-data element is needed for versions lower than 4.1 -->
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="onair.onems.mainactivities.TakeAttendance" />
+            android:label="Take Attendance">
         </activity>
         <activity
             android:screenOrientation="portrait"
@@ -112,33 +102,17 @@
         <activity
             android:screenOrientation="portrait"
             android:name="onair.onems.mainactivities.AllStudentAttendanceShow"
-            android:label="Attendance"
-            android:parentActivityName="onair.onems.mainactivities.StudentAttendanceShow">
-            <!-- The meta-data element is needed for versions lower than 4.1 -->
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="onair.onems.mainactivities.StudentAttendanceShow" />
+            android:label="Attendance">
         </activity>
         <activity
             android:screenOrientation="portrait"
             android:name="onair.onems.mainactivities.AllStudentSubjectWiseAttendance"
-            android:label="Attendance"
-            android:parentActivityName="onair.onems.mainactivities.AllStudentAttendanceShow">
-            <!-- The meta-data element is needed for versions lower than 4.1 -->
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="onair.onems.mainactivities.AllStudentAttendanceShow" />
+            android:label="Attendance">
         </activity>
         <activity
             android:screenOrientation="portrait"
             android:name="onair.onems.mainactivities.TeacherAttendanceShow.ShowAttendance"
-            android:label="Attendance"
-            android:parentActivityName=".mainactivities.TakeAttendance"
-          >
-            <!-- The meta-data element is needed for versions lower than 4.1 -->
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".mainactivities.TakeAttendance" />
+            android:label="Attendance">
         </activity>
         <activity
             android:screenOrientation="portrait"

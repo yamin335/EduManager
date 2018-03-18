@@ -17,6 +17,8 @@ import android.support.v7.widget.SearchView;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
+
+import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -27,10 +29,14 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 import onair.onems.R;
 import onair.onems.customadapters.ReportAllStudentShowListAdapter;
 import onair.onems.models.ReportAllStudentRowModel;
+import onair.onems.network.MySingleton;
 
 /**
  * Created by User on 1/24/2018.
@@ -94,24 +100,7 @@ public class ReportAllStudentList extends AppCompatActivity implements ReportAll
         recyclerView.setAdapter(mAdapter);
 
         dialog.show();
-        //Preparing Student data from server
-        RequestQueue queueStudent = Volley.newRequestQueue(ReportAllStudentList.this);
-        StringRequest stringStudentRequest = new StringRequest(Request.Method.GET, studentUrl,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-
-                        parseStudentJsonData(response);
-
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-
-                dialog.dismiss();
-            }
-        });
-        queueStudent.add(stringStudentRequest);
+        StudentDataGetRequest();
     }
 
     void parseStudentJsonData(String jsonString) {
@@ -210,7 +199,6 @@ public class ReportAllStudentList extends AppCompatActivity implements ReportAll
     public void RefreshStudentList(){
         ClearStudentList();
         //Preparing Student data from server
-        RequestQueue queueStudent = Volley.newRequestQueue(ReportAllStudentList.this);
         StringRequest stringStudentRequest = new StringRequest(Request.Method.GET, studentUrl,
                 new Response.Listener<String>() {
                     @Override
@@ -225,8 +213,44 @@ public class ReportAllStudentList extends AppCompatActivity implements ReportAll
 
                 mSwipeRefreshLayout.setRefreshing(false);
             }
-        });
-        queueStudent.add(stringStudentRequest);
+        })
+        {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String>  params = new HashMap<String, String>();
+                params.put("Authorization", "Request_From_onEMS_Android_app");
+                return params;
+            }
+        };
+        MySingleton.getInstance(this).addToRequestQueue(stringStudentRequest);
+    }
+
+    public void StudentDataGetRequest(){
+        //Preparing Student data from server
+        StringRequest stringStudentRequest = new StringRequest(Request.Method.GET, studentUrl,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+
+                        parseStudentJsonData(response);
+
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+                dialog.dismiss();
+            }
+        })
+        {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String>  params = new HashMap<String, String>();
+                params.put("Authorization", "Request_From_onEMS_Android_app");
+                return params;
+            }
+        };
+        MySingleton.getInstance(this).addToRequestQueue(stringStudentRequest);
     }
 
     public void ClearStudentList(){

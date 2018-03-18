@@ -144,12 +144,12 @@
                 android:layout_marginStart="8dp"
                 android:paddingLeft="20dp"
                 android:paddingRight="10dp"
-                android:background="@drawable/button"
+                android:background="@drawable/spinner_background"
                 android:elevation="5dp"
                 >
                 <Spinner
                     android:id="@+id/spinnerShift"
-                    android:backgroundTint="#ffffff"
+                    android:backgroundTint="#000000"
                     android:popupBackground="@drawable/drop_down_menu"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
@@ -165,12 +165,12 @@
                 android:layout_marginStart="8dp"
                 android:paddingLeft="20dp"
                 android:paddingRight="10dp"
-                android:background="@drawable/button"
+                android:background="@drawable/spinner_background"
                 android:elevation="5dp"
                 >
                 <Spinner
                     android:id="@+id/spinnerMedium"
-                    android:backgroundTint="#ffffff"
+                    android:backgroundTint="#000000"
                     android:popupBackground="@drawable/drop_down_menu"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
@@ -186,12 +186,12 @@
                 android:layout_marginStart="8dp"
                 android:paddingLeft="20dp"
                 android:paddingRight="10dp"
-                android:background="@drawable/button"
+                android:background="@drawable/spinner_background"
                 android:elevation="5dp"
                 >
                 <Spinner
                     android:id="@+id/spinnerClass"
-                    android:backgroundTint="#ffffff"
+                    android:backgroundTint="#000000"
                     android:popupBackground="@drawable/drop_down_menu"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
@@ -207,12 +207,12 @@
                 android:layout_marginStart="8dp"
                 android:paddingLeft="20dp"
                 android:paddingRight="10dp"
-                android:background="@drawable/button"
+                android:background="@drawable/spinner_background"
                 android:elevation="5dp"
                 >
                 <Spinner
                     android:id="@+id/spinnerDepartment"
-                    android:backgroundTint="#ffffff"
+                    android:backgroundTint="#000000"
                     android:popupBackground="@drawable/drop_down_menu"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
@@ -228,12 +228,12 @@
                 android:layout_marginStart="8dp"
                 android:paddingLeft="20dp"
                 android:paddingRight="10dp"
-                android:background="@drawable/button"
+                android:background="@drawable/spinner_background"
                 android:elevation="5dp"
                 >
                 <Spinner
                     android:id="@+id/spinnerSection"
-                    android:backgroundTint="#ffffff"
+                    android:backgroundTint="#000000"
                     android:popupBackground="@drawable/drop_down_menu"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"

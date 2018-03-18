@@ -31,6 +31,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -48,6 +49,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import onair.onems.R;
 import onair.onems.Services.GlideApp;
@@ -60,6 +62,7 @@ import onair.onems.models.MediumModel;
 import onair.onems.models.SectionModel;
 import onair.onems.models.ShiftModel;
 import onair.onems.models.SubjectModel;
+import onair.onems.network.MySingleton;
 
 /**
  * Created by User on 1/24/2018.
@@ -165,9 +168,9 @@ public class ReportAllStudentMain extends AppCompatActivity {
             Toast.makeText(ReportAllStudentMain.this,"Please check your internet connection and open app again!!! ",Toast.LENGTH_LONG).show();
         }
 
-        ShiftDataGetRequest(this, shiftUrl);
+        ShiftDataGetRequest(shiftUrl);
 
-        MediumDataGetRequest(this, mediumUrl);
+        MediumDataGetRequest(mediumUrl);
 
 
         showAll.setOnClickListener(new View.OnClickListener() {
@@ -177,27 +180,7 @@ public class ReportAllStudentMain extends AppCompatActivity {
                 {
                     if(selectedClass.getClassID() != -2)
                     {
-                        if(selectedClass.getClassID() == -2)
-                        {
-                            selectedClass.setClassID("0");
-                        }
-                        if(selectedShift.getShiftID() == -2)
-                        {
-                            selectedShift.setShiftID("0");
-                        }
-                        if(selectedSection.getSectionID() == -2)
-                        {
-                            selectedSection.setSectionID("0");
-                        }
-                        if(selectedMedium.getMediumID() == -2)
-                        {
-                            selectedMedium.setMediumID("0");
-                        }
-                        if(selectedDepartment.getDepartmentID() == -2)
-                        {
-                            selectedDepartment.setDepartmentID("0");
-                        }
-
+                        CheckSelectedData();
                         Bundle bundle = new Bundle();
                         bundle.putLong("InstituteID", InstituteID);
                         bundle.putLong("MediumID",selectedMedium.getMediumID());
@@ -260,14 +243,14 @@ public class ReportAllStudentMain extends AppCompatActivity {
                         selectedClass = new ClassModel();
                         selectedDepartment = new DepartmentModel();
                         selectedSection = new SectionModel();
+                        CheckSelectedData();
+                        classUrl = getString(R.string.baseUrlLocal)+"MediumWiseClassDDL/"+InstituteID+"/"+selectedMedium.getMediumID();
+                        ClassDataGetRequest(classUrl);
                     }
                     catch (IndexOutOfBoundsException e)
                     {
                         Toast.makeText(ReportAllStudentMain.this,"No medium found !!!",Toast.LENGTH_LONG).show();
                     }
-                    CheckSelectedData();
-                    classUrl = getString(R.string.baseUrlLocal)+"MediumWiseClassDDL/"+InstituteID+"/"+selectedMedium.getMediumID();
-                    ClassDataGetRequest(ReportAllStudentMain.this, classUrl);
                 }
                 else
                 {
@@ -291,15 +274,15 @@ public class ReportAllStudentMain extends AppCompatActivity {
                         selectedClass = allClassArrayList.get(position-1);
                         selectedDepartment = new DepartmentModel();
                         selectedSection = new SectionModel();
+                        CheckSelectedData();
+                        departmentUrl = getString(R.string.baseUrlLocal)+"ClassWiseDepartmentDDL/"+InstituteID+"/"+
+                                selectedClass.getClassID()+"/"+selectedMedium.getMediumID();
+                        DepartmentDataGetRequest(departmentUrl);
                     }
                     catch (IndexOutOfBoundsException e)
                     {
                         Toast.makeText(ReportAllStudentMain.this,"No class found !!!",Toast.LENGTH_LONG).show();
                     }
-                    CheckSelectedData();
-                    departmentUrl = getString(R.string.baseUrlLocal)+"ClassWiseDepartmentDDL/"+InstituteID+"/"+
-                            selectedClass.getClassID()+"/"+selectedMedium.getMediumID();
-                    DepartmentDataGetRequest(ReportAllStudentMain.this, departmentUrl);
                 }
                 else
                 {
@@ -322,15 +305,15 @@ public class ReportAllStudentMain extends AppCompatActivity {
                     try {
                         selectedDepartment = allDepartmentArrayList.get(position-1);
                         selectedSection = new SectionModel();
+                        CheckSelectedData();
+                        sectionUrl = getString(R.string.baseUrlLocal)+"getInsSection/"+InstituteID+"/"+
+                                selectedClass.getClassID()+"/"+selectedDepartment.getDepartmentID();
+                        SectionDataGetRequest(sectionUrl);
                     }
                     catch (IndexOutOfBoundsException e)
                     {
                         Toast.makeText(ReportAllStudentMain.this,"No department found !!!",Toast.LENGTH_LONG).show();
                     }
-                    CheckSelectedData();
-                    sectionUrl = getString(R.string.baseUrlLocal)+"getInsSection/"+InstituteID+"/"+
-                            selectedClass.getClassID()+"/"+selectedDepartment.getDepartmentID();
-                    SectionDataGetRequest(ReportAllStudentMain.this, sectionUrl);
                 }
                 else
                 {
@@ -621,7 +604,7 @@ public class ReportAllStudentMain extends AppCompatActivity {
                 CheckSelectedData();
                 sectionUrl = getString(R.string.baseUrlLocal)+"getInsSection/"+InstituteID+"/"+
                         selectedClass.getClassID()+"/"+selectedDepartment.getDepartmentID();
-                SectionDataGetRequest(ReportAllStudentMain.this, sectionUrl);
+                SectionDataGetRequest(sectionUrl);
             }
             try {
                 String[] strings = new String[departmentArrayList.size()];
@@ -791,11 +774,10 @@ public class ReportAllStudentMain extends AppCompatActivity {
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
-    private void ShiftDataGetRequest(Context context, String url)
+    private void ShiftDataGetRequest(String url)
     {
         dialog.show();
         //Preparing Shift data from server
-        RequestQueue queueShift = Volley.newRequestQueue(context);
         StringRequest stringShiftRequest = new StringRequest(Request.Method.GET, url,
                 new Response.Listener<String>() {
                     @Override
@@ -810,15 +792,22 @@ public class ReportAllStudentMain extends AppCompatActivity {
 
                 dialog.dismiss();
             }
-        });
-        queueShift.add(stringShiftRequest);
+        })
+        {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String>  params = new HashMap<String, String>();
+                params.put("Authorization", "Request_From_onEMS_Android_app");
+                return params;
+            }
+        };
+        MySingleton.getInstance(this).addToRequestQueue(stringShiftRequest);
     }
 
-    private void MediumDataGetRequest(Context context, String url)
+    private void MediumDataGetRequest(String url)
     {
         dialog.show();
         //Preparing Medium data from server
-        RequestQueue queueMedium = Volley.newRequestQueue(context);
         StringRequest stringMediumRequest = new StringRequest(Request.Method.GET, url,
                 new Response.Listener<String>() {
                     @Override
@@ -833,15 +822,22 @@ public class ReportAllStudentMain extends AppCompatActivity {
 
                 dialog.dismiss();
             }
-        });
-        queueMedium.add(stringMediumRequest);
+        })
+        {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String>  params = new HashMap<String, String>();
+                params.put("Authorization", "Request_From_onEMS_Android_app");
+                return params;
+            }
+        };
+        MySingleton.getInstance(this).addToRequestQueue(stringMediumRequest);
     }
 
-    private void ClassDataGetRequest(Context context, String url)
+    private void ClassDataGetRequest(String url)
     {
         dialog.show();
         //Preparing claas data from server
-        RequestQueue queueClass = Volley.newRequestQueue(context);
         StringRequest stringClassRequest = new StringRequest(Request.Method.GET, url,
                 new Response.Listener<String>() {
                     @Override
@@ -856,15 +852,22 @@ public class ReportAllStudentMain extends AppCompatActivity {
 
                 dialog.dismiss();
             }
-        });
-        queueClass.add(stringClassRequest);
+        })
+        {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String>  params = new HashMap<String, String>();
+                params.put("Authorization", "Request_From_onEMS_Android_app");
+                return params;
+            }
+        };
+        MySingleton.getInstance(this).addToRequestQueue(stringClassRequest);
     }
 
-    private void DepartmentDataGetRequest(Context context, String url)
+    private void DepartmentDataGetRequest(String url)
     {
         dialog.show();
         //Preparing Department data from server
-        RequestQueue queueDepartment = Volley.newRequestQueue(context);
         StringRequest stringDepartmentRequest = new StringRequest(Request.Method.GET, url,
                 new Response.Listener<String>() {
                     @Override
@@ -879,15 +882,22 @@ public class ReportAllStudentMain extends AppCompatActivity {
 
                 dialog.dismiss();
             }
-        });
-        queueDepartment.add(stringDepartmentRequest);
+        })
+        {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String>  params = new HashMap<String, String>();
+                params.put("Authorization", "Request_From_onEMS_Android_app");
+                return params;
+            }
+        };
+        MySingleton.getInstance(this).addToRequestQueue(stringDepartmentRequest);
     }
 
-    private void SectionDataGetRequest(Context context, String url)
+    private void SectionDataGetRequest(String url)
     {
         dialog.show();
         //Preparing section data from server
-        RequestQueue queueSection = Volley.newRequestQueue(context);
         StringRequest stringSectionRequest = new StringRequest(Request.Method.GET, url,
                 new Response.Listener<String>() {
                     @Override
@@ -902,8 +912,16 @@ public class ReportAllStudentMain extends AppCompatActivity {
 
                 dialog.dismiss();
             }
-        });
-        queueSection.add(stringSectionRequest);
+        })
+        {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String>  params = new HashMap<String, String>();
+                params.put("Authorization", "Request_From_onEMS_Android_app");
+                return params;
+            }
+        };
+        MySingleton.getInstance(this).addToRequestQueue(stringSectionRequest);
     }
 
     private void CheckSelectedData(){

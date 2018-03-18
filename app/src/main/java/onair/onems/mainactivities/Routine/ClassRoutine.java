@@ -1,8 +1,6 @@
 package onair.onems.mainactivities.Routine;
 
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -13,7 +11,6 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.app.NavUtils;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
@@ -38,8 +35,6 @@ import java.util.List;
 import de.hdodenhof.circleimageview.CircleImageView;
 import onair.onems.R;
 import onair.onems.customadapters.ExpandableListAdapterStudent;
-import onair.onems.fragment.OneFragment;
-import onair.onems.fragment.TwoFragment;
 import onair.onems.mainactivities.Fees.Fee;
 import onair.onems.mainactivities.Fees.FeesHistory;
 import onair.onems.mainactivities.LoginScreen;

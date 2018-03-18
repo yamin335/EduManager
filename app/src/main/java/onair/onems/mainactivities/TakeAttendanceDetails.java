@@ -18,6 +18,7 @@ import android.view.MenuItem;
 import android.view.WindowManager;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -32,7 +33,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 import onair.onems.R;
 import onair.onems.Services.AttendanceDataPoster;
 import onair.onems.customadapters.CustomRequest;
@@ -41,6 +45,7 @@ import onair.onems.models.ApiResponseValue;
 import onair.onems.models.AttendanceSheetModel;
 import onair.onems.models.AttendanceStudentModel;
 import onair.onems.models.StudentModel;
+import onair.onems.network.MySingleton;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Retrofit;
@@ -113,23 +118,7 @@ public class TakeAttendanceDetails extends AppCompatActivity {
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(adapter);
 
-        //Preparing claas data from server
-        RequestQueue queueStudentData = Volley.newRequestQueue(this);
-        StringRequest stringStudentDataRequest = new StringRequest(Request.Method.GET, StudentDataGetUrl,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-
-                        prepareAlbums(response);
-
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                dialog.dismiss();
-            }
-        });
-        queueStudentData.add(stringStudentDataRequest);
+        StudentDataGetRequest();
 //        prepareAlbums();
 
     }
@@ -266,7 +255,6 @@ public class TakeAttendanceDetails extends AppCompatActivity {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        RequestQueue queuePost = Volley.newRequestQueue(this);
         CustomRequest customRequest = new CustomRequest (Request.Method.POST, postUrl, postDatajsonObject,
                 new Response.Listener<JSONArray>() {
                     @Override
@@ -274,7 +262,7 @@ public class TakeAttendanceDetails extends AppCompatActivity {
                         dialog.dismiss();
                         try {
                             Toast.makeText(TakeAttendanceDetails.this,"Data Successfully Updated with Response: "+response.getJSONObject(0).get("ReturnValue"),Toast.LENGTH_LONG).show();
-                            NavUtils.navigateUpFromSameTask(TakeAttendanceDetails.this);
+                            finish();
                         }
                         catch (Exception e)
                         {
@@ -287,8 +275,16 @@ public class TakeAttendanceDetails extends AppCompatActivity {
                 Toast.makeText(TakeAttendanceDetails.this,"Not Response: "+error.toString(),Toast.LENGTH_LONG).show();
                 dialog.dismiss();
             }
-        });
-        queuePost.add(customRequest);
+        })
+        {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String>  params = new HashMap<String, String>();
+                params.put("Authorization", "Request_From_onEMS_Android_app");
+                return params;
+            }
+        };
+        MySingleton.getInstance(this).addToRequestQueue(customRequest);
     }
 
     private boolean isNetworkAvailable() {
@@ -299,7 +295,34 @@ public class TakeAttendanceDetails extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        NavUtils.navigateUpFromSameTask(this);
+//        NavUtils.navigateUpFromSameTask(this);
         super.onBackPressed();
+    }
+
+    public void StudentDataGetRequest(){
+        //Preparing claas data from server
+        StringRequest stringStudentDataRequest = new StringRequest(Request.Method.GET, StudentDataGetUrl,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+
+                        prepareAlbums(response);
+
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                dialog.dismiss();
+            }
+        })
+        {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String>  params = new HashMap<String, String>();
+                params.put("Authorization", "Request_From_onEMS_Android_app");
+                return params;
+            }
+        };
+        MySingleton.getInstance(this).addToRequestQueue(stringStudentDataRequest);
     }
 }

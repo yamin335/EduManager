@@ -1,46 +1,33 @@
-package onair.onems.mainactivities.TeacherAttendanceShow;
+package onair.onems.fragments;
 
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
-import android.os.Handler;
 import android.preference.PreferenceManager;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.NavUtils;
-import android.support.v7.app.AppCompatActivity;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.Toast;
-
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
-import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
-import com.jaredrummler.materialspinner.MaterialSpinner;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-
-import de.codecrafters.tableview.TableView;
 import onair.onems.R;
 import onair.onems.mainactivities.StudentAttendanceShow;
 import onair.onems.models.ClassModel;
@@ -51,11 +38,9 @@ import onair.onems.models.SectionModel;
 import onair.onems.models.ShiftModel;
 import onair.onems.network.MySingleton;
 
-/**
- * Created by User on 12/26/2017.
- */
 
-public class ShowAttendance extends AppCompatActivity {
+public class OthersAttendance extends Fragment {
+    private View rootView;
     private Spinner spinnerClass, spinnerShift, spinnerSection, spinnerMedium, spinnerDepartment, spinnerMonth;
     private String classUrl, shiftUrl, sectionUrl, mediumUrl, monthUrl, departmentUrl;
     private ArrayList<ClassModel> allClassArrayList;
@@ -79,17 +64,33 @@ public class ShowAttendance extends AppCompatActivity {
     private long InstituteID;
     ProgressDialog dialog;
     Button student_find_button;
+    public OthersAttendance()
+    {
+
+    }
+    public static OthersAttendance newInstance()
+    {
+        OthersAttendance fragment = new OthersAttendance();
+        return fragment;
+    }
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.student_attendance_others_attendence);
-        spinnerClass = (Spinner)findViewById(R.id.spinnerClass);
-        spinnerShift = (Spinner)findViewById(R.id.spinnerShift);
-        spinnerSection = (Spinner)findViewById(R.id.spinnerSection);
-        spinnerMedium =(Spinner)findViewById(R.id.spinnerMedium);
-        spinnerDepartment =(Spinner)findViewById(R.id.spinnerDepartment);
-        spinnerMonth = (Spinner)findViewById(R.id.spinnerMonth);
-        student_find_button=(Button)findViewById(R.id.show_button);
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState)
+    {
+        rootView = inflater.inflate(R.layout.student_attendance_others_attendence, container, false);
+        spinnerClass = (Spinner)rootView.findViewById(R.id.spinnerClass);
+        spinnerShift = (Spinner)rootView.findViewById(R.id.spinnerShift);
+        spinnerSection = (Spinner)rootView.findViewById(R.id.spinnerSection);
+        spinnerMedium =(Spinner)rootView.findViewById(R.id.spinnerMedium);
+        spinnerDepartment =(Spinner)rootView.findViewById(R.id.spinnerDepartment);
+        spinnerMonth = (Spinner)rootView.findViewById(R.id.spinnerMonth);
+        student_find_button=(Button) rootView.findViewById(R.id.show_button);
 
         selectedClass = new ClassModel();
         selectedShift = new ShiftModel();
@@ -98,27 +99,27 @@ public class ShowAttendance extends AppCompatActivity {
         selectedDepartment = new DepartmentModel();
         selectedMonth = new MonthModel();
 
-        ArrayAdapter<String> class_spinner_adapter = new ArrayAdapter<String>(this, R.layout.spinner_item, tempClassArray);
+        ArrayAdapter<String> class_spinner_adapter = new ArrayAdapter<String>(getActivity(), R.layout.spinner_item, tempClassArray);
         class_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerClass.setAdapter(class_spinner_adapter);
 
-        ArrayAdapter<String> shift_spinner_adapter = new ArrayAdapter<String>(this, R.layout.spinner_item, tempShiftArray);
+        ArrayAdapter<String> shift_spinner_adapter = new ArrayAdapter<String>(getActivity(), R.layout.spinner_item, tempShiftArray);
         shift_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerShift.setAdapter(shift_spinner_adapter);
 
-        ArrayAdapter<String> section_spinner_adapter = new ArrayAdapter<String>(this, R.layout.spinner_item, tempSectionArray);
+        ArrayAdapter<String> section_spinner_adapter = new ArrayAdapter<String>(getActivity(), R.layout.spinner_item, tempSectionArray);
         section_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerSection.setAdapter(section_spinner_adapter);
 
-        ArrayAdapter<String> department_spinner_adapter = new ArrayAdapter<String>(this, R.layout.spinner_item, tempDepartmentArray);
+        ArrayAdapter<String> department_spinner_adapter = new ArrayAdapter<String>(getActivity(), R.layout.spinner_item, tempDepartmentArray);
         department_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerDepartment.setAdapter(department_spinner_adapter);
 
-        ArrayAdapter<String> medium_spinner_adapter = new ArrayAdapter<String>(this, R.layout.spinner_item, tempMediumArray);
+        ArrayAdapter<String> medium_spinner_adapter = new ArrayAdapter<String>(getActivity(), R.layout.spinner_item, tempMediumArray);
         medium_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerMedium.setAdapter(medium_spinner_adapter);
 
-        ArrayAdapter<String> month_spinner_adapter = new ArrayAdapter<String>(this, R.layout.spinner_item, tempMonthArray);
+        ArrayAdapter<String> month_spinner_adapter = new ArrayAdapter<String>(getActivity(), R.layout.spinner_item, tempMonthArray);
         month_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerMonth.setAdapter(month_spinner_adapter);
 
@@ -129,14 +130,14 @@ public class ShowAttendance extends AppCompatActivity {
         allDepartmentArrayList = new ArrayList<>();
         allMonthArrayList = new ArrayList<>();
 
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         InstituteID = prefs.getLong("InstituteID",0);
 
         monthUrl=getString(R.string.baseUrlLocal)+"getMonth";
         shiftUrl = getString(R.string.baseUrlLocal)+"getInsShift/"+InstituteID;
         mediumUrl = getString(R.string.baseUrlLocal)+"getInsMedium/"+InstituteID;
 
-        dialog = new ProgressDialog(this);
+        dialog = new ProgressDialog(getActivity());
         dialog.setTitle("Loading...");
         dialog.setMessage("Please Wait...");
         dialog.setCancelable(false);
@@ -144,7 +145,7 @@ public class ShowAttendance extends AppCompatActivity {
 
         if(!isNetworkAvailable())
         {
-            Toast.makeText(this,"Please check your internet connection and open app again!!! ",Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity(),"Please check your internet connection and open app again!!! ",Toast.LENGTH_LONG).show();
         }
 
         ShiftDataGetRequest(shiftUrl);
@@ -164,7 +165,7 @@ public class ShowAttendance extends AppCompatActivity {
                     }
                     catch (IndexOutOfBoundsException e)
                     {
-                        Toast.makeText(ShowAttendance.this,"No shift found !!!",Toast.LENGTH_LONG).show();
+                        Toast.makeText(getActivity(),"No shift found !!!",Toast.LENGTH_LONG).show();
                     }
                 }
                 else
@@ -198,7 +199,7 @@ public class ShowAttendance extends AppCompatActivity {
                     }
                     catch (IndexOutOfBoundsException e)
                     {
-                        Toast.makeText(ShowAttendance.this,"No medium found !!!",Toast.LENGTH_LONG).show();
+                        Toast.makeText(getActivity(),"No medium found !!!",Toast.LENGTH_LONG).show();
                     }
                 }
                 else
@@ -231,7 +232,7 @@ public class ShowAttendance extends AppCompatActivity {
                     }
                     catch (IndexOutOfBoundsException e)
                     {
-                        Toast.makeText(ShowAttendance.this,"No class found !!!",Toast.LENGTH_LONG).show();
+                        Toast.makeText(getActivity(),"No class found !!!",Toast.LENGTH_LONG).show();
                     }
                 }
                 else
@@ -263,7 +264,7 @@ public class ShowAttendance extends AppCompatActivity {
                     }
                     catch (IndexOutOfBoundsException e)
                     {
-                        Toast.makeText(ShowAttendance.this,"No shift found !!!",Toast.LENGTH_LONG).show();
+                        Toast.makeText(getActivity(),"No shift found !!!",Toast.LENGTH_LONG).show();
                     }
                 }
                 else
@@ -289,7 +290,7 @@ public class ShowAttendance extends AppCompatActivity {
                     }
                     catch (IndexOutOfBoundsException e)
                     {
-                        Toast.makeText(ShowAttendance.this,"No section found !!!",Toast.LENGTH_LONG).show();
+                        Toast.makeText(getActivity(),"No section found !!!",Toast.LENGTH_LONG).show();
                     }
                 }
                 else
@@ -315,7 +316,7 @@ public class ShowAttendance extends AppCompatActivity {
                     }
                     catch (IndexOutOfBoundsException e)
                     {
-                        Toast.makeText(ShowAttendance.this,"No section found !!!",Toast.LENGTH_LONG).show();
+                        Toast.makeText(getActivity(),"No section found !!!",Toast.LENGTH_LONG).show();
                     }
                 }
                 else
@@ -338,27 +339,27 @@ public class ShowAttendance extends AppCompatActivity {
             {
                 if(selectedMedium.getMediumID() == -2)
                 {
-                    Toast.makeText(ShowAttendance.this,"Please select a medium!!!",Toast.LENGTH_LONG).show();
+                    Toast.makeText(getActivity(),"Please select a medium!!!",Toast.LENGTH_LONG).show();
                 }
                 else if(selectedClass.getClassID() == -2)
                 {
-                    Toast.makeText(ShowAttendance.this,"Please select a class!!!",Toast.LENGTH_LONG).show();
+                    Toast.makeText(getActivity(),"Please select a class!!!",Toast.LENGTH_LONG).show();
                 }
                 else if((selectedDepartment.getDepartmentID() == -2)&&(allDepartmentArrayList.size()>0))
                 {
-                    Toast.makeText(ShowAttendance.this,"Please select a department!!!",Toast.LENGTH_LONG).show();
+                    Toast.makeText(getActivity(),"Please select a department!!!",Toast.LENGTH_LONG).show();
                 }
                 else if((selectedSection.getSectionID() == -2)&&(allSectionArrayList.size()>0))
                 {
-                    Toast.makeText(ShowAttendance.this,"Please select a section!!!",Toast.LENGTH_LONG).show();
+                    Toast.makeText(getActivity(),"Please select a section!!!",Toast.LENGTH_LONG).show();
                 }
                 else if(selectedMonth.getMonthID() == 0)
                 {
-                    Toast.makeText(ShowAttendance.this,"Please select a month!!!",Toast.LENGTH_LONG).show();
+                    Toast.makeText(getActivity(),"Please select a month!!!",Toast.LENGTH_LONG).show();
                 }
                 else
                 {
-                    Intent intent = new Intent(ShowAttendance.this, StudentAttendanceShow.class);
+                    Intent intent = new Intent(getActivity(), StudentAttendanceShow.class);
                     intent.putExtra("ShiftID", selectedShift.getShiftID());
                     intent.putExtra("MediumID", selectedMedium.getMediumID());
                     intent.putExtra("ClassID", selectedClass.getClassID());
@@ -369,11 +370,8 @@ public class ShowAttendance extends AppCompatActivity {
                 }
             }
         });
-    }
 
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
+        return rootView;
     }
 
     void parseClassJsonData(String jsonString) {
@@ -395,7 +393,7 @@ public class ShowAttendance extends AppCompatActivity {
             try {
                 String[] strings = new String[classArrayList.size()];
                 strings = classArrayList.toArray(strings);
-                ArrayAdapter<String> class_spinner_adapter = new ArrayAdapter<>(this,R.layout.spinner_item, strings);
+                ArrayAdapter<String> class_spinner_adapter = new ArrayAdapter<>(getActivity(),R.layout.spinner_item, strings);
                 class_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinnerClass.setAdapter(class_spinner_adapter);
                 dialog.dismiss();
@@ -403,11 +401,11 @@ public class ShowAttendance extends AppCompatActivity {
             catch (IndexOutOfBoundsException e)
             {
                 dialog.dismiss();
-                Toast.makeText(this,"No class found !!!",Toast.LENGTH_LONG).show();
+                Toast.makeText(getActivity(),"No class found !!!",Toast.LENGTH_LONG).show();
             }
             //spinner.setSelectedIndex(1);
         } catch (JSONException e) {
-            Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity(),""+e,Toast.LENGTH_LONG).show();
             dialog.dismiss();
         }
     }
@@ -431,7 +429,7 @@ public class ShowAttendance extends AppCompatActivity {
             try {
                 String[] strings = new String[shiftArrayList.size()];
                 strings = shiftArrayList.toArray(strings);
-                ArrayAdapter<String> shift_spinner_adapter = new ArrayAdapter<>(this,R.layout.spinner_item, strings);
+                ArrayAdapter<String> shift_spinner_adapter = new ArrayAdapter<>(getActivity(),R.layout.spinner_item, strings);
                 shift_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinnerShift.setAdapter(shift_spinner_adapter);
                 dialog.dismiss();
@@ -439,11 +437,11 @@ public class ShowAttendance extends AppCompatActivity {
             catch (IndexOutOfBoundsException e)
             {
                 dialog.dismiss();
-                Toast.makeText(this,"No shift found !!!",Toast.LENGTH_LONG).show();
+                Toast.makeText(getActivity(),"No shift found !!!",Toast.LENGTH_LONG).show();
             }
             //spinner.setSelectedIndex(1);
         } catch (JSONException e) {
-            Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity(),""+e,Toast.LENGTH_LONG).show();
             dialog.dismiss();
         }
     }
@@ -467,7 +465,7 @@ public class ShowAttendance extends AppCompatActivity {
             try {
                 String[] strings = new String[sectionArrayList.size()];
                 strings = sectionArrayList.toArray(strings);
-                ArrayAdapter<String> section_spinner_adapter = new ArrayAdapter<>(this,R.layout.spinner_item, strings);
+                ArrayAdapter<String> section_spinner_adapter = new ArrayAdapter<>(getActivity(),R.layout.spinner_item, strings);
                 section_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinnerSection.setAdapter(section_spinner_adapter);
                 dialog.dismiss();
@@ -475,11 +473,11 @@ public class ShowAttendance extends AppCompatActivity {
             catch (IndexOutOfBoundsException e)
             {
                 dialog.dismiss();
-                Toast.makeText(this,"No section found !!!",Toast.LENGTH_LONG).show();
+                Toast.makeText(getActivity(),"No section found !!!",Toast.LENGTH_LONG).show();
             }
             //spinner.setSelectedIndex(1);
         } catch (JSONException e) {
-            Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity(),""+e,Toast.LENGTH_LONG).show();
             dialog.dismiss();
         }
     }
@@ -504,7 +502,7 @@ public class ShowAttendance extends AppCompatActivity {
             try {
                 String[] strings = new String[mediumnArrayList.size()];
                 strings = mediumnArrayList.toArray(strings);
-                ArrayAdapter<String> medium_spinner_adapter = new ArrayAdapter<>(this,R.layout.spinner_item, strings);
+                ArrayAdapter<String> medium_spinner_adapter = new ArrayAdapter<>(getActivity(),R.layout.spinner_item, strings);
                 medium_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinnerMedium.setAdapter(medium_spinner_adapter);
                 dialog.dismiss();
@@ -512,11 +510,11 @@ public class ShowAttendance extends AppCompatActivity {
             catch (IndexOutOfBoundsException e)
             {
                 dialog.dismiss();
-                Toast.makeText(this,"No medium found !!!",Toast.LENGTH_LONG).show();
+                Toast.makeText(getActivity(),"No medium found !!!",Toast.LENGTH_LONG).show();
             }
             //spinner.setSelectedIndex(1);
         } catch (JSONException e) {
-            Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity(),""+e,Toast.LENGTH_LONG).show();
             dialog.dismiss();
         }
     }
@@ -546,7 +544,7 @@ public class ShowAttendance extends AppCompatActivity {
             try {
                 String[] strings = new String[departmentArrayList.size()];
                 strings = departmentArrayList.toArray(strings);
-                ArrayAdapter<String> department_spinner_adapter = new ArrayAdapter<>(this,R.layout.spinner_item, strings);
+                ArrayAdapter<String> department_spinner_adapter = new ArrayAdapter<>(getActivity(),R.layout.spinner_item, strings);
                 department_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinnerDepartment.setAdapter(department_spinner_adapter);
                 dialog.dismiss();
@@ -554,11 +552,11 @@ public class ShowAttendance extends AppCompatActivity {
             catch (IndexOutOfBoundsException e)
             {
                 dialog.dismiss();
-                Toast.makeText(this,"No department found !!!",Toast.LENGTH_LONG).show();
+                Toast.makeText(getActivity(),"No department found !!!",Toast.LENGTH_LONG).show();
             }
             //spinner.setSelectedIndex(1);
         } catch (JSONException e) {
-            Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity(),""+e,Toast.LENGTH_LONG).show();
             dialog.dismiss();
         }
     }
@@ -586,7 +584,7 @@ public class ShowAttendance extends AppCompatActivity {
             try {
                 String[] strings = new String[monthArrayList.size()];
                 strings = monthArrayList.toArray(strings);
-                ArrayAdapter<String> month_spinner_adapter = new ArrayAdapter<>(this,R.layout.spinner_item, strings);
+                ArrayAdapter<String> month_spinner_adapter = new ArrayAdapter<>(getActivity(),R.layout.spinner_item, strings);
                 month_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinnerMonth.setAdapter(month_spinner_adapter);
                 dialog.dismiss();
@@ -594,11 +592,11 @@ public class ShowAttendance extends AppCompatActivity {
             catch (IndexOutOfBoundsException e)
             {
                 dialog.dismiss();
-                Toast.makeText(this,"No class found !!!",Toast.LENGTH_LONG).show();
+                Toast.makeText(getActivity(),"No class found !!!",Toast.LENGTH_LONG).show();
             }
 
         } catch (JSONException e) {
-            Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity(),""+e,Toast.LENGTH_LONG).show();
             dialog.dismiss();
 
         }
@@ -606,7 +604,7 @@ public class ShowAttendance extends AppCompatActivity {
     }
 
     private boolean isNetworkAvailable() {
-        ConnectivityManager connectivityManager = (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
+        ConnectivityManager connectivityManager = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
@@ -638,7 +636,7 @@ public class ShowAttendance extends AppCompatActivity {
                 return params;
             }
         };
-        MySingleton.getInstance(this).addToRequestQueue(stringShiftRequest);
+        MySingleton.getInstance(getActivity()).addToRequestQueue(stringShiftRequest);
     }
 
     private void MediumDataGetRequest(String url)
@@ -668,7 +666,7 @@ public class ShowAttendance extends AppCompatActivity {
                 return params;
             }
         };
-        MySingleton.getInstance(this).addToRequestQueue(stringMediumRequest);
+        MySingleton.getInstance(getActivity()).addToRequestQueue(stringMediumRequest);
     }
 
     private void ClassDataGetRequest(String url)
@@ -698,7 +696,7 @@ public class ShowAttendance extends AppCompatActivity {
                 return params;
             }
         };
-        MySingleton.getInstance(this).addToRequestQueue(stringClassRequest);
+        MySingleton.getInstance(getActivity()).addToRequestQueue(stringClassRequest);
     }
 
     private void DepartmentDataGetRequest(String url)
@@ -728,7 +726,7 @@ public class ShowAttendance extends AppCompatActivity {
                 return params;
             }
         };
-        MySingleton.getInstance(this).addToRequestQueue(stringDepartmentRequest);
+        MySingleton.getInstance(getActivity()).addToRequestQueue(stringDepartmentRequest);
     }
 
     private void SectionDataGetRequest(String url)
@@ -758,7 +756,7 @@ public class ShowAttendance extends AppCompatActivity {
                 return params;
             }
         };
-        MySingleton.getInstance(this).addToRequestQueue(stringSectionRequest);
+        MySingleton.getInstance(getActivity()).addToRequestQueue(stringSectionRequest);
     }
 
     void MonthDataGetRequest(){
@@ -788,7 +786,7 @@ public class ShowAttendance extends AppCompatActivity {
                 return params;
             }
         };
-        MySingleton.getInstance(this).addToRequestQueue(stringMonthRequest);
+        MySingleton.getInstance(getActivity()).addToRequestQueue(stringMonthRequest);
     }
 
     private void CheckSelectedData(){
@@ -813,4 +811,10 @@ public class ShowAttendance extends AppCompatActivity {
             selectedDepartment.setDepartmentID("0");
         }
     }
+    @Override
+    public void onStop()
+    {
+        super.onStop();
+    }
+
 }

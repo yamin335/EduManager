@@ -12,6 +12,7 @@ import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -24,6 +25,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import de.codecrafters.tableview.TableView;
 import de.codecrafters.tableview.listeners.TableDataClickListener;
@@ -31,8 +34,9 @@ import de.codecrafters.tableview.model.TableColumnWeightModel;
 import de.codecrafters.tableview.toolkit.SimpleTableDataAdapter;
 import de.codecrafters.tableview.toolkit.SimpleTableHeaderAdapter;
 import de.codecrafters.tableview.toolkit.TableDataRowBackgroundProviders;
-import de.hdodenhof.circleimageview.CircleImageView;
 import onair.onems.R;
+import onair.onems.models.StudentAttendanceReportModels.DailyAttendanceModel;
+import onair.onems.network.MySingleton;
 
 /**
  * Created by hp on 12/5/2017.
@@ -40,6 +44,8 @@ import onair.onems.R;
 
 public class AllStudentAttendanceShow extends AppCompatActivity
 {
+    private ArrayList<DailyAttendanceModel> dailyAttendanceList;
+    private DailyAttendanceModel selectedDay;
     TextView name,roll,id;
     TableView tableView;
     SimpleTableHeaderAdapter simpleTableHeaderAdapter;
@@ -48,9 +54,9 @@ public class AllStudentAttendanceShow extends AppCompatActivity
     SharedPreferences sharedPre;
     Configuration config;
     ProgressDialog dialog;
-    String RFID="",monthAttendanceUrl="",studentName="",studentRoll="";
-    long InstituteID=0;
-    int SectionID=0,ClassID=0,MediumID=0,ShiftID=0,MonthID=0;
+    String RFID="", monthAttendanceUrl="", UserFullName="", RollNo="", UserID = "";
+    long InstituteID=0, SectionID=0, ClassID=0, MediumID=0, ShiftID=0, DepartmentID = 0;
+    int MonthID=0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,30 +66,36 @@ public class AllStudentAttendanceShow extends AppCompatActivity
         name=(TextView) findViewById(R.id.name);
         roll=(TextView) findViewById(R.id.roll);
         id=(TextView) findViewById(R.id.Id);
+
         dialog = new ProgressDialog(this);
         dialog.setMessage("Loading....");
         dialog.show();
         //Loding show end code
 
+        dailyAttendanceList = new ArrayList<>();
+        selectedDay = new DailyAttendanceModel();
         // get Internal Data using SharedPreferences
-
         sharedPre = PreferenceManager.getDefaultSharedPreferences(this);
-        InstituteID=sharedPre.getLong("InstituteID",0);
-        ShiftID=sharedPre.getInt("ShiftSelectID",0);
-        MediumID=sharedPre.getInt("MediumSelectID",0);
-        ClassID=sharedPre.getInt("ClassSelectID",0);
-        SectionID=sharedPre.getInt("SectionSelectID",0);
-        MonthID=sharedPre.getInt("MonthSelectID",0);
-        RFID=sharedPre.getString("SelectStudentRFID","");
-        studentName=sharedPre.getString("SelectStudentName","");
-        studentRoll=sharedPre.getString("SelectStudentRoll","");
+        InstituteID = sharedPre.getLong("InstituteID",0);
+
+        Intent intent = getIntent();
+        ShiftID = intent.getLongExtra("ShiftID", 0);
+        MediumID = intent.getLongExtra("MediumID", 0);
+        ClassID = intent.getLongExtra("ClassID", 0);
+        DepartmentID = intent.getLongExtra("DepartmentID", 0);
+        SectionID = intent.getLongExtra("SectionID", 0);
+        MonthID = intent.getIntExtra("MonthID", 0);
+        RFID = intent.getStringExtra("RFID");
+        UserFullName = intent.getStringExtra("UserFullName");
+        RollNo = intent.getStringExtra("RollNo");
+        UserID = intent.getStringExtra("UserID");
         // get Internal Data using SharedPreferences end
-        name.setText(""+studentName);
-        roll.setText("Roll: "+studentRoll);
+        name.setText(""+UserFullName);
+        roll.setText("Roll: "+RollNo);
         id.setText("ID: "+RFID);
 
-        monthAttendanceUrl=getString(R.string.baseUrlRaw)+"getStudentMonthlyDeviceAttendance/"+ShiftID+"/"+MediumID+"/"+ClassID+"/"+SectionID+"/"+MonthID+"/"+RFID;
-         Toast.makeText(this,""+monthAttendanceUrl,Toast.LENGTH_LONG).show();
+        monthAttendanceUrl = getString(R.string.baseUrlLocal)+"getStudentMonthlyDeviceAttendance/"+
+                ShiftID+"/"+MediumID+"/"+ClassID+"/"+SectionID+"/"+DepartmentID+"/"+MonthID+"/"+RFID+"/"+InstituteID;
         // Add Header of The Table
 
         simpleTableHeaderAdapter = new SimpleTableHeaderAdapter(this, "SI","Date","Present", "Late(m)");
@@ -126,38 +138,23 @@ public class AllStudentAttendanceShow extends AppCompatActivity
             @Override
             public void onDataClicked(int rowIndex, Object clickedData)
             {
-                dialog.show();
-                SharedPreferences.Editor editor = sharedPre.edit();
-                editor.putString("SelectDate", DATA_TO_SHOW[rowIndex][1]);
-                editor.commit();
-                Intent i = new Intent(AllStudentAttendanceShow.this,AllStudentSubjectWiseAttendance.class);
-                startActivity(i);
+                selectedDay = dailyAttendanceList.get(rowIndex);
+                Intent intent = new Intent(AllStudentAttendanceShow.this, AllStudentSubjectWiseAttendance.class);
+                intent.putExtra("UserID", UserID);
+                intent.putExtra("ShiftID", ShiftID);
+                intent.putExtra("MediumID", MediumID);
+                intent.putExtra("ClassID", ClassID);
+                intent.putExtra("DepartmentID", DepartmentID);
+                intent.putExtra("SectionID", SectionID);
+                intent.putExtra("Date", selectedDay.getDate());
+                startActivity(intent);
             }
         });
         //Table View Click Event  End
 
-
         // Loding http Monthly Attendance string file using volley
 
-        RequestQueue queue = Volley.newRequestQueue(this);
-
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, monthAttendanceUrl,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-
-                        parseMonthlyAttendanceJsonData(response);
-
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-
-                dialog.dismiss();
-            }
-        });
-
-        queue.add(stringRequest);
+        AttendanceDataGetRequest();
 
         // Loding http Monthly Attendance string file using volley
 
@@ -175,27 +172,22 @@ public class AllStudentAttendanceShow extends AppCompatActivity
 
     void parseMonthlyAttendanceJsonData(String jsonString) {
         try {
-            JSONArray jsonArray = new JSONArray(jsonString);
-            ArrayList al = new ArrayList();
-            DATA_TO_SHOW = new String[jsonArray.length()][4];
-            for(int i = 0; i < jsonArray.length(); ++i) {
-                JSONObject jsonObject=jsonArray.getJSONObject(i);
-
-                DATA_TO_SHOW[i][0]= String.valueOf((i+1));
-                DATA_TO_SHOW [i][1]=jsonObject.getString("Date");
-                int status=jsonObject.getInt("Present");
-                if(status==1)
-                {
-                    DATA_TO_SHOW[i][2]="YES";
-                }
-                else
-                    DATA_TO_SHOW[i][2]="NO";
-                DATA_TO_SHOW [i][3]=jsonObject.getString("Late");
-
-                al.add(DATA_TO_SHOW[i][0]);
-                al.add(DATA_TO_SHOW[i][1]);
-                al.add(DATA_TO_SHOW[i][2]);
-                al.add(DATA_TO_SHOW[i][3]);
+            dailyAttendanceList = new ArrayList<>();
+            JSONArray dailyAttendanceJsonArray = new JSONArray(jsonString);
+            DATA_TO_SHOW = new String[dailyAttendanceJsonArray.length()][4];
+            for(int i = 0; i < dailyAttendanceJsonArray.length(); ++i) {
+                JSONObject dailyAttendanceJsonObject = dailyAttendanceJsonArray.getJSONObject(i);
+                DailyAttendanceModel perDayAttendance = new DailyAttendanceModel();
+                perDayAttendance.setDate(dailyAttendanceJsonObject.getString("Date"));
+                perDayAttendance.setPresent(dailyAttendanceJsonObject.getString("Present"));
+                perDayAttendance.setLate(dailyAttendanceJsonObject.getString("Late"));
+                perDayAttendance.setTotalClassDay(dailyAttendanceJsonObject.getString("TotalClassDay"));
+                perDayAttendance.setTotalPresent(dailyAttendanceJsonObject.getString("TotalPresent"));
+                DATA_TO_SHOW[i][0] = String.valueOf((i+1));
+                DATA_TO_SHOW [i][1] = perDayAttendance.getDate();
+                DATA_TO_SHOW[i][2] = perDayAttendance.getPresent() == 1 ? "YES" : "NO";
+                DATA_TO_SHOW [i][3] = Integer.toString(perDayAttendance.getLate());
+                dailyAttendanceList.add(perDayAttendance);
             }
 
             simpleTabledataAdapter = new SimpleTableDataAdapter(this,DATA_TO_SHOW);
@@ -215,6 +207,32 @@ public class AllStudentAttendanceShow extends AppCompatActivity
         }
 
         dialog.dismiss();
+    }
+
+    public void AttendanceDataGetRequest(){
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, monthAttendanceUrl,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+
+                        parseMonthlyAttendanceJsonData(response);
+
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                dialog.dismiss();
+            }
+        })
+        {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String>  params = new HashMap<String, String>();
+                params.put("Authorization", "Request_From_onEMS_Android_app");
+                return params;
+            }
+        };
+        MySingleton.getInstance(this).addToRequestQueue(stringRequest);
     }
 
 }

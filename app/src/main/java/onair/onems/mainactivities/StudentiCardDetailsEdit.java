@@ -44,6 +44,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -71,7 +72,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import onair.onems.R;
 import onair.onems.Services.GlideApp;
@@ -85,6 +88,7 @@ import onair.onems.models.ReligionModel;
 import onair.onems.models.SectionModel;
 import onair.onems.models.ShiftModel;
 import onair.onems.models.StudentInformationEntry;
+import onair.onems.network.MySingleton;
 
 
 /**
@@ -227,25 +231,7 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
         studentDataGetUrl = getString(R.string.baseUrlLocal)+"getStudent"+"/"+InstituteID+"/"+
                 selected_Class+"/"+selected_Section+"/"+
                 selected_Department+"/"+selected_Medium+"/"+selected_Shift+"/"+UserID;
-
-        //Preparing Student data from server
-        RequestQueue queueStudent = Volley.newRequestQueue(StudentiCardDetailsEdit.this);
-        StringRequest stringStudentRequest = new StringRequest(Request.Method.GET, studentDataGetUrl,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-
-                        parseStudentJsonData(response);
-
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-
-                dialog.dismiss();
-            }
-        });
-        queueStudent.add(stringStudentRequest);
+        StudentDataGetRequest();
 
         t_roll = (EditText) findViewById(R.id.stuRoll);
         t_name = (EditText)findViewById(R.id.stuName);
@@ -518,65 +504,11 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
 
         MediumDataGetRequest(this, mediumUrl);
 
-        dialog.show();
-        //Preparing Gender data from server
-        RequestQueue queueGender = Volley.newRequestQueue(this);
-        StringRequest stringGenderRequest = new StringRequest(Request.Method.GET, genderUrl,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
+        ReligionDataGetRequest();
 
-                        parseGenderJsonData(response);
+        GenderDataGetRequest();
 
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-
-                dialog.dismiss();
-            }
-        });
-        queueGender.add(stringGenderRequest);
-
-        dialog.show();
-        //Preparing Religion data from server
-        RequestQueue queueReligion = Volley.newRequestQueue(this);
-        StringRequest stringReligionRequest = new StringRequest(Request.Method.GET, religionUrl,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-
-                        parseReligionJsonData(response);
-
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-
-                dialog.dismiss();
-            }
-        });
-        queueReligion.add(stringReligionRequest);
-
-        dialog.show();
-        //Preparing Blood Group data from server
-        RequestQueue queueBloodGroup = Volley.newRequestQueue(this);
-        StringRequest stringBloodGroupRequest = new StringRequest(Request.Method.GET, bloodGroupUrl,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-
-                        parseBloodGroupJsonData(response);
-
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-
-                dialog.dismiss();
-            }
-        });
-        queueBloodGroup.add(stringBloodGroupRequest);
+        BloodGroupDataGetRequest();
 
         spinnerShift.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -1267,7 +1199,15 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
                 Toast.makeText(StudentiCardDetailsEdit.this,"Not Successfully Updated"+error.toString(),Toast.LENGTH_LONG).show();
                 dialog.dismiss();
             }
-        });
+        })
+        {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String>  params = new HashMap<String, String>();
+                params.put("Authorization", "Request_From_onEMS_Android_app");
+                return params;
+            }
+        };
         queuePost.add(customRequest);
     }
 
@@ -1275,7 +1215,10 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
         try {
             JSONArray studentJsonArray = new JSONArray(jsonString);
             JSONObject studentJsonObject = studentJsonArray.getJSONObject(0);
-
+            if(studentJsonObject.getString("ImageUrl").equals("null")){
+                progressBar.setVisibility(View.GONE);
+                Toast.makeText(StudentiCardDetailsEdit.this,"No image found!!!",Toast.LENGTH_LONG).show();
+            }
             GlideApp.with(this)
                     .asBitmap()
                     .load(getString(R.string.baseUrlRaw)+studentJsonObject.getString("ImageUrl").replace("\\","/"))
@@ -1363,26 +1306,26 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
             t_remarks.setText(studentJsonObject.getString("Remarks"));
             t_bloodGroup.setText(studentJsonObject.getString("BloodGroup"));
 
-            sectionUrl = getString(R.string.baseUrlLocal)+"getInsSection/"+InstituteID+"/"+studentJsonObject.getString("ClassID");
-            dialog.show();
-            //Preparing section data from server
-            RequestQueue queueSection = Volley.newRequestQueue(StudentiCardDetailsEdit.this);
-            StringRequest stringSectionRequest = new StringRequest(Request.Method.GET, sectionUrl,
-                    new Response.Listener<String>() {
-                        @Override
-                        public void onResponse(String response) {
-
-                            parseSectionJsonData(response);
-
-                        }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-
-                    dialog.dismiss();
-                }
-            });
-            queueSection.add(stringSectionRequest);
+//            sectionUrl = getString(R.string.baseUrlLocal)+"getInsSection/"+InstituteID+"/"+studentJsonObject.getString("ClassID");
+//            dialog.show();
+//            //Preparing section data from server
+//            RequestQueue queueSection = Volley.newRequestQueue(StudentiCardDetailsEdit.this);
+//            StringRequest stringSectionRequest = new StringRequest(Request.Method.GET, sectionUrl,
+//                    new Response.Listener<String>() {
+//                        @Override
+//                        public void onResponse(String response) {
+//
+//                            parseSectionJsonData(response);
+//
+//                        }
+//                    }, new Response.ErrorListener() {
+//                @Override
+//                public void onErrorResponse(VolleyError error) {
+//
+//                    dialog.dismiss();
+//                }
+//            });
+//            queueSection.add(stringSectionRequest);
 
         } catch (JSONException e) {
             Toast.makeText(this,"WARNING!!! "+e,Toast.LENGTH_LONG).show();
@@ -1734,7 +1677,6 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
     {
         dialog.show();
         //Preparing Shift data from server
-        RequestQueue queueShift = Volley.newRequestQueue(context);
         StringRequest stringShiftRequest = new StringRequest(Request.Method.GET, url,
                 new Response.Listener<String>() {
                     @Override
@@ -1749,15 +1691,22 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
 
                 dialog.dismiss();
             }
-        });
-        queueShift.add(stringShiftRequest);
+        })
+        {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String>  params = new HashMap<String, String>();
+                params.put("Authorization", "Request_From_onEMS_Android_app");
+                return params;
+            }
+        };
+        MySingleton.getInstance(this).addToRequestQueue(stringShiftRequest);
     }
 
     private void MediumDataGetRequest(Context context, String url)
     {
         dialog.show();
         //Preparing Medium data from server
-        RequestQueue queueMedium = Volley.newRequestQueue(context);
         StringRequest stringMediumRequest = new StringRequest(Request.Method.GET, url,
                 new Response.Listener<String>() {
                     @Override
@@ -1772,15 +1721,22 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
 
                 dialog.dismiss();
             }
-        });
-        queueMedium.add(stringMediumRequest);
+        })
+        {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String>  params = new HashMap<String, String>();
+                params.put("Authorization", "Request_From_onEMS_Android_app");
+                return params;
+            }
+        };
+        MySingleton.getInstance(this).addToRequestQueue(stringMediumRequest);
     }
 
     private void ClassDataGetRequest(Context context, String url)
     {
         dialog.show();
         //Preparing claas data from server
-        RequestQueue queueClass = Volley.newRequestQueue(context);
         StringRequest stringClassRequest = new StringRequest(Request.Method.GET, url,
                 new Response.Listener<String>() {
                     @Override
@@ -1795,15 +1751,22 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
 
                 dialog.dismiss();
             }
-        });
-        queueClass.add(stringClassRequest);
+        })
+        {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String>  params = new HashMap<String, String>();
+                params.put("Authorization", "Request_From_onEMS_Android_app");
+                return params;
+            }
+        };
+        MySingleton.getInstance(this).addToRequestQueue(stringClassRequest);
     }
 
     private void DepartmentDataGetRequest(Context context, String url)
     {
         dialog.show();
         //Preparing Department data from server
-        RequestQueue queueDepartment = Volley.newRequestQueue(context);
         StringRequest stringDepartmentRequest = new StringRequest(Request.Method.GET, url,
                 new Response.Listener<String>() {
                     @Override
@@ -1818,15 +1781,22 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
 
                 dialog.dismiss();
             }
-        });
-        queueDepartment.add(stringDepartmentRequest);
+        })
+        {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String>  params = new HashMap<String, String>();
+                params.put("Authorization", "Request_From_onEMS_Android_app");
+                return params;
+            }
+        };
+        MySingleton.getInstance(this).addToRequestQueue(stringDepartmentRequest);
     }
 
     private void SectionDataGetRequest(Context context, String url)
     {
         dialog.show();
         //Preparing section data from server
-        RequestQueue queueSection = Volley.newRequestQueue(context);
         StringRequest stringSectionRequest = new StringRequest(Request.Method.GET, url,
                 new Response.Listener<String>() {
                     @Override
@@ -1841,8 +1811,16 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
 
                 dialog.dismiss();
             }
-        });
-        queueSection.add(stringSectionRequest);
+        })
+        {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String>  params = new HashMap<String, String>();
+                params.put("Authorization", "Request_From_onEMS_Android_app");
+                return params;
+            }
+        };
+        MySingleton.getInstance(this).addToRequestQueue(stringSectionRequest);
     }
 
     private void CheckSelectedData(){
@@ -1868,5 +1846,119 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
         }
     }
 
+    public void StudentDataGetRequest(){
+        //Preparing Student data from server
+        StringRequest stringStudentRequest = new StringRequest(Request.Method.GET, studentDataGetUrl,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+
+                        parseStudentJsonData(response);
+
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+                dialog.dismiss();
+            }
+        })
+        {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String>  params = new HashMap<String, String>();
+                params.put("Authorization", "Request_From_onEMS_Android_app");
+                return params;
+            }
+        };
+        MySingleton.getInstance(this).addToRequestQueue(stringStudentRequest);
+    }
+
+    public void ReligionDataGetRequest(){
+        dialog.show();
+        //Preparing Gender data from server
+        StringRequest stringGenderRequest = new StringRequest(Request.Method.GET, genderUrl,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+
+                        parseGenderJsonData(response);
+
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+                dialog.dismiss();
+            }
+        })
+        {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String>  params = new HashMap<String, String>();
+                params.put("Authorization", "Request_From_onEMS_Android_app");
+                return params;
+            }
+        };
+        MySingleton.getInstance(this).addToRequestQueue(stringGenderRequest);
+    }
+
+    public void GenderDataGetRequest(){
+        dialog.show();
+        //Preparing Religion data from server
+        StringRequest stringReligionRequest = new StringRequest(Request.Method.GET, religionUrl,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+
+                        parseReligionJsonData(response);
+
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+                dialog.dismiss();
+            }
+        })
+        {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String>  params = new HashMap<String, String>();
+                params.put("Authorization", "Request_From_onEMS_Android_app");
+                return params;
+            }
+        };
+        MySingleton.getInstance(this).addToRequestQueue(stringReligionRequest);
+    }
+
+    public void BloodGroupDataGetRequest(){
+        dialog.show();
+        //Preparing Blood Group data from server
+        StringRequest stringBloodGroupRequest = new StringRequest(Request.Method.GET, bloodGroupUrl,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+
+                        parseBloodGroupJsonData(response);
+
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+                dialog.dismiss();
+            }
+        })
+        {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String>  params = new HashMap<String, String>();
+                params.put("Authorization", "Request_From_onEMS_Android_app");
+                return params;
+            }
+        };
+        MySingleton.getInstance(this).addToRequestQueue(stringBloodGroupRequest);
+    }
 
 }

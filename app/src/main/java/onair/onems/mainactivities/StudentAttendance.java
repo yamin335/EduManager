@@ -18,17 +18,13 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ExpandableListView;
 import android.widget.ImageView;
-import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 
@@ -39,10 +35,9 @@ import java.util.List;
 import de.hdodenhof.circleimageview.CircleImageView;
 import onair.onems.R;
 import onair.onems.Services.GlideApp;
-import onair.onems.customadapters.ExpandableListAdapter;
 import onair.onems.customadapters.ExpandableListAdapterStudent;
-import onair.onems.fragment.OneFragment;
-import onair.onems.fragment.TwoFragment;
+import onair.onems.fragments.SelfAttendance;
+import onair.onems.fragments.OthersAttendance;
 import onair.onems.mainactivities.Fees.Fee;
 import onair.onems.mainactivities.Fees.FeesHistory;
 import onair.onems.mainactivities.Routine.ClassRoutine;
@@ -70,7 +65,7 @@ public class StudentAttendance extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_student_attendance);
+        setContentView(R.layout.student_attendance_activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         viewPager = (ViewPager) findViewById(R.id.pager);
@@ -83,7 +78,7 @@ public class StudentAttendance extends AppCompatActivity {
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         expandableList = (ExpandableListView) findViewById(R.id.navigationmenu);
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        View view = getLayoutInflater().inflate(R.layout.nav_header_student_attendance,null);
+        View view = getLayoutInflater().inflate(R.layout.student_attendance_nav_header_main,null);
         ImageView profilePicture = (ImageView)view.findViewById(R.id.profilePicture);
         TextView userType = (TextView)view.findViewById(R.id.userType);
         TextView userName = (TextView)view.findViewById(R.id.userName);
@@ -338,8 +333,8 @@ public class StudentAttendance extends AppCompatActivity {
     {
 
             ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
-            adapter.addFragment(new OneFragment(), "SELF ATTENDANCE");
-            adapter.addFragment(new TwoFragment(), "OTHERS ATTENDANCE");
+            adapter.addFragment(new SelfAttendance(), "SELF ATTENDANCE");
+            adapter.addFragment(new OthersAttendance(), "OTHERS ATTENDANCE");
             viewPager.setAdapter(adapter);
     }
 

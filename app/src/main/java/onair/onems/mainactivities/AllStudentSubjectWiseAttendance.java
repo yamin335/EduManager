@@ -11,6 +11,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -22,6 +23,8 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import de.codecrafters.tableview.TableView;
 import de.codecrafters.tableview.model.TableColumnWeightModel;
@@ -29,6 +32,8 @@ import de.codecrafters.tableview.toolkit.SimpleTableDataAdapter;
 import de.codecrafters.tableview.toolkit.SimpleTableHeaderAdapter;
 import de.codecrafters.tableview.toolkit.TableDataRowBackgroundProviders;
 import onair.onems.R;
+import onair.onems.models.StudentAttendanceReportModels.DailySybjectWiseAttendanceModel;
+import onair.onems.network.MySingleton;
 
 /**
  * Created by hp on 12/5/2017.
@@ -45,10 +50,8 @@ public class AllStudentSubjectWiseAttendance extends AppCompatActivity {
     SimpleTableDataAdapter simpleTabledataAdapter;
     String[][] DATA_TO_SHOW;
     String subjectWiseAttendanceUrl;
-    String RFID = "", monthUrl = "", monthAttendanceUrl = "", studentName = "", studentRFID = "", studentRoll = "", UserID = "", day = "";
-    long InstituteID = 0;
-    int  SectionID = 0, ClassID = 0, MediumID = 0, ShiftID = 0, MonthID = 0;
-
+    String UserID = "", Date = "";
+    long InstituteID=0, SectionID=0, ClassID=0, MediumID=0, ShiftID=0, DepartmentID = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,15 +73,18 @@ public class AllStudentSubjectWiseAttendance extends AppCompatActivity {
 
         sharedPre = PreferenceManager.getDefaultSharedPreferences(this);
         InstituteID = sharedPre.getLong("InstituteID", 0);
-        ShiftID = sharedPre.getInt("ShiftSelectID", 0);
-        MediumID = sharedPre.getInt("MediumSelectID", 0);
-        ClassID = sharedPre.getInt("ClassSelectID", 0);
-        SectionID = sharedPre.getInt("SectionSelectID", 0);
-        UserID = sharedPre.getString("SelectUserID", "");
-        day = sharedPre.getString("SelectDate", "");
+
+        Intent intent = getIntent();
+        ShiftID = intent.getLongExtra("ShiftID", 0);
+        MediumID = intent.getLongExtra("MediumID", 0);
+        ClassID = intent.getLongExtra("ClassID", 0);
+        DepartmentID = intent.getLongExtra("DepartmentID", 0);
+        SectionID = intent.getLongExtra("SectionID", 0);
+        UserID = intent.getStringExtra("UserID");
+        Date = intent.getStringExtra("Date");
 
         // get Internal Data using SharedPreferences end
-        subjectWiseAttendanceUrl = getString(R.string.baseUrl) + "getHrmSubWiseAtdByStudentID/" + ShiftID + "/" + MediumID + "/" + ClassID + "/" + SectionID + "/" + UserID + "/" + day;
+        subjectWiseAttendanceUrl = getString(R.string.baseUrlLocal) + "getHrmSubWiseAtdByStudentID/" + ShiftID + "/" + MediumID + "/" + ClassID + "/" + SectionID +"/"+DepartmentID+ "/" + UserID + "/" + Date+"/"+InstituteID;
 
 
         int colorEvenRows = getResources().getColor(R.color.table_data_row_even);
@@ -101,27 +107,7 @@ public class AllStudentSubjectWiseAttendance extends AppCompatActivity {
             simpleTableHeaderAdapter.setTextSize(10);
 
         }
-
-        RequestQueue queueSubjectWiseAttendance = Volley.newRequestQueue(this);
-        StringRequest stringSubjectWiseAttendanceRequest = new StringRequest(Request.Method.GET, subjectWiseAttendanceUrl,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-
-                        parseSubjectWiseAttendanceJsonData(response);
-
-
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                dialog.dismiss();
-            }
-        });
-
-        queueSubjectWiseAttendance.add(stringSubjectWiseAttendanceRequest);
-
-
+        AttendanceDataGetRequest();
     }
 
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -134,24 +120,19 @@ public class AllStudentSubjectWiseAttendance extends AppCompatActivity {
 
     void parseSubjectWiseAttendanceJsonData(String jsonString) {
         try {
-            JSONArray jsonArray = new JSONArray(jsonString);
-            ArrayList al = new ArrayList();
-            DATA_TO_SHOW = new String[jsonArray.length()][4];
-            for (int i = 0; i < jsonArray.length(); ++i) {
+            JSONArray subjectWiseAttendanceJsonArray = new JSONArray(jsonString);
+            DATA_TO_SHOW = new String[subjectWiseAttendanceJsonArray.length()][4];
+            for (int i = 0; i < subjectWiseAttendanceJsonArray.length(); ++i) {
 
-                JSONObject jsonObject = jsonArray.getJSONObject(i);
-                DATA_TO_SHOW[i][0] = jsonObject.getString("Subject");
-                DATA_TO_SHOW[i][1] = String.valueOf(jsonObject.getInt("SubjectID"));
-                int status = jsonObject.getInt("Status");
+                JSONObject subjectWiseAttendanceJsonObject = subjectWiseAttendanceJsonArray.getJSONObject(i);
+                DATA_TO_SHOW[i][0] = subjectWiseAttendanceJsonObject.getString("Subject");
+                DATA_TO_SHOW[i][1] = String.valueOf(subjectWiseAttendanceJsonObject.getInt("SubjectID"));
+                int status = subjectWiseAttendanceJsonObject.getInt("Status");
                 if (status == 1) {
                     DATA_TO_SHOW[i][2] = "Present";
                 } else
                     DATA_TO_SHOW[i][2] = "Absent";
-                DATA_TO_SHOW[i][3] = jsonObject.getString("ClassTeacher");
-
-                al.add(DATA_TO_SHOW[i][0]);
-                al.add(DATA_TO_SHOW[i][1]);
-                al.add(DATA_TO_SHOW[i][2]);
+                DATA_TO_SHOW[i][3] = subjectWiseAttendanceJsonObject.getString("ClassTeacher");
             }
 
             simpleTabledataAdapter = new SimpleTableDataAdapter(this, DATA_TO_SHOW);
@@ -178,7 +159,29 @@ public class AllStudentSubjectWiseAttendance extends AppCompatActivity {
             Toast.makeText(this, "" + e, Toast.LENGTH_LONG).show();
             dialog.dismiss();
         }
+    }
 
-
+    public void AttendanceDataGetRequest(){
+        StringRequest stringSubjectWiseAttendanceRequest = new StringRequest(Request.Method.GET, subjectWiseAttendanceUrl,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        parseSubjectWiseAttendanceJsonData(response);
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                dialog.dismiss();
+            }
+        })
+        {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String>  params = new HashMap<String, String>();
+                params.put("Authorization", "Request_From_onEMS_Android_app");
+                return params;
+            }
+        };
+        MySingleton.getInstance(this).addToRequestQueue(stringSubjectWiseAttendanceRequest);
     }
 }
