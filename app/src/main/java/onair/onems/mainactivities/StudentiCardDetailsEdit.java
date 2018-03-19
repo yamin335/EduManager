@@ -161,7 +161,7 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
     private static int brightnessValue;
     private BrightnessProcessTask mBrightnessProcessTask = null;
     private RotateProcessTask mRotateProcessTask = null;
-    private String selectedDate = "", ClassID = "", ShiftID = "", SectionID = "", MediumID = "", DepartmentID = "", GenderID = "", ReligionID = "";
+    private String selectedDate = "", ClassID = "", ShiftID = "", SectionID = "", MediumID = "", DepartmentID = "", GenderID = "", ReligionID = "", BloodGroupID = "";
     private DatePickerDialog datePickerDialog;
     private boolean imageChanged = false;
     private int firstClass = 0, firstShift = 0, firstSection = 0, firstMedium = 0,
@@ -455,6 +455,7 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
                     studentInformationEntry.setStudentNo(t_studentNo.getText().toString());
                     studentInformationEntry.setEmailID(t_stuEmail.getText().toString());
                     studentInformationEntry.setPhoneNo(t_stuPhone.getText().toString());
+                    String test = t_parent.getText().toString();
                     studentInformationEntry.setGuardian(t_parent.getText().toString());
                     studentInformationEntry.setGuardianPhone(t_parentsPhone.getText().toString());
                     studentInformationEntry.setGuardianEmailID(t_email.getText().toString());
@@ -1264,6 +1265,12 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
             studentInformationEntry.setUserTypeID(studentJsonObject.getString("UserTypeID"));
             studentInformationEntry.setGenderID(studentJsonObject.getString("GenderID"));
             GenderID = studentJsonObject.getString("GenderID");
+            studentInformationEntry.setBloodGroupID(studentJsonObject.getString("BloodGroupID"));
+            BloodGroupID = studentJsonObject.getString("BloodGroupID");
+            studentInformationEntry.setReligionID(studentJsonObject.getString("ReligionID"));
+            ReligionID = studentJsonObject.getString("ReligionID");
+            studentInformationEntry.setSessionID(studentJsonObject.getString("SessionID"));
+            studentInformationEntry.setBoardID(studentJsonObject.getString("BoardID"));
             studentInformationEntry.setPhoneNo(studentJsonObject.getString("PhoneNo"));
             studentInformationEntry.setEmailID(studentJsonObject.getString("EmailID"));
             studentInformationEntry.setFingerUrl(studentJsonObject.getString("FingerUrl"));

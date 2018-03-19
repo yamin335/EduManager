@@ -204,6 +204,38 @@ public class StudentInformationEntry {
         }
     }
 
+    public long getBoardID() {
+        return BoardID;
+    }
+
+    public void setBoardID(String BoardID) {
+
+        if(BoardID.equals("null"))
+        {
+            this.BoardID = -2;
+        }
+        else
+        {
+            this.BoardID = Long.parseLong(BoardID);
+        }
+    }
+
+    public long getSessionID() {
+        return SessionID;
+    }
+
+    public void setSessionID(String SessionID) {
+
+        if(SessionID.equals("null"))
+        {
+            this.SessionID = -2;
+        }
+        else
+        {
+            this.SessionID = Long.parseLong(SessionID);
+        }
+    }
+
     public long getShiftID() {
         return ShiftID;
     }

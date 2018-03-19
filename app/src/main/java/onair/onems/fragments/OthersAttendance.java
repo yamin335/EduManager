@@ -38,7 +38,6 @@ import onair.onems.models.SectionModel;
 import onair.onems.models.ShiftModel;
 import onair.onems.network.MySingleton;
 
-
 public class OthersAttendance extends Fragment {
     private View rootView;
     private Spinner spinnerClass, spinnerShift, spinnerSection, spinnerMedium, spinnerDepartment, spinnerMonth;

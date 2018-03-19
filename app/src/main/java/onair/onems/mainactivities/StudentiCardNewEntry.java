@@ -447,7 +447,7 @@ public class StudentiCardNewEntry extends AppCompatActivity {
         doneButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                StudentiCardNewEntry.this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+//                StudentiCardNewEntry.this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
                 if(isNetworkAvailable())
                 {
                     StudentiCardNewEntry.this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
@@ -653,7 +653,6 @@ public class StudentiCardNewEntry extends AppCompatActivity {
                             originalBitmap = null;
                             mCropImageView.clearImage();
                             checkBox.setChecked(false);
-
                         }
                         catch (Exception e)
                         {
@@ -1098,10 +1097,7 @@ public class StudentiCardNewEntry extends AppCompatActivity {
     @Override
     public void onBackPressed()
     {
-        NavUtils.navigateUpFromSameTask(this);
         super.onBackPressed();
-
-        // your code.
     }
 
     public static Bitmap rotateImage(Bitmap sourceImage, float angle)
