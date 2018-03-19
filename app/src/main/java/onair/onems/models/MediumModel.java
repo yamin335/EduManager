@@ -7,20 +7,16 @@ package onair.onems.models;
 public class MediumModel {
     private long MediumID = -2;
     private String MameName = "";
-    private long InstMediumID = 0;
-    private long InstituteID = 0;
-    private int IsActive = 0;
+    private boolean IsDefault = false;
 
     public MediumModel()
     {
         this.MediumID = -2;
         this.MameName = "";
-        this.InstMediumID = 0;
-        this.InstituteID = 0;
-        this.IsActive = 0;
+        this.IsDefault = false;
     }
 
-    public MediumModel(String MediumID, String MameName, String InstMediumID, String InstituteID, String IsActive)
+    public MediumModel(String MediumID, String MameName, String IsDefault)
     {
         if(MediumID.equals("null"))
         {
@@ -33,31 +29,13 @@ public class MediumModel {
 
         this.MameName = MameName;
 
-        if(InstMediumID.equals("null"))
+        if(IsDefault.equals("null"))
         {
-            this.InstMediumID = 0;
+            this.IsDefault = false;
         }
         else
         {
-            this.InstMediumID = Long.parseLong(InstMediumID);
-        }
-
-        if(InstituteID.equals("null"))
-        {
-            this.InstituteID = 0;
-        }
-        else
-        {
-            this.InstituteID = Long.parseLong(InstituteID);
-        }
-
-        if(IsActive.equals("null"))
-        {
-            this.IsActive = 0;
-        }
-        else
-        {
-            this.IsActive = Integer.parseInt(IsActive);
+            this.IsDefault = Boolean.parseBoolean(IsDefault);
         }
     }
 
@@ -78,30 +56,17 @@ public class MediumModel {
         this.MameName = MameName;
     }
 
-    public void setInstMediumID(String InstMediumID)
+    public void setIsDefault(String IsDefault)
     {
-        if(InstMediumID.equals("null"))
+        if(IsDefault.equals("null"))
         {
-            this.InstMediumID = 0;
+            this.IsDefault = false;
         }
         else
         {
-            this.InstMediumID = Long.parseLong(InstMediumID);
+            this.IsDefault = Boolean.parseBoolean(IsDefault);
         }
     }
-
-    public void setInstituteID(String InstituteID)
-    {
-        this.InstituteID = Long.parseLong(InstituteID);
-
-    }
-
-    public void setIsActive(String IsActive)
-    {
-        this.IsActive = Integer.parseInt(IsActive);
-
-    }
-
     public long getMediumID()
     {
         return MediumID;
@@ -112,18 +77,8 @@ public class MediumModel {
         return MameName;
     }
 
-    public long getInstMediumID()
+    public boolean getIsDefault()
     {
-        return InstMediumID;
-    }
-
-    public long getInstituteID()
-    {
-        return InstituteID;
-    }
-
-    public int getIsActive()
-    {
-        return IsActive;
+        return IsDefault;
     }
 }

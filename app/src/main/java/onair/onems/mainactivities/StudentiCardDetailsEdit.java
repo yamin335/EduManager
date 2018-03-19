@@ -318,7 +318,7 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
         allBloodGroupArrayList = new ArrayList<>();
 
         shiftUrl = getString(R.string.baseUrlLocal)+"getInsShift/"+InstituteID;
-        mediumUrl = getString(R.string.baseUrlLocal)+"getInsMedium/"+InstituteID;
+        mediumUrl = getString(R.string.baseUrlLocal)+"getInstituteMediumDdl/"+InstituteID;
         genderUrl = getString(R.string.baseUrlLocal)+"getallgender";
         religionUrl = getString(R.string.baseUrlLocal)+"getreligion";
         bloodGroupUrl = getString(R.string.baseUrlLocal)+"getbloodgroups";
@@ -501,9 +501,9 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
             }
         });
 
-        ShiftDataGetRequest(this, shiftUrl);
+        ShiftDataGetRequest(shiftUrl);
 
-        MediumDataGetRequest(this, mediumUrl);
+        MediumDataGetRequest(mediumUrl);
 
         ReligionDataGetRequest();
 
@@ -566,7 +566,7 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
                     }
                     CheckSelectedData();
                     classUrl = getString(R.string.baseUrlLocal)+"MediumWiseClassDDL/"+InstituteID+"/"+selectedMedium.getMediumID();
-                    ClassDataGetRequest(StudentiCardDetailsEdit.this, classUrl);
+                    ClassDataGetRequest(classUrl);
                 }
                 else
                 {
@@ -608,7 +608,7 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
                     CheckSelectedData();
                     departmentUrl = getString(R.string.baseUrlLocal)+"ClassWiseDepartmentDDL/"+InstituteID+"/"+
                             selectedClass.getClassID()+"/"+selectedMedium.getMediumID();
-                    DepartmentDataGetRequest(StudentiCardDetailsEdit.this, departmentUrl);
+                    DepartmentDataGetRequest(departmentUrl);
                 }
                 else
                 {
@@ -648,7 +648,7 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
                     CheckSelectedData();
                     sectionUrl = getString(R.string.baseUrlLocal)+"getInsSection/"+InstituteID+"/"+
                             selectedClass.getClassID()+"/"+selectedDepartment.getDepartmentID();
-                    SectionDataGetRequest(StudentiCardDetailsEdit.this, sectionUrl);
+                    SectionDataGetRequest(sectionUrl);
                 }
                 else
                 {
@@ -820,7 +820,7 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
                 classArrayList.add(classModel.getClassName());
             }
             if(allClassArrayList.size() == 1){
-                selectedClass = allClassArrayList.get(1);
+                selectedClass = allClassArrayList.get(0);
             }
             try {
                 String[] strings = new String[classArrayList.size()];
@@ -856,7 +856,7 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
                 shiftArrayList.add(shiftModel.getShiftName());
             }
             if(allShiftArrayList.size() == 1){
-                selectedShift = allShiftArrayList.get(1);
+                selectedShift = allShiftArrayList.get(0);
             }
             try {
                 String[] strings = new String[shiftArrayList.size()];
@@ -892,7 +892,7 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
                 sectionArrayList.add(sectionModel.getSectionName());
             }
             if(allSectionArrayList.size() == 1){
-                selectedSection = allSectionArrayList.get(1);
+                selectedSection = allSectionArrayList.get(0);
             }
             try {
                 String[] strings = new String[sectionArrayList.size()];
@@ -923,13 +923,13 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
             for(int i = 0; i < mediumJsonArray.length(); ++i) {
                 JSONObject mediumJsonObject = mediumJsonArray.getJSONObject(i);
                 MediumModel mediumModel = new MediumModel(mediumJsonObject.getString("MediumID"), mediumJsonObject.getString("MameName"),
-                        mediumJsonObject.getString("InstMediumID"), mediumJsonObject.getString("InstituteID"), mediumJsonObject.getString("IsActive"));
+                        mediumJsonObject.getString("IsDefault"));
 //                Toast.makeText(this,classJsonObject.getString("ClassID")+classJsonObject.getString("ClassName"),Toast.LENGTH_LONG).show();
                 allMediumArrayList.add(mediumModel);
                 mediumnArrayList.add(mediumModel.getMameName());
             }
             if(allMediumArrayList.size() == 1){
-                selectedMedium = allMediumArrayList.get(1);
+                selectedMedium = allMediumArrayList.get(0);
             }
             try {
                 String[] strings = new String[mediumnArrayList.size()];
@@ -965,13 +965,13 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
                 departmentArrayList.add(departmentModel.getDepartmentName());
             }
             if(allDepartmentArrayList.size() == 1){
-                selectedDepartment = allDepartmentArrayList.get(1);
+                selectedDepartment = allDepartmentArrayList.get(0);
             }
             if(allDepartmentArrayList.size() == 0){
                 CheckSelectedData();
                 sectionUrl = getString(R.string.baseUrlLocal)+"getInsSection/"+InstituteID+"/"+
                         selectedClass.getClassID()+"/"+selectedDepartment.getDepartmentID();
-                SectionDataGetRequest(StudentiCardDetailsEdit.this, sectionUrl);
+                SectionDataGetRequest(sectionUrl);
             }
             try {
                 String[] strings = new String[departmentArrayList.size()];
@@ -1680,7 +1680,7 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
         }
     }
 
-    private void ShiftDataGetRequest(Context context, String url)
+    private void ShiftDataGetRequest(String url)
     {
         dialog.show();
         //Preparing Shift data from server
@@ -1710,7 +1710,7 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
         MySingleton.getInstance(this).addToRequestQueue(stringShiftRequest);
     }
 
-    private void MediumDataGetRequest(Context context, String url)
+    private void MediumDataGetRequest(String url)
     {
         dialog.show();
         //Preparing Medium data from server
@@ -1740,7 +1740,7 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
         MySingleton.getInstance(this).addToRequestQueue(stringMediumRequest);
     }
 
-    private void ClassDataGetRequest(Context context, String url)
+    private void ClassDataGetRequest(String url)
     {
         dialog.show();
         //Preparing claas data from server
@@ -1770,7 +1770,7 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
         MySingleton.getInstance(this).addToRequestQueue(stringClassRequest);
     }
 
-    private void DepartmentDataGetRequest(Context context, String url)
+    private void DepartmentDataGetRequest(String url)
     {
         dialog.show();
         //Preparing Department data from server
@@ -1800,7 +1800,7 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
         MySingleton.getInstance(this).addToRequestQueue(stringDepartmentRequest);
     }
 
-    private void SectionDataGetRequest(Context context, String url)
+    private void SectionDataGetRequest(String url)
     {
         dialog.show();
         //Preparing section data from server
@@ -1854,6 +1854,7 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
     }
 
     public void StudentDataGetRequest(){
+        dialog.show();
         //Preparing Student data from server
         StringRequest stringStudentRequest = new StringRequest(Request.Method.GET, studentDataGetUrl,
                 new Response.Listener<String>() {

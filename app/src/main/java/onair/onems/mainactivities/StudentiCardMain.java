@@ -160,7 +160,7 @@ public class StudentiCardMain extends AppCompatActivity {
         InstituteID = prefs.getLong("InstituteID",0);
 
         shiftUrl = getString(R.string.baseUrlLocal)+"getInsShift/"+InstituteID;
-        mediumUrl = getString(R.string.baseUrlLocal)+"getInsMedium/"+InstituteID;
+        mediumUrl = getString(R.string.baseUrlLocal)+"getInstituteMediumDdl/"+InstituteID;
 
         dialog = new ProgressDialog(this);
         dialog.setTitle("Loading...");
@@ -590,7 +590,7 @@ public class StudentiCardMain extends AppCompatActivity {
                 classArrayList.add(classModel.getClassName());
             }
             if(allClassArrayList.size() == 1){
-                selectedClass = allClassArrayList.get(1);
+                selectedClass = allClassArrayList.get(0);
             }
             try {
                 String[] strings = new String[classArrayList.size()];
@@ -626,7 +626,7 @@ public class StudentiCardMain extends AppCompatActivity {
                 shiftArrayList.add(shiftModel.getShiftName());
             }
             if(allShiftArrayList.size() == 1){
-                selectedShift = allShiftArrayList.get(1);
+                selectedShift = allShiftArrayList.get(0);
             }
             try {
                 String[] strings = new String[shiftArrayList.size()];
@@ -662,7 +662,7 @@ public class StudentiCardMain extends AppCompatActivity {
                 sectionArrayList.add(sectionModel.getSectionName());
             }
             if(allSectionArrayList.size() == 1){
-                selectedSection = allSectionArrayList.get(1);
+                selectedSection = allSectionArrayList.get(0);
             }
             try {
                 String[] strings = new String[sectionArrayList.size()];
@@ -693,13 +693,13 @@ public class StudentiCardMain extends AppCompatActivity {
             for(int i = 0; i < mediumJsonArray.length(); ++i) {
                 JSONObject mediumJsonObject = mediumJsonArray.getJSONObject(i);
                 MediumModel mediumModel = new MediumModel(mediumJsonObject.getString("MediumID"), mediumJsonObject.getString("MameName"),
-                        mediumJsonObject.getString("InstMediumID"), mediumJsonObject.getString("InstituteID"), mediumJsonObject.getString("IsActive"));
+                        mediumJsonObject.getString("IsDefault"));
 //                Toast.makeText(this,classJsonObject.getString("ClassID")+classJsonObject.getString("ClassName"),Toast.LENGTH_LONG).show();
                 allMediumArrayList.add(mediumModel);
                 mediumnArrayList.add(mediumModel.getMameName());
             }
             if(allMediumArrayList.size() == 1){
-                selectedMedium = allMediumArrayList.get(1);
+                selectedMedium = allMediumArrayList.get(0);
             }
             try {
                 String[] strings = new String[mediumnArrayList.size()];
@@ -735,7 +735,7 @@ public class StudentiCardMain extends AppCompatActivity {
                 departmentArrayList.add(departmentModel.getDepartmentName());
             }
             if(allDepartmentArrayList.size() == 1){
-                selectedDepartment = allDepartmentArrayList.get(1);
+                selectedDepartment = allDepartmentArrayList.get(0);
             }
             if(allDepartmentArrayList.size() == 0){
                 CheckSelectedData();

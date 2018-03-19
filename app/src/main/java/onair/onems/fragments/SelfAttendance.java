@@ -200,7 +200,7 @@ public class SelfAttendance extends Fragment {
             }
 
             if(allMonthArrayList.size() >= 1){
-                selectedMonth = allMonthArrayList.get(1);
+                selectedMonth = allMonthArrayList.get(0);
                 MonthlyAttendanceDataGetRequest(selectedMonth.getMonthID());
             }
 

@@ -890,6 +890,7 @@ public class StudentiCardDetails extends AppCompatActivity {
     }
 
     public void StudentDataGetRequest(){
+        dialog.show();
         //Preparing Student data from server
         StringRequest stringStudentRequest = new StringRequest(Request.Method.GET, studentDataGetUrl,
                 new Response.Listener<String>() {

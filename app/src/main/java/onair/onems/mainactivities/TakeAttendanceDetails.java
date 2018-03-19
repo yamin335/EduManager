@@ -250,6 +250,7 @@ public class TakeAttendanceDetails extends AppCompatActivity {
 
     public void postUsingVolley(String json)
     {
+        dialog.show();
         try {
             postDatajsonObject = new JSONObject(json);
         } catch (JSONException e) {
@@ -300,6 +301,7 @@ public class TakeAttendanceDetails extends AppCompatActivity {
     }
 
     public void StudentDataGetRequest(){
+        dialog.show();
         //Preparing claas data from server
         StringRequest stringStudentDataRequest = new StringRequest(Request.Method.GET, StudentDataGetUrl,
                 new Response.Listener<String>() {
