@@ -25,7 +25,6 @@ import android.os.Parcelable;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
-import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.system.ErrnoException;
 import android.util.Log;
@@ -43,7 +42,6 @@ import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -51,7 +49,6 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
@@ -59,11 +56,9 @@ import com.google.gson.Gson;
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
 import com.theartofdev.edmodo.cropper.CropImageView;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -75,7 +70,6 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import onair.onems.R;
 import onair.onems.Services.GlideApp;
 import onair.onems.customadapters.CustomRequest;
@@ -90,11 +84,6 @@ import onair.onems.models.ShiftModel;
 import onair.onems.models.StudentInformationEntry;
 import onair.onems.network.MySingleton;
 
-
-/**
- * Created by User on 12/20/2017.
- */
-
 public class StudentiCardDetailsEdit extends AppCompatActivity {
 
     private EditText t_name, t_email, t_address, t_parent, t_parentsPhone, t_roll,
@@ -102,17 +91,14 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
     private TextView t_board, t_session, t_class, t_section, t_birthDay, t_department,
             t_sex, t_religion, t_medium, t_shift, t_branch, t_studentNo, t_rfid, t_bloodGroup;
 
-    private Bundle bundle;
-
     private CropImageView mCropImageView;
     private CheckBox checkBox;
     private Uri mCropImageUri;
-    private ProgressDialog dialog;
+    private ProgressDialog mShiftDialog, mMediumDialog, mClassDialog, mDepartmentDialog, mSectionDialog, mReligionDialog, mGenderDialog, mBloodGroupDialog, mStudentDataPostDialog, mRotateDialog, mBrightnessDialog, mStudentDataGetDialog;
 
     private StudentInformationEntry studentInformationEntry;
-    private Button updateStudentPhoto, cameraButton, searchButton, rotateRight, rotateLeft, datePicker;
     private Spinner spinnerClass, spinnerShift, spinnerSection, spinnerMedium, spinnerDepartment, spinnerGender, spinnerReligion, spinnerBloodGroup;
-    private String classUrl, shiftUrl, sectionUrl, mediumUrl, departmentUrl, genderUrl, religionUrl, bloodGroupUrl;
+
     private ArrayList<ClassModel> allClassArrayList;
     private ArrayList<ShiftModel> allShiftArrayList;
     private ArrayList<SectionModel> allSectionArrayList;
@@ -149,19 +135,15 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
 
     private FileFromBitmap fileFromBitmap = null;
 
-    private String studentDataGetUrl, studentDataPostUrl, selected_Class, selected_Shift,
-            selected_Section, selected_Medium, selected_Department, UserID,
-            ClassName = "", SectionName = "", ShiftName = "", MameName = "", DepartmentName = "", Gender = "", Religion = "";
+    private String selected_Class, selected_Shift,
+            selected_Section, selected_Medium, selected_Department, UserID;
     private int PICK_IMAGE_REQUEST = 1;
-    private String ImagePath;
-    private Uri URI;
 
     private long InstituteID;
-    private SeekBar brightImageSeekBar;
     private static int brightnessValue;
     private BrightnessProcessTask mBrightnessProcessTask = null;
     private RotateProcessTask mRotateProcessTask = null;
-    private String selectedDate = "", ClassID = "", ShiftID = "", SectionID = "", MediumID = "", DepartmentID = "", GenderID = "", ReligionID = "", BloodGroupID = "";
+    private String selectedDate = "";
     private DatePickerDialog datePickerDialog;
     private boolean imageChanged = false;
     private int firstClass = 0, firstShift = 0, firstSection = 0, firstMedium = 0,
@@ -188,7 +170,7 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
         Intent intent = getIntent();
-        bundle = intent.getExtras();
+        Bundle bundle = intent.getExtras();
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         InstituteID = prefs.getLong("InstituteID",0);
@@ -199,15 +181,9 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
         selected_Department = bundle.getString("DepartmentID");
         UserID = bundle.getString("UserID");
 
-        dialog = new ProgressDialog(this);
-        dialog.setTitle("Loading...");
-        dialog.setMessage("Please Wait...");
-        dialog.setCancelable(false);
-        dialog.show();
-
-        rotateLeft = (Button)findViewById(R.id.rotateLeft);
-        rotateRight = (Button)findViewById(R.id.rotateRight);
-        brightImageSeekBar = (SeekBar)findViewById(R.id.brightness);
+        Button rotateLeft = (Button)findViewById(R.id.rotateLeft);
+        Button rotateRight = (Button)findViewById(R.id.rotateRight);
+        SeekBar brightImageSeekBar = (SeekBar)findViewById(R.id.brightness);
         brightImageSeekBar.setProgress(100);
         progressBar = (ProgressBar)findViewById(R.id.spin_kit);
 
@@ -220,18 +196,12 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
         mCropImageView.setAutoZoomEnabled(true);
         mCropImageView.setFixedAspectRatio(true);
 
-        updateStudentPhoto = (Button)findViewById(R.id.updatephoto);
+        Button updateStudentPhoto = (Button)findViewById(R.id.updatephoto);
 
         checkBox = (CheckBox)findViewById(R.id.checkbox);
 
-        cameraButton=(Button)findViewById(R.id.camera);
-        searchButton=(Button) findViewById(R.id.browse);
-
-        studentDataPostUrl = getString(R.string.baseUrlLocal)+"setStudentBasicInfo";
-        studentDataGetUrl = getString(R.string.baseUrlLocal)+"getStudent"+"/"+InstituteID+"/"+
-                selected_Class+"/"+selected_Section+"/"+
-                selected_Department+"/"+selected_Medium+"/"+selected_Shift+"/"+UserID;
-        StudentDataGetRequest();
+        Button cameraButton=(Button)findViewById(R.id.camera);
+        Button searchButton=(Button) findViewById(R.id.browse);
 
         t_roll = (EditText) findViewById(R.id.stuRoll);
         t_name = (EditText)findViewById(R.id.stuName);
@@ -256,7 +226,7 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
         t_studentNo = (TextView)findViewById(R.id.studentNo);
         t_rfid = (TextView)findViewById(R.id.rfid);
         t_bloodGroup = (TextView)findViewById(R.id.bloodGroup);
-        datePicker = (Button)findViewById(R.id.pickDate);
+        Button datePicker = (Button)findViewById(R.id.pickDate);
 
         spinnerClass = (Spinner)findViewById(R.id.spinnerClass);
         spinnerShift = (Spinner)findViewById(R.id.spinnerShift);
@@ -266,15 +236,6 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
         spinnerGender =(Spinner)findViewById(R.id.spinnerGender);
         spinnerReligion =(Spinner)findViewById(R.id.spinnerReligion);
         spinnerBloodGroup =(Spinner)findViewById(R.id.spinnerBloodGroup);
-
-        selectedClass = new ClassModel();
-        selectedShift = new ShiftModel();
-        selectedSection = new SectionModel();
-        selectedMedium = new MediumModel();
-        selectedDepartment = new DepartmentModel();
-        selectedGender = new GenderModel();
-        selectedReligion = new ReligionModel();
-        selectedBloodGroup = new BloodGroupModel();
 
         ArrayAdapter<String> class_spinner_adapter = new ArrayAdapter<>(this, R.layout.spinner_item, tempClassArray);
         class_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -308,20 +269,7 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
         bloodGroup_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerBloodGroup.setAdapter(bloodGroup_spinner_adapter);
 
-        allClassArrayList = new ArrayList<>();
-        allShiftArrayList = new ArrayList<>();
-        allSectionArrayList = new ArrayList<>();
-        allMediumArrayList = new ArrayList<>();
-        allDepartmentArrayList = new ArrayList<>();
-        allGenderArrayList = new ArrayList<>();
-        allReligionArrayList = new ArrayList<>();
-        allBloodGroupArrayList = new ArrayList<>();
-
-        shiftUrl = getString(R.string.baseUrlLocal)+"getInsShift/"+InstituteID;
-        mediumUrl = getString(R.string.baseUrlLocal)+"getInstituteMediumDdl/"+InstituteID;
-        genderUrl = getString(R.string.baseUrlLocal)+"getallgender";
-        religionUrl = getString(R.string.baseUrlLocal)+"getreligion";
-        bloodGroupUrl = getString(R.string.baseUrlLocal)+"getbloodgroups";
+        StudentDataGetRequest();
 
         datePicker.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -388,7 +336,12 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
             public void onClick(View v) {
                 if(originalBitmap != null)
                 {
-                    dialog.show();
+                    mRotateDialog = new ProgressDialog(StudentiCardDetailsEdit.this);
+                    mRotateDialog.setTitle("Loading...");
+                    mRotateDialog.setMessage("Please Wait...");
+                    mRotateDialog.setCancelable(false);
+                    mRotateDialog.setIcon(R.drawable.onair);
+                    mRotateDialog.show();
                     imageChanged = true;
                     mRotateProcessTask = new RotateProcessTask(originalBitmap, -90);
                     mRotateProcessTask.execute((Void) null);
@@ -405,7 +358,12 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
             public void onClick(View v) {
                 if(originalBitmap != null)
                 {
-                    dialog.show();
+                    mRotateDialog = new ProgressDialog(StudentiCardDetailsEdit.this);
+                    mRotateDialog.setTitle("Loading...");
+                    mRotateDialog.setMessage("Please Wait...");
+                    mRotateDialog.setCancelable(false);
+                    mRotateDialog.setIcon(R.drawable.onair);
+                    mRotateDialog.show();
                     imageChanged = true;
                     mRotateProcessTask = new RotateProcessTask(originalBitmap, 90);
                     mRotateProcessTask.execute((Void) null);
@@ -432,7 +390,12 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
             public void onStopTrackingTouch(SeekBar seekBar) {
                 if(originalBitmap != null)
                 {
-                    dialog.show();
+                    mBrightnessDialog = new ProgressDialog(StudentiCardDetailsEdit.this);
+                    mBrightnessDialog.setTitle("Loading...");
+                    mBrightnessDialog.setMessage("Please Wait...");
+                    mBrightnessDialog.setCancelable(false);
+                    mBrightnessDialog.setIcon(R.drawable.onair);
+                    mBrightnessDialog.show();
                     imageChanged = true;
                     mBrightnessProcessTask = new BrightnessProcessTask(originalBitmap, brightnessValue);
                     mBrightnessProcessTask.execute((Void) null);
@@ -455,7 +418,6 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
                     studentInformationEntry.setStudentNo(t_studentNo.getText().toString());
                     studentInformationEntry.setEmailID(t_stuEmail.getText().toString());
                     studentInformationEntry.setPhoneNo(t_stuPhone.getText().toString());
-                    String test = t_parent.getText().toString();
                     studentInformationEntry.setGuardian(t_parent.getText().toString());
                     studentInformationEntry.setGuardianPhone(t_parentsPhone.getText().toString());
                     studentInformationEntry.setGuardianEmailID(t_email.getText().toString());
@@ -466,7 +428,12 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
                     {
                         if(originalBitmap != null)
                         {
-                            dialog.show();
+                            mStudentDataPostDialog = new ProgressDialog(StudentiCardDetailsEdit.this);
+                            mStudentDataPostDialog.setTitle("Loading...");
+                            mStudentDataPostDialog.setMessage("Please Wait...");
+                            mStudentDataPostDialog.setCancelable(false);
+                            mStudentDataPostDialog.setIcon(R.drawable.onair);
+                            mStudentDataPostDialog.show();
                             if(checkBox.isChecked())
                             {
                                 tempBitmap = mCropImageView.getCroppedImage(500, 500);
@@ -482,13 +449,17 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
                         }
                         else
                         {
-                            dialog.dismiss();
                             Toast.makeText(StudentiCardDetailsEdit.this,"Take or choose a photo to update!!!",Toast.LENGTH_LONG).show();
                         }
                     }
                     else
                     {
-                        dialog.show();
+                        mStudentDataPostDialog = new ProgressDialog(StudentiCardDetailsEdit.this);
+                        mStudentDataPostDialog.setTitle("Loading...");
+                        mStudentDataPostDialog.setMessage("Please Wait...");
+                        mStudentDataPostDialog.setCancelable(false);
+                        mStudentDataPostDialog.setIcon(R.drawable.onair);
+                        mStudentDataPostDialog.show();
                         Gson gson = new Gson();
                         String json = gson.toJson(studentInformationEntry);
                         postUsingVolley(json);
@@ -501,9 +472,9 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
             }
         });
 
-        ShiftDataGetRequest(shiftUrl);
+        ShiftDataGetRequest();
 
-        MediumDataGetRequest(mediumUrl);
+        MediumDataGetRequest();
 
         ReligionDataGetRequest();
 
@@ -521,6 +492,7 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
                         selectedShift = allShiftArrayList.get(position-1);
                         studentInformationEntry.setShiftID(Long.toString(selectedShift.getShiftID()));
                         t_shift.setText(selectedShift.getShiftName());
+
                     }
                     catch (IndexOutOfBoundsException e)
                     {
@@ -532,8 +504,6 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
                     if(firstShift++>1)
                     {
                         selectedShift = new ShiftModel();
-//                        studentInformationEntry.setShiftID(ShiftID);
-//                        t_shift.setText(ShiftName);
                         studentInformationEntry.setShiftID(Long.toString(selectedShift.getShiftID()));
                         t_shift.setText("NONE");
                     }
@@ -559,22 +529,19 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
                         selectedSection = new SectionModel();
                         studentInformationEntry.setMediumID(Long.toString(selectedMedium.getMediumID()));
                         t_medium.setText(selectedMedium.getMameName());
+
+                        ClassDataGetRequest();
                     }
                     catch (IndexOutOfBoundsException e)
                     {
                         Toast.makeText(StudentiCardDetailsEdit.this,"No medium found !!!",Toast.LENGTH_LONG).show();
                     }
-                    CheckSelectedData();
-                    classUrl = getString(R.string.baseUrlLocal)+"MediumWiseClassDDL/"+InstituteID+"/"+selectedMedium.getMediumID();
-                    ClassDataGetRequest(classUrl);
                 }
                 else
                 {
                     if(firstMedium++>1)
                     {
                         selectedMedium = new MediumModel();
-//                        studentInformationEntry.setMediumID(MediumID);
-//                        t_medium.setText(MameName);
                         studentInformationEntry.setMediumID(Long.toString(selectedMedium.getMediumID()));
                         t_medium.setText("NONE");
                     }
@@ -600,15 +567,13 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
                         selectedSection = new SectionModel();
                         studentInformationEntry.setClassID(Long.toString(selectedClass.getClassID()));
                         t_class.setText(selectedClass.getClassName());
+
+                        DepartmentDataGetRequest();
                     }
                     catch (IndexOutOfBoundsException e)
                     {
                         Toast.makeText(StudentiCardDetailsEdit.this,"No class found !!!",Toast.LENGTH_LONG).show();
                     }
-                    CheckSelectedData();
-                    departmentUrl = getString(R.string.baseUrlLocal)+"ClassWiseDepartmentDDL/"+InstituteID+"/"+
-                            selectedClass.getClassID()+"/"+selectedMedium.getMediumID();
-                    DepartmentDataGetRequest(departmentUrl);
                 }
                 else
                 {
@@ -640,15 +605,13 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
                         selectedSection = new SectionModel();
                         studentInformationEntry.setDepartmentID(Long.toString(selectedDepartment.getDepartmentID()));
                         t_department.setText(selectedDepartment.getDepartmentName());
+
+                        SectionDataGetRequest();
                     }
                     catch (IndexOutOfBoundsException e)
                     {
                         Toast.makeText(StudentiCardDetailsEdit.this,"No department found !!!",Toast.LENGTH_LONG).show();
                     }
-                    CheckSelectedData();
-                    sectionUrl = getString(R.string.baseUrlLocal)+"getInsSection/"+InstituteID+"/"+
-                            selectedClass.getClassID()+"/"+selectedDepartment.getDepartmentID();
-                    SectionDataGetRequest(sectionUrl);
                 }
                 else
                 {
@@ -802,8 +765,6 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
 
             }
         });
-
-        dialog.dismiss();
     }
 
     void parseClassJsonData(String jsonString) {
@@ -821,6 +782,7 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
             }
             if(allClassArrayList.size() == 1){
                 selectedClass = allClassArrayList.get(0);
+                DepartmentDataGetRequest();
             }
             try {
                 String[] strings = new String[classArrayList.size()];
@@ -828,17 +790,17 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
                 ArrayAdapter<String> class_spinner_adapter = new ArrayAdapter<>(this,R.layout.spinner_item, strings);
                 class_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinnerClass.setAdapter(class_spinner_adapter);
-                dialog.dismiss();
+                mClassDialog.dismiss();
             }
             catch (IndexOutOfBoundsException e)
             {
-                dialog.dismiss();
+                mClassDialog.dismiss();
                 Toast.makeText(this,"No class found !!!",Toast.LENGTH_LONG).show();
             }
             //spinner.setSelectedIndex(1);
         } catch (JSONException e) {
+            mClassDialog.dismiss();
             Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
-            dialog.dismiss();
         }
     }
 
@@ -864,17 +826,17 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
                 ArrayAdapter<String> shift_spinner_adapter = new ArrayAdapter<>(this,R.layout.spinner_item, strings);
                 shift_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinnerShift.setAdapter(shift_spinner_adapter);
-                dialog.dismiss();
+                mShiftDialog.dismiss();
             }
             catch (IndexOutOfBoundsException e)
             {
-                dialog.dismiss();
+                mShiftDialog.dismiss();
                 Toast.makeText(this,"No shift found !!!",Toast.LENGTH_LONG).show();
             }
             //spinner.setSelectedIndex(1);
         } catch (JSONException e) {
+            mShiftDialog.dismiss();
             Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
-            dialog.dismiss();
         }
     }
 
@@ -900,17 +862,17 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
                 ArrayAdapter<String> section_spinner_adapter = new ArrayAdapter<>(this,R.layout.spinner_item, strings);
                 section_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinnerSection.setAdapter(section_spinner_adapter);
-                dialog.dismiss();
+                mSectionDialog.dismiss();
             }
             catch (IndexOutOfBoundsException e)
             {
-                dialog.dismiss();
+                mSectionDialog.dismiss();
                 Toast.makeText(this,"No section found !!!",Toast.LENGTH_LONG).show();
             }
             //spinner.setSelectedIndex(1);
         } catch (JSONException e) {
+            mSectionDialog.dismiss();
             Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
-            dialog.dismiss();
         }
     }
 
@@ -930,6 +892,7 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
             }
             if(allMediumArrayList.size() == 1){
                 selectedMedium = allMediumArrayList.get(0);
+                ClassDataGetRequest();
             }
             try {
                 String[] strings = new String[mediumnArrayList.size()];
@@ -937,17 +900,17 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
                 ArrayAdapter<String> medium_spinner_adapter = new ArrayAdapter<>(this,R.layout.spinner_item, strings);
                 medium_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinnerMedium.setAdapter(medium_spinner_adapter);
-                dialog.dismiss();
+                mMediumDialog.dismiss();
             }
             catch (IndexOutOfBoundsException e)
             {
-                dialog.dismiss();
+                mMediumDialog.dismiss();
                 Toast.makeText(this,"No medium found !!!",Toast.LENGTH_LONG).show();
             }
             //spinner.setSelectedIndex(1);
         } catch (JSONException e) {
+            mMediumDialog.dismiss();
             Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
-            dialog.dismiss();
         }
     }
 
@@ -966,12 +929,10 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
             }
             if(allDepartmentArrayList.size() == 1){
                 selectedDepartment = allDepartmentArrayList.get(0);
+                SectionDataGetRequest();
             }
             if(allDepartmentArrayList.size() == 0){
-                CheckSelectedData();
-                sectionUrl = getString(R.string.baseUrlLocal)+"getInsSection/"+InstituteID+"/"+
-                        selectedClass.getClassID()+"/"+selectedDepartment.getDepartmentID();
-                SectionDataGetRequest(sectionUrl);
+                SectionDataGetRequest();
             }
             try {
                 String[] strings = new String[departmentArrayList.size()];
@@ -979,17 +940,17 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
                 ArrayAdapter<String> department_spinner_adapter = new ArrayAdapter<>(this,R.layout.spinner_item, strings);
                 department_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinnerDepartment.setAdapter(department_spinner_adapter);
-                dialog.dismiss();
+                mDepartmentDialog.dismiss();
             }
             catch (IndexOutOfBoundsException e)
             {
-                dialog.dismiss();
+                mDepartmentDialog.dismiss();
                 Toast.makeText(this,"No department found !!!",Toast.LENGTH_LONG).show();
             }
             //spinner.setSelectedIndex(1);
         } catch (JSONException e) {
+            mDepartmentDialog.dismiss();
             Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
-            dialog.dismiss();
         }
     }
 
@@ -1012,17 +973,17 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
                 ArrayAdapter<String> gender_spinner_adapter = new ArrayAdapter<>(this,R.layout.spinner_item, strings);
                 gender_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinnerGender.setAdapter(gender_spinner_adapter);
-                dialog.dismiss();
+                mGenderDialog.dismiss();
             }
             catch (IndexOutOfBoundsException e)
             {
-                dialog.dismiss();
+                mGenderDialog.dismiss();
                 Toast.makeText(this,"No gender found !!!",Toast.LENGTH_LONG).show();
             }
             //spinner.setSelectedIndex(1);
         } catch (JSONException e) {
+            mGenderDialog.dismiss();
             Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
-            dialog.dismiss();
         }
     }
 
@@ -1045,17 +1006,17 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
                 ArrayAdapter<String> religion_spinner_adapter = new ArrayAdapter<>(this,R.layout.spinner_item, strings);
                 religion_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinnerReligion.setAdapter(religion_spinner_adapter);
-                dialog.dismiss();
+                mReligionDialog.dismiss();
             }
             catch (IndexOutOfBoundsException e)
             {
-                dialog.dismiss();
+                mReligionDialog.dismiss();
                 Toast.makeText(this,"No religion found !!!",Toast.LENGTH_LONG).show();
             }
             //spinner.setSelectedIndex(1);
         } catch (JSONException e) {
+            mReligionDialog.dismiss();
             Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
-            dialog.dismiss();
         }
     }
 
@@ -1078,17 +1039,17 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
                 ArrayAdapter<String> bloodGroup_spinner_adapter = new ArrayAdapter<>(this,R.layout.spinner_item, strings);
                 bloodGroup_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinnerBloodGroup.setAdapter(bloodGroup_spinner_adapter);
-                dialog.dismiss();
+                mBloodGroupDialog.dismiss();
             }
             catch (IndexOutOfBoundsException e)
             {
-                dialog.dismiss();
+                mBloodGroupDialog.dismiss();
                 Toast.makeText(this,"No blood group found !!!",Toast.LENGTH_LONG).show();
             }
             //spinner.setSelectedIndex(1);
         } catch (JSONException e) {
+            mBloodGroupDialog.dismiss();
             Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
-            dialog.dismiss();
         }
     }
 
@@ -1124,7 +1085,7 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
                 fo.flush();
                 fo.close();
             } catch (IOException e) {
-                dialog.dismiss();
+                mStudentDataPostDialog.dismiss();
                 e.printStackTrace();
             }
 
@@ -1140,7 +1101,7 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
             // exp; make progressbar gone
             Ion.with(getApplicationContext())
                     .load(getString(R.string.baseUrlLocal)+"Mobile/uploads")
-                    .progressDialog(dialog)
+                    .progressDialog(mStudentDataPostDialog)
                     .setMultipartParameter("name", "source")
                     .setMultipartFile("file", "image/jpeg", file)
                     .asString()
@@ -1158,7 +1119,7 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
                                 postUsingVolley(json);
                                 Log.d( "ImageUrl", jsonObject.getString("path"));
                             } catch (JSONException e1) {
-                                dialog.dismiss();
+                                mStudentDataPostDialog.dismiss();
                                 e1.printStackTrace();
                             }
                         }
@@ -1170,10 +1131,11 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
 
     public void postUsingVolley(String json)
     {
+        String studentDataPostUrl = getString(R.string.baseUrlLocal)+"setStudentBasicInfo";
         try {
             jsonObjectStudentData = new JSONObject(json);
         } catch (JSONException e) {
-            dialog.dismiss();
+            mStudentDataPostDialog.dismiss();
             e.printStackTrace();
         }
         RequestQueue queuePost = Volley.newRequestQueue(this);
@@ -1181,24 +1143,21 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
                 new Response.Listener<JSONArray>() {
                     @Override
                     public void onResponse(JSONArray response) {
-                        dialog.dismiss();
+                        mStudentDataPostDialog.dismiss();
                         try {
-//                            Toast.makeText(StudentiCardDetails.this,"Data Successfully Updated with Response: "+response.getJSONObject(0).get("ReturnValue"),Toast.LENGTH_LONG).show();
                             Toast.makeText(StudentiCardDetailsEdit.this,"Successfully Updated",Toast.LENGTH_LONG).show();
-//                            NavUtils.navigateUpFromSameTask(StudentiCardDetailsEdit.this);
                             StudentiCardDetailsEdit.super.onBackPressed();
                         }
                         catch (Exception e)
                         {
-                            dialog.dismiss();
+                            mStudentDataPostDialog.dismiss();
                         }
                     }
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-//                Toast.makeText(StudentiCardDetails.this,"Not Response: "+error.toString(),Toast.LENGTH_LONG).show();
+                mStudentDataPostDialog.dismiss();
                 Toast.makeText(StudentiCardDetailsEdit.this,"Not Successfully Updated"+error.toString(),Toast.LENGTH_LONG).show();
-                dialog.dismiss();
             }
         })
         {
@@ -1234,7 +1193,7 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
                             progressBar.setVisibility(View.GONE);
                         }
                         @Override
-                        public void onLoadFailed(Drawable errorDrawable) {
+                        public void onLoadFailed(Drawable errorDrawable){
                             super.onLoadFailed(errorDrawable);
                             progressBar.setVisibility(View.GONE);
                             Toast.makeText(StudentiCardDetailsEdit.this,"No image found!!!",Toast.LENGTH_LONG).show();
@@ -1254,21 +1213,15 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
             studentInformationEntry.setRFID(studentJsonObject.getString("RFID"));
             studentInformationEntry.setStudentNo(studentJsonObject.getString("StudentNo"));
             studentInformationEntry.setSectionID(studentJsonObject.getString("SectionID"));
-            SectionID = studentJsonObject.getString("SectionID");
             studentInformationEntry.setClassID(studentJsonObject.getString("ClassID"));
-            ClassID = studentJsonObject.getString("ClassID");
             studentInformationEntry.setBrunchID(studentJsonObject.getString("BrunchID"));
             studentInformationEntry.setShiftID(studentJsonObject.getString("ShiftID"));
-            ShiftID = studentJsonObject.getString("ShiftID");
             studentInformationEntry.setRemarks(studentJsonObject.getString("Remarks"));
             studentInformationEntry.setInstituteID(studentJsonObject.getString("InstituteID"));
             studentInformationEntry.setUserTypeID(studentJsonObject.getString("UserTypeID"));
             studentInformationEntry.setGenderID(studentJsonObject.getString("GenderID"));
-            GenderID = studentJsonObject.getString("GenderID");
             studentInformationEntry.setBloodGroupID(studentJsonObject.getString("BloodGroupID"));
-            BloodGroupID = studentJsonObject.getString("BloodGroupID");
             studentInformationEntry.setReligionID(studentJsonObject.getString("ReligionID"));
-            ReligionID = studentJsonObject.getString("ReligionID");
             studentInformationEntry.setSessionID(studentJsonObject.getString("SessionID"));
             studentInformationEntry.setBoardID(studentJsonObject.getString("BoardID"));
             studentInformationEntry.setPhoneNo(studentJsonObject.getString("PhoneNo"));
@@ -1276,35 +1229,26 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
             studentInformationEntry.setFingerUrl(studentJsonObject.getString("FingerUrl"));
             studentInformationEntry.setSignatureUrl(studentJsonObject.getString("SignatureUrl"));
             studentInformationEntry.setMediumID(studentJsonObject.getString("MediumID"));
-            MediumID = studentJsonObject.getString("MediumID");
             studentInformationEntry.setDepartmentID(studentJsonObject.getString("DepartmentID"));
-            DepartmentID = studentJsonObject.getString("DepartmentID");
             studentInformationEntry.setIsImageCaptured(studentJsonObject.getBoolean("IsImageCaptured"));
             studentInformationEntry.setImageUrl(studentJsonObject.getString("ImageUrl"));
 
             t_roll.setText(studentJsonObject.getString("RollNo"));
             t_name.setText(studentJsonObject.getString("UserName"));
             t_section.setText(studentJsonObject.getString("SectionName"));
-            SectionName = studentJsonObject.getString("SectionName");
             t_birthDay.setText(studentJsonObject.getString("DOB"));
             t_email.setText(studentJsonObject.getString("GuardianEmailID"));
             t_address.setText(studentJsonObject.getString("PreAddress"));
             t_parent.setText(studentJsonObject.getString("Guardian"));
             t_parentsPhone.setText(studentJsonObject.getString("GuardianPhone"));
             t_department.setText(studentJsonObject.getString("DepartmentName"));
-            DepartmentName = studentJsonObject.getString("DepartmentName");
             t_sex.setText(studentJsonObject.getString("Gender"));
-            Gender = studentJsonObject.getString("Gender");
             t_religion.setText(studentJsonObject.getString("Religion"));
-            Religion = studentJsonObject.getString("Religion");
             t_medium.setText(studentJsonObject.getString("MameName"));
-            MameName = studentJsonObject.getString("MameName");
             t_session.setText(studentJsonObject.getString("SessionName"));
             t_board.setText(studentJsonObject.getString("BoardName"));
             t_class.setText(studentJsonObject.getString("ClassName"));
-            ClassName = studentJsonObject.getString("ClassName");
             t_shift.setText(studentJsonObject.getString("ShiftName"));
-            ShiftName = studentJsonObject.getString("ShiftName");
             t_rfid.setText(studentJsonObject.getString("RFID"));
             t_studentNo.setText(studentJsonObject.getString("StudentNo"));
             t_branch.setText(studentJsonObject.getString("BrunchName"));
@@ -1313,30 +1257,10 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
             t_remarks.setText(studentJsonObject.getString("Remarks"));
             t_bloodGroup.setText(studentJsonObject.getString("BloodGroup"));
 
-//            sectionUrl = getString(R.string.baseUrlLocal)+"getInsSection/"+InstituteID+"/"+studentJsonObject.getString("ClassID");
-//            dialog.show();
-//            //Preparing section data from server
-//            RequestQueue queueSection = Volley.newRequestQueue(StudentiCardDetailsEdit.this);
-//            StringRequest stringSectionRequest = new StringRequest(Request.Method.GET, sectionUrl,
-//                    new Response.Listener<String>() {
-//                        @Override
-//                        public void onResponse(String response) {
-//
-//                            parseSectionJsonData(response);
-//
-//                        }
-//                    }, new Response.ErrorListener() {
-//                @Override
-//                public void onErrorResponse(VolleyError error) {
-//
-//                    dialog.dismiss();
-//                }
-//            });
-//            queueSection.add(stringSectionRequest);
-
+            mStudentDataGetDialog.dismiss();
         } catch (JSONException e) {
             Toast.makeText(this,"WARNING!!! "+e,Toast.LENGTH_LONG).show();
-            dialog.dismiss();
+            mStudentDataGetDialog.dismiss();
         }
     }
 
@@ -1391,8 +1315,8 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
                 tempBitmap = originalBitmap;
                 imageChanged = true;
                 try {
-                    ImagePath = MediaStore.Images.Media.insertImage(this.getContentResolver(), bitmap, "demo_image", "demo_image");
-                    URI = Uri.parse(ImagePath);
+                    String ImagePath = MediaStore.Images.Media.insertImage(this.getContentResolver(), bitmap, "demo_image", "demo_image");
+                    Uri URI = Uri.parse(ImagePath);
                     mCropImageView.setImageUriAsync(URI);
                 }
                 catch (Exception e)
@@ -1614,6 +1538,7 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
                 Thread.sleep(100);
                 return true;
             } catch (InterruptedException e) {
+                mBrightnessDialog.dismiss();
                 return false;
             }
         }
@@ -1621,7 +1546,7 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
         @Override
         protected void onPostExecute(final Boolean success) {
 //            mBrightnessProcessTask = null;
-            dialog.dismiss();
+            mBrightnessDialog.dismiss();
             if (success) {
                 mCropImageView.setImageBitmap(tempBitmap);
             }
@@ -1634,7 +1559,7 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
         @Override
         protected void onCancelled() {
 //            mBrightnessProcessTask = null;
-            dialog.dismiss();
+            mBrightnessDialog.dismiss();
         }
     }
 
@@ -1656,6 +1581,7 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
                 Thread.sleep(100);
                 return true;
             } catch (InterruptedException e) {
+                mRotateDialog.dismiss();
                 return false;
             }
         }
@@ -1663,7 +1589,7 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
         @Override
         protected void onPostExecute(final Boolean success) {
             mRotateProcessTask = null;
-            dialog.dismiss();
+            mRotateDialog.dismiss();
             if (success) {
                 mCropImageView.setImageBitmap(tempBitmap);
             }
@@ -1676,15 +1602,21 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
         @Override
         protected void onCancelled() {
             mRotateProcessTask = null;
-            dialog.dismiss();
+            mRotateDialog.dismiss();
         }
     }
 
-    private void ShiftDataGetRequest(String url)
+    private void ShiftDataGetRequest()
     {
-        dialog.show();
+        String shiftUrl = getString(R.string.baseUrlLocal)+"getInsShift/"+InstituteID;
+        mShiftDialog = new ProgressDialog(this);
+        mShiftDialog.setTitle("Loading...");
+        mShiftDialog.setMessage("Please Wait...");
+        mShiftDialog.setCancelable(false);
+        mShiftDialog.setIcon(R.drawable.onair);
+        mShiftDialog.show();
         //Preparing Shift data from server
-        StringRequest stringShiftRequest = new StringRequest(Request.Method.GET, url,
+        StringRequest stringShiftRequest = new StringRequest(Request.Method.GET, shiftUrl,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
@@ -1696,7 +1628,7 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
             @Override
             public void onErrorResponse(VolleyError error) {
 
-                dialog.dismiss();
+                mShiftDialog.dismiss();
             }
         })
         {
@@ -1710,11 +1642,17 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
         MySingleton.getInstance(this).addToRequestQueue(stringShiftRequest);
     }
 
-    private void MediumDataGetRequest(String url)
+    private void MediumDataGetRequest()
     {
-        dialog.show();
+        String mediumUrl = getString(R.string.baseUrlLocal)+"getInstituteMediumDdl/"+InstituteID;
+        mMediumDialog = new ProgressDialog(this);
+        mMediumDialog.setTitle("Loading...");
+        mMediumDialog.setMessage("Please Wait...");
+        mMediumDialog.setCancelable(false);
+        mMediumDialog.setIcon(R.drawable.onair);
+        mMediumDialog.show();
         //Preparing Medium data from server
-        StringRequest stringMediumRequest = new StringRequest(Request.Method.GET, url,
+        StringRequest stringMediumRequest = new StringRequest(Request.Method.GET, mediumUrl,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
@@ -1726,7 +1664,7 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
             @Override
             public void onErrorResponse(VolleyError error) {
 
-                dialog.dismiss();
+                mMediumDialog.dismiss();
             }
         })
         {
@@ -1740,11 +1678,18 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
         MySingleton.getInstance(this).addToRequestQueue(stringMediumRequest);
     }
 
-    private void ClassDataGetRequest(String url)
+    private void ClassDataGetRequest()
     {
-        dialog.show();
+        CheckSelectedData();
+        String classUrl = getString(R.string.baseUrlLocal)+"MediumWiseClassDDL/"+InstituteID+"/"+selectedMedium.getMediumID();
+        mClassDialog = new ProgressDialog(this);
+        mClassDialog.setTitle("Loading...");
+        mClassDialog.setMessage("Please Wait...");
+        mClassDialog.setCancelable(false);
+        mClassDialog.setIcon(R.drawable.onair);
+        mClassDialog.show();
         //Preparing claas data from server
-        StringRequest stringClassRequest = new StringRequest(Request.Method.GET, url,
+        StringRequest stringClassRequest = new StringRequest(Request.Method.GET, classUrl,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
@@ -1756,7 +1701,7 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
             @Override
             public void onErrorResponse(VolleyError error) {
 
-                dialog.dismiss();
+                mClassDialog.dismiss();
             }
         })
         {
@@ -1770,11 +1715,19 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
         MySingleton.getInstance(this).addToRequestQueue(stringClassRequest);
     }
 
-    private void DepartmentDataGetRequest(String url)
+    private void DepartmentDataGetRequest()
     {
-        dialog.show();
+        CheckSelectedData();
+        String departmentUrl = getString(R.string.baseUrlLocal)+"ClassWiseDepartmentDDL/"+InstituteID+"/"+
+                selectedClass.getClassID()+"/"+selectedMedium.getMediumID();
+        mDepartmentDialog = new ProgressDialog(this);
+        mDepartmentDialog.setTitle("Loading...");
+        mDepartmentDialog.setMessage("Please Wait...");
+        mDepartmentDialog.setCancelable(false);
+        mDepartmentDialog.setIcon(R.drawable.onair);
+        mDepartmentDialog.show();
         //Preparing Department data from server
-        StringRequest stringDepartmentRequest = new StringRequest(Request.Method.GET, url,
+        StringRequest stringDepartmentRequest = new StringRequest(Request.Method.GET, departmentUrl,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
@@ -1786,7 +1739,7 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
             @Override
             public void onErrorResponse(VolleyError error) {
 
-                dialog.dismiss();
+                mDepartmentDialog.dismiss();
             }
         })
         {
@@ -1800,11 +1753,19 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
         MySingleton.getInstance(this).addToRequestQueue(stringDepartmentRequest);
     }
 
-    private void SectionDataGetRequest(String url)
+    private void SectionDataGetRequest()
     {
-        dialog.show();
+        CheckSelectedData();
+        String sectionUrl = getString(R.string.baseUrlLocal)+"getInsSection/"+InstituteID+"/"+
+                selectedClass.getClassID()+"/"+selectedDepartment.getDepartmentID();
+        mSectionDialog = new ProgressDialog(this);
+        mSectionDialog.setTitle("Loading...");
+        mSectionDialog.setMessage("Please Wait...");
+        mSectionDialog.setCancelable(false);
+        mSectionDialog.setIcon(R.drawable.onair);
+        mSectionDialog.show();
         //Preparing section data from server
-        StringRequest stringSectionRequest = new StringRequest(Request.Method.GET, url,
+        StringRequest stringSectionRequest = new StringRequest(Request.Method.GET, sectionUrl,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
@@ -1816,7 +1777,7 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
             @Override
             public void onErrorResponse(VolleyError error) {
 
-                dialog.dismiss();
+                mSectionDialog.dismiss();
             }
         })
         {
@@ -1854,7 +1815,16 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
     }
 
     public void StudentDataGetRequest(){
-        dialog.show();
+
+        String studentDataGetUrl = getString(R.string.baseUrlLocal)+"getStudent"+"/"+InstituteID+"/"+
+                selected_Class+"/"+selected_Section+"/"+
+                selected_Department+"/"+selected_Medium+"/"+selected_Shift+"/"+UserID;
+        mStudentDataGetDialog = new ProgressDialog(this);
+        mStudentDataGetDialog.setTitle("Loading...");
+        mStudentDataGetDialog.setMessage("Please Wait...");
+        mStudentDataGetDialog.setCancelable(false);
+        mStudentDataGetDialog.setIcon(R.drawable.onair);
+        mStudentDataGetDialog.show();
         //Preparing Student data from server
         StringRequest stringStudentRequest = new StringRequest(Request.Method.GET, studentDataGetUrl,
                 new Response.Listener<String>() {
@@ -1868,7 +1838,7 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
             @Override
             public void onErrorResponse(VolleyError error) {
 
-                dialog.dismiss();
+                mStudentDataGetDialog.dismiss();
             }
         })
         {
@@ -1882,8 +1852,15 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
         MySingleton.getInstance(this).addToRequestQueue(stringStudentRequest);
     }
 
-    public void ReligionDataGetRequest(){
-        dialog.show();
+    public void GenderDataGetRequest(){
+
+        String genderUrl = getString(R.string.baseUrlLocal)+"getallgender";
+        mGenderDialog = new ProgressDialog(this);
+        mGenderDialog.setTitle("Loading...");
+        mGenderDialog.setMessage("Please Wait...");
+        mGenderDialog.setCancelable(false);
+        mGenderDialog.setIcon(R.drawable.onair);
+        mGenderDialog.show();
         //Preparing Gender data from server
         StringRequest stringGenderRequest = new StringRequest(Request.Method.GET, genderUrl,
                 new Response.Listener<String>() {
@@ -1897,7 +1874,7 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
             @Override
             public void onErrorResponse(VolleyError error) {
 
-                dialog.dismiss();
+                mGenderDialog.dismiss();
             }
         })
         {
@@ -1911,8 +1888,15 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
         MySingleton.getInstance(this).addToRequestQueue(stringGenderRequest);
     }
 
-    public void GenderDataGetRequest(){
-        dialog.show();
+    public void ReligionDataGetRequest(){
+
+        String religionUrl = getString(R.string.baseUrlLocal)+"getreligion";
+        mReligionDialog = new ProgressDialog(this);
+        mReligionDialog.setTitle("Loading...");
+        mReligionDialog.setMessage("Please Wait...");
+        mReligionDialog.setCancelable(false);
+        mReligionDialog.setIcon(R.drawable.onair);
+        mReligionDialog.show();
         //Preparing Religion data from server
         StringRequest stringReligionRequest = new StringRequest(Request.Method.GET, religionUrl,
                 new Response.Listener<String>() {
@@ -1926,7 +1910,7 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
             @Override
             public void onErrorResponse(VolleyError error) {
 
-                dialog.dismiss();
+                mReligionDialog.dismiss();
             }
         })
         {
@@ -1941,7 +1925,14 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
     }
 
     public void BloodGroupDataGetRequest(){
-        dialog.show();
+
+        String bloodGroupUrl = getString(R.string.baseUrlLocal)+"getbloodgroups";
+        mBloodGroupDialog = new ProgressDialog(this);
+        mBloodGroupDialog.setTitle("Loading...");
+        mBloodGroupDialog.setMessage("Please Wait...");
+        mBloodGroupDialog.setCancelable(false);
+        mBloodGroupDialog.setIcon(R.drawable.onair);
+        mBloodGroupDialog.show();
         //Preparing Blood Group data from server
         StringRequest stringBloodGroupRequest = new StringRequest(Request.Method.GET, bloodGroupUrl,
                 new Response.Listener<String>() {
@@ -1955,7 +1946,7 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
             @Override
             public void onErrorResponse(VolleyError error) {
 
-                dialog.dismiss();
+                mBloodGroupDialog.dismiss();
             }
         })
         {

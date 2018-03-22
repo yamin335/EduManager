@@ -36,14 +36,11 @@ import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
-import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
@@ -70,26 +67,18 @@ import onair.onems.customadapters.CustomRequest;
 import onair.onems.models.StudentInformationEntry;
 import onair.onems.network.MySingleton;
 
-
-/**
- * Created by User on 12/20/2017.
- */
-
 public class StudentiCardDetails extends AppCompatActivity {
 
     private TextView t_name, t_class, t_section, t_birthDay, t_email, t_address,
             t_parent, t_parentsPhone,t_roll,t_department,t_sex,t_religion,t_medium,t_board,
             t_session, t_shift,t_branch, t_stuEmail, t_stuPhone, t_remarks, t_studentNo, t_rfid;
 
-    private Bundle bundle;
-
     private CropImageView mCropImageView;
     private CheckBox checkBox;
     private Uri mCropImageUri;
-    private ProgressDialog dialog;
+    private ProgressDialog mStudentDataPostDialog, mRotateDialog, mBrightnessDialog, mStudentDataGetDialog;
 
     private StudentInformationEntry studentInformationEntry;
-    private Button updateStudentPhoto, cameraButton, searchButton, rotateRight, rotateLeft;
 
     private JSONObject jsonObjectStudentData;
 
@@ -100,14 +89,11 @@ public class StudentiCardDetails extends AppCompatActivity {
 
     private FileFromBitmap fileFromBitmap = null;
 
-    private String studentDataGetUrl, studentDataPostUrl, selectedClass, selectedShift,
+    private String selectedClass, selectedShift,
             selectedSection, selectedMedium, selectedDepartment, UserID;
     private int PICK_IMAGE_REQUEST = 1;
-    private String ImagePath;
-    private Uri URI;
 
     private long InstituteID;
-    private SeekBar brightImageSeekBar;
     private static int brightnessValue;
     private BrightnessProcessTask mBrightnessProcessTask = null;
     private RotateProcessTask mRotateProcessTask = null;
@@ -132,7 +118,7 @@ public class StudentiCardDetails extends AppCompatActivity {
         setContentView(R.layout.icard_student_details);
 
         Intent intent = getIntent();
-        bundle = intent.getExtras();
+        Bundle bundle = intent.getExtras();
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         InstituteID = prefs.getLong("InstituteID",0);
@@ -143,22 +129,10 @@ public class StudentiCardDetails extends AppCompatActivity {
         selectedDepartment = bundle.getString("DepartmentID");
         UserID = bundle.getString("UserID");
 
-        dialog = new ProgressDialog(this);
-        dialog.setTitle("Loading...");
-        dialog.setMessage("Please Wait...");
-        dialog.setCancelable(false);
-        dialog.show();
+        Button rotateLeft = (Button)findViewById(R.id.rotateLeft);
+        Button rotateRight = (Button)findViewById(R.id.rotateRight);
 
-//        glideProgress.setOnCancelListener(new DialogInterface.OnCancelListener() {
-//            @Override
-//            public void onCancel(DialogInterface dialog) {
-//                Toast.makeText(StudentiCardDetails.this,"No image found!!!",Toast.LENGTH_LONG).show();
-//            }
-//        });
-
-        rotateLeft = (Button)findViewById(R.id.rotateLeft);
-        rotateRight = (Button)findViewById(R.id.rotateRight);
-        brightImageSeekBar = (SeekBar)findViewById(R.id.brightness);
+        SeekBar brightImageSeekBar = (SeekBar)findViewById(R.id.brightness);
         brightImageSeekBar.setProgress(100);
         progressBar = (ProgressBar)findViewById(R.id.spin_kit);
 
@@ -167,18 +141,12 @@ public class StudentiCardDetails extends AppCompatActivity {
         mCropImageView.setAutoZoomEnabled(true);
         mCropImageView.setFixedAspectRatio(true);
 
-        updateStudentPhoto = (Button)findViewById(R.id.updatephoto);
+        Button updateStudentPhoto = (Button)findViewById(R.id.updatephoto);
 
         checkBox = (CheckBox)findViewById(R.id.checkbox);
 
-        cameraButton=(Button)findViewById(R.id.camera);
-        searchButton=(Button) findViewById(R.id.browse);
-
-        studentDataPostUrl = getString(R.string.baseUrlLocal)+"setStudentBasicInfo";
-        studentDataGetUrl = getString(R.string.baseUrlLocal)+"getStudent"+"/"+InstituteID+"/"+
-                selectedClass+"/"+selectedSection+"/"+
-                selectedDepartment+"/"+selectedMedium+"/"+selectedShift+"/"+UserID;
-        StudentDataGetRequest();
+        Button cameraButton=(Button)findViewById(R.id.camera);
+        Button searchButton=(Button) findViewById(R.id.browse);
 
         t_roll = (TextView)findViewById(R.id.roll);
         t_name = (TextView)findViewById(R.id.name);
@@ -202,6 +170,8 @@ public class StudentiCardDetails extends AppCompatActivity {
         t_remarks = (TextView)findViewById(R.id.remarks);
         t_studentNo = (TextView)findViewById(R.id.studentNo);
         t_rfid = (TextView)findViewById(R.id.rfid);
+
+        StudentDataGetRequest();
 
         cameraButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -240,7 +210,12 @@ public class StudentiCardDetails extends AppCompatActivity {
             public void onClick(View v) {
                 if(originalBitmap != null)
                 {
-                    dialog.show();
+                    mRotateDialog = new ProgressDialog(StudentiCardDetails.this);
+                    mRotateDialog.setTitle("Loading...");
+                    mRotateDialog.setMessage("Please Wait...");
+                    mRotateDialog.setCancelable(false);
+                    mRotateDialog.setIcon(R.drawable.onair);
+                    mRotateDialog.show();
                     imageChanged = true;
                     mRotateProcessTask = new RotateProcessTask(originalBitmap, -90);
                     mRotateProcessTask.execute((Void) null);
@@ -257,7 +232,12 @@ public class StudentiCardDetails extends AppCompatActivity {
             public void onClick(View v) {
                 if(originalBitmap != null)
                 {
-                    dialog.show();
+                    mRotateDialog = new ProgressDialog(StudentiCardDetails.this);
+                    mRotateDialog.setTitle("Loading...");
+                    mRotateDialog.setMessage("Please Wait...");
+                    mRotateDialog.setCancelable(false);
+                    mRotateDialog.setIcon(R.drawable.onair);
+                    mRotateDialog.show();
                     imageChanged = true;
                     mRotateProcessTask = new RotateProcessTask(originalBitmap, 90);
                     mRotateProcessTask.execute((Void) null);
@@ -284,7 +264,12 @@ public class StudentiCardDetails extends AppCompatActivity {
             public void onStopTrackingTouch(SeekBar seekBar) {
                 if(originalBitmap != null)
                 {
-                    dialog.show();
+                    mBrightnessDialog = new ProgressDialog(StudentiCardDetails.this);
+                    mBrightnessDialog.setTitle("Loading...");
+                    mBrightnessDialog.setMessage("Please Wait...");
+                    mBrightnessDialog.setCancelable(false);
+                    mBrightnessDialog.setIcon(R.drawable.onair);
+                    mBrightnessDialog.show();
                     imageChanged = true;
                     mBrightnessProcessTask = new BrightnessProcessTask(originalBitmap, brightnessValue);
                     mBrightnessProcessTask.execute((Void) null);
@@ -303,7 +288,12 @@ public class StudentiCardDetails extends AppCompatActivity {
                 {
                     if(imageChanged)
                     {
-                        dialog.show();
+                        mStudentDataPostDialog = new ProgressDialog(StudentiCardDetails.this);
+                        mStudentDataPostDialog.setTitle("Loading...");
+                        mStudentDataPostDialog.setMessage("Please Wait...");
+                        mStudentDataPostDialog.setCancelable(false);
+                        mStudentDataPostDialog.setIcon(R.drawable.onair);
+                        mStudentDataPostDialog.show();
                         if(checkBox.isChecked())
                         {
                             tempBitmap = mCropImageView.getCroppedImage(500, 500);
@@ -319,7 +309,7 @@ public class StudentiCardDetails extends AppCompatActivity {
                     }
                     else
                     {
-                        dialog.dismiss();
+                        mStudentDataPostDialog.dismiss();
                         Toast.makeText(StudentiCardDetails.this,"Take or choose a photo to update!!!",Toast.LENGTH_LONG).show();
                     }
                 }
@@ -329,8 +319,6 @@ public class StudentiCardDetails extends AppCompatActivity {
                 }
             }
         });
-        dialog.dismiss();
-
     }
 
     public class FileFromBitmap extends AsyncTask<Void, Integer, String> {
@@ -365,7 +353,7 @@ public class StudentiCardDetails extends AppCompatActivity {
                 fo.flush();
                 fo.close();
             } catch (IOException e) {
-                dialog.dismiss();
+                mStudentDataPostDialog.dismiss();
                 e.printStackTrace();
             }
 
@@ -381,7 +369,7 @@ public class StudentiCardDetails extends AppCompatActivity {
             // exp; make progressbar gone
             Ion.with(getApplicationContext())
                     .load(getString(R.string.baseUrlLocal)+"Mobile/uploads")
-                    .progressDialog(dialog)
+                    .progressDialog(mStudentDataPostDialog)
                     .setMultipartParameter("name", "source")
                     .setMultipartFile("file", "image/jpeg", file)
                     .asString()
@@ -399,7 +387,7 @@ public class StudentiCardDetails extends AppCompatActivity {
                                 postUsingVolley(json);
                                 Log.d( "ImageUrl", jsonObject.getString("path"));
                             } catch (JSONException e1) {
-                                dialog.dismiss();
+                                mStudentDataPostDialog.dismiss();
                                 e1.printStackTrace();
                             }
                         }
@@ -408,43 +396,40 @@ public class StudentiCardDetails extends AppCompatActivity {
         }
     }
 
-
     public void postUsingVolley(String json)
     {
+        String studentDataPostUrl = getString(R.string.baseUrlLocal)+"setStudentBasicInfo";
         try {
             jsonObjectStudentData = new JSONObject(json);
         } catch (JSONException e) {
-            dialog.dismiss();
+            mStudentDataPostDialog.dismiss();
             e.printStackTrace();
         }
         CustomRequest customRequest = new CustomRequest (Request.Method.POST, studentDataPostUrl, jsonObjectStudentData,
                 new Response.Listener<JSONArray>() {
                     @Override
                     public void onResponse(JSONArray response) {
-                        dialog.dismiss();
+                        mStudentDataPostDialog.dismiss();
                         try {
-//                            Toast.makeText(StudentiCardDetails.this,"Data Successfully Updated with Response: "+response.getJSONObject(0).get("ReturnValue"),Toast.LENGTH_LONG).show();
                             Toast.makeText(StudentiCardDetails.this,"Successfully Updated",Toast.LENGTH_LONG).show();
-//                            NavUtils.navigateUpFromSameTask(StudentiCardDetails.this);
                             StudentiCardDetails.super.onBackPressed();
                         }
                         catch (Exception e)
                         {
-
+                            mStudentDataPostDialog.dismiss();
                         }
                     }
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-//                Toast.makeText(StudentiCardDetails.this,"Not Response: "+error.toString(),Toast.LENGTH_LONG).show();
+                mStudentDataPostDialog.dismiss();
                 Toast.makeText(StudentiCardDetails.this,"Not Successfully Updated"+error.toString(),Toast.LENGTH_LONG).show();
-                dialog.dismiss();
             }
         })
         {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String>  params = new HashMap<String, String>();
+                Map<String, String>  params = new HashMap<>();
                 params.put("Authorization", "Request_From_onEMS_Android_app");
                 return params;
             }
@@ -456,16 +441,6 @@ public class StudentiCardDetails extends AppCompatActivity {
         try {
             JSONArray studentJsonArray = new JSONArray(jsonString);
             JSONObject studentJsonObject = studentJsonArray.getJSONObject(0);
-
-//            Runnable progressRunnable = new Runnable() {
-//                @Override
-//                public void run() {
-//                    glideProgress.dismiss();
-//                }
-//            };
-//
-//            Handler pdCanceller = new Handler();
-//            pdCanceller.postDelayed(progressRunnable, 5000);
             if(studentJsonObject.getString("ImageUrl").equals("null")){
                 progressBar.setVisibility(View.GONE);
                 Toast.makeText(StudentiCardDetails.this,"No image found!!!",Toast.LENGTH_LONG).show();
@@ -542,11 +517,11 @@ public class StudentiCardDetails extends AppCompatActivity {
             t_remarks.setText(studentJsonObject.getString("Remarks"));
             t_studentNo.setText(studentJsonObject.getString("StudentNo"));
             t_rfid.setText(studentJsonObject.getString("RFID"));
-            dialog.dismiss();
+            mStudentDataGetDialog.dismiss();
 
         } catch (JSONException e) {
+            mStudentDataGetDialog.dismiss();
             Toast.makeText(this,"WARNING!!! "+e,Toast.LENGTH_LONG).show();
-            dialog.dismiss();
         }
     }
 
@@ -601,8 +576,8 @@ public class StudentiCardDetails extends AppCompatActivity {
                 tempBitmap = originalBitmap;
                 imageChanged = true;
                 try {
-                    ImagePath = MediaStore.Images.Media.insertImage(this.getContentResolver(), bitmap, "demo_image", "demo_image");
-                    URI = Uri.parse(ImagePath);
+                    String ImagePath = MediaStore.Images.Media.insertImage(this.getContentResolver(), bitmap, "demo_image", "demo_image");
+                    Uri URI = Uri.parse(ImagePath);
                     mCropImageView.setImageUriAsync(URI);
                 }
                 catch (Exception e)
@@ -824,6 +799,7 @@ public class StudentiCardDetails extends AppCompatActivity {
                 Thread.sleep(100);
                 return true;
             } catch (InterruptedException e) {
+                mBrightnessDialog.dismiss();
                 return false;
             }
         }
@@ -831,20 +807,20 @@ public class StudentiCardDetails extends AppCompatActivity {
         @Override
         protected void onPostExecute(final Boolean success) {
             mBrightnessProcessTask = null;
-            dialog.dismiss();
+            mBrightnessDialog.dismiss();
             if (success) {
                 mCropImageView.setImageBitmap(tempBitmap);
             }
             else{
                 mCropImageView.setImageBitmap(originalBitmap);
-                Toast.makeText(StudentiCardDetails.this,"One ERROR occured!!!",Toast.LENGTH_LONG).show();
+                Toast.makeText(StudentiCardDetails.this,"One ERROR occurred !!!",Toast.LENGTH_LONG).show();
             }
         }
 
         @Override
         protected void onCancelled() {
             mBrightnessProcessTask = null;
-            dialog.dismiss();
+            mBrightnessDialog.dismiss();
         }
     }
 
@@ -872,7 +848,7 @@ public class StudentiCardDetails extends AppCompatActivity {
         @Override
         protected void onPostExecute(final Boolean success) {
             mRotateProcessTask = null;
-            dialog.dismiss();
+            mRotateDialog.dismiss();
             if (success) {
                 mCropImageView.setImageBitmap(tempBitmap);
             }
@@ -885,12 +861,22 @@ public class StudentiCardDetails extends AppCompatActivity {
         @Override
         protected void onCancelled() {
             mRotateProcessTask = null;
-            dialog.dismiss();
+            mRotateDialog.dismiss();
         }
     }
 
     public void StudentDataGetRequest(){
-        dialog.show();
+
+        String studentDataGetUrl = getString(R.string.baseUrlLocal)+"getStudent"+"/"+InstituteID+"/"+
+                selectedClass+"/"+selectedSection+"/"+
+                selectedDepartment+"/"+selectedMedium+"/"+selectedShift+"/"+UserID;
+
+        mStudentDataGetDialog = new ProgressDialog(this);
+        mStudentDataGetDialog.setTitle("Loading...");
+        mStudentDataGetDialog.setMessage("Please Wait...");
+        mStudentDataGetDialog.setCancelable(false);
+        mStudentDataGetDialog.setIcon(R.drawable.onair);
+        mStudentDataGetDialog.show();
         //Preparing Student data from server
         StringRequest stringStudentRequest = new StringRequest(Request.Method.GET, studentDataGetUrl,
                 new Response.Listener<String>() {
@@ -903,14 +889,13 @@ public class StudentiCardDetails extends AppCompatActivity {
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-
-                dialog.dismiss();
+                mStudentDataGetDialog.dismiss();
             }
         })
         {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String>  params = new HashMap<String, String>();
+                Map<String, String>  params = new HashMap<>();
                 params.put("Authorization", "Request_From_onEMS_Android_app");
                 return params;
             }

@@ -27,26 +27,20 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
-import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import onair.onems.R;
 import onair.onems.Services.GlideApp;
 import onair.onems.customadapters.ExpandableListAdapter;
@@ -60,33 +54,28 @@ import onair.onems.models.ShiftModel;
 import onair.onems.models.SpinnerStudentInformation;
 import onair.onems.network.MySingleton;
 
-/**
- * Created by User on 1/7/2018.
- */
-
 public class StudentiCardMain extends AppCompatActivity {
 
     private DrawerLayout mDrawerLayout;
-    private ExpandableListAdapter mMenuAdapter;
-    private ExpandableListView expandableList;
     private List<ExpandedMenuModel> listDataHeader;
     private HashMap<ExpandedMenuModel, List<String>> listDataChild;
     private Spinner spinnerClass, spinnerShift, spinnerSection, spinnerMedium, spinnerDepartment, spinnerStudent;
-    private Button showStudentData, newEntry, editStudentData;
-    private ProgressDialog dialog;
-    private String classUrl, shiftUrl, sectionUrl, mediumUrl, studentUrl, departmentUrl;
+    private ProgressDialog mShiftDialog, mMediumDialog, mClassDialog, mDepartmentDialog, mSectionDialog, mStudentListGetDialog;
+
     private ArrayList<ClassModel> allClassArrayList;
     private ArrayList<ShiftModel> allShiftArrayList;
     private ArrayList<SectionModel> allSectionArrayList;
     private ArrayList<MediumModel> allMediumArrayList;
     private ArrayList<DepartmentModel> allDepartmentArrayList;
     private ArrayList<SpinnerStudentInformation> allStudentArrayList;
+
     private String[] tempClassArray = {"Select Class"};
     private String[] tempShiftArray = {"Select Shift"};
     private String[] tempSectionArray = {"Select Section"};
     private String[] tempDepartmentArray = {"Select Department"};
     private String[] tempMediumArray = {"Select Medium"};
     private String[] tempStudentArray = {"Select Student"};
+
     private ClassModel selectedClass = null;
     private ShiftModel selectedShift = null;
     private SectionModel selectedSection = null;
@@ -107,6 +96,10 @@ public class StudentiCardMain extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.icard_activity_main);
 
+        ExpandableListAdapter mMenuAdapter;
+        ExpandableListView expandableList;
+        Button showStudentData, newEntry, editStudentData;
+
         spinnerClass = (Spinner)findViewById(R.id.spinnerClass);
         spinnerShift = (Spinner)findViewById(R.id.spinnerShift);
         spinnerSection = (Spinner)findViewById(R.id.spinnerSection);
@@ -114,68 +107,45 @@ public class StudentiCardMain extends AppCompatActivity {
         spinnerDepartment =(Spinner)findViewById(R.id.spinnerDepartment);
         spinnerStudent = (Spinner)findViewById(R.id.spinnerStudent);
 
-        selectedClass = new ClassModel();
-        selectedShift = new ShiftModel();
-        selectedSection = new SectionModel();
-        selectedMedium = new MediumModel();
-        selectedDepartment = new DepartmentModel();
-        selectedStudent = new SpinnerStudentInformation();
-
         showStudentData = (Button)findViewById(R.id.showStudentData);
         editStudentData = (Button)findViewById(R.id.editStudentInfo);
         newEntry = (Button)findViewById(R.id.newEntry);
 
-        ArrayAdapter<String> class_spinner_adapter = new ArrayAdapter<String>(this, R.layout.spinner_item, tempClassArray);
+        ArrayAdapter<String> class_spinner_adapter = new ArrayAdapter<>(this, R.layout.spinner_item, tempClassArray);
         class_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerClass.setAdapter(class_spinner_adapter);
 
-        ArrayAdapter<String> shift_spinner_adapter = new ArrayAdapter<String>(this, R.layout.spinner_item, tempShiftArray);
+        ArrayAdapter<String> shift_spinner_adapter = new ArrayAdapter<>(this, R.layout.spinner_item, tempShiftArray);
         shift_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerShift.setAdapter(shift_spinner_adapter);
 
-        ArrayAdapter<String> section_spinner_adapter = new ArrayAdapter<String>(this, R.layout.spinner_item, tempSectionArray);
+        ArrayAdapter<String> section_spinner_adapter = new ArrayAdapter<>(this, R.layout.spinner_item, tempSectionArray);
         section_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerSection.setAdapter(section_spinner_adapter);
 
-        ArrayAdapter<String> department_spinner_adapter = new ArrayAdapter<String>(this, R.layout.spinner_item, tempDepartmentArray);
+        ArrayAdapter<String> department_spinner_adapter = new ArrayAdapter<>(this, R.layout.spinner_item, tempDepartmentArray);
         department_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerDepartment.setAdapter(department_spinner_adapter);
 
-        ArrayAdapter<String> medium_spinner_adapter = new ArrayAdapter<String>(this, R.layout.spinner_item, tempMediumArray);
+        ArrayAdapter<String> medium_spinner_adapter = new ArrayAdapter<>(this, R.layout.spinner_item, tempMediumArray);
         medium_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerMedium.setAdapter(medium_spinner_adapter);
 
-        ArrayAdapter<String> student_spinner_adapter = new ArrayAdapter<String>(this, R.layout.spinner_item, tempStudentArray);
+        ArrayAdapter<String> student_spinner_adapter = new ArrayAdapter<>(this, R.layout.spinner_item, tempStudentArray);
         student_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerStudent.setAdapter(student_spinner_adapter);
 
-        allClassArrayList = new ArrayList<>();
-        allShiftArrayList = new ArrayList<>();
-        allSectionArrayList = new ArrayList<>();
-        allMediumArrayList = new ArrayList<>();
-        allDepartmentArrayList = new ArrayList<>();
-        allStudentArrayList = new ArrayList<>();
-
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         InstituteID = prefs.getLong("InstituteID",0);
-
-        shiftUrl = getString(R.string.baseUrlLocal)+"getInsShift/"+InstituteID;
-        mediumUrl = getString(R.string.baseUrlLocal)+"getInstituteMediumDdl/"+InstituteID;
-
-        dialog = new ProgressDialog(this);
-        dialog.setTitle("Loading...");
-        dialog.setMessage("Please Wait...");
-        dialog.setCancelable(false);
-        dialog.show();
 
         if(!isNetworkAvailable())
         {
             Toast.makeText(StudentiCardMain.this,"Please check your internet connection and open app again!!! ",Toast.LENGTH_LONG).show();
         }
 
-        ShiftDataGetRequest(shiftUrl);
+        ShiftDataGetRequest();
 
-        MediumDataGetRequest(mediumUrl);
+        MediumDataGetRequest();
 
         spinnerShift.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -196,6 +166,8 @@ public class StudentiCardMain extends AppCompatActivity {
                 else
                 {
                     selectedShift = new ShiftModel();
+                    StudentDataGetRequest();
+                    selectedStudent = null;
                 }
             }
 
@@ -217,9 +189,7 @@ public class StudentiCardMain extends AppCompatActivity {
                         selectedClass = new ClassModel();
                         selectedDepartment = new DepartmentModel();
                         selectedSection = new SectionModel();
-                        CheckSelectedData();
-                        classUrl = getString(R.string.baseUrlLocal)+"MediumWiseClassDDL/"+InstituteID+"/"+selectedMedium.getMediumID();
-                        ClassDataGetRequest(classUrl);
+                        ClassDataGetRequest();
                         StudentDataGetRequest();
                         selectedStudent = null;
                     }
@@ -231,6 +201,12 @@ public class StudentiCardMain extends AppCompatActivity {
                 else
                 {
                     selectedMedium = new MediumModel();
+                    selectedClass = new ClassModel();
+                    selectedDepartment = new DepartmentModel();
+                    selectedSection = new SectionModel();
+                    ClassDataGetRequest();
+                    StudentDataGetRequest();
+                    selectedStudent = null;
                 }
             }
 
@@ -250,10 +226,7 @@ public class StudentiCardMain extends AppCompatActivity {
                         selectedClass = allClassArrayList.get(position-1);
                         selectedDepartment = new DepartmentModel();
                         selectedSection = new SectionModel();
-                        CheckSelectedData();
-                        departmentUrl = getString(R.string.baseUrlLocal)+"ClassWiseDepartmentDDL/"+InstituteID+"/"+
-                                selectedClass.getClassID()+"/"+selectedMedium.getMediumID();
-                        DepartmentDataGetRequest(departmentUrl);
+                        DepartmentDataGetRequest();
                         StudentDataGetRequest();
                         selectedStudent = null;
                     }
@@ -265,6 +238,11 @@ public class StudentiCardMain extends AppCompatActivity {
                 else
                 {
                     selectedClass = new ClassModel();
+                    selectedDepartment = new DepartmentModel();
+                    selectedSection = new SectionModel();
+                    DepartmentDataGetRequest();
+                    StudentDataGetRequest();
+                    selectedStudent = null;
                 }
             }
 
@@ -283,10 +261,7 @@ public class StudentiCardMain extends AppCompatActivity {
                     try {
                         selectedDepartment = allDepartmentArrayList.get(position-1);
                         selectedSection = new SectionModel();
-                        CheckSelectedData();
-                        sectionUrl = getString(R.string.baseUrlLocal)+"getInsSection/"+InstituteID+"/"+
-                                selectedClass.getClassID()+"/"+selectedDepartment.getDepartmentID();
-                        SectionDataGetRequest(sectionUrl);
+                        SectionDataGetRequest();
                         StudentDataGetRequest();
                         selectedStudent = null;
                     }
@@ -298,6 +273,10 @@ public class StudentiCardMain extends AppCompatActivity {
                 else
                 {
                     selectedDepartment = new DepartmentModel();
+                    selectedSection = new SectionModel();
+                    SectionDataGetRequest();
+                    StudentDataGetRequest();
+                    selectedStudent = null;
                 }
             }
 
@@ -327,6 +306,8 @@ public class StudentiCardMain extends AppCompatActivity {
                 else
                 {
                     selectedSection = new SectionModel();
+                    StudentDataGetRequest();
+                    selectedStudent = null;
                 }
             }
 
@@ -384,35 +365,15 @@ public class StudentiCardMain extends AppCompatActivity {
                 {
                     if(selectedStudent != null)
                     {
+                        CheckSelectedData();
                         Bundle bundle = new Bundle();
                         bundle.putString("UserName", selectedStudent.getUserName());
                         bundle.putString("RollNo", selectedStudent.getRollNo());
                         bundle.putString("UserID", selectedStudent.getUserID());
-                        if(selectedSection.getSectionID() == -2)
-                        {
-                            selectedSection.setSectionID("0");
-                        }
                         bundle.putString("SectionID", Long.toString(selectedSection.getSectionID()));
-                        if(selectedClass.getClassID() == -2)
-                        {
-                            selectedClass.setClassID("0");
-                        }
                         bundle.putString("ClassID", Long.toString(selectedClass.getClassID()));
-//                        bundle.putString("BrunchID", Long.toString(selectedStudent.getBrunchID()));
-                        if(selectedShift.getShiftID() == -2)
-                        {
-                            selectedShift.setShiftID("0");
-                        }
                         bundle.putString("ShiftID", Long.toString(selectedShift.getShiftID()));
-                        if(selectedMedium.getMediumID() == -2)
-                        {
-                            selectedMedium.setMediumID("0");
-                        }
                         bundle.putString("MediumID", Long.toString(selectedMedium.getMediumID()));
-                        if(selectedDepartment.getDepartmentID() == -2)
-                        {
-                            selectedDepartment.setDepartmentID("0");
-                        }
                         bundle.putString("DepartmentID", Long.toString(selectedDepartment.getDepartmentID()));
                         bundle.putBoolean("IsImageCaptured", selectedStudent.getIsImageCaptured());
 
@@ -439,35 +400,15 @@ public class StudentiCardMain extends AppCompatActivity {
                 {
                     if(selectedStudent != null)
                     {
+                        CheckSelectedData();
                         Bundle bundle = new Bundle();
                         bundle.putString("UserName", selectedStudent.getUserName());
                         bundle.putString("RollNo", selectedStudent.getRollNo());
                         bundle.putString("UserID", selectedStudent.getUserID());
-                        if(selectedSection.getSectionID() == -2)
-                        {
-                            selectedSection.setSectionID("0");
-                        }
                         bundle.putString("SectionID", Long.toString(selectedSection.getSectionID()));
-                        if(selectedClass.getClassID() == -2)
-                        {
-                            selectedClass.setClassID("0");
-                        }
                         bundle.putString("ClassID", Long.toString(selectedClass.getClassID()));
-//                        bundle.putString("BrunchID", Long.toString(selectedStudent.getBrunchID()));
-                        if(selectedShift.getShiftID() == -2)
-                        {
-                            selectedShift.setShiftID("0");
-                        }
                         bundle.putString("ShiftID", Long.toString(selectedShift.getShiftID()));
-                        if(selectedMedium.getMediumID() == -2)
-                        {
-                            selectedMedium.setMediumID("0");
-                        }
                         bundle.putString("MediumID", Long.toString(selectedMedium.getMediumID()));
-                        if(selectedDepartment.getDepartmentID() == -2)
-                        {
-                            selectedDepartment.setDepartmentID("0");
-                        }
                         bundle.putString("DepartmentID", Long.toString(selectedDepartment.getDepartmentID()));
                         bundle.putBoolean("IsImageCaptured", selectedStudent.getIsImageCaptured());
 
@@ -514,7 +455,6 @@ public class StudentiCardMain extends AppCompatActivity {
                 .diskCacheStrategy(DiskCacheStrategy.NONE)
                 .skipMemoryCache(true)
                 .apply(RequestOptions.circleCropTransform()).into(profilePicture);
-        // profilePicture.setImageDrawable(getResources().getDrawable(R.drawable.album1));
         navigationView.addHeaderView(view);
         if (navigationView != null) {
             setupDrawerContent(navigationView);
@@ -538,10 +478,6 @@ public class StudentiCardMain extends AppCompatActivity {
                     Intent intent = new Intent(StudentiCardMain.this, TakeAttendance.class);
                     startActivity(intent);
                     finish();
-//                    DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-//                    if (drawer.isDrawerOpen(GravityCompat.START)) {
-//                        drawer.closeDrawer(GravityCompat.START);
-//                    }
                 }
 
                 return false;
@@ -550,7 +486,6 @@ public class StudentiCardMain extends AppCompatActivity {
         expandableList.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
             @Override
             public boolean onGroupClick(ExpandableListView expandableListView, View view, int i, long l) {
-//                Log.d("DEBUG", "heading clicked"+i+"--"+l);
                 if((i == 7) && (l == 7))
                 {
                     DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -585,12 +520,12 @@ public class StudentiCardMain extends AppCompatActivity {
             for(int i = 0; i < classJsonArray.length(); ++i) {
                 JSONObject classJsonObject = classJsonArray.getJSONObject(i);
                 ClassModel classModel = new ClassModel(classJsonObject.getString("ClassID"), classJsonObject.getString("ClassName"));
-//                Toast.makeText(this,classJsonObject.getString("ClassID")+classJsonObject.getString("ClassName"),Toast.LENGTH_LONG).show();
                 allClassArrayList.add(classModel);
                 classArrayList.add(classModel.getClassName());
             }
             if(allClassArrayList.size() == 1){
                 selectedClass = allClassArrayList.get(0);
+                DepartmentDataGetRequest();
             }
             try {
                 String[] strings = new String[classArrayList.size()];
@@ -598,17 +533,16 @@ public class StudentiCardMain extends AppCompatActivity {
                 ArrayAdapter<String> class_spinner_adapter = new ArrayAdapter<>(this,R.layout.spinner_item, strings);
                 class_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinnerClass.setAdapter(class_spinner_adapter);
-                dialog.dismiss();
+                mClassDialog.dismiss();
             }
             catch (IndexOutOfBoundsException e)
             {
-                dialog.dismiss();
+                mClassDialog.dismiss();
                 Toast.makeText(this,"No class found !!!",Toast.LENGTH_LONG).show();
             }
-            //spinner.setSelectedIndex(1);
         } catch (JSONException e) {
+            mClassDialog.dismiss();
             Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
-            dialog.dismiss();
         }
     }
 
@@ -621,7 +555,6 @@ public class StudentiCardMain extends AppCompatActivity {
             for(int i = 0; i < shiftJsonArray.length(); ++i) {
                 JSONObject shiftJsonObject = shiftJsonArray.getJSONObject(i);
                 ShiftModel shiftModel = new ShiftModel(shiftJsonObject.getString("ShiftID"), shiftJsonObject.getString("ShiftName"));
-//                Toast.makeText(this,classJsonObject.getString("ClassID")+classJsonObject.getString("ClassName"),Toast.LENGTH_LONG).show();
                 allShiftArrayList.add(shiftModel);
                 shiftArrayList.add(shiftModel.getShiftName());
             }
@@ -634,17 +567,16 @@ public class StudentiCardMain extends AppCompatActivity {
                 ArrayAdapter<String> shift_spinner_adapter = new ArrayAdapter<>(this,R.layout.spinner_item, strings);
                 shift_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinnerShift.setAdapter(shift_spinner_adapter);
-                dialog.dismiss();
+                mShiftDialog.dismiss();
             }
             catch (IndexOutOfBoundsException e)
             {
-                dialog.dismiss();
+                mShiftDialog.dismiss();
                 Toast.makeText(this,"No shift found !!!",Toast.LENGTH_LONG).show();
             }
-            //spinner.setSelectedIndex(1);
         } catch (JSONException e) {
+            mShiftDialog.dismiss();
             Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
-            dialog.dismiss();
         }
     }
 
@@ -657,7 +589,6 @@ public class StudentiCardMain extends AppCompatActivity {
             for(int i = 0; i < sectionJsonArray.length(); ++i) {
                 JSONObject sectionJsonObject = sectionJsonArray.getJSONObject(i);
                 SectionModel sectionModel = new SectionModel(sectionJsonObject.getString("SectionID"), sectionJsonObject.getString("SectionName"));
-//                Toast.makeText(this,classJsonObject.getString("ClassID")+classJsonObject.getString("ClassName"),Toast.LENGTH_LONG).show();
                 allSectionArrayList.add(sectionModel);
                 sectionArrayList.add(sectionModel.getSectionName());
             }
@@ -670,17 +601,16 @@ public class StudentiCardMain extends AppCompatActivity {
                 ArrayAdapter<String> section_spinner_adapter = new ArrayAdapter<>(this,R.layout.spinner_item, strings);
                 section_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinnerSection.setAdapter(section_spinner_adapter);
-                dialog.dismiss();
+                mSectionDialog.dismiss();
             }
             catch (IndexOutOfBoundsException e)
             {
-                dialog.dismiss();
+                mSectionDialog.dismiss();
                 Toast.makeText(this,"No section found !!!",Toast.LENGTH_LONG).show();
             }
-            //spinner.setSelectedIndex(1);
         } catch (JSONException e) {
             Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
-            dialog.dismiss();
+            mSectionDialog.dismiss();
         }
     }
 
@@ -694,12 +624,12 @@ public class StudentiCardMain extends AppCompatActivity {
                 JSONObject mediumJsonObject = mediumJsonArray.getJSONObject(i);
                 MediumModel mediumModel = new MediumModel(mediumJsonObject.getString("MediumID"), mediumJsonObject.getString("MameName"),
                         mediumJsonObject.getString("IsDefault"));
-//                Toast.makeText(this,classJsonObject.getString("ClassID")+classJsonObject.getString("ClassName"),Toast.LENGTH_LONG).show();
                 allMediumArrayList.add(mediumModel);
                 mediumnArrayList.add(mediumModel.getMameName());
             }
             if(allMediumArrayList.size() == 1){
                 selectedMedium = allMediumArrayList.get(0);
+                ClassDataGetRequest();
             }
             try {
                 String[] strings = new String[mediumnArrayList.size()];
@@ -707,17 +637,16 @@ public class StudentiCardMain extends AppCompatActivity {
                 ArrayAdapter<String> medium_spinner_adapter = new ArrayAdapter<>(this,R.layout.spinner_item, strings);
                 medium_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinnerMedium.setAdapter(medium_spinner_adapter);
-                dialog.dismiss();
+                mMediumDialog.dismiss();
             }
             catch (IndexOutOfBoundsException e)
             {
-                dialog.dismiss();
+                mMediumDialog.dismiss();
                 Toast.makeText(this,"No medium found !!!",Toast.LENGTH_LONG).show();
             }
-            //spinner.setSelectedIndex(1);
         } catch (JSONException e) {
+            mMediumDialog.dismiss();
             Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
-            dialog.dismiss();
         }
     }
 
@@ -730,18 +659,15 @@ public class StudentiCardMain extends AppCompatActivity {
             for(int i = 0; i < departmentJsonArray.length(); ++i) {
                 JSONObject departmentJsonObject = departmentJsonArray.getJSONObject(i);
                 DepartmentModel departmentModel = new DepartmentModel(departmentJsonObject.getString("DepartmentID"), departmentJsonObject.getString("DepartmentName"));
-//                Toast.makeText(this,classJsonObject.getString("ClassID")+classJsonObject.getString("ClassName"),Toast.LENGTH_LONG).show();
                 allDepartmentArrayList.add(departmentModel);
                 departmentArrayList.add(departmentModel.getDepartmentName());
             }
             if(allDepartmentArrayList.size() == 1){
                 selectedDepartment = allDepartmentArrayList.get(0);
+                SectionDataGetRequest();
             }
             if(allDepartmentArrayList.size() == 0){
-                CheckSelectedData();
-                sectionUrl = getString(R.string.baseUrlLocal)+"getInsSection/"+InstituteID+"/"+
-                        selectedClass.getClassID()+"/"+selectedDepartment.getDepartmentID();
-                SectionDataGetRequest(sectionUrl);
+                SectionDataGetRequest();
             }
             try {
                 String[] strings = new String[departmentArrayList.size()];
@@ -749,17 +675,16 @@ public class StudentiCardMain extends AppCompatActivity {
                 ArrayAdapter<String> department_spinner_adapter = new ArrayAdapter<>(this,R.layout.spinner_item, strings);
                 department_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinnerDepartment.setAdapter(department_spinner_adapter);
-                dialog.dismiss();
+                mDepartmentDialog.dismiss();
             }
             catch (IndexOutOfBoundsException e)
             {
-                dialog.dismiss();
+                mDepartmentDialog.dismiss();
                 Toast.makeText(this,"No department found !!!",Toast.LENGTH_LONG).show();
             }
-            //spinner.setSelectedIndex(1);
         } catch (JSONException e) {
+            mDepartmentDialog.dismiss();
             Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
-            dialog.dismiss();
         }
     }
 
@@ -790,22 +715,22 @@ public class StudentiCardMain extends AppCompatActivity {
                 ArrayAdapter<String> student_spinner_adapter = new ArrayAdapter<>(this,R.layout.spinner_item, strings);
                 student_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinnerStudent.setAdapter(student_spinner_adapter);
-                dialog.dismiss();
+                mStudentListGetDialog.dismiss();
             }
             catch (IndexOutOfBoundsException e)
             {
-                dialog.dismiss();
+                mStudentListGetDialog.dismiss();
                 Toast.makeText(this,"No student found !!!",Toast.LENGTH_LONG).show();
             }
         } catch (JSONException e) {
+            mStudentListGetDialog.dismiss();
             Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
-            dialog.dismiss();
         }
     }
 
     private void prepareListData() {
-        listDataHeader = new ArrayList<ExpandedMenuModel>();
-        listDataChild = new HashMap<ExpandedMenuModel, List<String>>();
+        listDataHeader = new ArrayList<>();
+        listDataChild = new HashMap<>();
 
         ExpandedMenuModel menuNotice = new ExpandedMenuModel();
         menuNotice.setIconName("Notice");
@@ -886,7 +811,6 @@ public class StudentiCardMain extends AppCompatActivity {
     }
 
     private void setupDrawerContent(NavigationView navigationView) {
-        //revision: this don't works, use setOnChildClickListener() and setOnGroupClickListener() above instead
         navigationView.setNavigationItemSelectedListener(
             new NavigationView.OnNavigationItemSelectedListener() {
                 @Override
@@ -929,7 +853,7 @@ public class StudentiCardMain extends AppCompatActivity {
             sharedPreferences  = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putBoolean("LogInState", false);
-            editor.commit();
+            editor.apply();
             Intent intent = new Intent(StudentiCardMain.this, LoginScreen.class);
             startActivity(intent);
             finish();
@@ -951,11 +875,18 @@ public class StudentiCardMain extends AppCompatActivity {
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
-    private void ShiftDataGetRequest(String url)
+    private void ShiftDataGetRequest()
     {
-        dialog.show();
+        String shiftUrl = getString(R.string.baseUrl)+"getInsShift/"+InstituteID;
+
+        mShiftDialog = new ProgressDialog(this);
+        mShiftDialog.setTitle("Loading...");
+        mShiftDialog.setMessage("Please Wait...");
+        mShiftDialog.setCancelable(false);
+        mShiftDialog.setIcon(R.drawable.onair);
+        mShiftDialog.show();
         //Preparing Shift data from server
-        StringRequest stringShiftRequest = new StringRequest(Request.Method.GET, url,
+        StringRequest stringShiftRequest = new StringRequest(Request.Method.GET, shiftUrl,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
@@ -966,8 +897,7 @@ public class StudentiCardMain extends AppCompatActivity {
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-
-                dialog.dismiss();
+                mShiftDialog.dismiss();
             }
         })
         {
@@ -981,11 +911,18 @@ public class StudentiCardMain extends AppCompatActivity {
         MySingleton.getInstance(this).addToRequestQueue(stringShiftRequest);
     }
 
-    private void MediumDataGetRequest(String url)
+    private void MediumDataGetRequest()
     {
-        dialog.show();
+        String mediumUrl = getString(R.string.baseUrl)+"getInstituteMediumDdl/"+InstituteID;
+
+        mMediumDialog = new ProgressDialog(this);
+        mMediumDialog.setTitle("Loading...");
+        mMediumDialog.setMessage("Please Wait...");
+        mMediumDialog.setCancelable(false);
+        mMediumDialog.setIcon(R.drawable.onair);
+        mMediumDialog.show();
         //Preparing Medium data from server
-        StringRequest stringMediumRequest = new StringRequest(Request.Method.GET, url,
+        StringRequest stringMediumRequest = new StringRequest(Request.Method.GET, mediumUrl,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
@@ -996,8 +933,7 @@ public class StudentiCardMain extends AppCompatActivity {
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-
-                dialog.dismiss();
+                mMediumDialog.dismiss();
             }
         })
         {
@@ -1011,11 +947,20 @@ public class StudentiCardMain extends AppCompatActivity {
         MySingleton.getInstance(this).addToRequestQueue(stringMediumRequest);
     }
 
-    private void ClassDataGetRequest(String url)
+    private void ClassDataGetRequest()
     {
-        dialog.show();
+        CheckSelectedData();
+
+        String classUrl = getString(R.string.baseUrlLocal)+"MediumWiseClassDDL/"+InstituteID+"/"+selectedMedium.getMediumID();
+
+        mClassDialog = new ProgressDialog(this);
+        mClassDialog.setTitle("Loading...");
+        mClassDialog.setMessage("Please Wait...");
+        mClassDialog.setCancelable(false);
+        mClassDialog.setIcon(R.drawable.onair);
+        mClassDialog.show();
         //Preparing claas data from server
-        StringRequest stringClassRequest = new StringRequest(Request.Method.GET, url,
+        StringRequest stringClassRequest = new StringRequest(Request.Method.GET, classUrl,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
@@ -1026,14 +971,13 @@ public class StudentiCardMain extends AppCompatActivity {
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-
-                dialog.dismiss();
+                mClassDialog.dismiss();
             }
         })
         {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String>  params = new HashMap<String, String>();
+                Map<String, String>  params = new HashMap<>();
                 params.put("Authorization", "Request_From_onEMS_Android_app");
                 return params;
             }
@@ -1041,11 +985,21 @@ public class StudentiCardMain extends AppCompatActivity {
         MySingleton.getInstance(this).addToRequestQueue(stringClassRequest);
     }
 
-    private void DepartmentDataGetRequest(String url)
+    private void DepartmentDataGetRequest()
     {
-        dialog.show();
+        CheckSelectedData();
+
+        String departmentUrl = getString(R.string.baseUrlLocal)+"ClassWiseDepartmentDDL/"+InstituteID+"/"+
+                selectedClass.getClassID()+"/"+selectedMedium.getMediumID();
+
+        mDepartmentDialog = new ProgressDialog(this);
+        mDepartmentDialog.setTitle("Loading...");
+        mDepartmentDialog.setMessage("Please Wait...");
+        mDepartmentDialog.setCancelable(false);
+        mDepartmentDialog.setIcon(R.drawable.onair);
+        mDepartmentDialog.show();
         //Preparing Department data from server
-        StringRequest stringDepartmentRequest = new StringRequest(Request.Method.GET, url,
+        StringRequest stringDepartmentRequest = new StringRequest(Request.Method.GET, departmentUrl,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
@@ -1056,14 +1010,13 @@ public class StudentiCardMain extends AppCompatActivity {
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-
-                dialog.dismiss();
+                mDepartmentDialog.dismiss();
             }
         })
         {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String>  params = new HashMap<String, String>();
+                Map<String, String>  params = new HashMap<>();
                 params.put("Authorization", "Request_From_onEMS_Android_app");
                 return params;
             }
@@ -1071,11 +1024,21 @@ public class StudentiCardMain extends AppCompatActivity {
         MySingleton.getInstance(this).addToRequestQueue(stringDepartmentRequest);
     }
 
-    private void SectionDataGetRequest(String url)
+    private void SectionDataGetRequest()
     {
-        dialog.show();
+        CheckSelectedData();
+
+        String sectionUrl = getString(R.string.baseUrlLocal)+"getInsSection/"+InstituteID+"/"+
+                selectedClass.getClassID()+"/"+selectedDepartment.getDepartmentID();
+
+        mSectionDialog = new ProgressDialog(this);
+        mSectionDialog.setTitle("Loading...");
+        mSectionDialog.setMessage("Please Wait...");
+        mSectionDialog.setCancelable(false);
+        mSectionDialog.setIcon(R.drawable.onair);
+        mSectionDialog.show();
         //Preparing section data from server
-        StringRequest stringSectionRequest = new StringRequest(Request.Method.GET, url,
+        StringRequest stringSectionRequest = new StringRequest(Request.Method.GET, sectionUrl,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
@@ -1086,14 +1049,13 @@ public class StudentiCardMain extends AppCompatActivity {
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-
-                dialog.dismiss();
+                mSectionDialog.dismiss();
             }
         })
         {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String>  params = new HashMap<String, String>();
+                Map<String, String>  params = new HashMap<>();
                 params.put("Authorization", "Request_From_onEMS_Android_app");
                 return params;
             }
@@ -1104,11 +1066,19 @@ public class StudentiCardMain extends AppCompatActivity {
     private void StudentDataGetRequest()
     {
         CheckSelectedData();
-        studentUrl = getString(R.string.baseUrlLocal)+"getStudent"+"/"+InstituteID+"/"+
+
+        String studentUrl = getString(R.string.baseUrlLocal)+"getStudent"+"/"+InstituteID+"/"+
                 selectedClass.getClassID()+"/"+selectedSection.getSectionID()+"/"+
                 selectedDepartment.getDepartmentID()+"/"+selectedMedium.getMediumID()+"/"+
                 selectedShift.getShiftID()+"/"+"0";
-        dialog.show();
+
+        mStudentListGetDialog = new ProgressDialog(this);
+        mStudentListGetDialog.setTitle("Loading...");
+        mStudentListGetDialog.setMessage("Please Wait...");
+        mStudentListGetDialog.setCancelable(false);
+        mStudentListGetDialog.setIcon(R.drawable.onair);
+        mStudentListGetDialog.show();
+
         //Preparing Student data from server
         StringRequest stringStudentRequest = new StringRequest(Request.Method.GET, studentUrl,
                 new Response.Listener<String>() {
@@ -1121,14 +1091,13 @@ public class StudentiCardMain extends AppCompatActivity {
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-
-                dialog.dismiss();
+                mStudentListGetDialog.dismiss();
             }
         })
         {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String>  params = new HashMap<String, String>();
+                Map<String, String>  params = new HashMap<>();
                 params.put("Authorization", "Request_From_onEMS_Android_app");
                 return params;
             }
