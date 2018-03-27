@@ -8,7 +8,6 @@ import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
-import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -17,54 +16,32 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.WindowManager;
 import android.widget.Toast;
-
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
-import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-
 import onair.onems.R;
-import onair.onems.Services.AttendanceDataPoster;
 import onair.onems.customadapters.CustomRequest;
 import onair.onems.customadapters.TakeAttendanceAdapter;
-import onair.onems.models.ApiResponseValue;
 import onair.onems.models.AttendanceSheetModel;
 import onair.onems.models.AttendanceStudentModel;
-import onair.onems.models.StudentModel;
 import onair.onems.network.MySingleton;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
-import retrofit2.converter.scalars.ScalarsConverterFactory;
-
-/**
- * Created by User on 12/20/2017.
- */
-
 public class TakeAttendanceDetails extends AppCompatActivity {
 
-    private RecyclerView recyclerView;
     private TakeAttendanceAdapter adapter;
     private ArrayList<AttendanceStudentModel> attendanceSheetArrayList;
     private long InstituteID,MediumID,ShiftID,ClassID,SectionID,SubjectID,DepertmentID;
     String date, StudentDataGetUrl, postUrl, UserID, SubAtdID;
     ProgressDialog dialog;
-    JSONArray StudentJsonArray, InstituteIDJsonArray;
+    JSONArray StudentJsonArray;
     JSONObject postDatajsonObject;
 
     @Override
@@ -89,6 +66,7 @@ public class TakeAttendanceDetails extends AppCompatActivity {
         dialog.setTitle("Loading...");
         dialog.setMessage("Please Wait...");
         dialog.setCancelable(false);
+        dialog.setIcon(R.drawable.onair);
         dialog.show();
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
@@ -104,11 +82,11 @@ public class TakeAttendanceDetails extends AppCompatActivity {
         DepertmentID = StudentSelection.getLong("DepertmentID",0);
         date = StudentSelection.getString("Date", "");
 
-        postUrl = getString(R.string.baseUrlLocal)+"setHrmSubWiseAtd";
+        postUrl = getString(R.string.baseUrl)+"/api/onEms/setHrmSubWiseAtd";
 
-        StudentDataGetUrl = getString(R.string.baseUrlLocal)+"getHrmSubWiseAtdDetail/"+InstituteID+"/"+MediumID+"/"+ShiftID+"/"+ClassID+"/"+SectionID+"/"+SubjectID+"/"+DepertmentID+"/"+date;
+        StudentDataGetUrl = getString(R.string.baseUrl)+"/api/onEms/getHrmSubWiseAtdDetail/"+InstituteID+"/"+MediumID+"/"+ShiftID+"/"+ClassID+"/"+SectionID+"/"+SubjectID+"/"+DepertmentID+"/"+date;
 
-        recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
 
         attendanceSheetArrayList = new ArrayList<AttendanceStudentModel>();
         adapter = new TakeAttendanceAdapter(this, attendanceSheetArrayList);
@@ -119,23 +97,14 @@ public class TakeAttendanceDetails extends AppCompatActivity {
         recyclerView.setAdapter(adapter);
 
         StudentDataGetRequest();
-//        prepareAlbums();
-
     }
 
     private void prepareAlbums(String jsonString) {
 
         try {
             StudentJsonArray = new JSONArray(jsonString);
-//            ArrayList StudentArrayList = new ArrayList();
             for(int i = 0; i < StudentJsonArray.length(); ++i) {
                 JSONObject studentJsonObject = StudentJsonArray.getJSONObject(i);
-//                InstituteIDJsonArray = studentJsonObject.getJSONArray("InstituteID");
-//                String[] strings = new String[InstituteIDJsonArray.length()];
-//                for(int j = 0; j<InstituteIDJsonArray.length(); ++j)
-//                {
-//                    strings[j] = InstituteIDJsonArray.getString(j);
-//                }
                 AttendanceStudentModel attendanceStudentModel = new AttendanceStudentModel(
                         studentJsonObject.getString("SubAtdDetailID"),
                         studentJsonObject.getString("SubAtdID"),
@@ -170,25 +139,7 @@ public class TakeAttendanceDetails extends AppCompatActivity {
                         studentJsonObject.getString("DisplayDate"),
                         "true",
                         "0");
-//                ArrayList<String> arrayList = new ArrayList<String>();
-//                JSONArray jsonArray = studentJsonObject.getJSONArray("InstituteID");
-//                for(int j = 0; j<jsonArray.length(); ++i)
-//                {
-//                    arrayList.add(jsonArray.get(i).toString());
-//                }
-//                String[] InstituteID = new String[arrayList.size()];
-//                InstituteID = arrayList.toArray(InstituteID);
-//                StudentModel studentModel = new StudentModel(studentJsonObject.getString("UserID"), studentJsonObject.getString("UserFullName"),
-//                        studentJsonObject.getString("RFID"),studentJsonObject.getString("RollNo"),studentJsonObject.getString("SubjectID"),
-//                        studentJsonObject.getString("DepartmentID"),studentJsonObject.getString("SectionID"),InstituteID,
-//                        studentJsonObject.getString("MediumID"),studentJsonObject.getString("ShiftID"),studentJsonObject.getString("ClassID"),
-//                        studentJsonObject.getString("IsPresent"),studentJsonObject.getString("Islate"),studentJsonObject.getString("LateTime"),
-//                        studentJsonObject.getString("IsLeave"),studentJsonObject.getString("IsAbsent"),studentJsonObject.getString("Remarks"),
-//                        studentJsonObject.getString("Subject"),studentJsonObject.getString("Department"),studentJsonObject.getString("Medium"),
-//                        studentJsonObject.getString("Shift"),studentJsonObject.getString("Class"));
-//                Toast.makeText(this,classJsonObject.getString("ClassID")+classJsonObject.getString("ClassName"),Toast.LENGTH_LONG).show();
                 attendanceSheetArrayList.add(attendanceStudentModel);
-//                classArrayList.add(classModel.getClassName());
                 SubAtdID = studentJsonObject.getString("SubAtdID");
             }
             adapter.notifyDataSetChanged();
@@ -199,7 +150,6 @@ public class TakeAttendanceDetails extends AppCompatActivity {
             dialog.dismiss();
         }
 
-//        adapter.notifyDataSetChanged();
     }
 
     @Override
@@ -264,9 +214,7 @@ public class TakeAttendanceDetails extends AppCompatActivity {
                         try {
                             Toast.makeText(TakeAttendanceDetails.this,"Data Successfully Updated with Response: "+response.getJSONObject(0).get("ReturnValue"),Toast.LENGTH_LONG).show();
                             finish();
-                        }
-                        catch (Exception e)
-                        {
+                        } catch (Exception e) {
 
                         }
                     }

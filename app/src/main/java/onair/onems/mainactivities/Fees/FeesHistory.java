@@ -119,7 +119,7 @@ public class FeesHistory extends AppCompatActivity
         al.add("2022");
         ArrayAdapter adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, al);
         type_spinner.setAdapter(adapter);
-        YearlyFeesDetailsUrl = getString(R.string.baseUrlLocal)+"getStudentYearlyFeesSummeryInfo/"+instituteID+"/"+year+"/"+UserID;
+        YearlyFeesDetailsUrl = getString(R.string.baseUrl)+"/api/onEms/getStudentYearlyFeesSummeryInfo/"+instituteID+"/"+year+"/"+UserID;
         RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
         StringRequest stringRequest = new StringRequest(Request.Method.GET,   YearlyFeesDetailsUrl,
                 new Response.Listener<String>() {
@@ -149,7 +149,7 @@ public class FeesHistory extends AppCompatActivity
                 SharedPreferences.Editor editor = prefs.edit();
                 editor.putString("yearselectindex",year);
                 editor.commit();
-                YearlyFeesDetailsUrl = getString(R.string.baseUrlLocal)+"getStudentYearlyFeesSummeryInfo/"+instituteID+"/"+year+"/"+UserID;
+                YearlyFeesDetailsUrl = getString(R.string.baseUrl)+"/api/onEms/getStudentYearlyFeesSummeryInfo/"+instituteID+"/"+year+"/"+UserID;
                 RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
                 StringRequest stringRequest = new StringRequest(Request.Method.GET,   YearlyFeesDetailsUrl,
                         new Response.Listener<String>() {

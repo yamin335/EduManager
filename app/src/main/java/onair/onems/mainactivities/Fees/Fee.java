@@ -146,7 +146,7 @@ public class Fee extends AppCompatActivity
         {
             userType.setText("Guardian");
         }
-        Glide.with(this).load(getString(R.string.baseUrlRaw)+imageUrl.replace("\\","/")).apply(RequestOptions.circleCropTransform()).into(profilePicture);
+        Glide.with(this).load(getString(R.string.baseUrl)+"/"+imageUrl.replace("\\","/")).apply(RequestOptions.circleCropTransform()).into(profilePicture);
         navigationView.addHeaderView(view);
 
         if (navigationView != null)
@@ -193,7 +193,6 @@ public class Fee extends AppCompatActivity
             @Override
             public boolean onGroupClick(ExpandableListView expandableListView, View view, int i, long l)
             {
-//
                 if((i == 2) && (l == 2) )
                 {
                     DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -249,7 +248,7 @@ public class Fee extends AppCompatActivity
             }
         });
 
-        monthUrl=getString(R.string.baseUrlLocal)+"getMonth";
+        monthUrl=getString(R.string.baseUrl)+"/api/onEms/getMonth";
         dialog = new ProgressDialog(this);
         dialog.setMessage("Loading....");
         dialog.show();
@@ -284,7 +283,7 @@ public class Fee extends AppCompatActivity
         al.add("Paypal");
         ArrayAdapter adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, al);
         type_spinner.setAdapter(adapter);
-        monthFeesDetailsUrl = getString(R.string.baseUrlLocal)+"getMonthWiseFees/"+instituteID+"/"+shiftID+"/"+depertmentID+"/"+mediumID+"/"+classID+"/"+monthselectindex;
+        monthFeesDetailsUrl = getString(R.string.baseUrl)+"/api/onEms/getMonthWiseFees/"+instituteID+"/"+shiftID+"/"+depertmentID+"/"+mediumID+"/"+classID+"/"+monthselectindex;
         RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
 
         StringRequest stringRequestFee = new StringRequest(Request.Method.GET,  monthFeesDetailsUrl,
@@ -323,7 +322,7 @@ public class Fee extends AppCompatActivity
                 SharedPreferences.Editor editor = prefs.edit();
                 editor.putInt("monthselectindex",monthid);
                 editor.commit();
-                monthFeesDetailsUrl = getString(R.string.baseUrlLocal)+"getMonthWiseFees/"+instituteID+"/"+shiftID+"/"+depertmentID+"/"+mediumID+"/"+classID+"/"+monthselectindex;
+                monthFeesDetailsUrl = getString(R.string.baseUrl)+"/api/onEms/getMonthWiseFees/"+instituteID+"/"+shiftID+"/"+depertmentID+"/"+mediumID+"/"+classID+"/"+monthselectindex;
                 RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
 
                 StringRequest stringRequest = new StringRequest(Request.Method.GET, monthFeesDetailsUrl,
@@ -414,7 +413,7 @@ public class Fee extends AppCompatActivity
         cardModels.add(new CardModel("Total Fees: ", Double.toString( total_fees)+" TK"));
 
 
-        monthScholarshipUrl = getString(R.string.baseUrlLocal)+"getScholarship/"+instituteID+"/"+UserID+"/"+monthselectindex;
+        monthScholarshipUrl = getString(R.string.baseUrl)+"/api/onEms/getScholarship/"+instituteID+"/"+UserID+"/"+monthselectindex;
 
         RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
 
@@ -486,7 +485,7 @@ public class Fee extends AppCompatActivity
         }
         cardModels.add(new CardModel("Scholarship:", scholarship+" TK"));
 
-        monthFineDetailsUrl = getString(R.string.baseUrlLocal)+"getLateAndAbsent/"+instituteID;
+        monthFineDetailsUrl = getString(R.string.baseUrl)+"/api/onEms/getLateAndAbsent/"+instituteID;
         RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
 
         StringRequest stringRequestfine = new StringRequest(Request.Method.GET,  monthFineDetailsUrl,
@@ -533,7 +532,7 @@ public class Fee extends AppCompatActivity
             }
             cardModels.add(new CardModel("Total Fine:", Double.toString( TotalFineAmount )+" TK"));
 
-            monthDueDetailsUrl = getString(R.string.baseUrlLocal)+"getPreviousDue/"+instituteID+"/"+shiftID+"/"+depertmentID+"/"+mediumID+"/"+classID+"/"+UserID+"/"+monthselectindex;
+            monthDueDetailsUrl = getString(R.string.baseUrl)+"/api/onEms/getPreviousDue/"+instituteID+"/"+shiftID+"/"+depertmentID+"/"+mediumID+"/"+classID+"/"+UserID+"/"+monthselectindex;
             RequestQueue queue1 = Volley.newRequestQueue(getApplicationContext());
 
             StringRequest stringRequestfine = new StringRequest(Request.Method.GET,   monthDueDetailsUrl,

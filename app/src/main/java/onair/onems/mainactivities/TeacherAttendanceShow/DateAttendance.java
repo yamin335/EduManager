@@ -95,7 +95,7 @@ public class DateAttendance extends AppCompatActivity
         roll.setText("Roll: "+studentRoll);
         id.setText("ID: "+RFID);
 
-        Glide.with(this).load(getString(R.string.baseUrlRaw)+imageUrl.replace("\\","/")).apply(RequestOptions.circleCropTransform()).into(image);
+        Glide.with(this).load(getString(R.string.baseUrl)+"/"+imageUrl.replace("\\","/")).apply(RequestOptions.circleCropTransform()).into(image);
         monthAttendanceUrl=getString(R.string.baseUrl)+"getStudentMonthlyDeviceAttendance/"+ShiftID+"/"+MediumID+"/"+ClassID+"/"+SectionID+"/"+MonthID+"/"+RFID;
         // Toast.makeText(this,""+monthAttendanceUrl,Toast.LENGTH_LONG).show();
         // Add Header of The Table

@@ -18,21 +18,17 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.Toast;
-
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
-import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-
 import de.codecrafters.tableview.TableView;
 import de.codecrafters.tableview.listeners.TableDataClickListener;
 import de.codecrafters.tableview.model.TableColumnWeightModel;
@@ -46,18 +42,13 @@ import onair.onems.models.StudentAttendanceReportModels.DailyAttendanceModel;
 import onair.onems.network.MySingleton;
 
 public class SelfAttendance extends Fragment {
-    private View rootView;
     private TableView tableView;
     private Spinner spinnerMonth;
-    private String monthUrl = "",monthAttendanceUrl="";
     private String RFID="", UserID="";
     private ProgressDialog dialog;
     private Configuration config;
-    private SharedPreferences sharedPre;
     private long SectionID, ClassID, ShiftID, MediumID, DepartmentID, InstituteID;
     private SimpleTableHeaderAdapter simpleTableHeaderAdapter;
-    private SimpleTableDataAdapter simpleTabledataAdapter;
-    private String[][] DATA_TO_SHOW;
     private ArrayList<MonthModel> allMonthArrayList;
     private String[] tempMonthArray = {"Select Month"};
     private MonthModel selectedMonth = null;
@@ -76,16 +67,12 @@ public class SelfAttendance extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState)
-    {
-
-        rootView = inflater.inflate(R.layout.student_attendance_self_attendance, container, false);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View rootView = inflater.inflate(R.layout.student_attendance_self_attendance, container, false);
         tableView = (TableView)rootView.findViewById(R.id.tableView);
         tableView.setColumnCount(4);
 
-        monthUrl=getString(R.string.baseUrlLocal)+"getMonth";
-        sharedPre = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        SharedPreferences sharedPre = PreferenceManager.getDefaultSharedPreferences(getActivity());
         RFID=sharedPre.getString("RFID","");
         ShiftID=sharedPre.getLong("ShiftID",0);
         MediumID=sharedPre.getLong("MediumID",0);
@@ -95,23 +82,22 @@ public class SelfAttendance extends Fragment {
         InstituteID=sharedPre.getLong("InstituteID",0);
         UserID = sharedPre.getString("UserID","");
 
+        selectedMonth = new MonthModel();
+
         spinnerMonth = (Spinner)rootView.findViewById(R.id.spinnerMonth);
-        ArrayAdapter<String> month_spinner_adapter = new ArrayAdapter<String>(getActivity(), R.layout.spinner_item, tempMonthArray);
+        ArrayAdapter<String> month_spinner_adapter = new ArrayAdapter<>(getActivity(), R.layout.spinner_item, tempMonthArray);
         month_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerMonth.setAdapter(month_spinner_adapter);
         if(!isNetworkAvailable())
         {
             Toast.makeText(getActivity(),"Please check your internet connection and open app again!!! ",Toast.LENGTH_LONG).show();
         }
-        selectedMonth = new MonthModel();
-        allMonthArrayList = new ArrayList<>();
-        dailyAttendanceList = new ArrayList<>();
-        selectedDay = new DailyAttendanceModel();
 
         dialog = new ProgressDialog(getActivity());
         dialog.setTitle("Loading...");
         dialog.setMessage("Please Wait...");
         dialog.setCancelable(false);
+        dialog.setIcon(R.drawable.onair);
         dialog.show();
 
         simpleTableHeaderAdapter = new SimpleTableHeaderAdapter(getActivity(),"SI","Date","Present", "Late(min)");
@@ -169,7 +155,6 @@ public class SelfAttendance extends Fragment {
                 else
                 {
                     selectedMonth = new MonthModel();
-//                    tableView.removeAllViews();
                 }
             }
 
@@ -178,7 +163,6 @@ public class SelfAttendance extends Fragment {
 
             }
         });
-
 
         return rootView;
     }
@@ -194,7 +178,6 @@ public class SelfAttendance extends Fragment {
             {
                 JSONObject monthJsonObject = MonthJsonArray.getJSONObject(i);
                 MonthModel monthModel = new MonthModel(monthJsonObject.getString("MonthID"), monthJsonObject.getString("MonthName"));
-//                Toast.makeText(this,classJsonObject.getString("ClassID")+classJsonObject.getString("ClassName"),Toast.LENGTH_LONG).show();
                 allMonthArrayList.add(monthModel);
                 monthArrayList.add(monthModel.getMonthName());
             }
@@ -230,7 +213,7 @@ public class SelfAttendance extends Fragment {
         try {
             dailyAttendanceList = new ArrayList<>();
             JSONArray dailyAttendanceJsonArray = new JSONArray(jsonString);
-            DATA_TO_SHOW = new String[dailyAttendanceJsonArray.length()][4];
+            String[][] DATA_TO_SHOW = new String[dailyAttendanceJsonArray.length()][4];
             for(int i = 0; i < dailyAttendanceJsonArray.length(); ++i) {
                 JSONObject dailyAttendanceJsonObject = dailyAttendanceJsonArray.getJSONObject(i);
                 DailyAttendanceModel perDayAttendance = new DailyAttendanceModel();
@@ -246,7 +229,7 @@ public class SelfAttendance extends Fragment {
                 dailyAttendanceList.add(perDayAttendance);
             }
 
-            simpleTabledataAdapter = new SimpleTableDataAdapter(getActivity(),DATA_TO_SHOW);
+            SimpleTableDataAdapter simpleTabledataAdapter = new SimpleTableDataAdapter(getActivity(),DATA_TO_SHOW);
             tableView.setDataAdapter(simpleTabledataAdapter);
             if (config.smallestScreenWidthDp >320) {
                 simpleTableHeaderAdapter.setTextSize(14);
@@ -256,7 +239,6 @@ public class SelfAttendance extends Fragment {
                 simpleTabledataAdapter.setTextSize(10);
             }
             dialog.dismiss();
-
         } catch (JSONException e) {
             dialog.dismiss();
             Toast.makeText(getActivity(),""+e,Toast.LENGTH_LONG).show();
@@ -264,59 +246,70 @@ public class SelfAttendance extends Fragment {
     }
 
     void MonthDataGetRequest(){
-        dialog.show();
-        StringRequest stringMonthRequest = new StringRequest(Request.Method.GET, monthUrl,
-                new Response.Listener<String>()
-                {
-                    @Override
-                    public void onResponse(String response)
+        if(isNetworkAvailable()) {
+            dialog.show();
+            String monthUrl=getString(R.string.baseUrl)+"/api/onEms/getMonth";
+            StringRequest stringMonthRequest = new StringRequest(Request.Method.GET, monthUrl,
+                    new Response.Listener<String>()
                     {
+                        @Override
+                        public void onResponse(String response)
+                        {
 
-                        parseMonthJsonData(response);
+                            parseMonthJsonData(response);
 
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                dialog.dismiss();
-            }
-        })
-        {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String>  params = new HashMap<String, String>();
-                params.put("Authorization", "Request_From_onEMS_Android_app");
-                return params;
-            }
-        };
-        MySingleton.getInstance(getActivity()).addToRequestQueue(stringMonthRequest);
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    dialog.dismiss();
+                }
+            })
+            {
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    Map<String, String>  params = new HashMap<>();
+                    params.put("Authorization", "Request_From_onEMS_Android_app");
+                    return params;
+                }
+            };
+            MySingleton.getInstance(getActivity()).addToRequestQueue(stringMonthRequest);
+        } else {
+            Toast.makeText(getActivity(),"Please check your internet connection and select again!!! ",
+                    Toast.LENGTH_LONG).show();
+        }
     }
 
     void MonthlyAttendanceDataGetRequest(int MonthID){
-        dialog.show();
-        monthAttendanceUrl = getString(R.string.baseUrlLocal)+"getStudentMonthlyDeviceAttendance/"+
-                ShiftID+"/"+MediumID+"/"+ClassID+"/"+SectionID+"/"+DepartmentID+"/"+ MonthID+"/"+RFID+"/"+InstituteID;
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, monthAttendanceUrl,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        parseMonthlyAttendanceJsonData(response);
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                dialog.dismiss();
-            }
-        })
-        {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String>  params = new HashMap<String, String>();
-                params.put("Authorization", "Request_From_onEMS_Android_app");
-                return params;
-            }
-        };
-        MySingleton.getInstance(getActivity()).addToRequestQueue(stringRequest);
+        if(isNetworkAvailable()) {
+            dialog.show();
+            String monthAttendanceUrl = getString(R.string.baseUrl)+"/api/onEms/getStudentMonthlyDeviceAttendance/"+
+                    ShiftID+"/"+MediumID+"/"+ClassID+"/"+SectionID+"/"+DepartmentID+"/"+ MonthID+"/"+RFID+"/"+InstituteID;
+            StringRequest stringRequest = new StringRequest(Request.Method.GET, monthAttendanceUrl,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+                            parseMonthlyAttendanceJsonData(response);
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    dialog.dismiss();
+                }
+            })
+            {
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    Map<String, String>  params = new HashMap<>();
+                    params.put("Authorization", "Request_From_onEMS_Android_app");
+                    return params;
+                }
+            };
+            MySingleton.getInstance(getActivity()).addToRequestQueue(stringRequest);
+        } else {
+            Toast.makeText(getActivity(),"Please check your internet connection and select again!!! ",
+                    Toast.LENGTH_LONG).show();
+        }
     }
 
     private boolean isNetworkAvailable() {

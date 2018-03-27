@@ -89,7 +89,7 @@ public class LoginScreen extends AppCompatActivity
                 startActivity(intent);
                 finish();
             }
-            else if((UserTypeID == 4)||(UserTypeID == 1))
+            else if((UserTypeID == 4)||(UserTypeID == 1)||(UserTypeID == 2))
             {
                 Intent intent = new Intent(LoginScreen.this, TeacherMainScreen.class);
                 startActivity(intent);
@@ -115,7 +115,7 @@ public class LoginScreen extends AppCompatActivity
                 if(isNetworkAvailable())
                 {
 
-                    loginurl = getString(R.string.baseUrlLocal)+"getLoginInformation"+"/"+takeId.getText().toString()+"/"+takePassword.getText().toString();
+                    loginurl = getString(R.string.baseUrl)+"/api/onEms/getLoginInformation"+"/"+takeId.getText().toString()+"/"+takePassword.getText().toString();
                     if(takeId.getText().toString().isEmpty())
                     {
                         takeId.setError("This field is required");
@@ -148,7 +148,7 @@ public class LoginScreen extends AppCompatActivity
                                         }
 
                                         // Login For Teacher
-                                        else if(((UserID.length()>0) && (UserTypeID == 4))||((UserID.length()>0) && (UserTypeID == 1)))
+                                        else if(((UserID.length()>0) && (UserTypeID == 4))||((UserID.length()>0) && (UserTypeID == 1))||((UserID.length()>0) && (UserTypeID == 2)))
                                         {
                                             Intent mainIntent = new Intent(LoginScreen.this,TeacherMainScreen.class);
                                             LoginScreen.this.startActivity(mainIntent);

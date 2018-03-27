@@ -75,7 +75,7 @@ public class FineDetails extends AppCompatActivity
         dialog = new ProgressDialog(this);
         dialog.setMessage("Loading....");
         dialog.show();
-        monthFineDetailsUrl = getString(R.string.baseUrlLocal)+"getLateAndAbsent/"+instituteID;
+        monthFineDetailsUrl = getString(R.string.baseUrl)+"/api/onEms/getLateAndAbsent/"+instituteID;
         RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
 
         StringRequest stringRequest = new StringRequest(Request.Method.GET,  monthFineDetailsUrl,

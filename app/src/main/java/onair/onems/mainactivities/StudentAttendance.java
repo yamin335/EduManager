@@ -97,7 +97,7 @@ public class StudentAttendance extends AppCompatActivity {
             userType.setText("Guardian");
         }
         GlideApp.with(this)
-                .load(getString(R.string.baseUrlRaw)+imageUrl.replace("\\","/"))
+                .load(getString(R.string.baseUrl)+"/"+imageUrl.replace("\\","/"))
                 .diskCacheStrategy(DiskCacheStrategy.NONE)
                 .skipMemoryCache(true)
                 .apply(RequestOptions.circleCropTransform())

@@ -149,6 +149,8 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
     private int firstClass = 0, firstShift = 0, firstSection = 0, firstMedium = 0,
             firstDepartment = 0, firstGender = 0, firstReligion = 0, firstBloodGroup = 0;
     private ProgressBar progressBar;
+    private Button rotateLeft, rotateRight;
+    private SeekBar brightImageSeekBar;
 
     @Override
     public void onResume() {
@@ -167,13 +169,22 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.icard_student_details_edit);
 
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        InstituteID = prefs.getLong("InstituteID",0);
+
+        selectedClass = new ClassModel();
+        selectedShift = new ShiftModel();
+        selectedSection = new SectionModel();
+        selectedMedium = new MediumModel();
+        selectedDepartment = new DepartmentModel();
+        selectedGender = new GenderModel();
+        selectedReligion = new ReligionModel();
+        selectedBloodGroup = new BloodGroupModel();
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
         Intent intent = getIntent();
         Bundle bundle = intent.getExtras();
 
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        InstituteID = prefs.getLong("InstituteID",0);
         selected_Class = bundle.getString("ClassID");
         selected_Shift = bundle.getString("ShiftID");
         selected_Section = bundle.getString("SectionID");
@@ -181,9 +192,9 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
         selected_Department = bundle.getString("DepartmentID");
         UserID = bundle.getString("UserID");
 
-        Button rotateLeft = (Button)findViewById(R.id.rotateLeft);
-        Button rotateRight = (Button)findViewById(R.id.rotateRight);
-        SeekBar brightImageSeekBar = (SeekBar)findViewById(R.id.brightness);
+        rotateLeft = (Button)findViewById(R.id.rotateLeft);
+        rotateRight = (Button)findViewById(R.id.rotateRight);
+        brightImageSeekBar = (SeekBar)findViewById(R.id.brightness);
         brightImageSeekBar.setProgress(100);
         progressBar = (ProgressBar)findViewById(R.id.spin_kit);
 
@@ -236,6 +247,11 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
         spinnerGender =(Spinner)findViewById(R.id.spinnerGender);
         spinnerReligion =(Spinner)findViewById(R.id.spinnerReligion);
         spinnerBloodGroup =(Spinner)findViewById(R.id.spinnerBloodGroup);
+
+        checkBox.setEnabled(false);
+        rotateLeft.setEnabled(false);
+        rotateRight.setEnabled(false);
+        brightImageSeekBar.setEnabled(false);
 
         ArrayAdapter<String> class_spinner_adapter = new ArrayAdapter<>(this, R.layout.spinner_item, tempClassArray);
         class_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -334,44 +350,30 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
         rotateLeft.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(originalBitmap != null)
-                {
-                    mRotateDialog = new ProgressDialog(StudentiCardDetailsEdit.this);
-                    mRotateDialog.setTitle("Loading...");
-                    mRotateDialog.setMessage("Please Wait...");
-                    mRotateDialog.setCancelable(false);
-                    mRotateDialog.setIcon(R.drawable.onair);
-                    mRotateDialog.show();
-                    imageChanged = true;
-                    mRotateProcessTask = new RotateProcessTask(originalBitmap, -90);
-                    mRotateProcessTask.execute((Void) null);
-                }
-                else
-                {
-                    Toast.makeText(StudentiCardDetailsEdit.this,"No image found!!!",Toast.LENGTH_LONG).show();
-                }
+                mRotateDialog = new ProgressDialog(StudentiCardDetailsEdit.this);
+                mRotateDialog.setTitle("Loading...");
+                mRotateDialog.setMessage("Please Wait...");
+                mRotateDialog.setCancelable(false);
+                mRotateDialog.setIcon(R.drawable.onair);
+                mRotateDialog.show();
+                imageChanged = true;
+                mRotateProcessTask = new RotateProcessTask(originalBitmap, -90);
+                mRotateProcessTask.execute((Void) null);
             }
         });
 
         rotateRight.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(originalBitmap != null)
-                {
-                    mRotateDialog = new ProgressDialog(StudentiCardDetailsEdit.this);
-                    mRotateDialog.setTitle("Loading...");
-                    mRotateDialog.setMessage("Please Wait...");
-                    mRotateDialog.setCancelable(false);
-                    mRotateDialog.setIcon(R.drawable.onair);
-                    mRotateDialog.show();
-                    imageChanged = true;
-                    mRotateProcessTask = new RotateProcessTask(originalBitmap, 90);
-                    mRotateProcessTask.execute((Void) null);
-                }
-                else
-                {
-                    Toast.makeText(StudentiCardDetailsEdit.this,"No image found!!!",Toast.LENGTH_LONG).show();
-                }
+                mRotateDialog = new ProgressDialog(StudentiCardDetailsEdit.this);
+                mRotateDialog.setTitle("Loading...");
+                mRotateDialog.setMessage("Please Wait...");
+                mRotateDialog.setCancelable(false);
+                mRotateDialog.setIcon(R.drawable.onair);
+                mRotateDialog.show();
+                imageChanged = true;
+                mRotateProcessTask = new RotateProcessTask(originalBitmap, 90);
+                mRotateProcessTask.execute((Void) null);
             }
         });
 
@@ -388,30 +390,22 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                if(originalBitmap != null)
-                {
-                    mBrightnessDialog = new ProgressDialog(StudentiCardDetailsEdit.this);
-                    mBrightnessDialog.setTitle("Loading...");
-                    mBrightnessDialog.setMessage("Please Wait...");
-                    mBrightnessDialog.setCancelable(false);
-                    mBrightnessDialog.setIcon(R.drawable.onair);
-                    mBrightnessDialog.show();
-                    imageChanged = true;
-                    mBrightnessProcessTask = new BrightnessProcessTask(originalBitmap, brightnessValue);
-                    mBrightnessProcessTask.execute((Void) null);
-                }
-                else
-                {
-                    Toast.makeText(StudentiCardDetailsEdit.this,"No image found!!!",Toast.LENGTH_LONG).show();
-                }
+                mBrightnessDialog = new ProgressDialog(StudentiCardDetailsEdit.this);
+                mBrightnessDialog.setTitle("Loading...");
+                mBrightnessDialog.setMessage("Please Wait...");
+                mBrightnessDialog.setCancelable(false);
+                mBrightnessDialog.setIcon(R.drawable.onair);
+                mBrightnessDialog.show();
+                imageChanged = true;
+                mBrightnessProcessTask = new BrightnessProcessTask(originalBitmap, brightnessValue);
+                mBrightnessProcessTask.execute((Void) null);
             }
         });
 
         updateStudentPhoto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(isNetworkAvailable())
-                {
+                if(isNetworkAvailable()) {
                     studentInformationEntry.setUserName(t_name.getText().toString());
                     studentInformationEntry.setRollNo(t_roll.getText().toString());
                     studentInformationEntry.setRFID(t_rfid.getText().toString());
@@ -424,36 +418,27 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
                     studentInformationEntry.setPreAddress(t_address.getText().toString());
                     studentInformationEntry.setRemarks(t_remarks.getText().toString());
 
-                    if(imageChanged)
-                    {
-                        if(originalBitmap != null)
-                        {
+                    if(imageChanged) {
+                        if(originalBitmap != null) {
                             mStudentDataPostDialog = new ProgressDialog(StudentiCardDetailsEdit.this);
                             mStudentDataPostDialog.setTitle("Loading...");
                             mStudentDataPostDialog.setMessage("Please Wait...");
                             mStudentDataPostDialog.setCancelable(false);
                             mStudentDataPostDialog.setIcon(R.drawable.onair);
                             mStudentDataPostDialog.show();
-                            if(checkBox.isChecked())
-                            {
+                            if(checkBox.isChecked()) {
                                 tempBitmap = mCropImageView.getCroppedImage(500, 500);
                                 mCropImageView.setImageBitmap(tempBitmap);
                                 fileFromBitmap = new FileFromBitmap(tempBitmap, StudentiCardDetailsEdit.this);
                                 fileFromBitmap.execute();
-                            }
-                            else
-                            {
+                            } else {
                                 fileFromBitmap = new FileFromBitmap(tempBitmap, StudentiCardDetailsEdit.this);
                                 fileFromBitmap.execute();
                             }
-                        }
-                        else
-                        {
+                        } else {
                             Toast.makeText(StudentiCardDetailsEdit.this,"Take or choose a photo to update!!!",Toast.LENGTH_LONG).show();
                         }
-                    }
-                    else
-                    {
+                    } else {
                         mStudentDataPostDialog = new ProgressDialog(StudentiCardDetailsEdit.this);
                         mStudentDataPostDialog.setTitle("Loading...");
                         mStudentDataPostDialog.setMessage("Please Wait...");
@@ -464,45 +449,33 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
                         String json = gson.toJson(studentInformationEntry);
                         postUsingVolley(json);
                     }
-                }
-                else
-                {
+                } else {
                     Toast.makeText(StudentiCardDetailsEdit.this,"Please check your INTERNET connection!!!",Toast.LENGTH_LONG).show();
                 }
             }
         });
 
         ShiftDataGetRequest();
-
         MediumDataGetRequest();
-
         ReligionDataGetRequest();
-
         GenderDataGetRequest();
-
         BloodGroupDataGetRequest();
 
         spinnerShift.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
-                if(position != 0)
-                {
+                if(position != 0) {
                     try {
                         selectedShift = allShiftArrayList.get(position-1);
                         studentInformationEntry.setShiftID(Long.toString(selectedShift.getShiftID()));
                         t_shift.setText(selectedShift.getShiftName());
 
-                    }
-                    catch (IndexOutOfBoundsException e)
-                    {
+                    } catch (IndexOutOfBoundsException e) {
                         Toast.makeText(StudentiCardDetailsEdit.this,"No shift found !!!",Toast.LENGTH_LONG).show();
                     }
-                }
-                else
-                {
-                    if(firstShift++>1)
-                    {
+                } else {
+                    if(firstShift++>1) {
                         selectedShift = new ShiftModel();
                         studentInformationEntry.setShiftID(Long.toString(selectedShift.getShiftID()));
                         t_shift.setText("NONE");
@@ -520,30 +493,38 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
-                if(position != 0)
-                {
+                if(position != 0) {
                     try {
                         selectedMedium = allMediumArrayList.get(position-1);
                         selectedClass = new ClassModel();
                         selectedDepartment = new DepartmentModel();
                         selectedSection = new SectionModel();
                         studentInformationEntry.setMediumID(Long.toString(selectedMedium.getMediumID()));
+                        studentInformationEntry.setClassID(Long.toString(selectedClass.getClassID()));
+                        studentInformationEntry.setDepartmentID(Long.toString(selectedDepartment.getDepartmentID()));
+                        studentInformationEntry.setSectionID(Long.toString(selectedSection.getSectionID()));
                         t_medium.setText(selectedMedium.getMameName());
-
+                        t_class.setText("NONE");
+                        t_department.setText("NONE");
+                        t_section.setText("NONE");
                         ClassDataGetRequest();
-                    }
-                    catch (IndexOutOfBoundsException e)
-                    {
+                    } catch (IndexOutOfBoundsException e) {
                         Toast.makeText(StudentiCardDetailsEdit.this,"No medium found !!!",Toast.LENGTH_LONG).show();
                     }
-                }
-                else
-                {
-                    if(firstMedium++>1)
-                    {
+                } else {
+                    if(firstMedium++>1) {
                         selectedMedium = new MediumModel();
+                        selectedClass = new ClassModel();
+                        selectedDepartment = new DepartmentModel();
+                        selectedSection = new SectionModel();
                         studentInformationEntry.setMediumID(Long.toString(selectedMedium.getMediumID()));
+                        studentInformationEntry.setClassID(Long.toString(selectedClass.getClassID()));
+                        studentInformationEntry.setDepartmentID(Long.toString(selectedDepartment.getDepartmentID()));
+                        studentInformationEntry.setSectionID(Long.toString(selectedSection.getSectionID()));
                         t_medium.setText("NONE");
+                        t_class.setText("NONE");
+                        t_department.setText("NONE");
+                        t_section.setText("NONE");
                     }
                 }
             }
@@ -559,31 +540,32 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
-                if(position != 0)
-                {
+                if(position != 0) {
                     try {
                         selectedClass = allClassArrayList.get(position-1);
                         selectedDepartment = new DepartmentModel();
                         selectedSection = new SectionModel();
                         studentInformationEntry.setClassID(Long.toString(selectedClass.getClassID()));
+                        studentInformationEntry.setDepartmentID(Long.toString(selectedDepartment.getDepartmentID()));
+                        studentInformationEntry.setSectionID(Long.toString(selectedSection.getSectionID()));
                         t_class.setText(selectedClass.getClassName());
-
+                        t_department.setText("NONE");
+                        t_section.setText("NONE");
                         DepartmentDataGetRequest();
-                    }
-                    catch (IndexOutOfBoundsException e)
-                    {
+                    } catch (IndexOutOfBoundsException e) {
                         Toast.makeText(StudentiCardDetailsEdit.this,"No class found !!!",Toast.LENGTH_LONG).show();
                     }
-                }
-                else
-                {
-                    if(firstClass++>1)
-                    {
+                } else {
+                    if(firstClass++>1) {
                         selectedClass = new ClassModel();
-//                        studentInformationEntry.setClassID(ClassID);
-//                        t_class.setText(ClassName);
+                        selectedDepartment = new DepartmentModel();
+                        selectedSection = new SectionModel();
                         studentInformationEntry.setClassID(Long.toString(selectedClass.getClassID()));
+                        studentInformationEntry.setDepartmentID(Long.toString(selectedDepartment.getDepartmentID()));
+                        studentInformationEntry.setSectionID(Long.toString(selectedSection.getSectionID()));
                         t_class.setText("NONE");
+                        t_department.setText("NONE");
+                        t_section.setText("NONE");
                     }
                 }
             }
@@ -598,30 +580,26 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
-                if(position != 0)
-                {
+                if(position != 0) {
                     try {
                         selectedDepartment = allDepartmentArrayList.get(position-1);
                         selectedSection = new SectionModel();
                         studentInformationEntry.setDepartmentID(Long.toString(selectedDepartment.getDepartmentID()));
+                        studentInformationEntry.setSectionID(Long.toString(selectedSection.getSectionID()));
                         t_department.setText(selectedDepartment.getDepartmentName());
-
+                        t_section.setText("NONE");
                         SectionDataGetRequest();
-                    }
-                    catch (IndexOutOfBoundsException e)
-                    {
+                    } catch (IndexOutOfBoundsException e) {
                         Toast.makeText(StudentiCardDetailsEdit.this,"No department found !!!",Toast.LENGTH_LONG).show();
                     }
-                }
-                else
-                {
-                    if(firstDepartment++>1)
-                    {
+                } else {
+                    if(firstDepartment++>1) {
                         selectedDepartment = new DepartmentModel();
-//                        studentInformationEntry.setDepartmentID(DepartmentID);
-//                        t_department.setText(DepartmentName);
+                        selectedSection = new SectionModel();
                         studentInformationEntry.setDepartmentID(Long.toString(selectedDepartment.getDepartmentID()));
+                        studentInformationEntry.setSectionID(Long.toString(selectedSection.getSectionID()));
                         t_department.setText("NONE");
+                        t_section.setText("NONE");
                     }
                 }
             }
@@ -636,25 +614,17 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
-                if(position != 0)
-                {
+                if(position != 0) {
                     try {
                         selectedSection = allSectionArrayList.get(position-1);
                         studentInformationEntry.setSectionID(Long.toString(selectedSection.getSectionID()));
                         t_section.setText(selectedSection.getSectionName());
-                    }
-                    catch (IndexOutOfBoundsException e)
-                    {
+                    } catch (IndexOutOfBoundsException e) {
                         Toast.makeText(StudentiCardDetailsEdit.this,"No section found !!!",Toast.LENGTH_LONG).show();
                     }
-                }
-                else
-                {
-                    if(firstSection++>1)
-                    {
+                } else {
+                    if(firstSection++>1) {
                         selectedSection = new SectionModel();
-//                        studentInformationEntry.setSectionID(SectionID);
-//                        t_section.setText(SectionName);
                         studentInformationEntry.setSectionID(Long.toString(selectedSection.getSectionID()));
                         t_section.setText("NONE");
                     }
@@ -671,22 +641,16 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
-                if(position != 0)
-                {
+                if(position != 0) {
                     try {
                         selectedGender = allGenderArrayList.get(position-1);
                         studentInformationEntry.setGenderID(Long.toString(selectedGender.getGenderID()));
                         t_sex.setText(selectedGender.getGenderName());
-                    }
-                    catch (IndexOutOfBoundsException e)
-                    {
+                    } catch (IndexOutOfBoundsException e) {
                         Toast.makeText(StudentiCardDetailsEdit.this,"No gender found !!!",Toast.LENGTH_LONG).show();
                     }
-                }
-                else
-                {
-                    if(firstGender++>1)
-                    {
+                } else {
+                    if(firstGender++>1) {
                         selectedGender = new GenderModel();
                         studentInformationEntry.setGenderID(Long.toString(selectedGender.getGenderID()));
                         t_sex.setText("NONE");
@@ -704,22 +668,16 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
-                if(position != 0)
-                {
+                if(position != 0) {
                     try {
                         selectedReligion = allReligionArrayList.get(position-1);
                         studentInformationEntry.setReligionID(Long.toString(selectedReligion.getReligionID()));
                         t_religion.setText(selectedReligion.getReligionName());
-                    }
-                    catch (IndexOutOfBoundsException e)
-                    {
+                    } catch (IndexOutOfBoundsException e) {
                         Toast.makeText(StudentiCardDetailsEdit.this,"No religion found !!!",Toast.LENGTH_LONG).show();
                     }
-                }
-                else
-                {
-                    if(firstReligion++>1)
-                    {
+                } else {
+                    if(firstReligion++>1) {
                         selectedReligion = new ReligionModel();
                         studentInformationEntry.setReligionID(Long.toString(selectedReligion.getReligionID()));
                         t_religion.setText("NONE");
@@ -737,22 +695,16 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
-                if(position != 0)
-                {
+                if(position != 0) {
                     try {
                         selectedBloodGroup = allBloodGroupArrayList.get(position-1);
                         studentInformationEntry.setBloodGroupID(Long.toString(selectedBloodGroup.getBloodGroupID()));
                         t_bloodGroup.setText(selectedBloodGroup.getBloodGroupName());
-                    }
-                    catch (IndexOutOfBoundsException e)
-                    {
+                    } catch (IndexOutOfBoundsException e) {
                         Toast.makeText(StudentiCardDetailsEdit.this,"No religion found !!!",Toast.LENGTH_LONG).show();
                     }
-                }
-                else
-                {
-                    if(firstBloodGroup++>1)
-                    {
+                } else {
+                    if(firstBloodGroup++>1) {
                         selectedBloodGroup = new BloodGroupModel();
                         studentInformationEntry.setBloodGroupID(Long.toString(selectedBloodGroup.getBloodGroupID()));
                         t_bloodGroup.setText("NONE");
@@ -1053,6 +1005,152 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
         }
     }
 
+    void parseStudentJsonData(String jsonString) {
+        try {
+            JSONArray studentJsonArray = new JSONArray(jsonString);
+            JSONObject studentJsonObject = studentJsonArray.getJSONObject(0);
+            if(studentJsonObject.getString("ImageUrl").equals("null")){
+                progressBar.setVisibility(View.GONE);
+                Toast.makeText(StudentiCardDetailsEdit.this,"No image found!!!",Toast.LENGTH_LONG).show();
+            }
+            GlideApp.with(this)
+                    .asBitmap()
+                    .load(getString(R.string.baseUrl)+"/"+studentJsonObject.getString("ImageUrl").replace("\\","/"))
+                    .diskCacheStrategy(DiskCacheStrategy.NONE)
+                    .skipMemoryCache(true)
+                    .into(new SimpleTarget<Bitmap>() {
+                        @Override
+                        public void onResourceReady(Bitmap resource, Transition<? super Bitmap> transition) {
+                            mCropImageView.setImageBitmap(resource);
+                            originalBitmap = resource;
+                            tempBitmap = resource;
+                            progressBar.setVisibility(View.GONE);
+                            if(resource != null) {
+                                checkBox.setEnabled(true);
+                                rotateLeft.setEnabled(true);
+                                rotateRight.setEnabled(true);
+                                brightImageSeekBar.setEnabled(true);
+                            }
+                        }
+                        @Override
+                        public void onLoadFailed(Drawable errorDrawable){
+                            super.onLoadFailed(errorDrawable);
+                            progressBar.setVisibility(View.GONE);
+                            Toast.makeText(StudentiCardDetailsEdit.this,"No image found!!!",Toast.LENGTH_LONG).show();
+                        }
+                    });
+
+            studentInformationEntry = new StudentInformationEntry();
+            studentInformationEntry.setRollNo(studentJsonObject.getString("RollNo"));
+            studentInformationEntry.setUserName(studentJsonObject.getString("UserName"));
+            studentInformationEntry.setGuardian(studentJsonObject.getString("Guardian"));
+            studentInformationEntry.setGuardianPhone(studentJsonObject.getString("GuardianPhone"));
+            studentInformationEntry.setGuardianEmailID(studentJsonObject.getString("GuardianEmailID"));
+            studentInformationEntry.setDOB(studentJsonObject.getString("DOB"));
+            studentInformationEntry.setPreAddress(studentJsonObject.getString("PreAddress"));
+            studentInformationEntry.setUserClassID(studentJsonObject.getString("UserClassID"));
+            studentInformationEntry.setUserID(studentJsonObject.getString("UserID"));
+            studentInformationEntry.setRFID(studentJsonObject.getString("RFID"));
+            studentInformationEntry.setStudentNo(studentJsonObject.getString("StudentNo"));
+            studentInformationEntry.setSectionID(studentJsonObject.getString("SectionID"));
+            studentInformationEntry.setClassID(studentJsonObject.getString("ClassID"));
+            studentInformationEntry.setBrunchID(studentJsonObject.getString("BrunchID"));
+            studentInformationEntry.setShiftID(studentJsonObject.getString("ShiftID"));
+            studentInformationEntry.setRemarks(studentJsonObject.getString("Remarks"));
+            studentInformationEntry.setInstituteID(studentJsonObject.getString("InstituteID"));
+            studentInformationEntry.setUserTypeID(studentJsonObject.getString("UserTypeID"));
+            studentInformationEntry.setGenderID(studentJsonObject.getString("GenderID"));
+            studentInformationEntry.setBloodGroupID(studentJsonObject.getString("BloodGroupID"));
+            studentInformationEntry.setReligionID(studentJsonObject.getString("ReligionID"));
+            studentInformationEntry.setSessionID(studentJsonObject.getString("SessionID"));
+            studentInformationEntry.setBoardID(studentJsonObject.getString("BoardID"));
+            studentInformationEntry.setPhoneNo(studentJsonObject.getString("PhoneNo"));
+            studentInformationEntry.setEmailID(studentJsonObject.getString("EmailID"));
+            studentInformationEntry.setFingerUrl(studentJsonObject.getString("FingerUrl"));
+            studentInformationEntry.setSignatureUrl(studentJsonObject.getString("SignatureUrl"));
+            studentInformationEntry.setMediumID(studentJsonObject.getString("MediumID"));
+            studentInformationEntry.setDepartmentID(studentJsonObject.getString("DepartmentID"));
+            studentInformationEntry.setIsImageCaptured(studentJsonObject.getBoolean("IsImageCaptured"));
+            studentInformationEntry.setImageUrl(studentJsonObject.getString("ImageUrl"));
+            studentInformationEntry.setUserNo(studentJsonObject.getString("UserNo"));
+            studentInformationEntry.setUserTitleID(studentJsonObject.getString("UserTitleID"));
+            studentInformationEntry.setUserFirstName(studentJsonObject.getString("UserFirstName"));
+            studentInformationEntry.setUserMiddleName(studentJsonObject.getString("UserMiddleName"));
+            studentInformationEntry.setUserLastName(studentJsonObject.getString("UserLastName"));
+            studentInformationEntry.setNickName(studentJsonObject.getString("NickName"));
+            studentInformationEntry.setSkypeID(studentJsonObject.getString("SkypeID"));
+            studentInformationEntry.setFacebookID(studentJsonObject.getString("FacebookID"));
+            studentInformationEntry.setWhatsApp(studentJsonObject.getString("WhatsApp"));
+            studentInformationEntry.setViber(studentJsonObject.getString("Viber"));
+            studentInformationEntry.setLinkedIN(studentJsonObject.getString("LinkedIN"));
+            studentInformationEntry.setParAddress(studentJsonObject.getString("ParAddress"));
+            studentInformationEntry.setParThana(studentJsonObject.getString("ParThana"));
+            studentInformationEntry.setParPostCode(studentJsonObject.getString("ParPostCode"));
+            studentInformationEntry.setParCountryID(studentJsonObject.getString("ParCountryID"));
+            studentInformationEntry.setParStateID(studentJsonObject.getString("ParStateID"));
+            studentInformationEntry.setParCityID(studentJsonObject.getString("ParCityID"));
+            studentInformationEntry.setPreThana(studentJsonObject.getString("PreThana"));
+            studentInformationEntry.setPrePostCode(studentJsonObject.getString("PrePostCode"));
+            studentInformationEntry.setPreCountryID(studentJsonObject.getString("PreCountryID"));
+            studentInformationEntry.setPreStateID(studentJsonObject.getString("PreStateID"));
+            studentInformationEntry.setPreCityID(studentJsonObject.getString("PreCityID"));
+            studentInformationEntry.setMobileNo(studentJsonObject.getString("MobileNo"));
+            studentInformationEntry.setUniqueIdentity(studentJsonObject.getString("UniqueIdentity"));
+            studentInformationEntry.setBloodGroupID(studentJsonObject.getString("BloodGroupID"));
+            studentInformationEntry.setWeigth(studentJsonObject.getString("Weigth"));
+            studentInformationEntry.setHeight(studentJsonObject.getString("Height"));
+            studentInformationEntry.setBirthCertificate(studentJsonObject.getString("BirthCertificate"));
+            studentInformationEntry.setPassportNO(studentJsonObject.getString("PassportNO"));
+            studentInformationEntry.setNID(studentJsonObject.getString("NID"));
+            studentInformationEntry.setIsActive(studentJsonObject.getString("IsActive"));
+            studentInformationEntry.setStatusID(studentJsonObject.getString("StatusID"));
+            studentInformationEntry.setGuardianMobileNo(studentJsonObject.getString("GuardianMobileNo"));
+            studentInformationEntry.setGuardianUserFirstName(studentJsonObject.getString("GuardianUserFirstName"));
+            studentInformationEntry.setGuardianUserMiddleName(studentJsonObject.getString("GuardianUserMiddleName"));
+            studentInformationEntry.setGuardianUserLastName(studentJsonObject.getString("GuardianUserLastName"));
+            studentInformationEntry.setGuardianNickName(studentJsonObject.getString("GuardianNickName"));
+            studentInformationEntry.setGuardianUniqueIdentity(studentJsonObject.getString("GuardianUniqueIdentity"));
+            studentInformationEntry.setGuardianBloodGroupID(studentJsonObject.getString("GuardianBloodGroupID"));
+            studentInformationEntry.setGuardianPassportNO(studentJsonObject.getString("GuardianPassportNO"));
+            studentInformationEntry.setGuardianNID(studentJsonObject.getString("GuardianNID"));
+            studentInformationEntry.setRelationID(studentJsonObject.getString("RelationID"));
+            studentInformationEntry.setIsLocalGuardian(studentJsonObject.getString("IsLocalGuardian"));
+            studentInformationEntry.setIsActiveFamily(studentJsonObject.getString("IsActiveFamily"));
+            studentInformationEntry.setIsActiveStudent(studentJsonObject.getString("IsActiveStudent"));
+
+
+
+            t_roll.setText(studentJsonObject.getString("RollNo"));
+            t_name.setText(studentJsonObject.getString("UserName"));
+            t_section.setText(studentJsonObject.getString("SectionName"));
+            t_birthDay.setText(studentJsonObject.getString("DOB"));
+            t_email.setText(studentJsonObject.getString("GuardianEmailID"));
+            t_address.setText(studentJsonObject.getString("PreAddress"));
+            t_parent.setText(studentJsonObject.getString("Guardian"));
+            t_parentsPhone.setText(studentJsonObject.getString("GuardianPhone"));
+            t_department.setText(studentJsonObject.getString("DepartmentName"));
+            t_sex.setText(studentJsonObject.getString("Gender"));
+            t_religion.setText(studentJsonObject.getString("Religion"));
+            t_medium.setText(studentJsonObject.getString("MameName"));
+            t_session.setText(studentJsonObject.getString("SessionName"));
+            t_board.setText(studentJsonObject.getString("BoardName"));
+            t_class.setText(studentJsonObject.getString("ClassName"));
+            t_shift.setText(studentJsonObject.getString("ShiftName"));
+            t_rfid.setText(studentJsonObject.getString("RFID"));
+            t_studentNo.setText(studentJsonObject.getString("StudentNo"));
+            t_branch.setText(studentJsonObject.getString("BrunchName"));
+            t_stuEmail.setText(studentJsonObject.getString("EmailID"));
+            t_stuPhone.setText(studentJsonObject.getString("PhoneNo"));
+            t_remarks.setText(studentJsonObject.getString("Remarks"));
+            t_bloodGroup.setText(studentJsonObject.getString("BloodGroup"));
+
+            mStudentDataGetDialog.dismiss();
+        } catch (JSONException e) {
+            Toast.makeText(this,"WARNING!!! "+e,Toast.LENGTH_LONG).show();
+            mStudentDataGetDialog.dismiss();
+        }
+    }
+
     public class FileFromBitmap extends AsyncTask<Void, Integer, String> {
 
         Context context;
@@ -1100,7 +1198,7 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
             // update your UI or take action after
             // exp; make progressbar gone
             Ion.with(getApplicationContext())
-                    .load(getString(R.string.baseUrlLocal)+"Mobile/uploads")
+                    .load(getString(R.string.baseUrl)+"/api/onEms/Mobile/uploads")
                     .progressDialog(mStudentDataPostDialog)
                     .setMultipartParameter("name", "source")
                     .setMultipartFile("file", "image/jpeg", file)
@@ -1131,7 +1229,7 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
 
     public void postUsingVolley(String json)
     {
-        String studentDataPostUrl = getString(R.string.baseUrlLocal)+"setStudentBasicInfo";
+        String studentDataPostUrl = getString(R.string.baseUrl)+"/api/onEms/setStudentBasicInfo";
         try {
             jsonObjectStudentData = new JSONObject(json);
         } catch (JSONException e) {
@@ -1171,99 +1269,6 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
         queuePost.add(customRequest);
     }
 
-    void parseStudentJsonData(String jsonString) {
-        try {
-            JSONArray studentJsonArray = new JSONArray(jsonString);
-            JSONObject studentJsonObject = studentJsonArray.getJSONObject(0);
-            if(studentJsonObject.getString("ImageUrl").equals("null")){
-                progressBar.setVisibility(View.GONE);
-                Toast.makeText(StudentiCardDetailsEdit.this,"No image found!!!",Toast.LENGTH_LONG).show();
-            }
-            GlideApp.with(this)
-                    .asBitmap()
-                    .load(getString(R.string.baseUrlRaw)+studentJsonObject.getString("ImageUrl").replace("\\","/"))
-                    .diskCacheStrategy(DiskCacheStrategy.NONE)
-                    .skipMemoryCache(true)
-                    .into(new SimpleTarget<Bitmap>() {
-                        @Override
-                        public void onResourceReady(Bitmap resource, Transition<? super Bitmap> transition) {
-                            mCropImageView.setImageBitmap(resource);
-                            originalBitmap = resource;
-                            tempBitmap = resource;
-                            progressBar.setVisibility(View.GONE);
-                        }
-                        @Override
-                        public void onLoadFailed(Drawable errorDrawable){
-                            super.onLoadFailed(errorDrawable);
-                            progressBar.setVisibility(View.GONE);
-                            Toast.makeText(StudentiCardDetailsEdit.this,"No image found!!!",Toast.LENGTH_LONG).show();
-                        }
-                    });
-
-            studentInformationEntry = new StudentInformationEntry();
-            studentInformationEntry.setRollNo(studentJsonObject.getString("RollNo"));
-            studentInformationEntry.setUserName(studentJsonObject.getString("UserName"));
-            studentInformationEntry.setGuardian(studentJsonObject.getString("Guardian"));
-            studentInformationEntry.setGuardianPhone(studentJsonObject.getString("GuardianPhone"));
-            studentInformationEntry.setGuardianEmailID(studentJsonObject.getString("GuardianEmailID"));
-            studentInformationEntry.setDOB(studentJsonObject.getString("DOB"));
-            studentInformationEntry.setPreAddress(studentJsonObject.getString("PreAddress"));
-            studentInformationEntry.setUserClassID(studentJsonObject.getString("UserClassID"));
-            studentInformationEntry.setUserID(studentJsonObject.getString("UserID"));
-            studentInformationEntry.setRFID(studentJsonObject.getString("RFID"));
-            studentInformationEntry.setStudentNo(studentJsonObject.getString("StudentNo"));
-            studentInformationEntry.setSectionID(studentJsonObject.getString("SectionID"));
-            studentInformationEntry.setClassID(studentJsonObject.getString("ClassID"));
-            studentInformationEntry.setBrunchID(studentJsonObject.getString("BrunchID"));
-            studentInformationEntry.setShiftID(studentJsonObject.getString("ShiftID"));
-            studentInformationEntry.setRemarks(studentJsonObject.getString("Remarks"));
-            studentInformationEntry.setInstituteID(studentJsonObject.getString("InstituteID"));
-            studentInformationEntry.setUserTypeID(studentJsonObject.getString("UserTypeID"));
-            studentInformationEntry.setGenderID(studentJsonObject.getString("GenderID"));
-            studentInformationEntry.setBloodGroupID(studentJsonObject.getString("BloodGroupID"));
-            studentInformationEntry.setReligionID(studentJsonObject.getString("ReligionID"));
-            studentInformationEntry.setSessionID(studentJsonObject.getString("SessionID"));
-            studentInformationEntry.setBoardID(studentJsonObject.getString("BoardID"));
-            studentInformationEntry.setPhoneNo(studentJsonObject.getString("PhoneNo"));
-            studentInformationEntry.setEmailID(studentJsonObject.getString("EmailID"));
-            studentInformationEntry.setFingerUrl(studentJsonObject.getString("FingerUrl"));
-            studentInformationEntry.setSignatureUrl(studentJsonObject.getString("SignatureUrl"));
-            studentInformationEntry.setMediumID(studentJsonObject.getString("MediumID"));
-            studentInformationEntry.setDepartmentID(studentJsonObject.getString("DepartmentID"));
-            studentInformationEntry.setIsImageCaptured(studentJsonObject.getBoolean("IsImageCaptured"));
-            studentInformationEntry.setImageUrl(studentJsonObject.getString("ImageUrl"));
-
-            t_roll.setText(studentJsonObject.getString("RollNo"));
-            t_name.setText(studentJsonObject.getString("UserName"));
-            t_section.setText(studentJsonObject.getString("SectionName"));
-            t_birthDay.setText(studentJsonObject.getString("DOB"));
-            t_email.setText(studentJsonObject.getString("GuardianEmailID"));
-            t_address.setText(studentJsonObject.getString("PreAddress"));
-            t_parent.setText(studentJsonObject.getString("Guardian"));
-            t_parentsPhone.setText(studentJsonObject.getString("GuardianPhone"));
-            t_department.setText(studentJsonObject.getString("DepartmentName"));
-            t_sex.setText(studentJsonObject.getString("Gender"));
-            t_religion.setText(studentJsonObject.getString("Religion"));
-            t_medium.setText(studentJsonObject.getString("MameName"));
-            t_session.setText(studentJsonObject.getString("SessionName"));
-            t_board.setText(studentJsonObject.getString("BoardName"));
-            t_class.setText(studentJsonObject.getString("ClassName"));
-            t_shift.setText(studentJsonObject.getString("ShiftName"));
-            t_rfid.setText(studentJsonObject.getString("RFID"));
-            t_studentNo.setText(studentJsonObject.getString("StudentNo"));
-            t_branch.setText(studentJsonObject.getString("BrunchName"));
-            t_stuEmail.setText(studentJsonObject.getString("EmailID"));
-            t_stuPhone.setText(studentJsonObject.getString("PhoneNo"));
-            t_remarks.setText(studentJsonObject.getString("Remarks"));
-            t_bloodGroup.setText(studentJsonObject.getString("BloodGroup"));
-
-            mStudentDataGetDialog.dismiss();
-        } catch (JSONException e) {
-            Toast.makeText(this,"WARNING!!! "+e,Toast.LENGTH_LONG).show();
-            mStudentDataGetDialog.dismiss();
-        }
-    }
-
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
 
         if (resultCode == Activity.RESULT_OK) {
@@ -1285,6 +1290,10 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
                     originalBitmap = getResizedBitmap(bitmap, 500);
                     tempBitmap = originalBitmap;
                     imageChanged = true;
+                    checkBox.setEnabled(true);
+                    rotateLeft.setEnabled(true);
+                    rotateRight.setEnabled(true);
+                    brightImageSeekBar.setEnabled(true);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -1300,6 +1309,10 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
                     originalBitmap = getResizedBitmap(bitmap, 500);
                     tempBitmap = originalBitmap;
                     imageChanged = true;
+                    checkBox.setEnabled(true);
+                    rotateLeft.setEnabled(true);
+                    rotateRight.setEnabled(true);
+                    brightImageSeekBar.setEnabled(true);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -1314,6 +1327,10 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
                 originalBitmap = getResizedBitmap(bitmap, 500);
                 tempBitmap = originalBitmap;
                 imageChanged = true;
+                checkBox.setEnabled(true);
+                rotateLeft.setEnabled(true);
+                rotateRight.setEnabled(true);
+                brightImageSeekBar.setEnabled(true);
                 try {
                     String ImagePath = MediaStore.Images.Media.insertImage(this.getContentResolver(), bitmap, "demo_image", "demo_image");
                     Uri URI = Uri.parse(ImagePath);
@@ -1606,189 +1623,381 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
         }
     }
 
-    private void ShiftDataGetRequest()
-    {
-        String shiftUrl = getString(R.string.baseUrlLocal)+"getInsShift/"+InstituteID;
-        mShiftDialog = new ProgressDialog(this);
-        mShiftDialog.setTitle("Loading...");
-        mShiftDialog.setMessage("Please Wait...");
-        mShiftDialog.setCancelable(false);
-        mShiftDialog.setIcon(R.drawable.onair);
-        mShiftDialog.show();
-        //Preparing Shift data from server
-        StringRequest stringShiftRequest = new StringRequest(Request.Method.GET, shiftUrl,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
+    private void ShiftDataGetRequest() {
+        if (isNetworkAvailable()) {
+            String shiftUrl = getString(R.string.baseUrl)+"/api/onEms/getInsShift/"+InstituteID;
 
-                        parseShiftJsonData(response);
+            mShiftDialog = new ProgressDialog(this);
+            mShiftDialog.setTitle("Loading...");
+            mShiftDialog.setMessage("Please Wait...");
+            mShiftDialog.setCancelable(false);
+            mShiftDialog.setIcon(R.drawable.onair);
+            mShiftDialog.show();
+            //Preparing Shift data from server
+            StringRequest stringShiftRequest = new StringRequest(Request.Method.GET, shiftUrl,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
 
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
+                            parseShiftJsonData(response);
 
-                mShiftDialog.dismiss();
-            }
-        })
-        {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String>  params = new HashMap<String, String>();
-                params.put("Authorization", "Request_From_onEMS_Android_app");
-                return params;
-            }
-        };
-        MySingleton.getInstance(this).addToRequestQueue(stringShiftRequest);
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    mShiftDialog.dismiss();
+                }
+            })
+            {
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    Map<String, String>  params = new HashMap<>();
+                    params.put("Authorization", "Request_From_onEMS_Android_app");
+                    return params;
+                }
+            };
+            MySingleton.getInstance(this).addToRequestQueue(stringShiftRequest);
+        } else {
+            Toast.makeText(StudentiCardDetailsEdit.this,"Please check your internet connection and select again!!! ",
+                    Toast.LENGTH_LONG).show();
+        }
     }
 
-    private void MediumDataGetRequest()
-    {
-        String mediumUrl = getString(R.string.baseUrlLocal)+"getInstituteMediumDdl/"+InstituteID;
-        mMediumDialog = new ProgressDialog(this);
-        mMediumDialog.setTitle("Loading...");
-        mMediumDialog.setMessage("Please Wait...");
-        mMediumDialog.setCancelable(false);
-        mMediumDialog.setIcon(R.drawable.onair);
-        mMediumDialog.show();
-        //Preparing Medium data from server
-        StringRequest stringMediumRequest = new StringRequest(Request.Method.GET, mediumUrl,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
+    private void MediumDataGetRequest() {
+        if(isNetworkAvailable()) {
+            String mediumUrl = getString(R.string.baseUrl)+"/api/onEms/getInstituteMediumDdl/"+InstituteID;
 
-                        parseMediumJsonData(response);
+            mMediumDialog = new ProgressDialog(this);
+            mMediumDialog.setTitle("Loading...");
+            mMediumDialog.setMessage("Please Wait...");
+            mMediumDialog.setCancelable(false);
+            mMediumDialog.setIcon(R.drawable.onair);
+            mMediumDialog.show();
+            //Preparing Medium data from server
+            StringRequest stringMediumRequest = new StringRequest(Request.Method.GET, mediumUrl,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
 
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
+                            parseMediumJsonData(response);
 
-                mMediumDialog.dismiss();
-            }
-        })
-        {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String>  params = new HashMap<String, String>();
-                params.put("Authorization", "Request_From_onEMS_Android_app");
-                return params;
-            }
-        };
-        MySingleton.getInstance(this).addToRequestQueue(stringMediumRequest);
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    mMediumDialog.dismiss();
+                }
+            })
+            {
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    Map<String, String>  params = new HashMap<>();
+                    params.put("Authorization", "Request_From_onEMS_Android_app");
+                    return params;
+                }
+            };
+            MySingleton.getInstance(this).addToRequestQueue(stringMediumRequest);
+        } else {
+            Toast.makeText(StudentiCardDetailsEdit.this,"Please check your internet connection and select again!!! ",
+                    Toast.LENGTH_LONG).show();
+        }
     }
 
-    private void ClassDataGetRequest()
-    {
-        CheckSelectedData();
-        String classUrl = getString(R.string.baseUrlLocal)+"MediumWiseClassDDL/"+InstituteID+"/"+selectedMedium.getMediumID();
-        mClassDialog = new ProgressDialog(this);
-        mClassDialog.setTitle("Loading...");
-        mClassDialog.setMessage("Please Wait...");
-        mClassDialog.setCancelable(false);
-        mClassDialog.setIcon(R.drawable.onair);
-        mClassDialog.show();
-        //Preparing claas data from server
-        StringRequest stringClassRequest = new StringRequest(Request.Method.GET, classUrl,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
+    private void ClassDataGetRequest() {
+        if(isNetworkAvailable()) {
 
-                        parseClassJsonData(response);
+            CheckSelectedData();
 
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
+            String classUrl = getString(R.string.baseUrl)+"/api/onEms/MediumWiseClassDDL/"+InstituteID+"/"+selectedMedium.getMediumID();
 
-                mClassDialog.dismiss();
-            }
-        })
-        {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String>  params = new HashMap<String, String>();
-                params.put("Authorization", "Request_From_onEMS_Android_app");
-                return params;
-            }
-        };
-        MySingleton.getInstance(this).addToRequestQueue(stringClassRequest);
+            mClassDialog = new ProgressDialog(this);
+            mClassDialog.setTitle("Loading...");
+            mClassDialog.setMessage("Please Wait...");
+            mClassDialog.setCancelable(false);
+            mClassDialog.setIcon(R.drawable.onair);
+            mClassDialog.show();
+            //Preparing claas data from server
+            StringRequest stringClassRequest = new StringRequest(Request.Method.GET, classUrl,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+
+                            parseClassJsonData(response);
+
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    mClassDialog.dismiss();
+                }
+            })
+            {
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    Map<String, String>  params = new HashMap<>();
+                    params.put("Authorization", "Request_From_onEMS_Android_app");
+                    return params;
+                }
+            };
+            MySingleton.getInstance(this).addToRequestQueue(stringClassRequest);
+        } else {
+            Toast.makeText(StudentiCardDetailsEdit.this,"Please check your internet connection and select again!!! ",
+                    Toast.LENGTH_LONG).show();
+        }
     }
 
-    private void DepartmentDataGetRequest()
-    {
-        CheckSelectedData();
-        String departmentUrl = getString(R.string.baseUrlLocal)+"ClassWiseDepartmentDDL/"+InstituteID+"/"+
-                selectedClass.getClassID()+"/"+selectedMedium.getMediumID();
-        mDepartmentDialog = new ProgressDialog(this);
-        mDepartmentDialog.setTitle("Loading...");
-        mDepartmentDialog.setMessage("Please Wait...");
-        mDepartmentDialog.setCancelable(false);
-        mDepartmentDialog.setIcon(R.drawable.onair);
-        mDepartmentDialog.show();
-        //Preparing Department data from server
-        StringRequest stringDepartmentRequest = new StringRequest(Request.Method.GET, departmentUrl,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
+    private void DepartmentDataGetRequest() {
+        if(isNetworkAvailable()) {
 
-                        parseDepartmentJsonData(response);
+            CheckSelectedData();
 
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
+            String departmentUrl = getString(R.string.baseUrl)+"/api/onEms/ClassWiseDepartmentDDL/"+InstituteID+"/"+
+                    selectedClass.getClassID()+"/"+selectedMedium.getMediumID();
 
-                mDepartmentDialog.dismiss();
-            }
-        })
-        {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String>  params = new HashMap<String, String>();
-                params.put("Authorization", "Request_From_onEMS_Android_app");
-                return params;
-            }
-        };
-        MySingleton.getInstance(this).addToRequestQueue(stringDepartmentRequest);
+            mDepartmentDialog = new ProgressDialog(this);
+            mDepartmentDialog.setTitle("Loading...");
+            mDepartmentDialog.setMessage("Please Wait...");
+            mDepartmentDialog.setCancelable(false);
+            mDepartmentDialog.setIcon(R.drawable.onair);
+            mDepartmentDialog.show();
+            //Preparing Department data from server
+            StringRequest stringDepartmentRequest = new StringRequest(Request.Method.GET, departmentUrl,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+
+                            parseDepartmentJsonData(response);
+
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    mDepartmentDialog.dismiss();
+                }
+            })
+            {
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    Map<String, String>  params = new HashMap<>();
+                    params.put("Authorization", "Request_From_onEMS_Android_app");
+                    return params;
+                }
+            };
+            MySingleton.getInstance(this).addToRequestQueue(stringDepartmentRequest);
+        } else {
+            Toast.makeText(StudentiCardDetailsEdit.this,"Please check your internet connection and select again!!! ",
+                    Toast.LENGTH_LONG).show();
+        }
     }
 
-    private void SectionDataGetRequest()
-    {
-        CheckSelectedData();
-        String sectionUrl = getString(R.string.baseUrlLocal)+"getInsSection/"+InstituteID+"/"+
-                selectedClass.getClassID()+"/"+selectedDepartment.getDepartmentID();
-        mSectionDialog = new ProgressDialog(this);
-        mSectionDialog.setTitle("Loading...");
-        mSectionDialog.setMessage("Please Wait...");
-        mSectionDialog.setCancelable(false);
-        mSectionDialog.setIcon(R.drawable.onair);
-        mSectionDialog.show();
-        //Preparing section data from server
-        StringRequest stringSectionRequest = new StringRequest(Request.Method.GET, sectionUrl,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
+    private void SectionDataGetRequest() {
+        if(isNetworkAvailable()) {
 
-                        parseSectionJsonData(response);
+            CheckSelectedData();
 
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
+            String sectionUrl = getString(R.string.baseUrl)+"/api/onEms/getInsSection/"+InstituteID+"/"+
+                    selectedClass.getClassID()+"/"+selectedDepartment.getDepartmentID();
 
-                mSectionDialog.dismiss();
-            }
-        })
-        {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String>  params = new HashMap<String, String>();
-                params.put("Authorization", "Request_From_onEMS_Android_app");
-                return params;
-            }
-        };
-        MySingleton.getInstance(this).addToRequestQueue(stringSectionRequest);
+            mSectionDialog = new ProgressDialog(this);
+            mSectionDialog.setTitle("Loading...");
+            mSectionDialog.setMessage("Please Wait...");
+            mSectionDialog.setCancelable(false);
+            mSectionDialog.setIcon(R.drawable.onair);
+            mSectionDialog.show();
+            //Preparing section data from server
+            StringRequest stringSectionRequest = new StringRequest(Request.Method.GET, sectionUrl,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+
+                            parseSectionJsonData(response);
+
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    mSectionDialog.dismiss();
+                }
+            })
+            {
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    Map<String, String>  params = new HashMap<>();
+                    params.put("Authorization", "Request_From_onEMS_Android_app");
+                    return params;
+                }
+            };
+            MySingleton.getInstance(this).addToRequestQueue(stringSectionRequest);
+        } else {
+            Toast.makeText(StudentiCardDetailsEdit.this,"Please check your internet connection and select again!!! ",
+                    Toast.LENGTH_LONG).show();
+        }
+    }
+
+    public void StudentDataGetRequest(){
+        if(isNetworkAvailable()) {
+
+            String studentDataGetUrl = getString(R.string.baseUrl)+"/api/onEms/getStudent"+"/"+InstituteID+"/"+
+                    selected_Class+"/"+selected_Section+"/"+
+                    selected_Department+"/"+selected_Medium+"/"+selected_Shift+"/"+UserID;
+            mStudentDataGetDialog = new ProgressDialog(this);
+            mStudentDataGetDialog.setTitle("Loading...");
+            mStudentDataGetDialog.setMessage("Please Wait...");
+            mStudentDataGetDialog.setCancelable(false);
+            mStudentDataGetDialog.setIcon(R.drawable.onair);
+            mStudentDataGetDialog.show();
+            //Preparing Student data from server
+            StringRequest stringStudentRequest = new StringRequest(Request.Method.GET, studentDataGetUrl,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+
+                            parseStudentJsonData(response);
+
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+
+                    mStudentDataGetDialog.dismiss();
+                }
+            })
+            {
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    Map<String, String>  params = new HashMap<String, String>();
+                    params.put("Authorization", "Request_From_onEMS_Android_app");
+                    return params;
+                }
+            };
+            MySingleton.getInstance(this).addToRequestQueue(stringStudentRequest);
+        } else {
+            Toast.makeText(StudentiCardDetailsEdit.this,"Please check your internet connection!!! ",
+                    Toast.LENGTH_LONG).show();
+        }
+    }
+
+    public void GenderDataGetRequest(){
+        if(isNetworkAvailable()) {
+
+            String genderUrl = getString(R.string.baseUrl)+"/api/onEms/getallgender";
+            mGenderDialog = new ProgressDialog(this);
+            mGenderDialog.setTitle("Loading...");
+            mGenderDialog.setMessage("Please Wait...");
+            mGenderDialog.setCancelable(false);
+            mGenderDialog.setIcon(R.drawable.onair);
+            mGenderDialog.show();
+            //Preparing Gender data from server
+            StringRequest stringGenderRequest = new StringRequest(Request.Method.GET, genderUrl,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+
+                            parseGenderJsonData(response);
+
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+
+                    mGenderDialog.dismiss();
+                }
+            })
+            {
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    Map<String, String>  params = new HashMap<>();
+                    params.put("Authorization", "Request_From_onEMS_Android_app");
+                    return params;
+                }
+            };
+            MySingleton.getInstance(this).addToRequestQueue(stringGenderRequest);
+        } else {
+            Toast.makeText(StudentiCardDetailsEdit.this,"Please check your internet connection!!! ",
+                    Toast.LENGTH_LONG).show();
+        }
+    }
+
+    public void ReligionDataGetRequest(){
+        if(isNetworkAvailable()) {
+
+            String religionUrl = getString(R.string.baseUrl)+"/api/onEms/getreligion";
+            mReligionDialog = new ProgressDialog(this);
+            mReligionDialog.setTitle("Loading...");
+            mReligionDialog.setMessage("Please Wait...");
+            mReligionDialog.setCancelable(false);
+            mReligionDialog.setIcon(R.drawable.onair);
+            mReligionDialog.show();
+            //Preparing Religion data from server
+            StringRequest stringReligionRequest = new StringRequest(Request.Method.GET, religionUrl,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+
+                            parseReligionJsonData(response);
+
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+
+                    mReligionDialog.dismiss();
+                }
+            })
+            {
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    Map<String, String>  params = new HashMap<>();
+                    params.put("Authorization", "Request_From_onEMS_Android_app");
+                    return params;
+                }
+            };
+            MySingleton.getInstance(this).addToRequestQueue(stringReligionRequest);
+        } else {
+            Toast.makeText(StudentiCardDetailsEdit.this,"Please check your internet connection!!! ",
+                    Toast.LENGTH_LONG).show();
+        }
+    }
+
+    public void BloodGroupDataGetRequest(){
+        if(isNetworkAvailable()) {
+
+            String bloodGroupUrl = getString(R.string.baseUrl)+"/api/onEms/getbloodgroups";
+            mBloodGroupDialog = new ProgressDialog(this);
+            mBloodGroupDialog.setTitle("Loading...");
+            mBloodGroupDialog.setMessage("Please Wait...");
+            mBloodGroupDialog.setCancelable(false);
+            mBloodGroupDialog.setIcon(R.drawable.onair);
+            mBloodGroupDialog.show();
+            //Preparing Blood Group data from server
+            StringRequest stringBloodGroupRequest = new StringRequest(Request.Method.GET, bloodGroupUrl,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+
+                            parseBloodGroupJsonData(response);
+
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+
+                    mBloodGroupDialog.dismiss();
+                }
+            })
+            {
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    Map<String, String>  params = new HashMap<>();
+                    params.put("Authorization", "Request_From_onEMS_Android_app");
+                    return params;
+                }
+            };
+            MySingleton.getInstance(this).addToRequestQueue(stringBloodGroupRequest);
+        } else {
+            Toast.makeText(StudentiCardDetailsEdit.this,"Please check your internet connection!!! ",
+                    Toast.LENGTH_LONG).show();
+        }
     }
 
     private void CheckSelectedData(){
@@ -1814,150 +2023,5 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
         }
     }
 
-    public void StudentDataGetRequest(){
-
-        String studentDataGetUrl = getString(R.string.baseUrlLocal)+"getStudent"+"/"+InstituteID+"/"+
-                selected_Class+"/"+selected_Section+"/"+
-                selected_Department+"/"+selected_Medium+"/"+selected_Shift+"/"+UserID;
-        mStudentDataGetDialog = new ProgressDialog(this);
-        mStudentDataGetDialog.setTitle("Loading...");
-        mStudentDataGetDialog.setMessage("Please Wait...");
-        mStudentDataGetDialog.setCancelable(false);
-        mStudentDataGetDialog.setIcon(R.drawable.onair);
-        mStudentDataGetDialog.show();
-        //Preparing Student data from server
-        StringRequest stringStudentRequest = new StringRequest(Request.Method.GET, studentDataGetUrl,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-
-                        parseStudentJsonData(response);
-
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-
-                mStudentDataGetDialog.dismiss();
-            }
-        })
-        {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String>  params = new HashMap<String, String>();
-                params.put("Authorization", "Request_From_onEMS_Android_app");
-                return params;
-            }
-        };
-        MySingleton.getInstance(this).addToRequestQueue(stringStudentRequest);
-    }
-
-    public void GenderDataGetRequest(){
-
-        String genderUrl = getString(R.string.baseUrlLocal)+"getallgender";
-        mGenderDialog = new ProgressDialog(this);
-        mGenderDialog.setTitle("Loading...");
-        mGenderDialog.setMessage("Please Wait...");
-        mGenderDialog.setCancelable(false);
-        mGenderDialog.setIcon(R.drawable.onair);
-        mGenderDialog.show();
-        //Preparing Gender data from server
-        StringRequest stringGenderRequest = new StringRequest(Request.Method.GET, genderUrl,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-
-                        parseGenderJsonData(response);
-
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-
-                mGenderDialog.dismiss();
-            }
-        })
-        {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String>  params = new HashMap<String, String>();
-                params.put("Authorization", "Request_From_onEMS_Android_app");
-                return params;
-            }
-        };
-        MySingleton.getInstance(this).addToRequestQueue(stringGenderRequest);
-    }
-
-    public void ReligionDataGetRequest(){
-
-        String religionUrl = getString(R.string.baseUrlLocal)+"getreligion";
-        mReligionDialog = new ProgressDialog(this);
-        mReligionDialog.setTitle("Loading...");
-        mReligionDialog.setMessage("Please Wait...");
-        mReligionDialog.setCancelable(false);
-        mReligionDialog.setIcon(R.drawable.onair);
-        mReligionDialog.show();
-        //Preparing Religion data from server
-        StringRequest stringReligionRequest = new StringRequest(Request.Method.GET, religionUrl,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-
-                        parseReligionJsonData(response);
-
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-
-                mReligionDialog.dismiss();
-            }
-        })
-        {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String>  params = new HashMap<String, String>();
-                params.put("Authorization", "Request_From_onEMS_Android_app");
-                return params;
-            }
-        };
-        MySingleton.getInstance(this).addToRequestQueue(stringReligionRequest);
-    }
-
-    public void BloodGroupDataGetRequest(){
-
-        String bloodGroupUrl = getString(R.string.baseUrlLocal)+"getbloodgroups";
-        mBloodGroupDialog = new ProgressDialog(this);
-        mBloodGroupDialog.setTitle("Loading...");
-        mBloodGroupDialog.setMessage("Please Wait...");
-        mBloodGroupDialog.setCancelable(false);
-        mBloodGroupDialog.setIcon(R.drawable.onair);
-        mBloodGroupDialog.show();
-        //Preparing Blood Group data from server
-        StringRequest stringBloodGroupRequest = new StringRequest(Request.Method.GET, bloodGroupUrl,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-
-                        parseBloodGroupJsonData(response);
-
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-
-                mBloodGroupDialog.dismiss();
-            }
-        })
-        {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String>  params = new HashMap<String, String>();
-                params.put("Authorization", "Request_From_onEMS_Android_app");
-                return params;
-            }
-        };
-        MySingleton.getInstance(this).addToRequestQueue(stringBloodGroupRequest);
-    }
 
 }

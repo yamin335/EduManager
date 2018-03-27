@@ -44,7 +44,6 @@ import onair.onems.network.MySingleton;
 
 public class ReportAllStudentList extends AppCompatActivity implements ReportAllStudentShowListAdapter.ReportAllStudentShowListAdapterListener{
 
-    private long InstituteID, MediumID, ShiftID, ClassID, SectionID, DepertmentID;
     private ProgressDialog dialog;
     private RecyclerView recyclerView;
     private ArrayList<ReportAllStudentRowModel> studentList;
@@ -68,11 +67,6 @@ public class ReportAllStudentList extends AppCompatActivity implements ReportAll
             }
         });
 
-        if(!isNetworkAvailable())
-        {
-            Toast.makeText(ReportAllStudentList.this,"Please check your internet connection and open app again!!! ",Toast.LENGTH_LONG).show();
-        }
-
         recyclerView = (RecyclerView)findViewById(R.id.recycler_view);
         studentList = new ArrayList<>();
         mAdapter = new ReportAllStudentShowListAdapter(this, studentList, this);
@@ -81,17 +75,18 @@ public class ReportAllStudentList extends AppCompatActivity implements ReportAll
         dialog.setTitle("Loading...");
         dialog.setMessage("Please Wait...");
         dialog.setCancelable(false);
+        dialog.setIcon(R.drawable.onair);
         dialog.show();
 
         Bundle StudentSelection = getIntent().getExtras();
-        InstituteID = StudentSelection.getLong("InstituteID",0);
-        MediumID = StudentSelection.getLong("MediumID",0);
-        ShiftID = StudentSelection.getLong("ShiftID",0);
-        ClassID = StudentSelection.getLong("ClassID",0);
-        SectionID = StudentSelection.getLong("SectionID",0);
-        DepertmentID = StudentSelection.getLong("DepertmentID",0);
+        long InstituteID = StudentSelection.getLong("InstituteID",0);
+        long MediumID = StudentSelection.getLong("MediumID",0);
+        long ShiftID = StudentSelection.getLong("ShiftID",0);
+        long ClassID = StudentSelection.getLong("ClassID",0);
+        long SectionID = StudentSelection.getLong("SectionID",0);
+        long DepertmentID = StudentSelection.getLong("DepertmentID",0);
 
-        studentUrl = getString(R.string.baseUrlLocal)+"getStudent"+"/"+InstituteID+"/"+
+        studentUrl = getString(R.string.baseUrl)+"/api/onEms/getStudent"+"/"+InstituteID+"/"+
                 ClassID+"/"+SectionID+"/"+DepertmentID+"/"+MediumID+"/"+ShiftID+"/"+"0";
 
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this);
@@ -99,7 +94,6 @@ public class ReportAllStudentList extends AppCompatActivity implements ReportAll
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(mAdapter);
 
-        dialog.show();
         StudentDataGetRequest();
     }
 
@@ -197,60 +191,70 @@ public class ReportAllStudentList extends AppCompatActivity implements ReportAll
     }
 
     public void RefreshStudentList(){
-        ClearStudentList();
-        //Preparing Student data from server
-        StringRequest stringStudentRequest = new StringRequest(Request.Method.GET, studentUrl,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
+        if(isNetworkAvailable()) {
+            ClearStudentList();
+            //Preparing Student data from server
+            StringRequest stringStudentRequest = new StringRequest(Request.Method.GET, studentUrl,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
 
-                        parseStudentJsonData(response);
-                        mSwipeRefreshLayout.setRefreshing(false);
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
+                            parseStudentJsonData(response);
+                            mSwipeRefreshLayout.setRefreshing(false);
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
 
-                mSwipeRefreshLayout.setRefreshing(false);
-            }
-        })
-        {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String>  params = new HashMap<String, String>();
-                params.put("Authorization", "Request_From_onEMS_Android_app");
-                return params;
-            }
-        };
-        MySingleton.getInstance(this).addToRequestQueue(stringStudentRequest);
+                    mSwipeRefreshLayout.setRefreshing(false);
+                }
+            })
+            {
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    Map<String, String>  params = new HashMap<>();
+                    params.put("Authorization", "Request_From_onEMS_Android_app");
+                    return params;
+                }
+            };
+            MySingleton.getInstance(this).addToRequestQueue(stringStudentRequest);
+        } else {
+            Toast.makeText(ReportAllStudentList.this,"Please check your internet connection!!! ",
+                    Toast.LENGTH_LONG).show();
+        }
     }
 
     public void StudentDataGetRequest(){
-        //Preparing Student data from server
-        StringRequest stringStudentRequest = new StringRequest(Request.Method.GET, studentUrl,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
+        if(isNetworkAvailable()) {
+            //Preparing Student data from server
+            StringRequest stringStudentRequest = new StringRequest(Request.Method.GET, studentUrl,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
 
-                        parseStudentJsonData(response);
+                            parseStudentJsonData(response);
 
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
 
-                dialog.dismiss();
-            }
-        })
-        {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String>  params = new HashMap<String, String>();
-                params.put("Authorization", "Request_From_onEMS_Android_app");
-                return params;
-            }
-        };
-        MySingleton.getInstance(this).addToRequestQueue(stringStudentRequest);
+                    dialog.dismiss();
+                }
+            })
+            {
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    Map<String, String>  params = new HashMap<>();
+                    params.put("Authorization", "Request_From_onEMS_Android_app");
+                    return params;
+                }
+            };
+            MySingleton.getInstance(this).addToRequestQueue(stringStudentRequest);
+        } else {
+            Toast.makeText(ReportAllStudentList.this,"Please check your internet connection!!! ",
+                    Toast.LENGTH_LONG).show();
+        }
     }
 
     public void ClearStudentList(){

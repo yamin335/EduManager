@@ -99,6 +99,8 @@ public class StudentiCardDetails extends AppCompatActivity {
     private RotateProcessTask mRotateProcessTask = null;
     private boolean imageChanged = false;
     private ProgressBar progressBar;
+    private Button rotateLeft, rotateRight;
+    private SeekBar brightImageSeekBar;
 
     @Override
     public void onResume() {
@@ -117,11 +119,12 @@ public class StudentiCardDetails extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.icard_student_details);
 
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        InstituteID = prefs.getLong("InstituteID",0);
+
         Intent intent = getIntent();
         Bundle bundle = intent.getExtras();
 
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        InstituteID = prefs.getLong("InstituteID",0);
         selectedClass = bundle.getString("ClassID");
         selectedShift = bundle.getString("ShiftID");
         selectedSection = bundle.getString("SectionID");
@@ -129,24 +132,20 @@ public class StudentiCardDetails extends AppCompatActivity {
         selectedDepartment = bundle.getString("DepartmentID");
         UserID = bundle.getString("UserID");
 
-        Button rotateLeft = (Button)findViewById(R.id.rotateLeft);
-        Button rotateRight = (Button)findViewById(R.id.rotateRight);
+        rotateLeft = (Button)findViewById(R.id.rotateLeft);
+        rotateRight = (Button)findViewById(R.id.rotateRight);
+        Button updateStudentPhoto = (Button)findViewById(R.id.updatephoto);
+        Button cameraButton=(Button)findViewById(R.id.camera);
+        Button searchButton=(Button) findViewById(R.id.browse);
 
-        SeekBar brightImageSeekBar = (SeekBar)findViewById(R.id.brightness);
+        brightImageSeekBar = (SeekBar)findViewById(R.id.brightness);
         brightImageSeekBar.setProgress(100);
         progressBar = (ProgressBar)findViewById(R.id.spin_kit);
-
         mCropImageView = (CropImageView)findViewById(R.id.CropImageView);
         mCropImageView.setAspectRatio(1,1);
         mCropImageView.setAutoZoomEnabled(true);
         mCropImageView.setFixedAspectRatio(true);
-
-        Button updateStudentPhoto = (Button)findViewById(R.id.updatephoto);
-
         checkBox = (CheckBox)findViewById(R.id.checkbox);
-
-        Button cameraButton=(Button)findViewById(R.id.camera);
-        Button searchButton=(Button) findViewById(R.id.browse);
 
         t_roll = (TextView)findViewById(R.id.roll);
         t_name = (TextView)findViewById(R.id.name);
@@ -171,6 +170,11 @@ public class StudentiCardDetails extends AppCompatActivity {
         t_studentNo = (TextView)findViewById(R.id.studentNo);
         t_rfid = (TextView)findViewById(R.id.rfid);
 
+        rotateLeft.setEnabled(false);
+        rotateRight.setEnabled(false);
+        brightImageSeekBar.setEnabled(false);
+        checkBox.setEnabled(false);
+
         StudentDataGetRequest();
 
         cameraButton.setOnClickListener(new View.OnClickListener() {
@@ -192,60 +196,42 @@ public class StudentiCardDetails extends AppCompatActivity {
             }
         });
 
-        checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
-        {
+        checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
-            {
-                if (originalBitmap != null)
-                {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (originalBitmap != null) {
                     imageChanged = true;
                 }
-
             }
         });
 
         rotateLeft.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(originalBitmap != null)
-                {
-                    mRotateDialog = new ProgressDialog(StudentiCardDetails.this);
-                    mRotateDialog.setTitle("Loading...");
-                    mRotateDialog.setMessage("Please Wait...");
-                    mRotateDialog.setCancelable(false);
-                    mRotateDialog.setIcon(R.drawable.onair);
-                    mRotateDialog.show();
-                    imageChanged = true;
-                    mRotateProcessTask = new RotateProcessTask(originalBitmap, -90);
-                    mRotateProcessTask.execute((Void) null);
-                }
-                else
-                {
-                    Toast.makeText(StudentiCardDetails.this,"No image found!!!",Toast.LENGTH_LONG).show();
-                }
+                mRotateDialog = new ProgressDialog(StudentiCardDetails.this);
+                mRotateDialog.setTitle("Loading...");
+                mRotateDialog.setMessage("Please Wait...");
+                mRotateDialog.setCancelable(false);
+                mRotateDialog.setIcon(R.drawable.onair);
+                mRotateDialog.show();
+                imageChanged = true;
+                mRotateProcessTask = new RotateProcessTask(originalBitmap, -90);
+                mRotateProcessTask.execute((Void) null);
             }
         });
 
         rotateRight.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(originalBitmap != null)
-                {
-                    mRotateDialog = new ProgressDialog(StudentiCardDetails.this);
-                    mRotateDialog.setTitle("Loading...");
-                    mRotateDialog.setMessage("Please Wait...");
-                    mRotateDialog.setCancelable(false);
-                    mRotateDialog.setIcon(R.drawable.onair);
-                    mRotateDialog.show();
-                    imageChanged = true;
-                    mRotateProcessTask = new RotateProcessTask(originalBitmap, 90);
-                    mRotateProcessTask.execute((Void) null);
-                }
-                else
-                {
-                    Toast.makeText(StudentiCardDetails.this,"No image found!!!",Toast.LENGTH_LONG).show();
-                }
+                mRotateDialog = new ProgressDialog(StudentiCardDetails.this);
+                mRotateDialog.setTitle("Loading...");
+                mRotateDialog.setMessage("Please Wait...");
+                mRotateDialog.setCancelable(false);
+                mRotateDialog.setIcon(R.drawable.onair);
+                mRotateDialog.show();
+                imageChanged = true;
+                mRotateProcessTask = new RotateProcessTask(originalBitmap, 90);
+                mRotateProcessTask.execute((Void) null);
             }
         });
 
@@ -262,59 +248,43 @@ public class StudentiCardDetails extends AppCompatActivity {
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                if(originalBitmap != null)
-                {
-                    mBrightnessDialog = new ProgressDialog(StudentiCardDetails.this);
-                    mBrightnessDialog.setTitle("Loading...");
-                    mBrightnessDialog.setMessage("Please Wait...");
-                    mBrightnessDialog.setCancelable(false);
-                    mBrightnessDialog.setIcon(R.drawable.onair);
-                    mBrightnessDialog.show();
-                    imageChanged = true;
-                    mBrightnessProcessTask = new BrightnessProcessTask(originalBitmap, brightnessValue);
-                    mBrightnessProcessTask.execute((Void) null);
-                }
-                else
-                {
-                    Toast.makeText(StudentiCardDetails.this,"No image found!!!",Toast.LENGTH_LONG).show();
-                }
+                mBrightnessDialog = new ProgressDialog(StudentiCardDetails.this);
+                mBrightnessDialog.setTitle("Loading...");
+                mBrightnessDialog.setMessage("Please Wait...");
+                mBrightnessDialog.setCancelable(false);
+                mBrightnessDialog.setIcon(R.drawable.onair);
+                mBrightnessDialog.show();
+                imageChanged = true;
+                mBrightnessProcessTask = new BrightnessProcessTask(originalBitmap, brightnessValue);
+                mBrightnessProcessTask.execute((Void) null);
             }
         });
 
         updateStudentPhoto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(isNetworkAvailable())
-                {
-                    if(imageChanged)
-                    {
+                if(isNetworkAvailable()) {
+                    if(imageChanged) {
                         mStudentDataPostDialog = new ProgressDialog(StudentiCardDetails.this);
                         mStudentDataPostDialog.setTitle("Loading...");
                         mStudentDataPostDialog.setMessage("Please Wait...");
                         mStudentDataPostDialog.setCancelable(false);
                         mStudentDataPostDialog.setIcon(R.drawable.onair);
                         mStudentDataPostDialog.show();
-                        if(checkBox.isChecked())
-                        {
+                        if(checkBox.isChecked()) {
                             tempBitmap = mCropImageView.getCroppedImage(500, 500);
                             mCropImageView.setImageBitmap(tempBitmap);
                             fileFromBitmap = new StudentiCardDetails.FileFromBitmap(tempBitmap, StudentiCardDetails.this);
                             fileFromBitmap.execute();
-                        }
-                        else
-                        {
+                        } else {
                             fileFromBitmap = new StudentiCardDetails.FileFromBitmap(tempBitmap, StudentiCardDetails.this);
                             fileFromBitmap.execute();
                         }
-                    }
-                    else
-                    {
+                    } else {
                         mStudentDataPostDialog.dismiss();
                         Toast.makeText(StudentiCardDetails.this,"Take or choose a photo to update!!!",Toast.LENGTH_LONG).show();
                     }
-                }
-                else
-                {
+                } else {
                     Toast.makeText(StudentiCardDetails.this,"Please check your INTERNET connection!!!",Toast.LENGTH_LONG).show();
                 }
             }
@@ -356,10 +326,8 @@ public class StudentiCardDetails extends AppCompatActivity {
                 mStudentDataPostDialog.dismiss();
                 e.printStackTrace();
             }
-
             return null;
         }
-
 
         @Override
         protected void onPostExecute(String s) {
@@ -368,7 +336,7 @@ public class StudentiCardDetails extends AppCompatActivity {
             // update your UI or take action after
             // exp; make progressbar gone
             Ion.with(getApplicationContext())
-                    .load(getString(R.string.baseUrlLocal)+"Mobile/uploads")
+                    .load(getString(R.string.baseUrl)+"/api/onEms/Mobile/uploads")
                     .progressDialog(mStudentDataPostDialog)
                     .setMultipartParameter("name", "source")
                     .setMultipartFile("file", "image/jpeg", file)
@@ -396,9 +364,8 @@ public class StudentiCardDetails extends AppCompatActivity {
         }
     }
 
-    public void postUsingVolley(String json)
-    {
-        String studentDataPostUrl = getString(R.string.baseUrlLocal)+"setStudentBasicInfo";
+    public void postUsingVolley(String json) {
+        String studentDataPostUrl = getString(R.string.baseUrl)+"/api/onEms/setStudentBasicInfo";
         try {
             jsonObjectStudentData = new JSONObject(json);
         } catch (JSONException e) {
@@ -447,7 +414,7 @@ public class StudentiCardDetails extends AppCompatActivity {
             }
             GlideApp.with(this)
                     .asBitmap()
-                    .load(getString(R.string.baseUrlRaw)+studentJsonObject.getString("ImageUrl").replace("\\","/"))
+                    .load(getString(R.string.baseUrl)+"/"+studentJsonObject.getString("ImageUrl").replace("\\","/"))
                     .diskCacheStrategy(DiskCacheStrategy.NONE)
                     .skipMemoryCache(true)
                     .into(new SimpleTarget<Bitmap>() {
@@ -457,6 +424,12 @@ public class StudentiCardDetails extends AppCompatActivity {
                             originalBitmap = resource;
                             tempBitmap = resource;
                             progressBar.setVisibility(View.GONE);
+                            if(resource != null) {
+                                checkBox.setEnabled(true);
+                                rotateLeft.setEnabled(true);
+                                rotateRight.setEnabled(true);
+                                brightImageSeekBar.setEnabled(true);
+                            }
                         }
                         @Override
                         public void onLoadFailed(Drawable errorDrawable) {
@@ -486,6 +459,10 @@ public class StudentiCardDetails extends AppCompatActivity {
             studentInformationEntry.setInstituteID(studentJsonObject.getString("InstituteID"));
             studentInformationEntry.setUserTypeID(studentJsonObject.getString("UserTypeID"));
             studentInformationEntry.setGenderID(studentJsonObject.getString("GenderID"));
+            studentInformationEntry.setBloodGroupID(studentJsonObject.getString("BloodGroupID"));
+            studentInformationEntry.setReligionID(studentJsonObject.getString("ReligionID"));
+            studentInformationEntry.setSessionID(studentJsonObject.getString("SessionID"));
+            studentInformationEntry.setBoardID(studentJsonObject.getString("BoardID"));
             studentInformationEntry.setPhoneNo(studentJsonObject.getString("PhoneNo"));
             studentInformationEntry.setEmailID(studentJsonObject.getString("EmailID"));
             studentInformationEntry.setFingerUrl(studentJsonObject.getString("FingerUrl"));
@@ -494,6 +471,51 @@ public class StudentiCardDetails extends AppCompatActivity {
             studentInformationEntry.setDepartmentID(studentJsonObject.getString("DepartmentID"));
             studentInformationEntry.setIsImageCaptured(studentJsonObject.getBoolean("IsImageCaptured"));
             studentInformationEntry.setImageUrl(studentJsonObject.getString("ImageUrl"));
+            studentInformationEntry.setUserNo(studentJsonObject.getString("UserNo"));
+            studentInformationEntry.setUserTitleID(studentJsonObject.getString("UserTitleID"));
+            studentInformationEntry.setUserFirstName(studentJsonObject.getString("UserFirstName"));
+            studentInformationEntry.setUserMiddleName(studentJsonObject.getString("UserMiddleName"));
+            studentInformationEntry.setUserLastName(studentJsonObject.getString("UserLastName"));
+            studentInformationEntry.setNickName(studentJsonObject.getString("NickName"));
+            studentInformationEntry.setSkypeID(studentJsonObject.getString("SkypeID"));
+            studentInformationEntry.setFacebookID(studentJsonObject.getString("FacebookID"));
+            studentInformationEntry.setWhatsApp(studentJsonObject.getString("WhatsApp"));
+            studentInformationEntry.setViber(studentJsonObject.getString("Viber"));
+            studentInformationEntry.setLinkedIN(studentJsonObject.getString("LinkedIN"));
+            studentInformationEntry.setParAddress(studentJsonObject.getString("ParAddress"));
+            studentInformationEntry.setParThana(studentJsonObject.getString("ParThana"));
+            studentInformationEntry.setParPostCode(studentJsonObject.getString("ParPostCode"));
+            studentInformationEntry.setParCountryID(studentJsonObject.getString("ParCountryID"));
+            studentInformationEntry.setParStateID(studentJsonObject.getString("ParStateID"));
+            studentInformationEntry.setParCityID(studentJsonObject.getString("ParCityID"));
+            studentInformationEntry.setPreThana(studentJsonObject.getString("PreThana"));
+            studentInformationEntry.setPrePostCode(studentJsonObject.getString("PrePostCode"));
+            studentInformationEntry.setPreCountryID(studentJsonObject.getString("PreCountryID"));
+            studentInformationEntry.setPreStateID(studentJsonObject.getString("PreStateID"));
+            studentInformationEntry.setPreCityID(studentJsonObject.getString("PreCityID"));
+            studentInformationEntry.setMobileNo(studentJsonObject.getString("MobileNo"));
+            studentInformationEntry.setUniqueIdentity(studentJsonObject.getString("UniqueIdentity"));
+            studentInformationEntry.setBloodGroupID(studentJsonObject.getString("BloodGroupID"));
+            studentInformationEntry.setWeigth(studentJsonObject.getString("Weigth"));
+            studentInformationEntry.setHeight(studentJsonObject.getString("Height"));
+            studentInformationEntry.setBirthCertificate(studentJsonObject.getString("BirthCertificate"));
+            studentInformationEntry.setPassportNO(studentJsonObject.getString("PassportNO"));
+            studentInformationEntry.setNID(studentJsonObject.getString("NID"));
+            studentInformationEntry.setIsActive(studentJsonObject.getString("IsActive"));
+            studentInformationEntry.setStatusID(studentJsonObject.getString("StatusID"));
+            studentInformationEntry.setGuardianMobileNo(studentJsonObject.getString("GuardianMobileNo"));
+            studentInformationEntry.setGuardianUserFirstName(studentJsonObject.getString("GuardianUserFirstName"));
+            studentInformationEntry.setGuardianUserMiddleName(studentJsonObject.getString("GuardianUserMiddleName"));
+            studentInformationEntry.setGuardianUserLastName(studentJsonObject.getString("GuardianUserLastName"));
+            studentInformationEntry.setGuardianNickName(studentJsonObject.getString("GuardianNickName"));
+            studentInformationEntry.setGuardianUniqueIdentity(studentJsonObject.getString("GuardianUniqueIdentity"));
+            studentInformationEntry.setGuardianBloodGroupID(studentJsonObject.getString("GuardianBloodGroupID"));
+            studentInformationEntry.setGuardianPassportNO(studentJsonObject.getString("GuardianPassportNO"));
+            studentInformationEntry.setGuardianNID(studentJsonObject.getString("GuardianNID"));
+            studentInformationEntry.setRelationID(studentJsonObject.getString("RelationID"));
+            studentInformationEntry.setIsLocalGuardian(studentJsonObject.getString("IsLocalGuardian"));
+            studentInformationEntry.setIsActiveFamily(studentJsonObject.getString("IsActiveFamily"));
+            studentInformationEntry.setIsActiveStudent(studentJsonObject.getString("IsActiveStudent"));
 
             t_roll.setText(studentJsonObject.getString("RollNo"));
             t_name.setText(studentJsonObject.getString("UserName"));
@@ -546,6 +568,10 @@ public class StudentiCardDetails extends AppCompatActivity {
                     originalBitmap = getResizedBitmap(bitmap, 500);
                     tempBitmap = originalBitmap;
                     imageChanged = true;
+                    checkBox.setEnabled(true);
+                    rotateLeft.setEnabled(true);
+                    rotateRight.setEnabled(true);
+                    brightImageSeekBar.setEnabled(true);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -561,6 +587,10 @@ public class StudentiCardDetails extends AppCompatActivity {
                     originalBitmap = getResizedBitmap(bitmap, 500);
                     tempBitmap = originalBitmap;
                     imageChanged = true;
+                    checkBox.setEnabled(true);
+                    rotateLeft.setEnabled(true);
+                    rotateRight.setEnabled(true);
+                    brightImageSeekBar.setEnabled(true);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -575,6 +605,10 @@ public class StudentiCardDetails extends AppCompatActivity {
                 originalBitmap = getResizedBitmap(bitmap, 500);
                 tempBitmap = originalBitmap;
                 imageChanged = true;
+                checkBox.setEnabled(true);
+                rotateLeft.setEnabled(true);
+                rotateRight.setEnabled(true);
+                brightImageSeekBar.setEnabled(true);
                 try {
                     String ImagePath = MediaStore.Images.Media.insertImage(this.getContentResolver(), bitmap, "demo_image", "demo_image");
                     Uri URI = Uri.parse(ImagePath);
@@ -665,8 +699,6 @@ public class StudentiCardDetails extends AppCompatActivity {
     /**
      * Get URI to image received from capture by camera.
      */
-
-
 
     private Uri getCaptureImageOutputUri() {
         Uri outputFileUri = null;
@@ -866,40 +898,45 @@ public class StudentiCardDetails extends AppCompatActivity {
     }
 
     public void StudentDataGetRequest(){
+        if(isNetworkAvailable()) {
 
-        String studentDataGetUrl = getString(R.string.baseUrlLocal)+"getStudent"+"/"+InstituteID+"/"+
-                selectedClass+"/"+selectedSection+"/"+
-                selectedDepartment+"/"+selectedMedium+"/"+selectedShift+"/"+UserID;
+            String studentDataGetUrl = getString(R.string.baseUrl)+"/api/onEms/getStudent/"+InstituteID+"/"+
+                    selectedClass+"/"+selectedSection+"/"+
+                    selectedDepartment+"/"+selectedMedium+"/"+selectedShift+"/"+UserID;
 
-        mStudentDataGetDialog = new ProgressDialog(this);
-        mStudentDataGetDialog.setTitle("Loading...");
-        mStudentDataGetDialog.setMessage("Please Wait...");
-        mStudentDataGetDialog.setCancelable(false);
-        mStudentDataGetDialog.setIcon(R.drawable.onair);
-        mStudentDataGetDialog.show();
-        //Preparing Student data from server
-        StringRequest stringStudentRequest = new StringRequest(Request.Method.GET, studentDataGetUrl,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
+            mStudentDataGetDialog = new ProgressDialog(this);
+            mStudentDataGetDialog.setTitle("Loading...");
+            mStudentDataGetDialog.setMessage("Please Wait...");
+            mStudentDataGetDialog.setCancelable(false);
+            mStudentDataGetDialog.setIcon(R.drawable.onair);
+            mStudentDataGetDialog.show();
+            //Preparing Student data from server
+            StringRequest stringStudentRequest = new StringRequest(Request.Method.GET, studentDataGetUrl,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
 
-                        parseStudentJsonData(response);
+                            parseStudentJsonData(response);
 
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                mStudentDataGetDialog.dismiss();
-            }
-        })
-        {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String>  params = new HashMap<>();
-                params.put("Authorization", "Request_From_onEMS_Android_app");
-                return params;
-            }
-        };
-        MySingleton.getInstance(this).addToRequestQueue(stringStudentRequest);
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    mStudentDataGetDialog.dismiss();
+                }
+            })
+            {
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    Map<String, String>  params = new HashMap<>();
+                    params.put("Authorization", "Request_From_onEMS_Android_app");
+                    return params;
+                }
+            };
+            MySingleton.getInstance(this).addToRequestQueue(stringStudentRequest);
+        } else {
+            Toast.makeText(StudentiCardDetails.this,"Please check your internet connection!!! ",
+                    Toast.LENGTH_LONG).show();
+        }
     }
 }

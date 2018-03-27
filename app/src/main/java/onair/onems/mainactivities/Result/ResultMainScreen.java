@@ -119,7 +119,7 @@ public class ResultMainScreen extends AppCompatActivity implements ResultAdapter
             userType.setText("Teacher");
         }
         GlideApp.with(this)
-                .load(getString(R.string.baseUrlRaw)+imageUrl.replace("\\","/")).apply(RequestOptions.circleCropTransform())
+                .load(getString(R.string.baseUrl)+"/"+imageUrl.replace("\\","/")).apply(RequestOptions.circleCropTransform())
                 .diskCacheStrategy(DiskCacheStrategy.NONE)
                 .skipMemoryCache(true)
                 .into(profilePicture);

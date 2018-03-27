@@ -10,53 +10,39 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.widget.Toast;
-
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
-import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
-
 import org.json.JSONArray;
 import org.json.JSONObject;
-
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-
 import de.codecrafters.tableview.TableView;
 import de.codecrafters.tableview.model.TableColumnWeightModel;
 import de.codecrafters.tableview.toolkit.SimpleTableDataAdapter;
 import de.codecrafters.tableview.toolkit.SimpleTableHeaderAdapter;
 import de.codecrafters.tableview.toolkit.TableDataRowBackgroundProviders;
 import onair.onems.R;
-import onair.onems.models.StudentAttendanceReportModels.DailySybjectWiseAttendanceModel;
 import onair.onems.network.MySingleton;
 
-/**
- * Created by hp on 12/5/2017.
- */
-
 public class AllStudentSubjectWiseAttendance extends AppCompatActivity {
-
-
-    ProgressDialog dialog;
-    Configuration config;
-    SharedPreferences sharedPre;
-    TableView tableView;
-    SimpleTableHeaderAdapter simpleTableHeaderAdapter;
-    SimpleTableDataAdapter simpleTabledataAdapter;
-    String[][] DATA_TO_SHOW;
-    String subjectWiseAttendanceUrl;
-    String UserID = "", Date = "";
+    private ProgressDialog dialog;
+    private Configuration config;
+    private TableView tableView;
+    private SimpleTableHeaderAdapter simpleTableHeaderAdapter;
+    private String subjectWiseAttendanceUrl;
     long InstituteID=0, SectionID=0, ClassID=0, MediumID=0, ShiftID=0, DepartmentID = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.all_subject_wise_attendance);
+
+        SharedPreferences sharedPre = PreferenceManager.getDefaultSharedPreferences(this);
+        InstituteID = sharedPre.getLong("InstituteID", 0);
+
         tableView = (TableView) findViewById(R.id.tableView);
 
         simpleTableHeaderAdapter = new SimpleTableHeaderAdapter(this, "Subject Name", "Code ", "Status", "Teacher");
@@ -65,32 +51,29 @@ public class AllStudentSubjectWiseAttendance extends AppCompatActivity {
 
         // Loding Show
         dialog = new ProgressDialog(this);
-        dialog.setMessage("Loading....");
+        dialog.setTitle("Loading...");
+        dialog.setMessage("Please Wait...");
+        dialog.setCancelable(false);
+        dialog.setIcon(R.drawable.onair);
         dialog.show();
+
         //Loding show end code
-
         // get Internal Data using SharedPreferences
-
-        sharedPre = PreferenceManager.getDefaultSharedPreferences(this);
-        InstituteID = sharedPre.getLong("InstituteID", 0);
-
         Intent intent = getIntent();
         ShiftID = intent.getLongExtra("ShiftID", 0);
         MediumID = intent.getLongExtra("MediumID", 0);
         ClassID = intent.getLongExtra("ClassID", 0);
         DepartmentID = intent.getLongExtra("DepartmentID", 0);
         SectionID = intent.getLongExtra("SectionID", 0);
-        UserID = intent.getStringExtra("UserID");
-        Date = intent.getStringExtra("Date");
+        String UserID = intent.getStringExtra("UserID");
+        String Date = intent.getStringExtra("Date");
 
         // get Internal Data using SharedPreferences end
-        subjectWiseAttendanceUrl = getString(R.string.baseUrlLocal) + "getHrmSubWiseAtdByStudentID/" + ShiftID + "/" + MediumID + "/" + ClassID + "/" + SectionID +"/"+DepartmentID+ "/" + UserID + "/" + Date+"/"+InstituteID;
-
+        subjectWiseAttendanceUrl = getString(R.string.baseUrl) + "/api/onEms/getHrmSubWiseAtdByStudentID/" + ShiftID + "/" + MediumID + "/" + ClassID + "/" + SectionID +"/"+DepartmentID+ "/" + UserID + "/" + Date+"/"+InstituteID;
 
         int colorEvenRows = getResources().getColor(R.color.table_data_row_even);
         int colorOddRows = getResources().getColor(R.color.table_data_row_odd);
         tableView.setDataRowBackgroundProvider(TableDataRowBackgroundProviders.alternatingRowColors(colorEvenRows, colorOddRows));
-
 
         TableColumnWeightModel columnModel = new TableColumnWeightModel(4);
         columnModel.setColumnWeight(3, 5);
@@ -121,7 +104,7 @@ public class AllStudentSubjectWiseAttendance extends AppCompatActivity {
     void parseSubjectWiseAttendanceJsonData(String jsonString) {
         try {
             JSONArray subjectWiseAttendanceJsonArray = new JSONArray(jsonString);
-            DATA_TO_SHOW = new String[subjectWiseAttendanceJsonArray.length()][4];
+            String[][] DATA_TO_SHOW = new String[subjectWiseAttendanceJsonArray.length()][4];
             for (int i = 0; i < subjectWiseAttendanceJsonArray.length(); ++i) {
 
                 JSONObject subjectWiseAttendanceJsonObject = subjectWiseAttendanceJsonArray.getJSONObject(i);
@@ -135,7 +118,7 @@ public class AllStudentSubjectWiseAttendance extends AppCompatActivity {
                 DATA_TO_SHOW[i][3] = subjectWiseAttendanceJsonObject.getString("ClassTeacher");
             }
 
-            simpleTabledataAdapter = new SimpleTableDataAdapter(this, DATA_TO_SHOW);
+            SimpleTableDataAdapter simpleTabledataAdapter = new SimpleTableDataAdapter(this, DATA_TO_SHOW);
             tableView.setDataAdapter(simpleTabledataAdapter);
             int colorEvenRows = getResources().getColor(R.color.table_data_row_even);
             int colorOddRows = getResources().getColor(R.color.table_data_row_odd);

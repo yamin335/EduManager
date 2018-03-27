@@ -1,14 +1,8 @@
 package onair.onems.mainactivities;
 
-/**
- * Created by User on 12/3/2017.
- */
-
-import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
@@ -25,7 +19,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -35,28 +28,21 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
-import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
-import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import onair.onems.R;
 import onair.onems.Services.GlideApp;
 import onair.onems.customadapters.ExpandableListAdapter;
@@ -67,21 +53,17 @@ import onair.onems.models.ExpandedMenuModel;
 import onair.onems.models.MediumModel;
 import onair.onems.models.SectionModel;
 import onair.onems.models.ShiftModel;
-import onair.onems.models.SpinnerStudentInformation;
 import onair.onems.models.SubjectModel;
 import onair.onems.network.MySingleton;
 
 public class TakeAttendance extends AppCompatActivity {
 
     private DrawerLayout mDrawerLayout;
-    private ExpandableListAdapter mMenuAdapter;
-    private ExpandableListView expandableList;
     private List<ExpandedMenuModel> listDataHeader;
     private HashMap<ExpandedMenuModel, List<String>> listDataChild;
     private Spinner spinnerClass, spinnerShift,spinnerSection,spinnerMedium, spinnerDepartment, spinnerSubject;
-    private Button takeAttendance, datePicker;
-    private ProgressDialog dialog;
-    private String classUrl, shiftUrl, sectionUrl, mediumUrl, departmentUrl, subjectUrl, selectedDate = "";
+    private ProgressDialog mShiftDialog, mMediumDialog, mClassDialog, mDepartmentDialog, mSectionDialog, mSubjectDialog;
+    private Button datePicker;
     private ArrayList<ClassModel> allClassArrayList;
     private ArrayList<ShiftModel> allShiftArrayList;
     private ArrayList<SectionModel> allSectionArrayList;
@@ -103,19 +85,29 @@ public class TakeAttendance extends AppCompatActivity {
     private SubjectModel selectedSubject = null;
     private DepartmentModel selectedDepartment = null;
     private boolean hasDepartment = false;
-
+    private String selectedDate;
     long InstituteID;
 
     private DatePickerDialog datePickerDialog;
 
     public static final String MyPREFERENCES = "LogInKey";
     public static SharedPreferences sharedPreferences;
-
+    private int firstClass = 0, firstShift = 0, firstSection = 0, firstMedium = 0,
+            firstDepartment = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_take_attendance);
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        InstituteID = prefs.getLong("InstituteID",0);
+
+        selectedClass = new ClassModel();
+        selectedShift = new ShiftModel();
+        selectedSection = new SectionModel();
+        selectedMedium = new MediumModel();
+        selectedDepartment = new DepartmentModel();
 
         spinnerClass = (Spinner)findViewById(R.id.spinnerClass);
         spinnerShift = (Spinner)findViewById(R.id.spinnerShift);
@@ -124,344 +116,20 @@ public class TakeAttendance extends AppCompatActivity {
         spinnerDepartment =(Spinner)findViewById(R.id.spinnerDepartment);
         spinnerSubject = (Spinner)findViewById(R.id.spinnerSubject);
 
-        takeAttendance = (Button)findViewById(R.id.takeAttendance);
+        Button takeAttendance = (Button)findViewById(R.id.takeAttendance);
 
         datePicker = (Button)findViewById(R.id.pickDate);
 
-        ArrayAdapter<String> class_spinner_adapter = new ArrayAdapter<String>(this, R.layout.spinner_item, tempClassArray);
-        class_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerClass.setAdapter(class_spinner_adapter);
-
-        ArrayAdapter<String> shift_spinner_adapter = new ArrayAdapter<String>(this, R.layout.spinner_item, tempShiftArray);
-        shift_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerShift.setAdapter(shift_spinner_adapter);
-
-        ArrayAdapter<String> section_spinner_adapter = new ArrayAdapter<String>(this, R.layout.spinner_item, tempSectionArray);
-        section_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerSection.setAdapter(section_spinner_adapter);
-
-        ArrayAdapter<String> department_spinner_adapter = new ArrayAdapter<String>(this, R.layout.spinner_item, tempDepartmentArray);
-        department_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerDepartment.setAdapter(department_spinner_adapter);
-
-        ArrayAdapter<String> medium_spinner_adapter = new ArrayAdapter<String>(this, R.layout.spinner_item, tempMediumArray);
-        medium_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerMedium.setAdapter(medium_spinner_adapter);
-
-        ArrayAdapter<String> subject_spinner_adapter = new ArrayAdapter<String>(this, R.layout.spinner_item, tempSubjectArray);
-        subject_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerSubject.setAdapter(subject_spinner_adapter);
-
-        allClassArrayList = new ArrayList<>();
-        allShiftArrayList = new ArrayList<>();
-        allSectionArrayList = new ArrayList<>();
-        allMediumArrayList = new ArrayList<>();
-        allDepartmentArrayList = new ArrayList<>();
-        allSubjectArrayList = new ArrayList<>();
-
-        selectedClass = new ClassModel();
-        selectedShift = new ShiftModel();
-        selectedSection = new SectionModel();
-        selectedMedium = new MediumModel();
-        selectedDepartment = new DepartmentModel();
-        selectedSubject = new SubjectModel();
-
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        InstituteID = prefs.getLong("InstituteID",0);
-
-        shiftUrl = getString(R.string.baseUrlLocal)+"getInsShift/"+InstituteID;
-        mediumUrl = getString(R.string.baseUrlLocal)+"getInstituteMediumDdl/"+InstituteID;
-
-        dialog = new ProgressDialog(this);
-        dialog.setTitle("Loading...");
-        dialog.setMessage("Please Wait...");
-        dialog.setCancelable(false);
-        dialog.show();
-
-        if(!isNetworkAvailable())
-        {
-            Toast.makeText(TakeAttendance.this,"Please check your internet connection and open app again!!! ",Toast.LENGTH_LONG).show();
-        }
-
-        datePicker.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // calender class's instance and get current date , month and year from calender
-                final Calendar c = Calendar.getInstance();
-                int mYear = c.get(Calendar.YEAR); // current year
-                int mMonth = c.get(Calendar.MONTH); // current month
-                int mDay = c.get(Calendar.DAY_OF_MONTH); // current day
-                // date picker dialog
-                datePickerDialog = new DatePickerDialog(TakeAttendance.this,
-                        new DatePickerDialog.OnDateSetListener() {
-
-                            @Override
-                            public void onDateSet(DatePicker view, int year,
-                                                  int monthOfYear, int dayOfMonth) {
-                                // set day of month , month and year value in the edit text
-//                                selectedDate = dayOfMonth + "/" + (monthOfYear + 1) + "/" + year;
-//                                selectedDate = year + "-" + (monthOfYear + 1) + "-" + dayOfMonth;
-                                selectedDate = (monthOfYear + 1)+"-"+dayOfMonth+"-"+year;
-                                datePicker.setText(selectedDate);
-
-                            }
-                        }, mYear, mMonth, mDay);
-                datePickerDialog.show();
-            }
-        });
-
-        ShiftDataGetRequest(shiftUrl);
-
-        MediumDataGetRequest(mediumUrl);
-
-        takeAttendance.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(isNetworkAvailable())
-                {
-                    if((selectedClass.getClassID() != -2)&&(!selectedDate.isEmpty())&&(selectedSubject != null))
-                    {
-                        CheckSelectedData();
-                        Bundle bundle = new Bundle();
-                        bundle.putLong("InstituteID", InstituteID);
-                        bundle.putLong("MediumID",selectedMedium.getMediumID());
-                        bundle.putLong("ShiftID",selectedShift.getShiftID());
-                        bundle.putLong("ClassID",selectedClass.getClassID());
-                        bundle.putLong("SectionID",selectedSection.getSectionID());
-                        bundle.putLong("SubjectID",selectedSubject.getSubjectID());
-                        bundle.putLong("DepertmentID",selectedDepartment.getDepartmentID());
-                        bundle.putString("Date",selectedDate);
-
-                        Intent intent = new Intent(TakeAttendance.this, TakeAttendanceDetails.class);
-                        intent.putExtras(bundle);
-                        startActivity(intent);
-                    }
-                    else if(selectedClass.getClassID() == -2)
-                    {
-                        Toast.makeText(TakeAttendance.this,"Please select a class !!! ",Toast.LENGTH_LONG).show();
-                    }
-                    else if(selectedDate.isEmpty())
-                    {
-                        Toast.makeText(TakeAttendance.this,"Please select a date !!! ",Toast.LENGTH_LONG).show();
-                    }
-                    else if(selectedSubject == null)
-                    {
-                        Toast.makeText(TakeAttendance.this,"Please select a subject !!! ",Toast.LENGTH_LONG).show();
-                    }
-                }
-                else
-                {
-                    Toast.makeText(TakeAttendance.this,"Please check your internet connection!!!",Toast.LENGTH_LONG).show();
-                }
-            }
-        });
-
-
-        spinnerShift.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
-                if(position != 0)
-                {
-                    try {
-                        selectedShift = allShiftArrayList.get(position-1);
-                    }
-                    catch (IndexOutOfBoundsException e)
-                    {
-                        Toast.makeText(TakeAttendance.this,"No shift found !!!",Toast.LENGTH_LONG).show();
-                    }
-                }
-                else
-                {
-                    selectedShift = new ShiftModel();
-                }
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
-
-        spinnerMedium.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
-                if(position != 0)
-                {
-                    try {
-                        selectedMedium = allMediumArrayList.get(position-1);
-                        selectedClass = new ClassModel();
-                        selectedDepartment = new DepartmentModel();
-                        selectedSection = new SectionModel();
-                        CheckSelectedData();
-                        classUrl = getString(R.string.baseUrlLocal)+"MediumWiseClassDDL/"+InstituteID+"/"+selectedMedium.getMediumID();
-                        ClassDataGetRequest(classUrl);
-                        selectedSubject = null;
-                    }
-                    catch (IndexOutOfBoundsException e)
-                    {
-                        Toast.makeText(TakeAttendance.this,"No medium found !!!",Toast.LENGTH_LONG).show();
-                    }
-                }
-                else
-                {
-                    selectedMedium = new MediumModel();
-                }
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
-
-        spinnerClass.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
-                if(position != 0)
-                {
-                    try {
-                        selectedClass = allClassArrayList.get(position-1);
-                        selectedDepartment = new DepartmentModel();
-                        selectedSection = new SectionModel();
-                        CheckSelectedData();
-                        departmentUrl = getString(R.string.baseUrlLocal)+"ClassWiseDepartmentDDL/"+InstituteID+"/"+
-                                selectedClass.getClassID()+"/"+selectedMedium.getMediumID();
-                        DepartmentDataGetRequest(departmentUrl);
-                        SubjectDataGetRequest();
-                        selectedSubject = null;
-                    }
-                    catch (IndexOutOfBoundsException e)
-                    {
-                        Toast.makeText(TakeAttendance.this,"No class found !!!",Toast.LENGTH_LONG).show();
-                    }
-                }
-                else
-                {
-                    selectedClass = new ClassModel();
-                }
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
-
-//        spinnerClass.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-//            @Override
-//            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-//
-//                if(position != classSpinnerPosition)
-//                {
-//
-//                }
-//            }
-//
-//            @Override
-//            public void onNothingSelected(AdapterView<?> parent) {
-//
-//            }
-//        });
-
-        spinnerDepartment.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
-                if(position != 0)
-                {
-                    try {
-                        selectedDepartment = allDepartmentArrayList.get(position-1);
-                        selectedSection = new SectionModel();
-                        CheckSelectedData();
-                        sectionUrl = getString(R.string.baseUrlLocal)+"getInsSection/"+InstituteID+"/"+
-                                selectedClass.getClassID()+"/"+selectedDepartment.getDepartmentID();
-                        SectionDataGetRequest(sectionUrl);
-                        if(hasDepartment){
-                            SubjectDataGetRequest();
-                        }
-                        selectedSubject = null;
-                    }
-                    catch (IndexOutOfBoundsException e)
-                    {
-                        Toast.makeText(TakeAttendance.this,"No department found !!!",Toast.LENGTH_LONG).show();
-                    }
-                }
-                else
-                {
-                    selectedDepartment = new DepartmentModel();
-                }
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
-
-        spinnerSection.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
-                if(position != 0)
-                {
-                    try {
-                        selectedSection = allSectionArrayList.get(position-1);
-                        SubjectDataGetRequest();
-                        selectedSubject = null;
-                    }
-                    catch (IndexOutOfBoundsException e)
-                    {
-                        Toast.makeText(TakeAttendance.this,"No section found !!!",Toast.LENGTH_LONG).show();
-                    }
-                }
-                else
-                {
-                    selectedSection = new SectionModel();
-                }
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
-
-        spinnerSubject.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
-                if(position != 0)
-                {
-                    try {
-                        selectedSubject = allSubjectArrayList.get(position-1);
-                    }
-                    catch (IndexOutOfBoundsException e)
-                    {
-                        Toast.makeText(TakeAttendance.this,"No subject found !!!",Toast.LENGTH_LONG).show();
-                    }
-                }
-                else
-                {
-                    selectedSubject = null;
-                }
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
+        ExpandableListAdapter mMenuAdapter;
+        ExpandableListView expandableList;
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        final ActionBar ab = getSupportActionBar();
         /* to set the menu icon image*/
-        ab.setHomeAsUpIndicator(android.R.drawable.ic_menu_add);
-        ab.setDisplayHomeAsUpEnabled(true);
+        final ActionBar actionBar = getSupportActionBar();
+        actionBar.setHomeAsUpIndicator(android.R.drawable.ic_menu_add);
+        actionBar.setDisplayHomeAsUpEnabled(true);
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         expandableList = (ExpandableListView) findViewById(R.id.navigationmenu);
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
@@ -473,16 +141,18 @@ public class TakeAttendance extends AppCompatActivity {
         String name = prefs.getString("UserFullName","");
         long user = prefs.getLong("UserTypeID",0);
         userName.setText(name);
-        if(user == 4)
-        {
+        if(user == 4) {
             userType.setText("Teacher");
         }
+        if(user == 1) {
+            userType.setText("Admin");
+        }
         GlideApp.with(this)
-                .load(getString(R.string.baseUrlRaw)+imageUrl.replace("\\","/")).apply(RequestOptions.circleCropTransform())
+                .load(getString(R.string.baseUrl)+"/"+imageUrl.replace("\\","/")).apply(RequestOptions.circleCropTransform())
                 .diskCacheStrategy(DiskCacheStrategy.NONE)
                 .skipMemoryCache(true)
                 .into(profilePicture);
-       // profilePicture.setImageDrawable(getResources().getDrawable(R.drawable.album1));
+        // profilePicture.setImageDrawable(getResources().getDrawable(R.drawable.album1));
         navigationView.addHeaderView(view);
         if (navigationView != null) {
             setupDrawerContent(navigationView);
@@ -538,7 +208,279 @@ public class TakeAttendance extends AppCompatActivity {
                 this, mDrawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         mDrawerLayout.addDrawerListener(toggle);
         toggle.syncState();
-//        navigationView.setNavigationItemSelectedListener(this);
+
+        ArrayAdapter<String> class_spinner_adapter = new ArrayAdapter<>(this, R.layout.spinner_item, tempClassArray);
+        class_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerClass.setAdapter(class_spinner_adapter);
+
+        ArrayAdapter<String> shift_spinner_adapter = new ArrayAdapter<>(this, R.layout.spinner_item, tempShiftArray);
+        shift_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerShift.setAdapter(shift_spinner_adapter);
+
+        ArrayAdapter<String> section_spinner_adapter = new ArrayAdapter<>(this, R.layout.spinner_item, tempSectionArray);
+        section_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerSection.setAdapter(section_spinner_adapter);
+
+        ArrayAdapter<String> department_spinner_adapter = new ArrayAdapter<>(this, R.layout.spinner_item, tempDepartmentArray);
+        department_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerDepartment.setAdapter(department_spinner_adapter);
+
+        ArrayAdapter<String> medium_spinner_adapter = new ArrayAdapter<>(this, R.layout.spinner_item, tempMediumArray);
+        medium_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerMedium.setAdapter(medium_spinner_adapter);
+
+        ArrayAdapter<String> subject_spinner_adapter = new ArrayAdapter<>(this, R.layout.spinner_item, tempSubjectArray);
+        subject_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerSubject.setAdapter(subject_spinner_adapter);
+
+        datePicker.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // calender class's instance and get current date , month and year from calender
+                final Calendar c = Calendar.getInstance();
+                int mYear = c.get(Calendar.YEAR); // current year
+                int mMonth = c.get(Calendar.MONTH); // current month
+                int mDay = c.get(Calendar.DAY_OF_MONTH); // current day
+                // date picker dialog
+                datePickerDialog = new DatePickerDialog(TakeAttendance.this,
+                        new DatePickerDialog.OnDateSetListener() {
+
+                            @Override
+                            public void onDateSet(DatePicker view, int year,
+                                                  int monthOfYear, int dayOfMonth) {
+                                // set day of month , month and year value in the edit text
+//                                selectedDate = dayOfMonth + "/" + (monthOfYear + 1) + "/" + year;
+//                                selectedDate = year + "-" + (monthOfYear + 1) + "-" + dayOfMonth;
+                                selectedDate = (monthOfYear + 1)+"-"+dayOfMonth+"-"+year;
+                                datePicker.setText(selectedDate);
+
+                            }
+                        }, mYear, mMonth, mDay);
+                datePickerDialog.show();
+            }
+        });
+
+        ShiftDataGetRequest();
+        MediumDataGetRequest();
+
+        takeAttendance.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(isNetworkAvailable()) {
+                    if((selectedClass.getClassID() != -2)&&(!selectedDate.isEmpty())&&(selectedSubject != null)) {
+                        CheckSelectedData();
+                        Bundle bundle = new Bundle();
+                        bundle.putLong("InstituteID", InstituteID);
+                        bundle.putLong("MediumID",selectedMedium.getMediumID());
+                        bundle.putLong("ShiftID",selectedShift.getShiftID());
+                        bundle.putLong("ClassID",selectedClass.getClassID());
+                        bundle.putLong("SectionID",selectedSection.getSectionID());
+                        bundle.putLong("SubjectID",selectedSubject.getSubjectID());
+                        bundle.putLong("DepertmentID",selectedDepartment.getDepartmentID());
+                        bundle.putString("Date",selectedDate);
+
+                        Intent intent = new Intent(TakeAttendance.this, TakeAttendanceDetails.class);
+                        intent.putExtras(bundle);
+                        startActivity(intent);
+                    } else if(selectedClass.getClassID() == -2) {
+                        Toast.makeText(TakeAttendance.this,"Please select a class !!! ",Toast.LENGTH_LONG).show();
+                    } else if(selectedDate.isEmpty()) {
+                        Toast.makeText(TakeAttendance.this,"Please select a date !!! ",Toast.LENGTH_LONG).show();
+                    } else if(selectedSubject == null) {
+                        Toast.makeText(TakeAttendance.this,"Please select a subject !!! ",Toast.LENGTH_LONG).show();
+                    }
+                } else {
+                    Toast.makeText(TakeAttendance.this,"Please check your internet connection!!!",Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+
+
+        spinnerShift.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                if(position != 0) {
+                    try {
+                        selectedShift = allShiftArrayList.get(position-1);
+                    } catch (IndexOutOfBoundsException e) {
+                        Toast.makeText(TakeAttendance.this,"No shift found !!!",Toast.LENGTH_LONG).show();
+                    }
+                } else {
+                    if(firstShift++>1) {
+                        selectedShift = new ShiftModel();
+                    }
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+        spinnerMedium.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                if(position != 0) {
+                    try {
+                        selectedMedium = allMediumArrayList.get(position-1);
+                        selectedClass = new ClassModel();
+                        selectedDepartment = new DepartmentModel();
+                        selectedSection = new SectionModel();
+                        ClassDataGetRequest();
+                        SubjectDataGetRequest();
+                        selectedSubject = null;
+                    } catch (IndexOutOfBoundsException e) {
+                        Toast.makeText(TakeAttendance.this,"No medium found !!!",Toast.LENGTH_LONG).show();
+                    }
+                } else {
+                    if(firstMedium++>1) {
+                        selectedMedium = new MediumModel();
+                        selectedClass = new ClassModel();
+                        selectedDepartment = new DepartmentModel();
+                        selectedSection = new SectionModel();
+                        selectedSubject = null;
+                    }
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+        spinnerClass.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                if(position != 0) {
+                    try {
+                        selectedClass = allClassArrayList.get(position-1);
+                        selectedDepartment = new DepartmentModel();
+                        selectedSection = new SectionModel();
+                        DepartmentDataGetRequest();
+                        SubjectDataGetRequest();
+                        selectedSubject = null;
+                    } catch (IndexOutOfBoundsException e) {
+                        Toast.makeText(TakeAttendance.this,"No class found !!!",Toast.LENGTH_LONG).show();
+                    }
+                } else {
+                    if(firstClass++>1) {
+                        selectedClass = new ClassModel();
+                        selectedDepartment = new DepartmentModel();
+                        selectedSection = new SectionModel();
+                        selectedSubject = null;
+                    }
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+//        spinnerClass.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+//            @Override
+//            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+//
+//                if(position != classSpinnerPosition)
+//                {
+//
+//                }
+//            }
+//
+//            @Override
+//            public void onNothingSelected(AdapterView<?> parent) {
+//
+//            }
+//        });
+
+        spinnerDepartment.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                if(position != 0) {
+                    try {
+                        selectedDepartment = allDepartmentArrayList.get(position-1);
+                        selectedSection = new SectionModel();
+                        SectionDataGetRequest();
+                        if(hasDepartment){
+                            SubjectDataGetRequest();
+                        }
+                        selectedSubject = null;
+                    } catch (IndexOutOfBoundsException e) {
+                        Toast.makeText(TakeAttendance.this,"No department found !!!",Toast.LENGTH_LONG).show();
+                    }
+                } else {
+                    if(firstDepartment++>1) {
+                        selectedDepartment = new DepartmentModel();
+                        selectedSection = new SectionModel();
+                        selectedSubject = null;
+                    }
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+        spinnerSection.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                if(position != 0) {
+                    try {
+                        selectedSection = allSectionArrayList.get(position-1);
+                        SubjectDataGetRequest();
+                        selectedSubject = null;
+                    } catch (IndexOutOfBoundsException e) {
+                        Toast.makeText(TakeAttendance.this,"No section found !!!",Toast.LENGTH_LONG).show();
+                    }
+                } else {
+                    if(firstSection++>1) {
+                        selectedSection = new SectionModel();
+                        selectedSubject = null;
+                    }
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+        spinnerSubject.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                if(position != 0)
+                {
+                    try {
+                        selectedSubject = allSubjectArrayList.get(position-1);
+                    }
+                    catch (IndexOutOfBoundsException e)
+                    {
+                        Toast.makeText(TakeAttendance.this,"No subject found !!!",Toast.LENGTH_LONG).show();
+                    }
+                }
+                else
+                {
+                    selectedSubject = null;
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
     }
 
 //    void parseClassJsonData(String jsonString) {
@@ -592,42 +534,6 @@ public class TakeAttendance extends AppCompatActivity {
 //        }
 //    }
 
-    void parseClassJsonData(String jsonString) {
-        try {
-            allClassArrayList = new ArrayList<>();
-            JSONArray classJsonArray = new JSONArray(jsonString);
-            ArrayList<String> classArrayList = new ArrayList<>();
-            classArrayList.add("Select Class");
-            for(int i = 0; i < classJsonArray.length(); ++i) {
-                JSONObject classJsonObject = classJsonArray.getJSONObject(i);
-                ClassModel classModel = new ClassModel(classJsonObject.getString("ClassID"), classJsonObject.getString("ClassName"));
-//                Toast.makeText(this,classJsonObject.getString("ClassID")+classJsonObject.getString("ClassName"),Toast.LENGTH_LONG).show();
-                allClassArrayList.add(classModel);
-                classArrayList.add(classModel.getClassName());
-            }
-            if(allClassArrayList.size() == 1){
-                selectedClass = allClassArrayList.get(0);
-            }
-            try {
-                String[] strings = new String[classArrayList.size()];
-                strings = classArrayList.toArray(strings);
-                ArrayAdapter<String> class_spinner_adapter = new ArrayAdapter<>(this,R.layout.spinner_item, strings);
-                class_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                spinnerClass.setAdapter(class_spinner_adapter);
-                dialog.dismiss();
-            }
-            catch (IndexOutOfBoundsException e)
-            {
-                dialog.dismiss();
-                Toast.makeText(this,"No class found !!!",Toast.LENGTH_LONG).show();
-            }
-            //spinner.setSelectedIndex(1);
-        } catch (JSONException e) {
-            Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
-            dialog.dismiss();
-        }
-    }
-
     void parseShiftJsonData(String jsonString) {
         try {
             allShiftArrayList = new ArrayList<>();
@@ -637,7 +543,6 @@ public class TakeAttendance extends AppCompatActivity {
             for(int i = 0; i < shiftJsonArray.length(); ++i) {
                 JSONObject shiftJsonObject = shiftJsonArray.getJSONObject(i);
                 ShiftModel shiftModel = new ShiftModel(shiftJsonObject.getString("ShiftID"), shiftJsonObject.getString("ShiftName"));
-//                Toast.makeText(this,classJsonObject.getString("ClassID")+classJsonObject.getString("ClassName"),Toast.LENGTH_LONG).show();
                 allShiftArrayList.add(shiftModel);
                 shiftArrayList.add(shiftModel.getShiftName());
             }
@@ -650,53 +555,14 @@ public class TakeAttendance extends AppCompatActivity {
                 ArrayAdapter<String> shift_spinner_adapter = new ArrayAdapter<>(this,R.layout.spinner_item, strings);
                 shift_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinnerShift.setAdapter(shift_spinner_adapter);
-                dialog.dismiss();
-            }
-            catch (IndexOutOfBoundsException e)
-            {
-                dialog.dismiss();
+                mShiftDialog.dismiss();
+            } catch (IndexOutOfBoundsException e) {
+                mShiftDialog.dismiss();
                 Toast.makeText(this,"No shift found !!!",Toast.LENGTH_LONG).show();
             }
-            //spinner.setSelectedIndex(1);
         } catch (JSONException e) {
+            mShiftDialog.dismiss();
             Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
-            dialog.dismiss();
-        }
-    }
-
-    void parseSectionJsonData(String jsonString) {
-        try {
-            allSectionArrayList = new ArrayList<>();
-            JSONArray sectionJsonArray = new JSONArray(jsonString);
-            ArrayList<String> sectionArrayList = new ArrayList<>();
-            sectionArrayList.add("Select Section");
-            for(int i = 0; i < sectionJsonArray.length(); ++i) {
-                JSONObject sectionJsonObject = sectionJsonArray.getJSONObject(i);
-                SectionModel sectionModel = new SectionModel(sectionJsonObject.getString("SectionID"), sectionJsonObject.getString("SectionName"));
-//                Toast.makeText(this,classJsonObject.getString("ClassID")+classJsonObject.getString("ClassName"),Toast.LENGTH_LONG).show();
-                allSectionArrayList.add(sectionModel);
-                sectionArrayList.add(sectionModel.getSectionName());
-            }
-            if(allSectionArrayList.size() == 1){
-                selectedSection = allSectionArrayList.get(0);
-            }
-            try {
-                String[] strings = new String[sectionArrayList.size()];
-                strings = sectionArrayList.toArray(strings);
-                ArrayAdapter<String> section_spinner_adapter = new ArrayAdapter<>(this,R.layout.spinner_item, strings);
-                section_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                spinnerSection.setAdapter(section_spinner_adapter);
-                dialog.dismiss();
-            }
-            catch (IndexOutOfBoundsException e)
-            {
-                dialog.dismiss();
-                Toast.makeText(this,"No section found !!!",Toast.LENGTH_LONG).show();
-            }
-            //spinner.setSelectedIndex(1);
-        } catch (JSONException e) {
-            Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
-            dialog.dismiss();
         }
     }
 
@@ -710,12 +576,12 @@ public class TakeAttendance extends AppCompatActivity {
                 JSONObject mediumJsonObject = mediumJsonArray.getJSONObject(i);
                 MediumModel mediumModel = new MediumModel(mediumJsonObject.getString("MediumID"), mediumJsonObject.getString("MameName"),
                         mediumJsonObject.getString("IsDefault"));
-//                Toast.makeText(this,classJsonObject.getString("ClassID")+classJsonObject.getString("ClassName"),Toast.LENGTH_LONG).show();
                 allMediumArrayList.add(mediumModel);
                 mediumnArrayList.add(mediumModel.getMameName());
             }
             if(allMediumArrayList.size() == 1){
                 selectedMedium = allMediumArrayList.get(0);
+                ClassDataGetRequest();
             }
             try {
                 String[] strings = new String[mediumnArrayList.size()];
@@ -723,17 +589,47 @@ public class TakeAttendance extends AppCompatActivity {
                 ArrayAdapter<String> medium_spinner_adapter = new ArrayAdapter<>(this,R.layout.spinner_item, strings);
                 medium_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinnerMedium.setAdapter(medium_spinner_adapter);
-                dialog.dismiss();
-            }
-            catch (IndexOutOfBoundsException e)
-            {
-                dialog.dismiss();
+                mMediumDialog.dismiss();
+            } catch (IndexOutOfBoundsException e) {
+                mMediumDialog.dismiss();
                 Toast.makeText(this,"No medium found !!!",Toast.LENGTH_LONG).show();
             }
-            //spinner.setSelectedIndex(1);
         } catch (JSONException e) {
+            mMediumDialog.dismiss();
             Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
-            dialog.dismiss();
+        }
+    }
+
+    void parseClassJsonData(String jsonString) {
+        try {
+            allClassArrayList = new ArrayList<>();
+            JSONArray classJsonArray = new JSONArray(jsonString);
+            ArrayList<String> classArrayList = new ArrayList<>();
+            classArrayList.add("Select Class");
+            for(int i = 0; i < classJsonArray.length(); ++i) {
+                JSONObject classJsonObject = classJsonArray.getJSONObject(i);
+                ClassModel classModel = new ClassModel(classJsonObject.getString("ClassID"), classJsonObject.getString("ClassName"));
+                allClassArrayList.add(classModel);
+                classArrayList.add(classModel.getClassName());
+            }
+            if(allClassArrayList.size() == 1) {
+                selectedClass = allClassArrayList.get(0);
+                DepartmentDataGetRequest();
+            }
+            try {
+                String[] strings = new String[classArrayList.size()];
+                strings = classArrayList.toArray(strings);
+                ArrayAdapter<String> class_spinner_adapter = new ArrayAdapter<>(this,R.layout.spinner_item, strings);
+                class_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                spinnerClass.setAdapter(class_spinner_adapter);
+                mClassDialog.dismiss();
+            } catch (IndexOutOfBoundsException e) {
+                mClassDialog.dismiss();
+                Toast.makeText(this,"No class found !!!",Toast.LENGTH_LONG).show();
+            }
+        } catch (JSONException e) {
+            mClassDialog.dismiss();
+            Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
         }
     }
 
@@ -746,18 +642,15 @@ public class TakeAttendance extends AppCompatActivity {
             for(int i = 0; i < departmentJsonArray.length(); ++i) {
                 JSONObject departmentJsonObject = departmentJsonArray.getJSONObject(i);
                 DepartmentModel departmentModel = new DepartmentModel(departmentJsonObject.getString("DepartmentID"), departmentJsonObject.getString("DepartmentName"));
-//                Toast.makeText(this,classJsonObject.getString("ClassID")+classJsonObject.getString("ClassName"),Toast.LENGTH_LONG).show();
                 allDepartmentArrayList.add(departmentModel);
                 departmentArrayList.add(departmentModel.getDepartmentName());
             }
             if(allDepartmentArrayList.size() == 1){
                 selectedDepartment = allDepartmentArrayList.get(0);
+                SectionDataGetRequest();
             }
             if(allDepartmentArrayList.size() == 0){
-                CheckSelectedData();
-                sectionUrl = getString(R.string.baseUrlLocal)+"getInsSection/"+InstituteID+"/"+
-                        selectedClass.getClassID()+"/"+selectedDepartment.getDepartmentID();
-                SectionDataGetRequest(sectionUrl);
+                SectionDataGetRequest();
             }
             try {
                 String[] strings = new String[departmentArrayList.size()];
@@ -765,17 +658,46 @@ public class TakeAttendance extends AppCompatActivity {
                 ArrayAdapter<String> department_spinner_adapter = new ArrayAdapter<>(this,R.layout.spinner_item, strings);
                 department_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinnerDepartment.setAdapter(department_spinner_adapter);
-                dialog.dismiss();
-            }
-            catch (IndexOutOfBoundsException e)
-            {
-                dialog.dismiss();
+                mDepartmentDialog.dismiss();
+            } catch (IndexOutOfBoundsException e) {
+                mDepartmentDialog.dismiss();
                 Toast.makeText(this,"No department found !!!",Toast.LENGTH_LONG).show();
             }
-            //spinner.setSelectedIndex(1);
         } catch (JSONException e) {
+            mDepartmentDialog.dismiss();
             Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
-            dialog.dismiss();
+        }
+    }
+
+    void parseSectionJsonData(String jsonString) {
+        try {
+            allSectionArrayList = new ArrayList<>();
+            JSONArray sectionJsonArray = new JSONArray(jsonString);
+            ArrayList<String> sectionArrayList = new ArrayList<>();
+            sectionArrayList.add("Select Section");
+            for(int i = 0; i < sectionJsonArray.length(); ++i) {
+                JSONObject sectionJsonObject = sectionJsonArray.getJSONObject(i);
+                SectionModel sectionModel = new SectionModel(sectionJsonObject.getString("SectionID"), sectionJsonObject.getString("SectionName"));
+                allSectionArrayList.add(sectionModel);
+                sectionArrayList.add(sectionModel.getSectionName());
+            }
+            if(allSectionArrayList.size() == 1){
+                selectedSection = allSectionArrayList.get(0);
+            }
+            try {
+                String[] strings = new String[sectionArrayList.size()];
+                strings = sectionArrayList.toArray(strings);
+                ArrayAdapter<String> section_spinner_adapter = new ArrayAdapter<>(this,R.layout.spinner_item, strings);
+                section_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                spinnerSection.setAdapter(section_spinner_adapter);
+                mSectionDialog.dismiss();
+            } catch (IndexOutOfBoundsException e) {
+                mSectionDialog.dismiss();
+                Toast.makeText(this,"No section found !!!",Toast.LENGTH_LONG).show();
+            }
+        } catch (JSONException e) {
+            mSectionDialog.dismiss();
+            Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
         }
     }
     void parseSubjectJsonData(String jsonString) {
@@ -800,17 +722,15 @@ public class TakeAttendance extends AppCompatActivity {
                 ArrayAdapter<String> subject_spinner_adapter = new ArrayAdapter<>(this,R.layout.spinner_item, strings);
                 subject_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinnerSubject.setAdapter(subject_spinner_adapter);
-                dialog.dismiss();
-            }
-            catch (IndexOutOfBoundsException e)
-            {
-                dialog.dismiss();
+                mSubjectDialog.dismiss();
+            } catch (IndexOutOfBoundsException e) {
+                mSubjectDialog.dismiss();
                 Toast.makeText(this,"No subject found !!!",Toast.LENGTH_LONG).show();
             }
             //spinner.setSelectedIndex(1);
         } catch (JSONException e) {
+            mSubjectDialog.dismiss();
             Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
-            dialog.dismiss();
         }
     }
 
@@ -962,187 +882,257 @@ public class TakeAttendance extends AppCompatActivity {
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
-    private void ShiftDataGetRequest(String url)
-    {
-        dialog.show();
-        //Preparing Shift data from server
-        StringRequest stringShiftRequest = new StringRequest(Request.Method.GET, url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
+    private void ShiftDataGetRequest() {
+        if (isNetworkAvailable()) {
+            String shiftUrl = getString(R.string.baseUrl)+"/api/onEms/getInsShift/"+InstituteID;
 
-                        parseShiftJsonData(response);
+            mShiftDialog = new ProgressDialog(this);
+            mShiftDialog.setTitle("Loading...");
+            mShiftDialog.setMessage("Please Wait...");
+            mShiftDialog.setCancelable(false);
+            mShiftDialog.setIcon(R.drawable.onair);
+            mShiftDialog.show();
+            //Preparing Shift data from server
+            StringRequest stringShiftRequest = new StringRequest(Request.Method.GET, shiftUrl,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
 
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
+                            parseShiftJsonData(response);
 
-                dialog.dismiss();
-            }
-        })
-        {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String>  params = new HashMap<String, String>();
-                params.put("Authorization", "Request_From_onEMS_Android_app");
-                return params;
-            }
-        };
-        MySingleton.getInstance(this).addToRequestQueue(stringShiftRequest);
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    mShiftDialog.dismiss();
+                }
+            })
+            {
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    Map<String, String>  params = new HashMap<>();
+                    params.put("Authorization", "Request_From_onEMS_Android_app");
+                    return params;
+                }
+            };
+            MySingleton.getInstance(this).addToRequestQueue(stringShiftRequest);
+        } else {
+            Toast.makeText(TakeAttendance.this,"Please check your internet connection and select again!!! ",
+                    Toast.LENGTH_LONG).show();
+        }
     }
 
-    private void MediumDataGetRequest(String url)
-    {
-        dialog.show();
-        //Preparing Medium data from server
-        StringRequest stringMediumRequest = new StringRequest(Request.Method.GET, url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
+    private void MediumDataGetRequest() {
+        if(isNetworkAvailable()) {
+            String mediumUrl = getString(R.string.baseUrl)+"/api/onEms/getInstituteMediumDdl/"+InstituteID;
 
-                        parseMediumJsonData(response);
+            mMediumDialog = new ProgressDialog(this);
+            mMediumDialog.setTitle("Loading...");
+            mMediumDialog.setMessage("Please Wait...");
+            mMediumDialog.setCancelable(false);
+            mMediumDialog.setIcon(R.drawable.onair);
+            mMediumDialog.show();
+            //Preparing Medium data from server
+            StringRequest stringMediumRequest = new StringRequest(Request.Method.GET, mediumUrl,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
 
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
+                            parseMediumJsonData(response);
 
-                dialog.dismiss();
-            }
-        })
-        {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String>  params = new HashMap<String, String>();
-                params.put("Authorization", "Request_From_onEMS_Android_app");
-                return params;
-            }
-        };
-        MySingleton.getInstance(this).addToRequestQueue(stringMediumRequest);
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    mMediumDialog.dismiss();
+                }
+            })
+            {
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    Map<String, String>  params = new HashMap<>();
+                    params.put("Authorization", "Request_From_onEMS_Android_app");
+                    return params;
+                }
+            };
+            MySingleton.getInstance(this).addToRequestQueue(stringMediumRequest);
+        } else {
+            Toast.makeText(TakeAttendance.this,"Please check your internet connection and select again!!! ",
+                    Toast.LENGTH_LONG).show();
+        }
     }
 
-    private void ClassDataGetRequest(String url)
-    {
-        dialog.show();
-        //Preparing claas data from server
-        StringRequest stringClassRequest = new StringRequest(Request.Method.GET, url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
+    private void ClassDataGetRequest() {
+        if(isNetworkAvailable()) {
 
-                        parseClassJsonData(response);
+            CheckSelectedData();
 
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
+            String classUrl = getString(R.string.baseUrl)+"/api/onEms/MediumWiseClassDDL/"+InstituteID+"/"+selectedMedium.getMediumID();
 
-                dialog.dismiss();
-            }
-        })
-        {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String>  params = new HashMap<String, String>();
-                params.put("Authorization", "Request_From_onEMS_Android_app");
-                return params;
-            }
-        };
-        MySingleton.getInstance(this).addToRequestQueue(stringClassRequest);
+            mClassDialog = new ProgressDialog(this);
+            mClassDialog.setTitle("Loading...");
+            mClassDialog.setMessage("Please Wait...");
+            mClassDialog.setCancelable(false);
+            mClassDialog.setIcon(R.drawable.onair);
+            mClassDialog.show();
+            //Preparing claas data from server
+            StringRequest stringClassRequest = new StringRequest(Request.Method.GET, classUrl,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+
+                            parseClassJsonData(response);
+
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    mClassDialog.dismiss();
+                }
+            })
+            {
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    Map<String, String>  params = new HashMap<>();
+                    params.put("Authorization", "Request_From_onEMS_Android_app");
+                    return params;
+                }
+            };
+            MySingleton.getInstance(this).addToRequestQueue(stringClassRequest);
+        } else {
+            Toast.makeText(TakeAttendance.this,"Please check your internet connection and select again!!! ",
+                    Toast.LENGTH_LONG).show();
+        }
     }
 
-    private void DepartmentDataGetRequest(String url)
-    {
-        dialog.show();
-        //Preparing Department data from server
-        StringRequest stringDepartmentRequest = new StringRequest(Request.Method.GET, url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        hasDepartment = true;
-                        parseDepartmentJsonData(response);
+    private void DepartmentDataGetRequest() {
+        if(isNetworkAvailable()) {
 
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                hasDepartment = false;
-                dialog.dismiss();
-            }
-        })
-        {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String>  params = new HashMap<String, String>();
-                params.put("Authorization", "Request_From_onEMS_Android_app");
-                return params;
-            }
-        };
-        MySingleton.getInstance(this).addToRequestQueue(stringDepartmentRequest);
+            CheckSelectedData();
+
+            String departmentUrl = getString(R.string.baseUrl)+"/api/onEms/ClassWiseDepartmentDDL/"+InstituteID+"/"+
+                    selectedClass.getClassID()+"/"+selectedMedium.getMediumID();
+
+            mDepartmentDialog = new ProgressDialog(this);
+            mDepartmentDialog.setTitle("Loading...");
+            mDepartmentDialog.setMessage("Please Wait...");
+            mDepartmentDialog.setCancelable(false);
+            mDepartmentDialog.setIcon(R.drawable.onair);
+            mDepartmentDialog.show();
+            //Preparing Department data from server
+            StringRequest stringDepartmentRequest = new StringRequest(Request.Method.GET, departmentUrl,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+
+                            parseDepartmentJsonData(response);
+
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    mDepartmentDialog.dismiss();
+                }
+            })
+            {
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    Map<String, String>  params = new HashMap<>();
+                    params.put("Authorization", "Request_From_onEMS_Android_app");
+                    return params;
+                }
+            };
+            MySingleton.getInstance(this).addToRequestQueue(stringDepartmentRequest);
+        } else {
+            Toast.makeText(TakeAttendance.this,"Please check your internet connection and select again!!! ",
+                    Toast.LENGTH_LONG).show();
+        }
     }
 
-    private void SectionDataGetRequest(String url)
-    {
-        dialog.show();
-        //Preparing section data from server
-        StringRequest stringSectionRequest = new StringRequest(Request.Method.GET, url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
+    private void SectionDataGetRequest() {
+        if(isNetworkAvailable()) {
 
-                        parseSectionJsonData(response);
+            CheckSelectedData();
 
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
+            String sectionUrl = getString(R.string.baseUrl)+"/api/onEms/getInsSection/"+InstituteID+"/"+
+                    selectedClass.getClassID()+"/"+selectedDepartment.getDepartmentID();
 
-                dialog.dismiss();
-            }
-        })
-        {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String>  params = new HashMap<String, String>();
-                params.put("Authorization", "Request_From_onEMS_Android_app");
-                return params;
-            }
-        };
-        MySingleton.getInstance(this).addToRequestQueue(stringSectionRequest);
+            mSectionDialog = new ProgressDialog(this);
+            mSectionDialog.setTitle("Loading...");
+            mSectionDialog.setMessage("Please Wait...");
+            mSectionDialog.setCancelable(false);
+            mSectionDialog.setIcon(R.drawable.onair);
+            mSectionDialog.show();
+            //Preparing section data from server
+            StringRequest stringSectionRequest = new StringRequest(Request.Method.GET, sectionUrl,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+
+                            parseSectionJsonData(response);
+
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    mSectionDialog.dismiss();
+                }
+            })
+            {
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    Map<String, String>  params = new HashMap<>();
+                    params.put("Authorization", "Request_From_onEMS_Android_app");
+                    return params;
+                }
+            };
+            MySingleton.getInstance(this).addToRequestQueue(stringSectionRequest);
+        } else {
+            Toast.makeText(TakeAttendance.this,"Please check your internet connection and select again!!! ",
+                    Toast.LENGTH_LONG).show();
+        }
     }
 
-    private void SubjectDataGetRequest()
-    {
-        CheckSelectedData();
-        subjectUrl = getString(R.string.baseUrlLocal)+"getInsSubject"+"/"+InstituteID+"/"+
-                selectedDepartment.getDepartmentID()+"/"+selectedMedium.getMediumID()+"/"+selectedClass.getClassID();
-        dialog.show();
-        //Preparing subject data from server
-        StringRequest stringSubjectRequest = new StringRequest(Request.Method.GET, subjectUrl,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
+    private void SubjectDataGetRequest() {
+        if(isNetworkAvailable()) {
+            CheckSelectedData();
+            String subjectUrl = getString(R.string.baseUrl)+"/api/onEms/getInsSubject"+"/"+InstituteID+"/"+
+                    selectedDepartment.getDepartmentID()+"/"+selectedMedium.getMediumID()+"/"+selectedClass.getClassID();
+            mSubjectDialog = new ProgressDialog(this);
+            mSubjectDialog.setTitle("Loading...");
+            mSubjectDialog.setMessage("Please Wait...");
+            mSubjectDialog.setCancelable(false);
+            mSubjectDialog.setIcon(R.drawable.onair);
+            mSubjectDialog.show();
+            //Preparing subject data from server
+            StringRequest stringSubjectRequest = new StringRequest(Request.Method.GET, subjectUrl,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
 
-                        parseSubjectJsonData(response);
+                            parseSubjectJsonData(response);
 
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
 
-                dialog.dismiss();
-            }
-        })
-        {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String>  params = new HashMap<String, String>();
-                params.put("Authorization", "Request_From_onEMS_Android_app");
-                return params;
-            }
-        };
-        MySingleton.getInstance(this).addToRequestQueue(stringSubjectRequest);
+                    mSubjectDialog.dismiss();
+                }
+            })
+            {
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    Map<String, String>  params = new HashMap<>();
+                    params.put("Authorization", "Request_From_onEMS_Android_app");
+                    return params;
+                }
+            };
+            MySingleton.getInstance(this).addToRequestQueue(stringSubjectRequest);
+        } else {
+            Toast.makeText(TakeAttendance.this,"Please check your internet connection and select again!!! ",
+                    Toast.LENGTH_LONG).show();
+        }
     }
 
     private void CheckSelectedData(){

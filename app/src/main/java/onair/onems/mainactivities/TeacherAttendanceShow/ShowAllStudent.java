@@ -50,8 +50,6 @@ public class ShowAllStudent extends AppCompatActivity
     String[][] DATA_TO_SHOW;
     String AllStudentUrl = "";
     String studentNameList[],studentRFIDList[],studentRollList[], studentUserList[];;
-    String selectStudentName="",selectStudentRFID="",getSelectRoll="";
-    double percent[];
     long InstituteID=0;
     int SectionID=0,ClassID=0,MediumID=0,ShiftID=0;
     SimpleTableHeaderAdapter simpleTableHeaderAdapter;
@@ -69,7 +67,7 @@ public class ShowAllStudent extends AppCompatActivity
         ClassID=sharedPre.getInt("ClassSelectID",0);
         SectionID=sharedPre.getInt("SectionSelectID",0);
 
-        AllStudentUrl=getString(R.string.baseUrlLocal)+"getHrmSubWiseAtdDetail/"+InstituteID+
+        AllStudentUrl=getString(R.string.baseUrl)+"/api/onEms/getHrmSubWiseAtdDetail/"+InstituteID+
                 "/"+MediumID+"/"+ShiftID+"/"+ClassID+"/"+SectionID;
         dialog = new ProgressDialog(this);
         dialog.setMessage("Loading....");

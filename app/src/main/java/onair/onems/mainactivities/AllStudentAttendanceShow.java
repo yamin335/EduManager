@@ -11,23 +11,17 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
-import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-
 import de.codecrafters.tableview.TableView;
 import de.codecrafters.tableview.listeners.TableDataClickListener;
 import de.codecrafters.tableview.model.TableColumnWeightModel;
@@ -38,23 +32,15 @@ import onair.onems.R;
 import onair.onems.models.StudentAttendanceReportModels.DailyAttendanceModel;
 import onair.onems.network.MySingleton;
 
-/**
- * Created by hp on 12/5/2017.
- */
-
 public class AllStudentAttendanceShow extends AppCompatActivity
 {
     private ArrayList<DailyAttendanceModel> dailyAttendanceList;
     private DailyAttendanceModel selectedDay;
-    TextView name,roll,id;
-    TableView tableView;
-    SimpleTableHeaderAdapter simpleTableHeaderAdapter;
-    SimpleTableDataAdapter simpleTabledataAdapter;
-    String[][] DATA_TO_SHOW;
-    SharedPreferences sharedPre;
-    Configuration config;
-    ProgressDialog dialog;
-    String RFID="", monthAttendanceUrl="", UserFullName="", RollNo="", UserID = "";
+    private TableView tableView;
+    private SimpleTableHeaderAdapter simpleTableHeaderAdapter;
+    private Configuration config;
+    private ProgressDialog dialog;
+    private String RFID="", monthAttendanceUrl="", UserFullName="", RollNo="", UserID = "";
     long InstituteID=0, SectionID=0, ClassID=0, MediumID=0, ShiftID=0, DepartmentID = 0;
     int MonthID=0;
 
@@ -63,19 +49,23 @@ public class AllStudentAttendanceShow extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.other_attendance_show);
         tableView = (TableView) findViewById(R.id.tableView);
-        name=(TextView) findViewById(R.id.name);
-        roll=(TextView) findViewById(R.id.roll);
-        id=(TextView) findViewById(R.id.Id);
+        TextView name=(TextView) findViewById(R.id.name);
+        TextView roll=(TextView) findViewById(R.id.roll);
+        TextView id=(TextView) findViewById(R.id.Id);
 
         dialog = new ProgressDialog(this);
-        dialog.setMessage("Loading....");
+        dialog.setTitle("Loading...");
+        dialog.setMessage("Please Wait...");
+        dialog.setCancelable(false);
+        dialog.setIcon(R.drawable.onair);
         dialog.show();
+
         //Loding show end code
 
         dailyAttendanceList = new ArrayList<>();
         selectedDay = new DailyAttendanceModel();
         // get Internal Data using SharedPreferences
-        sharedPre = PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences sharedPre = PreferenceManager.getDefaultSharedPreferences(this);
         InstituteID = sharedPre.getLong("InstituteID",0);
 
         Intent intent = getIntent();
@@ -94,7 +84,7 @@ public class AllStudentAttendanceShow extends AppCompatActivity
         roll.setText("Roll: "+RollNo);
         id.setText("ID: "+RFID);
 
-        monthAttendanceUrl = getString(R.string.baseUrlLocal)+"getStudentMonthlyDeviceAttendance/"+
+        monthAttendanceUrl = getString(R.string.baseUrl)+"/api/onEms/getStudentMonthlyDeviceAttendance/"+
                 ShiftID+"/"+MediumID+"/"+ClassID+"/"+SectionID+"/"+DepartmentID+"/"+MonthID+"/"+RFID+"/"+InstituteID;
         // Add Header of The Table
 
@@ -136,8 +126,7 @@ public class AllStudentAttendanceShow extends AppCompatActivity
        //Table View Click Event
         tableView.addDataClickListener(new TableDataClickListener() {
             @Override
-            public void onDataClicked(int rowIndex, Object clickedData)
-            {
+            public void onDataClicked(int rowIndex, Object clickedData) {
                 selectedDay = dailyAttendanceList.get(rowIndex);
                 Intent intent = new Intent(AllStudentAttendanceShow.this, AllStudentSubjectWiseAttendance.class);
                 intent.putExtra("UserID", UserID);
@@ -174,7 +163,7 @@ public class AllStudentAttendanceShow extends AppCompatActivity
         try {
             dailyAttendanceList = new ArrayList<>();
             JSONArray dailyAttendanceJsonArray = new JSONArray(jsonString);
-            DATA_TO_SHOW = new String[dailyAttendanceJsonArray.length()][4];
+            String[][] DATA_TO_SHOW = new String[dailyAttendanceJsonArray.length()][4];
             for(int i = 0; i < dailyAttendanceJsonArray.length(); ++i) {
                 JSONObject dailyAttendanceJsonObject = dailyAttendanceJsonArray.getJSONObject(i);
                 DailyAttendanceModel perDayAttendance = new DailyAttendanceModel();
@@ -190,7 +179,7 @@ public class AllStudentAttendanceShow extends AppCompatActivity
                 dailyAttendanceList.add(perDayAttendance);
             }
 
-            simpleTabledataAdapter = new SimpleTableDataAdapter(this,DATA_TO_SHOW);
+            SimpleTableDataAdapter simpleTabledataAdapter = new SimpleTableDataAdapter(this,DATA_TO_SHOW);
             tableView.setDataAdapter(simpleTabledataAdapter);
             if (config.smallestScreenWidthDp >320) {
                 simpleTableHeaderAdapter.setTextSize(14);
@@ -199,13 +188,10 @@ public class AllStudentAttendanceShow extends AppCompatActivity
                 simpleTableHeaderAdapter.setTextSize(10);
                 simpleTabledataAdapter.setTextSize(10);
             }
-
-
-
         } catch (JSONException e) {
+            dialog.dismiss();
             Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
         }
-
         dialog.dismiss();
     }
 
@@ -227,7 +213,7 @@ public class AllStudentAttendanceShow extends AppCompatActivity
         {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String>  params = new HashMap<String, String>();
+                Map<String, String>  params = new HashMap<>();
                 params.put("Authorization", "Request_From_onEMS_Android_app");
                 return params;
             }

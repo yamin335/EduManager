@@ -81,7 +81,7 @@ public class TotalFees  extends AppCompatActivity
         dialog.setMessage("Loading....");
         dialog.show();
 
-        monthFeesDetailsUrl = getString(R.string.baseUrlLocal)+"getMonthWiseFees/"+instituteID+"/"+shiftID+"/"+1+"/"+1+"/"+1+"/"+1;
+        monthFeesDetailsUrl = getString(R.string.baseUrl)+"/api/onEms/getMonthWiseFees/"+instituteID+"/"+shiftID+"/"+1+"/"+1+"/"+1+"/"+1;
         RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
 
         StringRequest stringRequest = new StringRequest(Request.Method.GET,  monthFeesDetailsUrl,

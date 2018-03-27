@@ -95,7 +95,7 @@ public class ClassRoutine extends AppCompatActivity
         {
             userType.setText("Guardian");
         }
-        Glide.with(this).load(getString(R.string.baseUrlRaw)+imageUrl.replace("\\","/")).apply(RequestOptions.circleCropTransform()).into(profilePicture);
+        Glide.with(this).load(getString(R.string.baseUrl)+"/"+imageUrl.replace("\\","/")).apply(RequestOptions.circleCropTransform()).into(profilePicture);
         navigationView.addHeaderView(view);
 
         if (navigationView != null)

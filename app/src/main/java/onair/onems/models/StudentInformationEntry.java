@@ -1,9 +1,5 @@
 package onair.onems.models;
 
-/**
- * Created by User on 1/13/2018.
- */
-
 public class StudentInformationEntry {
     private long UserClassID = -2;
     private long UserID = 0;
@@ -90,11 +86,6 @@ public class StudentInformationEntry {
     private long SessionID = -2;
     private long BoardID = -2;
     private boolean IsActiveStudent = true;
-
-    /**
-     * No args constructor for use in serialization
-     *
-     */
 
     public StudentInformationEntry() {
 
@@ -579,6 +570,471 @@ public class StudentInformationEntry {
     public long getBloodGroupID()
     {
         return BloodGroupID;
+    }
+
+    public String getUserNo() {
+        return UserNo;
+    }
+
+    public void setUserNo(String UserNo) {
+        this.UserNo = UserNo;
+    }
+
+    public long getUserTitleID() {
+        return UserTitleID;
+    }
+
+    public void setUserTitleID(String UserTitleID) {
+        if(UserTitleID.equals("null"))
+        {
+            this.UserTitleID = -2;
+        }
+        else
+        {
+            this.UserTitleID = Long.parseLong(UserTitleID);
+        }
+    }
+
+    public String getUserFirstName() {
+        return UserFirstName;
+    }
+
+    public void setUserFirstName(String UserFirstName) {
+        this.UserFirstName = UserFirstName;
+    }
+
+    public String getUserMiddleName() {
+        return UserMiddleName;
+    }
+
+    public void setUserMiddleName(String UserMiddleName) {
+        this.UserMiddleName = UserMiddleName;
+    }
+
+    public String getUserLastName() {
+        return UserLastName;
+    }
+
+    public void setUserLastName(String UserLastName) {
+        this.UserLastName = UserLastName;
+    }
+
+    public String getNickName() {
+        return NickName;
+    }
+
+    public void setNickName(String NickName) {
+        this.NickName = NickName;
+    }
+
+    public String getSkypeID() {
+        return SkypeID;
+    }
+
+    public void setSkypeID(String SkypeID) {
+        this.SkypeID = SkypeID;
+    }
+
+    public String getFacebookID() {
+        return FacebookID;
+    }
+
+    public void setFacebookID(String FacebookID) {
+        this.FacebookID = FacebookID;
+    }
+
+    public String getWhatsApp() {
+        return WhatsApp;
+    }
+
+    public void setWhatsApp(String WhatsApp) {
+        this.WhatsApp = WhatsApp;
+    }
+
+    public String getViber() {
+        return Viber;
+    }
+
+    public void setViber(String Viber) {
+        this.Viber = Viber;
+    }
+
+    public String getLinkedIN() {
+        return LinkedIN;
+    }
+
+    public void setLinkedIN(String LinkedIN) {
+        this.LinkedIN = LinkedIN;
+    }
+
+    public String getParAddress() {
+        return ParAddress;
+    }
+
+    public void setParAddress(String ParAddress) {
+        this.ParAddress = ParAddress;
+    }
+
+    public String getParThana() {
+        return ParThana;
+    }
+
+    public void setParThana(String ParThana) {
+        this.ParThana = ParThana;
+    }
+
+    public String getParPostCode() {
+        return ParPostCode;
+    }
+
+    public void setParPostCode(String ParPostCode) {
+        this.ParPostCode = ParPostCode;
+    }
+
+
+    public long getParCountryID() {
+        return ParCountryID;
+    }
+
+    public void setParCountryID(String ParCountryID) {
+        if(ParCountryID.equals("null"))
+        {
+            this.ParCountryID = -2;
+        }
+        else
+        {
+            this.ParCountryID = Long.parseLong(ParCountryID);
+        }
+    }
+
+    public long getParStateID() {
+        return ParStateID;
+    }
+
+    public void setParStateID(String ParStateID) {
+        if(ParStateID.equals("null"))
+        {
+            this.ParStateID = -2;
+        }
+        else
+        {
+            this.ParStateID = Long.parseLong(ParStateID);
+        }
+    }
+
+    public long getParCityID() {
+        return ParCityID;
+    }
+
+    public void setParCityID(String ParCityID) {
+        if(ParCityID.equals("null"))
+        {
+            this.ParCityID = -2;
+        }
+        else
+        {
+            this.ParCityID = Long.parseLong(ParCityID);
+        }
+    }
+
+    public String getPreThana() {
+        return PreThana;
+    }
+
+    public void setPreThana(String PreThana) {
+        this.PreThana = PreThana;
+    }
+
+    public String getPrePostCode() {
+        return PrePostCode;
+    }
+
+    public void setPrePostCode(String PrePostCode) {
+        this.PrePostCode = PrePostCode;
+    }
+
+    public long getPreCountryID() {
+        return PreCountryID;
+    }
+
+    public void setPreCountryID(String PreCountryID) {
+        if(PreCountryID.equals("null"))
+        {
+            this.PreCountryID = -2;
+        }
+        else
+        {
+            this.PreCountryID = Long.parseLong(PreCountryID);
+        }
+    }
+
+    public long getPreStateID() {
+        return PreStateID;
+    }
+
+    public void setPreStateID(String PreStateID) {
+        if(PreStateID.equals("null"))
+        {
+            this.PreStateID = -2;
+        }
+        else
+        {
+            this.PreStateID = Long.parseLong(PreStateID);
+        }
+    }
+
+    public long getPreCityID() {
+        return PreCityID;
+    }
+
+    public void setPreCityID(String PreCityID) {
+        if(PreCityID.equals("null"))
+        {
+            this.PreCityID = -2;
+        }
+        else
+        {
+            this.PreCityID = Long.parseLong(PreCityID);
+        }
+    }
+
+    public String getMobileNo() {
+        return MobileNo;
+    }
+
+    public void setMobileNo(String MobileNo) {
+        this.MobileNo = MobileNo;
+    }
+
+    public String getUniqueIdentity() {
+        return UniqueIdentity;
+    }
+
+    public void setUniqueIdentity(String UniqueIdentity) {
+        this.UniqueIdentity = UniqueIdentity;
+    }
+
+    public int getWeigth() {
+        return Weigth;
+    }
+
+    public void setWeigth(String Weigth) {
+        if(Weigth.equals("null"))
+        {
+            this.Weigth = 0;
+        }
+        else
+        {
+            this.Weigth = Integer.parseInt(Weigth);
+        }
+    }
+
+    public int getHeight() {
+        return Height;
+    }
+
+    public void setHeight(String Height) {
+        if(Height.equals("null"))
+        {
+            this.Height = 0;
+        }
+        else
+        {
+            this.Height = Integer.parseInt(Height);
+        }
+    }
+
+    public String getBirthCertificate() {
+        return BirthCertificate;
+    }
+
+    public void setBirthCertificate(String BirthCertificate) {
+        this.BirthCertificate = BirthCertificate;
+    }
+
+    public String getPassportNO() {
+        return PassportNO;
+    }
+
+    public void setPassportNO(String PassportNO) {
+        this.PassportNO = PassportNO;
+    }
+
+    public String getNID() {
+        return NID;
+    }
+
+    public void setNID(String NID) {
+        this.NID = NID;
+    }
+
+    public boolean getIsActive() {
+        return IsActive;
+    }
+
+    public void setIsActive(String IsActive) {
+        if(IsActive.equals("null"))
+        {
+            this.IsActive = true;
+        }
+        else
+        {
+            this.IsActive = Boolean.parseBoolean(IsActive);
+        }
+    }
+
+    public long getStatusID() {
+        return StatusID;
+    }
+
+    public void setStatusID(String StatusID) {
+        if(StatusID.equals("null"))
+        {
+            this.StatusID = -2;
+        }
+        else
+        {
+            this.StatusID = Long.parseLong(StatusID);
+        }
+    }
+
+    public String getGuardianMobileNo() {
+        return GuardianMobileNo;
+    }
+
+    public void setGuardianMobileNo(String GuardianMobileNo) {
+        this.GuardianMobileNo = GuardianMobileNo;
+    }
+
+    public String getGuardianUserFirstName() {
+        return GuardianUserFirstName;
+    }
+
+    public void setGuardianUserFirstName(String GuardianUserFirstName) {
+        this.GuardianUserFirstName = GuardianUserFirstName;
+    }
+
+    public String getGuardianUserMiddleName() {
+        return GuardianUserMiddleName;
+    }
+
+    public void setGuardianUserMiddleName(String GuardianUserMiddleName) {
+        this.GuardianUserMiddleName = GuardianUserMiddleName;
+    }
+
+    public String getGuardianUserLastName() {
+        return GuardianUserLastName;
+    }
+
+    public void setGuardianUserLastName(String GuardianUserLastName) {
+        this.GuardianUserLastName = GuardianUserLastName;
+    }
+
+    public String getGuardianNickName() {
+        return GuardianNickName;
+    }
+
+    public void setGuardianNickName(String GuardianNickName) {
+        this.GuardianNickName = GuardianNickName;
+    }
+
+    public String getGuardianUniqueIdentity() {
+        return GuardianUniqueIdentity;
+    }
+
+    public void setGuardianUniqueIdentity(String GuardianUniqueIdentity) {
+        this.GuardianUniqueIdentity = GuardianUniqueIdentity;
+    }
+
+    public long getGuardianBloodGroupID() {
+        return GuardianBloodGroupID;
+    }
+
+    public void setGuardianBloodGroupID(String GuardianBloodGroupID) {
+        if(GuardianBloodGroupID.equals("null"))
+        {
+            this.GuardianBloodGroupID = -2;
+        }
+        else
+        {
+            this.GuardianBloodGroupID = Long.parseLong(GuardianBloodGroupID);
+        }
+    }
+
+    public String getGuardianPassportNO() {
+        return GuardianPassportNO;
+    }
+
+    public void setGuardianPassportNO(String GuardianPassportNO) {
+        this.GuardianPassportNO = GuardianPassportNO;
+    }
+
+    public String getGuardianNID() {
+        return GuardianNID;
+    }
+
+    public void setGuardianNID(String GuardianNID) {
+        this.GuardianNID = GuardianNID;
+    }
+
+    public long getRelationID() {
+        return RelationID;
+    }
+
+    public void setRelationID(String RelationID) {
+        if(RelationID.equals("null"))
+        {
+            this.RelationID = -2;
+        }
+        else
+        {
+            this.RelationID = Long.parseLong(RelationID);
+        }
+    }
+
+    public boolean getIsLocalGuardian() {
+        return IsLocalGuardian;
+    }
+
+    public void setIsLocalGuardian(String IsLocalGuardian) {
+        if(IsLocalGuardian.equals("null"))
+        {
+            this.IsLocalGuardian = true;
+        }
+        else
+        {
+            this.IsLocalGuardian = Boolean.parseBoolean(IsLocalGuardian);
+        }
+    }
+
+    public boolean getIsActiveFamily() {
+        return IsActiveFamily;
+    }
+
+    public void setIsActiveFamily(String IsActiveFamily) {
+        if(IsActiveFamily.equals("null"))
+        {
+            this.IsActiveFamily = true;
+        }
+        else
+        {
+            this.IsActiveFamily = Boolean.parseBoolean(IsActiveFamily);
+        }
+    }
+
+    public boolean getIsActiveStudent() {
+        return IsActiveStudent;
+    }
+
+    public void setIsActiveStudent(String IsActiveStudent) {
+        if(IsActiveStudent.equals("null"))
+        {
+            this.IsActiveStudent = true;
+        }
+        else
+        {
+            this.IsActiveStudent = Boolean.parseBoolean(IsActiveStudent);
+        }
     }
 
 }

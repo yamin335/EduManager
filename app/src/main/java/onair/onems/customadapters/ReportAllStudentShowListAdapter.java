@@ -100,7 +100,7 @@ public class ReportAllStudentShowListAdapter extends RecyclerView.Adapter<Report
         holder.studentRFID.setText("RFID: "+reportAllStudentRowModel.getRFID());
 
         GlideApp.with(context)
-                .load(context.getString(R.string.baseUrlRaw)+reportAllStudentRowModel.getImageUrl().replace("\\","/"))
+                .load(context.getString(R.string.baseUrl)+"/"+reportAllStudentRowModel.getImageUrl().replace("\\","/"))
                 .listener(new RequestListener<Drawable>() {
                     @Override
                     public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
