@@ -860,7 +860,7 @@ public class TakeAttendance extends AppCompatActivity {
             sharedPreferences  = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putBoolean("LogInState", false);
-            editor.commit();
+            editor.apply();
             Intent intent = new Intent(TakeAttendance.this, LoginScreen.class);
             startActivity(intent);
             finish();

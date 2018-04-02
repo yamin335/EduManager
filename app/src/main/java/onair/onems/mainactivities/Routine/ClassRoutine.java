@@ -24,14 +24,11 @@ import android.view.View;
 import android.widget.ExpandableListView;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
 import de.hdodenhof.circleimageview.CircleImageView;
 import onair.onems.R;
 import onair.onems.customadapters.ExpandableListAdapterStudent;
@@ -42,10 +39,6 @@ import onair.onems.mainactivities.StudentAttendance;
 import onair.onems.mainactivities.StudentMainScreen;
 import onair.onems.models.ExpandedMenuModel;
 
-/**
- * Created by hp on 2/5/2018.
- */
-
 public class ClassRoutine extends AppCompatActivity
 {
 
@@ -55,8 +48,6 @@ public class ClassRoutine extends AppCompatActivity
     CircleImageView circleImageView;
     List<ExpandedMenuModel> listDataHeader;
     HashMap<ExpandedMenuModel, List<String>> listDataChild;
-    private TabLayout tabLayout;
-    private ViewPager viewPager;
 
     public static final String MyPREFERENCES = "LogInKey";
     public static SharedPreferences sharedPreferences;
@@ -68,13 +59,13 @@ public class ClassRoutine extends AppCompatActivity
         setContentView(R.layout.activity_student_class_routine);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        viewPager = (ViewPager) findViewById(R.id.pager);
+        ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
         setupViewPager(viewPager);
-        tabLayout = (TabLayout) findViewById(R.id.tabLayout);
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabLayout);
         tabLayout.setupWithViewPager(viewPager);
-        final ActionBar ab = getSupportActionBar();
-        ab.setHomeAsUpIndicator(android.R.drawable.ic_menu_add);
-        ab.setDisplayHomeAsUpEnabled(true);
+        final ActionBar actionBar = getSupportActionBar();
+        actionBar.setHomeAsUpIndicator(android.R.drawable.ic_menu_add);
+        actionBar.setDisplayHomeAsUpEnabled(true);
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         expandableList = (ExpandableListView) findViewById(R.id.navigationmenu);
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);

@@ -14,10 +14,10 @@ import onair.onems.R;
  * Created by Sojib on 31-Jul-17.
  */
 
-public class RoutineAdapter extends ArrayAdapter<RoutineModel>
+public class RoutineListAdapter extends ArrayAdapter<RoutineModel>
 {
    Context context;
-    public RoutineAdapter(Context context, ArrayList<RoutineModel> objects)
+    public RoutineListAdapter(Context context, ArrayList<RoutineModel> objects)
     {
         super(context,0, objects);
         this.context=context;
@@ -43,7 +43,7 @@ public class RoutineAdapter extends ArrayAdapter<RoutineModel>
         TextView nameTextView = (TextView) listItemView.findViewById(R.id.name);
         nameTextView.setText(currentAndroidFlavor.getTeacherId());
 
-        TextView numberTextView = (TextView) listItemView.findViewById(R.id.time);
+        TextView numberTextView = (TextView) listItemView.findViewById(R.id.classTime);
         // Get the version number from the current AndroidFlavor object and
         // set this text on the number TextView
         numberTextView.setText(currentAndroidFlavor.getTimeId());

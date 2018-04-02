@@ -37,14 +37,14 @@ public class One extends Fragment
     {
         rootView = inflater.inflate(R.layout.card_routine, container, false);
         listView = (ListView) rootView.findViewById(R.id.list_cards);
-       cardModels = new ArrayList<RoutineModel>();
-       cardModels.add(new RoutineModel("Bangla","Md. Bony Israil", "10.30am-10.50am" ));
-       cardModels.add(new RoutineModel("English","Md. Yamin Mollah", "10.30am-10.50am" ));
-       cardModels.add(new RoutineModel("Bangla","Md. Bony Israil", "10.30am-10.50am" ));
-       cardModels.add(new RoutineModel("English","Md. Rony", "10.30am-10.50am" ));
-       cardModels.add(new RoutineModel("Bangla","Md. Bony Israil", "10.30am-10.50am" ));
-      RoutineAdapter cardAdapter = new RoutineAdapter(getActivity(),cardModels);
-       listView.setAdapter(cardAdapter);
+        cardModels = new ArrayList<RoutineModel>();
+        cardModels.add(new RoutineModel("Bangla","Md. Bony Israil", "10.30am-10.50am" ));
+        cardModels.add(new RoutineModel("English","Md. Yamin Mollah", "10.30am-10.50am" ));
+        cardModels.add(new RoutineModel("Bangla","Md. Bony Israil", "10.30am-10.50am" ));
+        cardModels.add(new RoutineModel("English","Md. Rony", "10.30am-10.50am" ));
+        cardModels.add(new RoutineModel("Bangla","Md. Bony Israil", "10.30am-10.50am" ));
+        RoutineListAdapter cardAdapter = new RoutineListAdapter(getActivity(), cardModels);
+        listView.setAdapter(cardAdapter);
         return  rootView;
     }
 }

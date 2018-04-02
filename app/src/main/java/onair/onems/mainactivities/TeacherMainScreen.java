@@ -7,26 +7,15 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-
 import onair.onems.R;
-import onair.onems.mainactivities.Result.ResultMainScreen;
 import onair.onems.mainactivities.Routine.ClassRoutine;
-
-/**
- * Created by User on 12/5/2017.
- */
 
 public class TeacherMainScreen extends AppCompatActivity {
 
-    private Button attendance, iCard, notice, result, contact, routine;
-    private TextView InstituteName;
-    private TextView userType;
     public static final String MyPREFERENCES = "LogInKey";
     public static SharedPreferences sharedPreferences;
 
@@ -36,18 +25,18 @@ public class TeacherMainScreen extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.teacher_dashboard);
 
-        attendance = (Button)findViewById(R.id.attendance);
-        iCard = (Button)findViewById(R.id.iCard);
-        notice = (Button)findViewById(R.id.notice);
-        InstituteName = (TextView) findViewById(R.id.InstituteName);
-        userType = (TextView) findViewById(R.id.userType);
-        result = (Button)findViewById(R.id.result);
-        contact = (Button)findViewById(R.id.contact);
-        routine = (Button)findViewById(R.id.routine);
+        Button attendance = (Button)findViewById(R.id.attendance);
+        Button iCard = (Button)findViewById(R.id.iCard);
+        Button notice = (Button)findViewById(R.id.notice);
+        TextView InstituteName = (TextView) findViewById(R.id.InstituteName);
+        TextView userType = (TextView) findViewById(R.id.userType);
+        Button result = (Button)findViewById(R.id.result);
+        Button contact = (Button)findViewById(R.id.contact);
+        Button routine = (Button)findViewById(R.id.routine);
 
         SharedPreferences sharedPre = PreferenceManager.getDefaultSharedPreferences(this);
-        String InstituteName = sharedPre.getString("InstituteName","");
-        this.InstituteName.setText(InstituteName);
+        String InstituteNameString = sharedPre.getString("InstituteName","");
+        InstituteName.setText(InstituteNameString);
         long user = sharedPre.getLong("UserTypeID",0);
         if(user == 4)
         {
@@ -64,15 +53,15 @@ public class TeacherMainScreen extends AppCompatActivity {
             }
         });
 
-//        // Routine module start point
-//        routine.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Intent mainIntent = new Intent(TeacherMainScreen.this,ClassRoutine.class);
-//                TeacherMainScreen.this.startActivity(mainIntent);
-//                finish();
-//            }
-//        });
+        // Routine module start point
+        routine.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent mainIntent = new Intent(TeacherMainScreen.this, RoutineMainScreen.class);
+                TeacherMainScreen.this.startActivity(mainIntent);
+                finish();
+            }
+        });
 
         // Attendance module start point
         attendance.setOnClickListener(new View.OnClickListener() {

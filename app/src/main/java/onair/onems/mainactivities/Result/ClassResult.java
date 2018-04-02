@@ -24,14 +24,11 @@ import android.view.View;
 import android.widget.ExpandableListView;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
 import de.hdodenhof.circleimageview.CircleImageView;
 import onair.onems.R;
 import onair.onems.customadapters.ExpandableListAdapterStudent;
@@ -42,10 +39,6 @@ import onair.onems.mainactivities.Routine.ClassRoutine;
 import onair.onems.mainactivities.StudentAttendance;
 import onair.onems.mainactivities.StudentMainScreen;
 import onair.onems.models.ExpandedMenuModel;
-
-/**
- * Created by hp on 2/5/2018.
- */
 
 public class ClassResult extends AppCompatActivity
 {

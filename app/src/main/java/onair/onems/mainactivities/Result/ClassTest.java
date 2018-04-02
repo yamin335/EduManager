@@ -10,7 +10,7 @@ import android.widget.ListView;
 import java.util.ArrayList;
 
 import onair.onems.R;
-import onair.onems.mainactivities.Routine.RoutineAdapter;
+import onair.onems.mainactivities.Routine.RoutineListAdapter;
 import onair.onems.mainactivities.Routine.RoutineModel;
 
 /**
@@ -46,7 +46,7 @@ public class ClassTest extends Fragment
        cardModels.add(new RoutineModel("Bangla","Md. Bony Israil", "10.30am-10.50am" ));
        cardModels.add(new RoutineModel("English","Md. Rony", "10.30am-10.50am" ));
        cardModels.add(new RoutineModel("Bangla","Md. Bony Israil", "10.30am-10.50am" ));
-      RoutineAdapter cardAdapter = new RoutineAdapter(getActivity(),cardModels);
+      RoutineListAdapter cardAdapter = new RoutineListAdapter(getActivity(),cardModels);
        listView.setAdapter(cardAdapter);
         return  rootView;
     }

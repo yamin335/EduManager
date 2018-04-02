@@ -11,22 +11,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-
 import onair.onems.R;
 import onair.onems.mainactivities.Fees.Fee;
 import onair.onems.mainactivities.Fees.StudentList;
-import onair.onems.mainactivities.Result.ClassResult;
-import onair.onems.mainactivities.Result.ResultMainScreen;
 import onair.onems.mainactivities.Routine.ClassRoutine;
 
 
-/**
- * Created by User on 12/5/2017.
- */
-
 public class StudentMainScreen extends AppCompatActivity {
 
-    private Button Attendance,Fees,Class_routine,result, notice, contact;
     TextView InstituteName;
     TextView userType;
     long user;
@@ -42,7 +34,7 @@ public class StudentMainScreen extends AppCompatActivity {
         SharedPreferences.Editor editor = sharedPre.edit();
         editor.putInt("monthselectindex",1);
         editor.putString("yearselectindex","2018");
-        editor.commit();
+        editor.apply();
         user = sharedPre.getLong("UserTypeID",0);
         if(user == 3)
         {
@@ -55,12 +47,12 @@ public class StudentMainScreen extends AppCompatActivity {
 
         InstituteName.setText(name);
 
-        notice = (Button)findViewById(R.id.notice);
-        Attendance = (Button)findViewById(R.id.attendance);
-        Fees=(Button) findViewById(R.id.fee);
-        Class_routine=(Button) findViewById(R.id.routine);
-        result = (Button)findViewById(R.id.result);
-        contact = (Button)findViewById(R.id.contact);
+        Button notice = (Button)findViewById(R.id.notice);
+        Button Attendance = (Button)findViewById(R.id.attendance);
+        Button Fees=(Button) findViewById(R.id.fee);
+        Button Class_routine=(Button) findViewById(R.id.routine);
+        Button result = (Button)findViewById(R.id.result);
+        Button contact = (Button)findViewById(R.id.contact);
 
 
 //        // Notice module start point
@@ -78,12 +70,12 @@ public class StudentMainScreen extends AppCompatActivity {
             @Override
             public void onClick(View v)
             {
-//                if(user == 3)
-//                {
-//                    Intent mainIntent = new Intent(StudentMainScreen.this,ClassRoutine.class);
-//                    StudentMainScreen.this.startActivity(mainIntent);
-//                    finish();
-//                }
+                if(user == 3)
+                {
+                    Intent mainIntent = new Intent(StudentMainScreen.this, RoutineMainScreen.class);
+                    startActivity(mainIntent);
+                    finish();
+                }
 //                else
 //                {
 //                    Intent mainIntent = new Intent(StudentMainScreen.this,StudentList.class);
