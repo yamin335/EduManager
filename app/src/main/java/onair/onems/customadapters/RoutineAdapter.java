@@ -11,6 +11,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 
@@ -34,7 +35,7 @@ public class RoutineAdapter extends RecyclerView.Adapter<RoutineAdapter.MyViewHo
         }
     }
 
-    public RoutineAdapter(Context context, String periods, int periodNumber) {
+    public RoutineAdapter(Context context, String periods) {
         this.context = context;
 //        this.periodNumber = periodNumber;
 
@@ -61,23 +62,16 @@ public class RoutineAdapter extends RecyclerView.Adapter<RoutineAdapter.MyViewHo
             String PeriodName = periodJsonArray.getJSONObject(position).getString("PeriodName");
             holder.periodName.setText(PeriodName);
             PeriodID = periodJsonArray.getJSONObject(position).getInt("PeriodID");
+            for(int i = 0; i < allPeriodJsonArray.length(); i++) {
+                if(allPeriodJsonArray.getJSONObject(i).getInt("PeriodID") == PeriodID) {
+                    holder.parentLinearLayout.addView(getClassRowItemView(allPeriodJsonArray.getJSONObject(i)), holder.parentLinearLayout.getChildCount() - 1);
+                }
+            }
 //            holder.periodTime.setText(periodJsonArray.getJSONObject(position).getString("StartTime")+" - "+periodJsonArray.getJSONObject(position).getString("EndTime"));
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        for(int i = 0; i < allPeriodJsonArray.length(); i++) {
 
-        }
-        LayoutInflater inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        final View rowView = inflater.inflate(R.layout.routine_class_row_item, null);
-        final View rowView1 = inflater.inflate(R.layout.routine_class_row_item, null);
-        final View rowView2 = inflater.inflate(R.layout.routine_class_row_item, null);
-        final View rowView3 = inflater.inflate(R.layout.routine_class_row_item, null);
-        // Add the new row before the add field button.
-        holder.parentLinearLayout.addView(rowView, holder.parentLinearLayout.getChildCount() - 1);
-        holder.parentLinearLayout.addView(rowView1, holder.parentLinearLayout.getChildCount() - 1);
-        holder.parentLinearLayout.addView(rowView2, holder.parentLinearLayout.getChildCount() - 1);
-        holder.parentLinearLayout.addView(rowView3, holder.parentLinearLayout.getChildCount() - 1);
         holder.periodName.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -116,6 +110,7 @@ public class RoutineAdapter extends RecyclerView.Adapter<RoutineAdapter.MyViewHo
                         }
                     }
                     holder.parentLinearLayout.setVisibility(View.VISIBLE);
+                    holder.parentLinearLayout.requestFocus();
                 }
             }
         });
@@ -143,7 +138,20 @@ public class RoutineAdapter extends RecyclerView.Adapter<RoutineAdapter.MyViewHo
         periodNumber = arrayList.size();
     }
 
-    private View getClassRowItem() {
+    private View getClassRowItemView(JSONObject object) {
+        LayoutInflater inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        final View rowView = inflater.inflate(R.layout.routine_class_row_item, null);
+        TextView subjectName = rowView.findViewById(R.id.subjectName);
+        TextView classTime = rowView.findViewById(R.id.classTime);
+        TextView teacherName = rowView.findViewById(R.id.teacherName);
+        try {
+            subjectName.setText(object.getString("SubjectName"));
+            classTime.setText(object.getString("StartTime")+" - "+object.getString("EndTime"));
+            teacherName.setText(object.getString("TeacherName"));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
+        return rowView;
     }
 }

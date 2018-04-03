@@ -1,6 +1,12 @@
 package onair.onems.mainactivities.Routine;
 
+import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -8,21 +14,23 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListView;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-
-import java.util.ArrayList;
+import android.widget.Toast;
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import java.util.HashMap;
+import java.util.Map;
 import onair.onems.R;
 import onair.onems.customadapters.RoutineAdapter;
-import onair.onems.models.Contact;
+import onair.onems.network.MySingleton;
 
 public class Saturday extends Fragment {
-    private View rootView;
-    private RecyclerView recyclerView;
-    private ArrayList<Contact> contactList;
+    private long InstituteID, ShiftID, MediumID, ClassID, DepartmentID, SectionID;
     private RoutineAdapter mAdapter;
+    private RecyclerView recyclerView;
+
     public Saturday() {
 
     }
@@ -32,34 +40,73 @@ public class Saturday extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        rootView = inflater.inflate(R.layout.routine_day_pager_item, container, false);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
+        View rootView = inflater.inflate(R.layout.routine_day_pager_item, container, false);
         recyclerView = rootView.findViewById(R.id.routinePeriods);
 
-        Bundle bundle = getArguments();
-        String saturdayJsonArrayString = bundle.getString("saturdayJsonArray");
-        int saturdayPeriodNumber = bundle.getInt("saturdayPeriodNumber");
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        InstituteID = prefs.getLong("InstituteID",0);
+        ShiftID = prefs.getLong("ShiftID",0);
+        MediumID = prefs.getLong("MediumID",0);
+        ClassID = prefs.getLong("ClassID",0);
+        DepartmentID = prefs.getLong("DepartmentID",0);
+        SectionID = prefs.getLong("SectionID",0);
 
-        contactList = new ArrayList<>();
-        mAdapter = new RoutineAdapter(getActivity(), saturdayJsonArrayString, saturdayPeriodNumber);
+        saturdayRoutineDataGetRequest();
 
-        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity());
-        recyclerView.setLayoutManager(mLayoutManager);
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
-        recyclerView.setAdapter(mAdapter);
-
-        fetchRoutine();
         return  rootView;
     }
 
-    private void fetchRoutine() {
-        for(int i = 0; i < 5; ++i) {
-            Contact contact = new Contact();
-            contact.setName("Person"+"--"+i);
-            contactList.add(contact);
+    void saturdayRoutineDataGetRequest() {
+        if(isNetworkAvailable()) {
+
+            String saturdayRoutineDataGetUrl = getString(R.string.baseUrl)+"/api/onEms/spGetDashClassRoutine/"+ShiftID
+                    +"/"+MediumID+"/"+ClassID+"/"+SectionID+"/"+DepartmentID+"/1/"+InstituteID;
+
+            final ProgressDialog saturdayRoutineGetDialog = new ProgressDialog(getActivity());
+            saturdayRoutineGetDialog.setTitle("Loading...");
+            saturdayRoutineGetDialog.setMessage("Please Wait...");
+            saturdayRoutineGetDialog.setCancelable(false);
+            saturdayRoutineGetDialog.setIcon(R.drawable.onair);
+            saturdayRoutineGetDialog.show();
+
+            StringRequest saturdayRoutineRequest = new StringRequest(Request.Method.GET, saturdayRoutineDataGetUrl,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+
+                            mAdapter = new RoutineAdapter(getActivity(), response);
+                            RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity());
+                            recyclerView.setLayoutManager(mLayoutManager);
+                            recyclerView.setItemAnimator(new DefaultItemAnimator());
+                            recyclerView.setAdapter(mAdapter);
+
+                            saturdayRoutineGetDialog.dismiss();
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    saturdayRoutineGetDialog.dismiss();
+                }
+            })
+            {
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    Map<String, String>  params = new HashMap<>();
+                    params.put("Authorization", "Request_From_onEMS_Android_app");
+                    return params;
+                }
+            };
+            MySingleton.getInstance(getActivity()).addToRequestQueue(saturdayRoutineRequest);
+        } else {
+            Toast.makeText(getActivity(),"Please check your internet connection !!!",Toast.LENGTH_LONG).show();
         }
-        // refreshing recycler view
-        mAdapter.notifyDataSetChanged();
+    }
+
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 }

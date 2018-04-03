@@ -27,7 +27,6 @@ import android.widget.ExpandableListView;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -35,16 +34,12 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
-
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import onair.onems.R;
 import onair.onems.Services.GlideApp;
 import onair.onems.customadapters.ExpandableListAdapter;
@@ -63,26 +58,14 @@ public class RoutineMainScreen extends AppCompatActivity {
     private DrawerLayout mDrawerLayout;
     private List<ExpandedMenuModel> listDataHeader;
     private HashMap<ExpandedMenuModel, List<String>> listDataChild;
-    private long InstituteID, UserTypeID, ClassID, UserID;
     private static final String MyPREFERENCES = "LogInKey";
-    private static SharedPreferences sharedPreferences;
-    private ProgressDialog myRoutineGetDialog;
-    private JSONArray saturdayJsonArray, sundayJsonArray, mondayJsonArray, tuesdayJsonArray, wednesdayJsonArray, thursdayJsonArray, fridayJsonArray;
-    private ViewPager viewPager;
-    private TabLayout tabLayout;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.routine_activity_main);
 
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        InstituteID = prefs.getLong("InstituteID",0);
-        UserTypeID = prefs.getLong("UserTypeID",0);
-        ClassID = prefs.getLong("ClassID",0);
-//        UserID = prefs.getString("UserID");
-
-        viewPager = (ViewPager) findViewById(R.id.pager);
-        tabLayout = (TabLayout) findViewById(R.id.tabLayout);
+        ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabLayout);
 
         ExpandableListAdapter mMenuAdapter;
         ExpandableListView expandableList;
@@ -99,6 +82,7 @@ public class RoutineMainScreen extends AppCompatActivity {
         ImageView profilePicture = (ImageView)view.findViewById(R.id.profilePicture);
         TextView userType = (TextView)view.findViewById(R.id.userType);
         TextView userName = (TextView)view.findViewById(R.id.userName);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         String imageUrl = prefs.getString("ImageUrl","");
         String name = prefs.getString("UserFullName","");
         long user = prefs.getLong("UserTypeID",0);
@@ -114,7 +98,7 @@ public class RoutineMainScreen extends AppCompatActivity {
                 .diskCacheStrategy(DiskCacheStrategy.NONE)
                 .skipMemoryCache(true)
                 .into(profilePicture);
-        // profilePicture.setImageDrawable(getResources().getDrawable(R.drawable.album1));
+
         navigationView.addHeaderView(view);
         if (navigationView != null) {
             setupDrawerContent(navigationView);
@@ -170,21 +154,21 @@ public class RoutineMainScreen extends AppCompatActivity {
                 this, mDrawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         mDrawerLayout.addDrawerListener(toggle);
         toggle.syncState();
-        myRoutineDataGetRequest();
+
+        setupViewPager(viewPager);
+        tabLayout.setupWithViewPager(viewPager);
     }
 
     class ViewPagerAdapter extends FragmentPagerAdapter {
         private final List<Fragment> mFragmentList = new ArrayList<>();
         private final List<String> mFragmentTitleList = new ArrayList<>();
 
-        public ViewPagerAdapter(FragmentManager manager)
-        {
+        ViewPagerAdapter(FragmentManager manager) {
             super(manager);
         }
 
         @Override
-        public Fragment getItem(int position)
-        {
+        public Fragment getItem(int position) {
             return mFragmentList.get(position);
         }
 
@@ -193,18 +177,17 @@ public class RoutineMainScreen extends AppCompatActivity {
             return mFragmentList.size();
         }
 
-        public void addFragment(Fragment fragment, String title)
-        {
+        void addFragment(Fragment fragment, String title) {
             mFragmentList.add(fragment);
             mFragmentTitleList.add(title);
         }
 
         @Override
-        public CharSequence getPageTitle(int position)
-        {
+        public CharSequence getPageTitle(int position) {
             return mFragmentTitleList.get(position);
         }
     }
+
     private void prepareListData() {
         listDataHeader = new ArrayList<ExpandedMenuModel>();
         listDataChild = new HashMap<ExpandedMenuModel, List<String>>();
@@ -328,7 +311,7 @@ public class RoutineMainScreen extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_logout) {
-            sharedPreferences  = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
+            SharedPreferences sharedPreferences  = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putBoolean("LogInState", false);
             editor.apply();
@@ -347,186 +330,18 @@ public class RoutineMainScreen extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private boolean isNetworkAvailable() {
-        ConnectivityManager connectivityManager = (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
-    }
-
-    void myRoutineDataGetRequest() {
-        if(isNetworkAvailable()) {
-            String myRoutineDataGetUrl = getString(R.string.baseUrl)+"/api/onEms/spGetTeacherStudentMyClassRoutine/"+InstituteID+"/"+
-                    ClassID+"/"+0;
-            myRoutineGetDialog = new ProgressDialog(this);
-            myRoutineGetDialog.setTitle("Loading...");
-            myRoutineGetDialog.setMessage("Please Wait...");
-            myRoutineGetDialog.setCancelable(false);
-            myRoutineGetDialog.setIcon(R.drawable.onair);
-            myRoutineGetDialog.show();
-            //Preparing subject data from server
-            StringRequest stringRoutineRequest = new StringRequest(Request.Method.GET, myRoutineDataGetUrl,
-                    new Response.Listener<String>() {
-                        @Override
-                        public void onResponse(String response) {
-
-                            parseRoutineJsonData(response);
-
-                        }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-
-                    myRoutineGetDialog.dismiss();
-                }
-            })
-            {
-                @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
-                    Map<String, String>  params = new HashMap<>();
-                    params.put("Authorization", "Request_From_onEMS_Android_app");
-                    return params;
-                }
-            };
-            MySingleton.getInstance(this).addToRequestQueue(stringRoutineRequest);
-        } else {
-            Toast.makeText(this,"Please check your internet connection !!!",Toast.LENGTH_LONG).show();
-        }
-    }
-
-    void parseRoutineJsonData(String jsonArrayResponse) {
-        try {
-            JSONArray totalRoutineJsonArray = new JSONArray(jsonArrayResponse);
-
-            saturdayJsonArray = new JSONArray();
-            sundayJsonArray = new JSONArray();
-            mondayJsonArray = new JSONArray();
-            tuesdayJsonArray = new JSONArray();
-            wednesdayJsonArray = new JSONArray();
-            thursdayJsonArray = new JSONArray();
-            fridayJsonArray = new JSONArray();
-
-            for(int i = 0; i < totalRoutineJsonArray.length(); i++) {
-                JSONObject routineJsonObject = totalRoutineJsonArray.getJSONObject(i);
-                switch(routineJsonObject.getInt("DayID")) {
-                    case 1: saturdayJsonArray.put(routineJsonObject);
-                            break;
-                    case 2: sundayJsonArray.put(routineJsonObject);
-                            break;
-                    case 3: mondayJsonArray.put(routineJsonObject);
-                            break;
-                    case 4: tuesdayJsonArray.put(routineJsonObject);
-                            break;
-                    case 5: wednesdayJsonArray.put(routineJsonObject);
-                            break;
-                    case 6: thursdayJsonArray.put(routineJsonObject);
-                            break;
-                    case 7: fridayJsonArray.put(routineJsonObject);
-                            break;
-                    default: Toast.makeText(this,"Invalid routine data from server !!!",Toast.LENGTH_LONG).show();
-                            break;
-                }
-            }
-
-            int saturdayPeriodNumber = countPeriodNumber(saturdayJsonArray);
-            int sundayPeriodNumber = countPeriodNumber(sundayJsonArray);
-            int mondayPeriodNumber = countPeriodNumber(mondayJsonArray);
-            int tuesdayPeriodNumber = countPeriodNumber(tuesdayJsonArray);
-            int wednesdayPeriodNumber = countPeriodNumber(wednesdayJsonArray);
-            int thursdayPeriodNumber = countPeriodNumber(thursdayJsonArray);
-            int fridayPeriodNumber = countPeriodNumber(fridayJsonArray);
-
-            setupViewPager(viewPager, saturdayJsonArray, saturdayPeriodNumber,
-                                      sundayJsonArray, sundayPeriodNumber,
-                                      mondayJsonArray, mondayPeriodNumber,
-                                      tuesdayJsonArray, tuesdayPeriodNumber,
-                                      wednesdayJsonArray, wednesdayPeriodNumber,
-                                      thursdayJsonArray, thursdayPeriodNumber,
-                                      fridayJsonArray, fridayPeriodNumber);
-            tabLayout.setupWithViewPager(viewPager);
-
-            myRoutineGetDialog.dismiss();
-        } catch (JSONException e) {
-            myRoutineGetDialog.dismiss();
-            e.printStackTrace();
-        }
-    }
-
-    private void setupViewPager(ViewPager viewPager,
-                                JSONArray saturdayJsonArray, int saturdayPeriodNumber,
-                                JSONArray sundayJsonArray, int sundayPeriodNumber,
-                                JSONArray mondayJsonArray, int mondayPeriodNumber,
-                                JSONArray tuesdayJsonArray, int tuesdayPeriodNumber,
-                                JSONArray wednesdayJsonArray, int wednesdayPeriodNumber,
-                                JSONArray thursdayJsonArray, int thursdayPeriodNumber,
-                                JSONArray fridayJsonArray, int fridayPeriodNumber) {
+    private void setupViewPager(ViewPager viewPager) {
 
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
 
-        Bundle saturdayBundle = new Bundle();
-        saturdayBundle.putString("saturdayJsonArray", saturdayJsonArray.toString());
-        saturdayBundle.putInt("saturdayPeriodNumber", saturdayPeriodNumber);
-        Saturday saturday = new Saturday();
-        saturday.setArguments(saturdayBundle);
-
-        Bundle sundayBundle = new Bundle();
-        sundayBundle.putString("sundayJsonArray", sundayJsonArray.toString());
-        sundayBundle.putInt("sundayPeriodNumber", sundayPeriodNumber);
-        Sunday sunday = new Sunday();
-        sunday.setArguments(sundayBundle);
-
-        Bundle mondayBundle = new Bundle();
-        mondayBundle.putString("mondayJsonArray", mondayJsonArray.toString());
-        mondayBundle.putInt("mondayPeriodNumber", mondayPeriodNumber);
-        Monday monday = new Monday();
-        monday.setArguments(mondayBundle);
-
-        Bundle tuesdayBundle = new Bundle();
-        tuesdayBundle.putString("tuesdayJsonArray", tuesdayJsonArray.toString());
-        tuesdayBundle.putInt("tuesdayPeriodNumber", tuesdayPeriodNumber);
-        Tuesday tuesday = new Tuesday();
-        tuesday.setArguments(tuesdayBundle);
-
-        Bundle wednesdayBundle = new Bundle();
-        wednesdayBundle.putString("wednesdayJsonArray", wednesdayJsonArray.toString());
-        wednesdayBundle.putInt("wednesdayPeriodNumber", wednesdayPeriodNumber);
-        Wednesday wednesday = new Wednesday();
-        wednesday.setArguments(wednesdayBundle);
-
-        Bundle thursdayBundle = new Bundle();
-        thursdayBundle.putString("thursdayJsonArray", thursdayJsonArray.toString());
-        thursdayBundle.putInt("thursdayPeriodNumber", thursdayPeriodNumber);
-        Thursday thursday = new Thursday();
-        thursday.setArguments(thursdayBundle);
-
-        Bundle fridayBundle = new Bundle();
-        fridayBundle.putString("fridayJsonArray", fridayJsonArray.toString());
-        fridayBundle.putInt("fridayPeriodNumber", fridayPeriodNumber);
-        Friday friday = new Friday();
-        friday.setArguments(fridayBundle);
-
-        adapter.addFragment(saturday, "Sat");
-        adapter.addFragment(sunday, "Sun");
-        adapter.addFragment(monday, "Mon");
-        adapter.addFragment(tuesday, "Tue");
-        adapter.addFragment(wednesday, "Wed");
-        adapter.addFragment(thursday, "Thu");
-        adapter.addFragment(friday, "Fri");
+        adapter.addFragment(new Saturday(), "Sat");
+        adapter.addFragment(new Sunday(), "Sun");
+        adapter.addFragment(new Monday(), "Mon");
+        adapter.addFragment(new Tuesday(), "Tue");
+        adapter.addFragment(new Wednesday(), "Wed");
+        adapter.addFragment(new Thursday(), "Thu");
+        adapter.addFragment(new Friday(), "Fri");
         viewPager.setAdapter(adapter);
 
-    }
-
-    int countPeriodNumber(JSONArray jsonArray) {
-        ArrayList<Integer> arrayList = new ArrayList<>();
-        for(int i = 0; i < jsonArray.length(); i++) {
-            try {
-                if(!arrayList.contains(jsonArray.getJSONObject(i).getInt("PeriodID"))) {
-                    arrayList.add(jsonArray.getJSONObject(i).getInt("PeriodID"));
-                }
-            } catch (JSONException e) {
-                myRoutineGetDialog.dismiss();
-                e.printStackTrace();
-            }
-        }
-        return arrayList.size();
     }
 }
