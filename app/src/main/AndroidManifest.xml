@@ -36,60 +36,42 @@
         <activity
             android:name=".mainactivities.LoginScreen"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar">
-
-        </activity>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".mainactivities.StudentMainScreen"
             android:screenOrientation="portrait"
-            android:theme="@style/SplashScreen">
-
-        </activity>
+            android:theme="@style/SplashScreen" />
         <activity
             android:name=".mainactivities.TeacherMainScreen"
             android:screenOrientation="portrait"
-            android:theme="@style/SplashScreen">
-
-        </activity>
+            android:theme="@style/SplashScreen" />
         <activity
             android:name=".mainactivities.TakeAttendance"
             android:label="Take Attendance"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar">
-
-        </activity>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".mainactivities.StudentAttendance"
             android:label="Attendance"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar">
-
-        </activity>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".mainactivities.Fees.StudentList"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar">
-
-        </activity>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".mainactivities.Fees.Fee"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="adjustResize">
-
-        </activity>
+            android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".mainactivities.StudentAttendanceShow"
             android:label="Attendance"
-            android:screenOrientation="portrait">
-
-        </activity>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".mainactivities.TakeAttendanceDetails"
             android:label="Take Attendance"
-            android:screenOrientation="portrait">
-
-        </activity>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".mainactivities.SubjectWiseAttendance"
             android:label="Attendance"
@@ -103,21 +85,15 @@
         <activity
             android:name=".mainactivities.AllStudentAttendanceShow"
             android:label="Attendance"
-            android:screenOrientation="portrait">
-
-        </activity>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".mainactivities.AllStudentSubjectWiseAttendance"
             android:label="Attendance"
-            android:screenOrientation="portrait">
-
-        </activity>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".mainactivities.TeacherAttendanceShow.ShowAttendance"
             android:label="Attendance"
-            android:screenOrientation="portrait">
-
-        </activity>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".mainactivities.TeacherAttendanceShow.ShowAllStudent"
             android:label="Attendance"
@@ -155,27 +131,19 @@
             android:name=".mainactivities.StudentiCardMain"
             android:label="iCard"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar">
-
-        </activity>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".mainactivities.StudentiCardDetails"
             android:label="Details Information"
-            android:screenOrientation="portrait">
-
-        </activity>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".mainactivities.StudentiCardDetailsEdit"
             android:label="Edit Information"
-            android:screenOrientation="portrait">
-
-        </activity>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".mainactivities.StudentiCardNewEntry"
             android:label="Entry Student"
-            android:screenOrientation="portrait">
-
-        </activity>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".mainactivities.Fees.FeesDetails"
             android:label="Fees Details"
@@ -257,23 +225,17 @@
             android:name=".mainactivities.Routine.ClassRoutine"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="adjustResize">
-
-        </activity>
+            android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".mainactivities.Result.ClassResult"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="adjustResize">
-
-        </activity>
+            android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".mainactivities.ReportAllStudentMain"
             android:label="Student List"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar">
-
-        </activity>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".mainactivities.ReportAllStudentList"
             android:label="Student List"
@@ -345,9 +307,22 @@
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
         </activity>
-        <activity android:name=".mainactivities.RoutineMainScreen"
-            android:screenOrientation="portrait"
+        <activity
+            android:name=".mainactivities.RoutineMainScreen"
             android:label="Class Routine"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar">
+
+        </activity>
+        <activity
+            android:name=".mainactivities.SideNavigationMenuParentActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar">
+
+        </activity>
+        <activity
+            android:name=".mainactivities.SyllabusMainScreen"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar">
 
         </activity>

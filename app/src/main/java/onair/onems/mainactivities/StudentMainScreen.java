@@ -14,7 +14,6 @@ import android.widget.TextView;
 import onair.onems.R;
 import onair.onems.mainactivities.Fees.Fee;
 import onair.onems.mainactivities.Fees.StudentList;
-import onair.onems.mainactivities.Routine.ClassRoutine;
 
 
 public class StudentMainScreen extends AppCompatActivity {
@@ -70,12 +69,12 @@ public class StudentMainScreen extends AppCompatActivity {
             @Override
             public void onClick(View v)
             {
-                if(user == 3)
-                {
-                    Intent mainIntent = new Intent(StudentMainScreen.this, RoutineMainScreen.class);
-                    startActivity(mainIntent);
-                    finish();
-                }
+//                if(user == 3)
+//                {
+//                    Intent mainIntent = new Intent(StudentMainScreen.this, RoutineMainScreen.class);
+//                    startActivity(mainIntent);
+//                    finish();
+//                }
 //                else
 //                {
 //                    Intent mainIntent = new Intent(StudentMainScreen.this,StudentList.class);
@@ -121,30 +120,30 @@ public class StudentMainScreen extends AppCompatActivity {
             @Override
             public void onClick(View v)
             {
-                if(user == 3)
-                {
-                    Intent mainIntent = new Intent(StudentMainScreen.this,Fee.class);
-                    StudentMainScreen.this.startActivity(mainIntent);
-                    finish();
-                }
-                else
-                {
-                    Intent mainIntent = new Intent(StudentMainScreen.this,StudentList.class);
-                    StudentMainScreen.this.startActivity(mainIntent);
-                    finish();
-                }
+//                if(user == 3)
+//                {
+//                    Intent mainIntent = new Intent(StudentMainScreen.this,Fee.class);
+//                    StudentMainScreen.this.startActivity(mainIntent);
+//                    finish();
+//                }
+//                else
+//                {
+//                    Intent mainIntent = new Intent(StudentMainScreen.this,StudentList.class);
+//                    StudentMainScreen.this.startActivity(mainIntent);
+//                    finish();
+//                }
             }
         });
 
-//        // Contact module start point
-//        contact.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Intent mainIntent = new Intent(StudentMainScreen.this,ContactsMainScreen.class);
+        // Contact module start point
+        contact.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+//                Intent mainIntent = new Intent(StudentMainScreen.this, SyllabusMainScreen.class);
 //                StudentMainScreen.this.startActivity(mainIntent);
 //                finish();
-//            }
-//        });
+            }
+        });
 
     }
     @Override

@@ -12,7 +12,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import onair.onems.R;
-import onair.onems.mainactivities.Routine.ClassRoutine;
 
 public class TeacherMainScreen extends AppCompatActivity {
 
@@ -57,9 +56,9 @@ public class TeacherMainScreen extends AppCompatActivity {
         routine.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent mainIntent = new Intent(TeacherMainScreen.this, RoutineMainScreen.class);
-                TeacherMainScreen.this.startActivity(mainIntent);
-                finish();
+//                Intent mainIntent = new Intent(TeacherMainScreen.this, RoutineMainScreen.class);
+//                TeacherMainScreen.this.startActivity(mainIntent);
+//                finish();
             }
         });
 

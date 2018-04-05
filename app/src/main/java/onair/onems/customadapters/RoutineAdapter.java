@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import org.json.JSONArray;
@@ -22,6 +23,7 @@ public class RoutineAdapter extends RecyclerView.Adapter<RoutineAdapter.MyViewHo
     private JSONArray periodJsonArray;
     private JSONArray allPeriodJsonArray;
     private int periodNumber;
+    private long UserTypeID;
 
     class MyViewHolder extends RecyclerView.ViewHolder {
         TextView periodName;
@@ -35,8 +37,9 @@ public class RoutineAdapter extends RecyclerView.Adapter<RoutineAdapter.MyViewHo
         }
     }
 
-    public RoutineAdapter(Context context, String periods) {
+    public RoutineAdapter(Context context, String periods, long UserTypeID) {
         this.context = context;
+        this.UserTypeID = UserTypeID;
 //        this.periodNumber = periodNumber;
 
         try {
@@ -114,7 +117,7 @@ public class RoutineAdapter extends RecyclerView.Adapter<RoutineAdapter.MyViewHo
                 }
             }
         });
-        holder.parentLinearLayout.setVisibility(View.GONE);
+//        holder.parentLinearLayout.setVisibility(View.GONE);
     }
 
     @Override
@@ -144,6 +147,20 @@ public class RoutineAdapter extends RecyclerView.Adapter<RoutineAdapter.MyViewHo
         TextView subjectName = rowView.findViewById(R.id.subjectName);
         TextView classTime = rowView.findViewById(R.id.classTime);
         TextView teacherName = rowView.findViewById(R.id.teacherName);
+        TextView className = rowView.findViewById(R.id.className);
+        ImageView teacherImage = rowView.findViewById(R.id.teacherImage);
+        if(UserTypeID == 3) {
+            className.setVisibility(View.GONE);
+        } else if(UserTypeID == 4) {
+            try {
+                className.setText(object.getString("ClassName"));
+                teacherName.setVisibility(View.GONE);
+                teacherImage.setVisibility(View.GONE);
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
         try {
             subjectName.setText(object.getString("SubjectName"));
             classTime.setText(object.getString("StartTime")+" - "+object.getString("EndTime"));

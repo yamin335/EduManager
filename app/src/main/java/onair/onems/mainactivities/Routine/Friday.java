@@ -28,9 +28,10 @@ import onair.onems.network.MySingleton;
 
 public class Friday extends Fragment {
 
-    private long InstituteID, ShiftID, MediumID, ClassID, DepartmentID, SectionID;
+    private long InstituteID, ShiftID, MediumID, ClassID, DepartmentID, SectionID, UserTypeID;
     private RoutineAdapter mAdapter;
     private RecyclerView recyclerView;
+    private String UserID;
 
     public Friday() {
 
@@ -54,6 +55,8 @@ public class Friday extends Fragment {
         ClassID = prefs.getLong("ClassID",0);
         DepartmentID = prefs.getLong("DepartmentID",0);
         SectionID = prefs.getLong("SectionID",0);
+        UserTypeID = prefs.getLong("UserTypeID",0);
+        UserID = prefs.getString("UserID","0");
 
         fridayRoutineDataGetRequest();
 
@@ -63,8 +66,14 @@ public class Friday extends Fragment {
     void fridayRoutineDataGetRequest() {
         if(isNetworkAvailable()) {
 
-            String fridayRoutineDataGetUrl = getString(R.string.baseUrl)+"/api/onEms/spGetDashClassRoutine/"+ShiftID
-                    +"/"+MediumID+"/"+ClassID+"/"+SectionID+"/"+DepartmentID+"/7/"+InstituteID;
+            String fridayRoutineDataGetUrl = "";
+            if(UserTypeID == 3) {
+                fridayRoutineDataGetUrl = getString(R.string.baseUrl)+"/api/onEms/spGetDashClassRoutine/"+ShiftID
+                        +"/"+MediumID+"/"+ClassID+"/"+SectionID+"/"+DepartmentID+"/7/"+InstituteID;
+            } else if(UserTypeID == 4) {
+                fridayRoutineDataGetUrl = getString(R.string.baseUrl)+"/api/onEms/spGetDashTeacherClassRoutine/"+UserID
+                        +"/7/"+InstituteID;
+            }
 
             final ProgressDialog fridayRoutineGetDialog = new ProgressDialog(getActivity());
             fridayRoutineGetDialog.setTitle("Loading...");
@@ -78,7 +87,7 @@ public class Friday extends Fragment {
                         @Override
                         public void onResponse(String response) {
 
-                            mAdapter = new RoutineAdapter(getActivity(), response);
+                            mAdapter = new RoutineAdapter(getActivity(), response, UserTypeID);
                             RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity());
                             recyclerView.setLayoutManager(mLayoutManager);
                             recyclerView.setItemAnimator(new DefaultItemAnimator());
