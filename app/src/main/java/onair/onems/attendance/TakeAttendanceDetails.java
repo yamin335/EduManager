@@ -1,10 +1,7 @@
-package onair.onems.mainactivities;
+package onair.onems.attendance;
 
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.SharedPreferences;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
@@ -29,6 +26,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import onair.onems.R;
+import onair.onems.Services.StaticHelperClass;
 import onair.onems.customadapters.CustomRequest;
 import onair.onems.customadapters.TakeAttendanceAdapter;
 import onair.onems.models.AttendanceSheetModel;
@@ -39,10 +37,10 @@ public class TakeAttendanceDetails extends AppCompatActivity {
     private TakeAttendanceAdapter adapter;
     private ArrayList<AttendanceStudentModel> attendanceSheetArrayList;
     private long InstituteID,MediumID,ShiftID,ClassID,SectionID,SubjectID,DepertmentID;
-    String date, StudentDataGetUrl, postUrl, UserID, SubAtdID;
-    ProgressDialog dialog;
-    JSONArray StudentJsonArray;
-    JSONObject postDatajsonObject;
+    private String date, StudentDataGetUrl, postUrl, UserID, SubAtdID;
+    private ProgressDialog dialog;
+    private JSONArray StudentJsonArray;
+    private JSONObject postDataJsonObject;
 
     @Override
     public void onResume() {
@@ -59,7 +57,7 @@ public class TakeAttendanceDetails extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_take_attendance_screen);
+        setContentView(R.layout.attendance_taking_activity_details);
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
 
         dialog = new ProgressDialog(this);
@@ -168,7 +166,7 @@ public class TakeAttendanceDetails extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.done) {
-            if(isNetworkAvailable())
+            if(StaticHelperClass.isNetworkAvailable(this))
             {
                 AttendanceSheetModel attendanceSheetModel = new AttendanceSheetModel();
                 attendanceSheetModel.setSubAtdID(SubAtdID);
@@ -202,11 +200,11 @@ public class TakeAttendanceDetails extends AppCompatActivity {
     {
         dialog.show();
         try {
-            postDatajsonObject = new JSONObject(json);
+            postDataJsonObject = new JSONObject(json);
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        CustomRequest customRequest = new CustomRequest (Request.Method.POST, postUrl, postDatajsonObject,
+        CustomRequest customRequest = new CustomRequest (Request.Method.POST, postUrl, postDataJsonObject,
                 new Response.Listener<JSONArray>() {
                     @Override
                     public void onResponse(JSONArray response) {
@@ -228,18 +226,12 @@ public class TakeAttendanceDetails extends AppCompatActivity {
         {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String>  params = new HashMap<String, String>();
+                Map<String, String>  params = new HashMap<>();
                 params.put("Authorization", "Request_From_onEMS_Android_app");
                 return params;
             }
         };
         MySingleton.getInstance(this).addToRequestQueue(customRequest);
-    }
-
-    private boolean isNetworkAvailable() {
-        ConnectivityManager connectivityManager = (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
     @Override
@@ -249,30 +241,34 @@ public class TakeAttendanceDetails extends AppCompatActivity {
     }
 
     public void StudentDataGetRequest(){
-        dialog.show();
-        //Preparing claas data from server
-        StringRequest stringStudentDataRequest = new StringRequest(Request.Method.GET, StudentDataGetUrl,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
+        if(StaticHelperClass.isNetworkAvailable(this)) {
+            dialog.show();
+            //Preparing claas data from server
+            StringRequest stringStudentDataRequest = new StringRequest(Request.Method.GET, StudentDataGetUrl,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
 
-                        prepareAlbums(response);
+                            prepareAlbums(response);
 
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                dialog.dismiss();
-            }
-        })
-        {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String>  params = new HashMap<String, String>();
-                params.put("Authorization", "Request_From_onEMS_Android_app");
-                return params;
-            }
-        };
-        MySingleton.getInstance(this).addToRequestQueue(stringStudentDataRequest);
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    dialog.dismiss();
+                }
+            })
+            {
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    Map<String, String>  params = new HashMap<>();
+                    params.put("Authorization", "Request_From_onEMS_Android_app");
+                    return params;
+                }
+            };
+            MySingleton.getInstance(this).addToRequestQueue(stringStudentDataRequest);
+        } else {
+            Toast.makeText(TakeAttendanceDetails.this,"Please check your internet connection!!!",Toast.LENGTH_LONG).show();
+        }
     }
 }

@@ -41,16 +41,12 @@ import onair.onems.customadapters.ExpandableListAdapter;
 import onair.onems.customadapters.MyDividerItemDecoration;
 import onair.onems.customadapters.ResultAdapter;
 import onair.onems.mainactivities.LoginScreen;
-import onair.onems.mainactivities.NoticeMainScreen;
 import onair.onems.mainactivities.ReportAllStudentMain;
-import onair.onems.mainactivities.StudentAttendance;
-import onair.onems.mainactivities.StudentMainScreen;
 import onair.onems.mainactivities.StudentiCardMain;
-import onair.onems.mainactivities.TakeAttendance;
-import onair.onems.mainactivities.TeacherAttendanceShow.ShowAttendance;
+import onair.onems.attendance.TakeAttendance;
+import onair.onems.attendance.ShowAttendance;
 import onair.onems.mainactivities.TeacherMainScreen;
 import onair.onems.models.ExpandedMenuModel;
-import onair.onems.models.NoticeModel;
 import onair.onems.models.ResultModel;
 
 /**
@@ -130,7 +126,7 @@ public class ResultMainScreen extends AppCompatActivity implements ResultAdapter
         }
 
         prepareListData();
-        mMenuAdapter = new ExpandableListAdapter(this, listDataHeader, listDataChild, expandableList);
+        mMenuAdapter = new ExpandableListAdapter(this, listDataHeader, listDataChild, 0);
 
         // setting list adapter
         expandableList.setAdapter(mMenuAdapter);

@@ -46,7 +46,7 @@
             android:screenOrientation="portrait"
             android:theme="@style/SplashScreen" />
         <activity
-            android:name=".mainactivities.TakeAttendance"
+            android:name=".attendance.TakeAttendance"
             android:label="Take Attendance"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
@@ -65,11 +65,11 @@
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name=".mainactivities.StudentAttendanceShow"
+            android:name=".attendance.StudentAttendanceShow"
             android:label="Attendance"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".mainactivities.TakeAttendanceDetails"
+            android:name=".attendance.TakeAttendanceDetails"
             android:label="Take Attendance"
             android:screenOrientation="portrait" />
         <activity
@@ -83,27 +83,28 @@
                 android:value="onair.onems.mainactivities.StudentAttendance" />
         </activity>
         <activity
-            android:name=".mainactivities.AllStudentAttendanceShow"
+            android:name=".attendance.StudentAttendanceAllDays"
             android:label="Attendance"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".mainactivities.AllStudentSubjectWiseAttendance"
+            android:name=".attendance.StudentSubjectWiseAttendance"
             android:label="Attendance"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".mainactivities.TeacherAttendanceShow.ShowAttendance"
-            android:label="Attendance"
-            android:screenOrientation="portrait" />
+            android:name=".attendance.ShowAttendance"
+            android:label="Attendance Report"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar"/>
         <activity
             android:name=".mainactivities.TeacherAttendanceShow.ShowAllStudent"
             android:label="Attendance"
-            android:parentActivityName=".mainactivities.TeacherAttendanceShow.ShowAttendance"
+            android:parentActivityName=".attendance.ShowAttendance"
             android:screenOrientation="portrait">
 
             <!-- The meta-data element is needed for versions lower than 4.1 -->
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="onair.onems.mainactivities.TeacherAttendanceShow.ShowAttendance" />
+                android:value="onair.onems.attendance.ShowAttendance" />
         </activity>
         <activity
             android:name=".mainactivities.TeacherAttendanceShow.DateAttendance"

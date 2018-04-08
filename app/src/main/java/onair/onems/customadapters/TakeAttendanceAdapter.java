@@ -15,9 +15,7 @@ import android.widget.Toast;
 import java.util.List;
 
 import onair.onems.R;
-import onair.onems.mainactivities.TakeAttendanceDetails;
 import onair.onems.models.AttendanceStudentModel;
-import onair.onems.models.StudentModel;
 
 /**
  * Created by Ravi Tamada on 18/05/16.

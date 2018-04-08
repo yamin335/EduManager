@@ -1,4 +1,4 @@
-package onair.onems.mainactivities;
+package onair.onems.attendance;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -43,7 +43,7 @@ public class StudentAttendanceShow extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.all_student_attendance_show);
+        setContentView(R.layout.attendance_report_student_list);
         tableView = (TableView) findViewById(R.id.tableView);
         SharedPreferences sharedPre = PreferenceManager.getDefaultSharedPreferences(this);
         InstituteID=sharedPre.getLong("InstituteID",0);
@@ -82,7 +82,7 @@ public class StudentAttendanceShow extends AppCompatActivity {
             @Override
             public void onDataClicked(int rowIndex, Object clickedData) {
                 selectedStudent = studentList.get(rowIndex);
-                Intent intent = new Intent(StudentAttendanceShow.this, AllStudentAttendanceShow.class);
+                Intent intent = new Intent(StudentAttendanceShow.this, StudentAttendanceAllDays.class);
                 intent.putExtra("UserID", selectedStudent.getUserID());
                 intent.putExtra("UserFullName", selectedStudent.getUserFullName());
                 intent.putExtra("RollNo", selectedStudent.getRollNo());

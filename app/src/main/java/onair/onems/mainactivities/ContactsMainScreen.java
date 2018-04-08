@@ -43,10 +43,11 @@ import java.util.List;
 
 import onair.onems.R;
 import onair.onems.Services.GlideApp;
+import onair.onems.attendance.TakeAttendance;
 import onair.onems.customadapters.ContactsAdapter;
 import onair.onems.customadapters.ExpandableListAdapter;
 import onair.onems.customadapters.MyDividerItemDecoration;
-import onair.onems.mainactivities.TeacherAttendanceShow.ShowAttendance;
+import onair.onems.attendance.ShowAttendance;
 import onair.onems.models.Contact;
 import onair.onems.models.ExpandedMenuModel;
 
@@ -134,7 +135,7 @@ public class ContactsMainScreen extends AppCompatActivity implements ContactsAda
         }
 
         prepareListData();
-        mMenuAdapter = new ExpandableListAdapter(this, listDataHeader, listDataChild, expandableList);
+        mMenuAdapter = new ExpandableListAdapter(this, listDataHeader, listDataChild, 0);
 
         // setting list adapter
         expandableList.setAdapter(mMenuAdapter);

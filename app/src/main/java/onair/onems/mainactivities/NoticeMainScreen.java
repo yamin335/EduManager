@@ -30,23 +30,18 @@ import android.widget.Toast;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 import onair.onems.R;
 import onair.onems.Services.GlideApp;
+import onair.onems.attendance.TakeAttendance;
 import onair.onems.customadapters.ExpandableListAdapter;
 import onair.onems.customadapters.NoticeAdapter;
-import onair.onems.customadapters.ReportAllStudentShowListAdapter;
-import onair.onems.mainactivities.TeacherAttendanceShow.ShowAttendance;
+import onair.onems.attendance.ShowAttendance;
 import onair.onems.models.ExpandedMenuModel;
 import onair.onems.models.NoticeModel;
-import onair.onems.models.ReportAllStudentRowModel;
 
 /**
  * Created by User on 2/6/2018.
@@ -122,7 +117,7 @@ public class NoticeMainScreen extends AppCompatActivity implements NoticeAdapter
         }
 
         prepareListData();
-        mMenuAdapter = new ExpandableListAdapter(this, listDataHeader, listDataChild, expandableList);
+        mMenuAdapter = new ExpandableListAdapter(this, listDataHeader, listDataChild, 0);
 
         // setting list adapter
         expandableList.setAdapter(mMenuAdapter);

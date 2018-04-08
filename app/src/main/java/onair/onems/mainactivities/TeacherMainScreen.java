@@ -12,6 +12,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import onair.onems.R;
+import onair.onems.attendance.TakeAttendance;
 
 public class TeacherMainScreen extends AppCompatActivity {
 
@@ -36,7 +37,7 @@ public class TeacherMainScreen extends AppCompatActivity {
         SharedPreferences sharedPre = PreferenceManager.getDefaultSharedPreferences(this);
         String InstituteNameString = sharedPre.getString("InstituteName","");
         InstituteName.setText(InstituteNameString);
-        long user = sharedPre.getLong("UserTypeID",0);
+        int user = sharedPre.getInt("UserTypeID",0);
         if(user == 4)
         {
             userType.setText("Teacher");
@@ -56,9 +57,9 @@ public class TeacherMainScreen extends AppCompatActivity {
         routine.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                Intent mainIntent = new Intent(TeacherMainScreen.this, RoutineMainScreen.class);
-//                TeacherMainScreen.this.startActivity(mainIntent);
-//                finish();
+                Intent mainIntent = new Intent(TeacherMainScreen.this, RoutineMainScreen.class);
+                TeacherMainScreen.this.startActivity(mainIntent);
+                finish();
             }
         });
 
@@ -86,6 +87,9 @@ public class TeacherMainScreen extends AppCompatActivity {
         contact.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Intent mainIntent = new Intent(TeacherMainScreen.this, SyllabusMainScreen.class);
+                startActivity(mainIntent);
+                finish();
 //                Intent mainIntent = new Intent(TeacherMainScreen.this,ContactsMainScreen.class);
 //                TeacherMainScreen.this.startActivity(mainIntent);
 //                finish();

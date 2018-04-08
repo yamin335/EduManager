@@ -40,9 +40,10 @@ public class LoginScreen extends AppCompatActivity
             DesignationName = "", BrunchName = "", RFID = "", RollNo = "",
             StudentNo = "";
 
-    private long UserTypeID = 0, InstituteID = 0, SBrunchID = 0, BoardID = 0, SDepartmentID = 0,
+    private long InstituteID = 0, SBrunchID = 0, BoardID = 0, SDepartmentID = 0,
             DepartmentID = 0, MediumID = 0, SectionID = 0, SessionID = 0, ShiftID = 0, ClassID = 0,
             DesignationID = 0, BrunchID = 0;
+    int UserTypeID = 0;
     private String loginurl = "";
     private ProgressDialog dialog;
     public static final String MyPREFERENCES = "LogInKey";
@@ -82,7 +83,7 @@ public class LoginScreen extends AppCompatActivity
         sharedPreferences  = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
         if(sharedPreferences.getBoolean("LogInState", true))
         {
-            long UserTypeID = prefs.getLong("UserTypeID",0);
+            int UserTypeID = prefs.getInt("UserTypeID",0);
             if((UserTypeID == 3)||(UserTypeID == 5))
             {
                 Intent intent = new Intent(LoginScreen.this, StudentMainScreen.class);
@@ -203,7 +204,7 @@ public class LoginScreen extends AppCompatActivity
             }
             else
             {
-                UserTypeID = Long.parseLong(UserTypeIDTemp);
+                UserTypeID = Integer.parseInt(UserTypeIDTemp);
             }
             UserFullName = jsonArray.getJSONObject(0).getString("UserFullName");
             InstituteName = jsonArray.getJSONObject(0).getString("InstituteName");
@@ -329,7 +330,7 @@ public class LoginScreen extends AppCompatActivity
             SharedPreferences.Editor editor = prefs.edit();
             editor.putString("UserID", UserID);
             editor.putString("Password",Password);
-            editor.putLong("UserTypeID",UserTypeID);
+            editor.putInt("UserTypeID",UserTypeID);
             editor.putString("UserFullName",UserFullName);
             editor.putLong("InstituteID",InstituteID);
             editor.putString("InstituteName",InstituteName);

@@ -1,4 +1,4 @@
-package onair.onems.mainactivities;
+package onair.onems.attendance;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -27,7 +27,7 @@ import de.codecrafters.tableview.toolkit.TableDataRowBackgroundProviders;
 import onair.onems.R;
 import onair.onems.network.MySingleton;
 
-public class AllStudentSubjectWiseAttendance extends AppCompatActivity {
+public class StudentSubjectWiseAttendance extends AppCompatActivity {
     private ProgressDialog dialog;
     private Configuration config;
     private TableView tableView;
@@ -38,7 +38,7 @@ public class AllStudentSubjectWiseAttendance extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.all_subject_wise_attendance);
+        setContentView(R.layout.attendance_report_subjectwise);
 
         SharedPreferences sharedPre = PreferenceManager.getDefaultSharedPreferences(this);
         InstituteID = sharedPre.getLong("InstituteID", 0);
@@ -94,7 +94,7 @@ public class AllStudentSubjectWiseAttendance extends AppCompatActivity {
     }
 
     public boolean onOptionsItemSelected(MenuItem item) {
-        Intent myIntent = new Intent(getApplicationContext(), AllStudentAttendanceShow.class);
+        Intent myIntent = new Intent(getApplicationContext(), StudentAttendanceAllDays.class);
         startActivityForResult(myIntent, 0);
         finish();
         return true;

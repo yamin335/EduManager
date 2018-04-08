@@ -1,4 +1,4 @@
-package onair.onems.mainactivities;
+package onair.onems.attendance;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -32,7 +32,7 @@ import onair.onems.R;
 import onair.onems.models.StudentAttendanceReportModels.DailyAttendanceModel;
 import onair.onems.network.MySingleton;
 
-public class AllStudentAttendanceShow extends AppCompatActivity
+public class StudentAttendanceAllDays extends AppCompatActivity
 {
     private ArrayList<DailyAttendanceModel> dailyAttendanceList;
     private DailyAttendanceModel selectedDay;
@@ -41,13 +41,13 @@ public class AllStudentAttendanceShow extends AppCompatActivity
     private Configuration config;
     private ProgressDialog dialog;
     private String RFID="", monthAttendanceUrl="", UserFullName="", RollNo="", UserID = "";
-    long InstituteID=0, SectionID=0, ClassID=0, MediumID=0, ShiftID=0, DepartmentID = 0;
-    int MonthID=0;
+    private long InstituteID=0, SectionID=0, ClassID=0, MediumID=0, ShiftID=0, DepartmentID = 0;
+    private int MonthID=0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.other_attendance_show);
+        setContentView(R.layout.attendance_report_all_days);
         tableView = (TableView) findViewById(R.id.tableView);
         TextView name=(TextView) findViewById(R.id.name);
         TextView roll=(TextView) findViewById(R.id.roll);
@@ -128,7 +128,7 @@ public class AllStudentAttendanceShow extends AppCompatActivity
             @Override
             public void onDataClicked(int rowIndex, Object clickedData) {
                 selectedDay = dailyAttendanceList.get(rowIndex);
-                Intent intent = new Intent(AllStudentAttendanceShow.this, AllStudentSubjectWiseAttendance.class);
+                Intent intent = new Intent(StudentAttendanceAllDays.this, StudentSubjectWiseAttendance.class);
                 intent.putExtra("UserID", UserID);
                 intent.putExtra("ShiftID", ShiftID);
                 intent.putExtra("MediumID", MediumID);

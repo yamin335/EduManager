@@ -36,7 +36,7 @@ import de.codecrafters.tableview.toolkit.SimpleTableDataAdapter;
 import de.codecrafters.tableview.toolkit.SimpleTableHeaderAdapter;
 import de.codecrafters.tableview.toolkit.TableDataRowBackgroundProviders;
 import onair.onems.R;
-import onair.onems.mainactivities.AllStudentSubjectWiseAttendance;
+import onair.onems.attendance.StudentSubjectWiseAttendance;
 import onair.onems.models.MonthModel;
 import onair.onems.models.StudentAttendanceReportModels.DailyAttendanceModel;
 import onair.onems.network.MySingleton;
@@ -123,7 +123,7 @@ public class SelfAttendance extends Fragment {
             public void onDataClicked(int rowIndex, Object clickedData)
             {
                 selectedDay = dailyAttendanceList.get(rowIndex);
-                Intent intent = new Intent(getActivity(), AllStudentSubjectWiseAttendance.class);
+                Intent intent = new Intent(getActivity(), StudentSubjectWiseAttendance.class);
                 intent.putExtra("UserID", UserID);
                 intent.putExtra("ShiftID", ShiftID);
                 intent.putExtra("MediumID", MediumID);

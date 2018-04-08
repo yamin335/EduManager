@@ -1,52 +1,47 @@
 package onair.onems.customadapters;
 
 import android.content.Context;
-import android.graphics.Typeface;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
-import android.widget.ExpandableListView;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import java.util.HashMap;
 import java.util.List;
-
 import onair.onems.R;
 import onair.onems.models.ExpandedMenuModel;
 
-/**
- * Created by User on 12/5/2017.
- */
 public class ExpandableListAdapter extends BaseExpandableListAdapter {
     private Context mContext;
-    private List<ExpandedMenuModel> mListDataHeader; // header titles
-
+    private List<ExpandedMenuModel> mListDataHeader;
+    private int UserTypeID;
     // child data in format of header title, child title
     private HashMap<ExpandedMenuModel, List<String>> mListDataChild;
-    ExpandableListView expandList;
+//    ExpandableListView expandList;
 
-    public ExpandableListAdapter(Context context, List<ExpandedMenuModel> listDataHeader, HashMap<ExpandedMenuModel, List<String>> listChildData, ExpandableListView mView) {
+    public ExpandableListAdapter(Context context, List<ExpandedMenuModel> listDataHeader,
+                                 HashMap<ExpandedMenuModel, List<String>> listChildData, int UserTypeID) {
         this.mContext = context;
         this.mListDataHeader = listDataHeader;
         this.mListDataChild = listChildData;
-        this.expandList = mView;
+        this.UserTypeID = UserTypeID;
+//        this.expandList = mView;
 //        expandList.setGroupIndicator(null);
     }
 
     @Override
     public int getGroupCount() {
         int i = mListDataHeader.size();
-        Log.d("GROUPCOUNT", String.valueOf(i));
+        Log.d("GROUP COUNT", String.valueOf(i));
         return this.mListDataHeader.size();
     }
 
     @Override
     public int getChildrenCount(int groupPosition) {
         int childCount = 0;
-        if (groupPosition != 4) {
+        if (groupPosition != 0) {
             childCount = this.mListDataChild.get(this.mListDataHeader.get(groupPosition))
                     .size();
         }
@@ -85,18 +80,32 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
     public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
         ExpandedMenuModel headerTitle = (ExpandedMenuModel) getGroup(groupPosition);
         if (convertView == null) {
-            LayoutInflater infalInflater = (LayoutInflater) this.mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            convertView = infalInflater.inflate(R.layout.listheader, null);
+            LayoutInflater inflater = (LayoutInflater) this.mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            convertView = inflater.inflate(R.layout.listheader, null);
         }
         TextView lblListHeader = (TextView) convertView.findViewById(R.id.submenu);
         ImageView headerIcon = (ImageView) convertView.findViewById(R.id.iconimage);
         ImageView indicator = (ImageView) convertView.findViewById(R.id.arrow);
-        switch (groupPosition) {
-            case 2:
-                indicator.setVisibility(View.VISIBLE);
-                break;
-            default:
-                indicator.setVisibility(View.INVISIBLE);
+
+        if(UserTypeID == 1) {
+
+        } else if(UserTypeID == 2) {
+
+        } else if(UserTypeID == 3) {
+
+        } else if(UserTypeID == 4) {
+            switch (groupPosition) {
+                case 3:
+                    indicator.setVisibility(View.VISIBLE);
+                    break;
+                case 8:
+                    indicator.setVisibility(View.VISIBLE);
+                    break;
+                default:
+                    indicator.setVisibility(View.INVISIBLE);
+            }
+        } else if(UserTypeID == 5) {
+
         }
 
         if (isExpanded) {

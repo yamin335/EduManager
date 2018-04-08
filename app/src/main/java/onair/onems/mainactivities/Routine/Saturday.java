@@ -53,7 +53,7 @@ public class Saturday extends Fragment {
         ClassID = prefs.getLong("ClassID",0);
         DepartmentID = prefs.getLong("DepartmentID",0);
         SectionID = prefs.getLong("SectionID",0);
-        UserTypeID = prefs.getLong("UserTypeID",0);
+        UserTypeID = prefs.getInt("UserTypeID",0);
         UserID = prefs.getString("UserID","0");
 
         saturdayRoutineDataGetRequest();

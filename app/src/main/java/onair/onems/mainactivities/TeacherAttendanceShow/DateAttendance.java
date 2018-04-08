@@ -4,7 +4,6 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
-import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.content.ContextCompat;
@@ -35,11 +34,7 @@ import de.codecrafters.tableview.model.TableColumnWeightModel;
 import de.codecrafters.tableview.toolkit.SimpleTableDataAdapter;
 import de.codecrafters.tableview.toolkit.SimpleTableHeaderAdapter;
 import de.codecrafters.tableview.toolkit.TableDataRowBackgroundProviders;
-import de.hdodenhof.circleimageview.CircleImageView;
 import onair.onems.R;
-import onair.onems.mainactivities.AllStudentAttendanceShow;
-import onair.onems.mainactivities.AllStudentSubjectWiseAttendance;
-import onair.onems.mainactivities.StudentAttendanceShow;
 
 /**
  * Created by hp on 1/2/2018.
@@ -63,7 +58,7 @@ public class DateAttendance extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.other_attendance_show);
+        setContentView(R.layout.attendance_report_all_days);
         tableView = (TableView) findViewById(R.id.tableView);
         name=(TextView) findViewById(R.id.name);
         roll=(TextView) findViewById(R.id.roll);

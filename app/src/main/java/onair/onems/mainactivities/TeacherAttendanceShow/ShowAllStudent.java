@@ -32,9 +32,7 @@ import de.codecrafters.tableview.toolkit.SimpleTableDataAdapter;
 import de.codecrafters.tableview.toolkit.SimpleTableHeaderAdapter;
 import de.codecrafters.tableview.toolkit.TableDataRowBackgroundProviders;
 import onair.onems.R;
-import onair.onems.mainactivities.AllStudentAttendanceShow;
-import onair.onems.mainactivities.StudentAttendance;
-import onair.onems.mainactivities.StudentAttendanceShow;
+import onair.onems.attendance.ShowAttendance;
 
 /**
  * Created by hp on 1/2/2018.
@@ -57,7 +55,7 @@ public class ShowAllStudent extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.all_student_attendance_show);
+        setContentView(R.layout.attendance_report_student_list);
         tableView = (TableView) findViewById(R.id.tableView);
 
         sharedPre = PreferenceManager.getDefaultSharedPreferences(this);

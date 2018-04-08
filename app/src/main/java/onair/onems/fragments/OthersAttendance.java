@@ -29,7 +29,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import onair.onems.R;
-import onair.onems.mainactivities.StudentAttendanceShow;
+import onair.onems.attendance.StudentAttendanceShow;
 import onair.onems.models.ClassModel;
 import onair.onems.models.DepartmentModel;
 import onair.onems.models.MediumModel;
@@ -80,7 +80,7 @@ public class OthersAttendance extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.student_attendance_others_attendence, container, false);
+        View rootView = inflater.inflate(R.layout.attendance_report_monthly_student_other, container, false);
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         InstituteID = prefs.getLong("InstituteID",0);

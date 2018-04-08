@@ -43,8 +43,9 @@ import java.util.List;
 import java.util.Map;
 import onair.onems.R;
 import onair.onems.Services.GlideApp;
+import onair.onems.attendance.TakeAttendance;
 import onair.onems.customadapters.ExpandableListAdapter;
-import onair.onems.mainactivities.TeacherAttendanceShow.ShowAttendance;
+import onair.onems.attendance.ShowAttendance;
 import onair.onems.models.ClassModel;
 import onair.onems.models.DepartmentModel;
 import onair.onems.models.ExpandedMenuModel;
@@ -119,7 +120,7 @@ public class ReportAllStudentMain extends AppCompatActivity {
         TextView userName = (TextView)view.findViewById(R.id.userName);
         String imageUrl = prefs.getString("ImageUrl","");
         String name = prefs.getString("UserFullName","");
-        long user = prefs.getLong("UserTypeID",0);
+        int user = prefs.getInt("UserTypeID",0);
         userName.setText(name);
         if(user == 4) {
             userType.setText("Teacher");
@@ -139,7 +140,7 @@ public class ReportAllStudentMain extends AppCompatActivity {
         }
 
         prepareListData();
-        mMenuAdapter = new ExpandableListAdapter(this, listDataHeader, listDataChild, expandableList);
+        mMenuAdapter = new ExpandableListAdapter(this, listDataHeader, listDataChild, 0);
 
         // setting list adapter
         expandableList.setAdapter(mMenuAdapter);

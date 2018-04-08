@@ -1,15 +1,11 @@
-package onair.onems.mainactivities.TeacherAttendanceShow;
+package onair.onems.attendance;
 
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -28,7 +24,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import onair.onems.R;
-import onair.onems.mainactivities.StudentAttendanceShow;
+import onair.onems.Services.StaticHelperClass;
+import onair.onems.mainactivities.SideNavigationMenuParentActivity;
+import onair.onems.mainactivities.StudentMainScreen;
+import onair.onems.mainactivities.TeacherMainScreen;
 import onair.onems.models.ClassModel;
 import onair.onems.models.DepartmentModel;
 import onair.onems.models.MediumModel;
@@ -37,7 +36,7 @@ import onair.onems.models.SectionModel;
 import onair.onems.models.ShiftModel;
 import onair.onems.network.MySingleton;
 
-public class ShowAttendance extends AppCompatActivity {
+public class ShowAttendance extends SideNavigationMenuParentActivity {
     private Spinner spinnerClass, spinnerShift, spinnerSection, spinnerMedium, spinnerDepartment, spinnerMonth;
     private ProgressDialog mShiftDialog, mMediumDialog, mClassDialog, mDepartmentDialog, mSectionDialog, mMonthDialog;
     private ArrayList<ClassModel> allClassArrayList;
@@ -60,14 +59,16 @@ public class ShowAttendance extends AppCompatActivity {
     private MonthModel selectedMonth = null;
     private long InstituteID;
     private int firstClass = 0, firstShift = 0, firstSection = 0, firstMedium = 0,
-            firstDepartment = 0;
+            firstDepartment = 0, UserTypeID;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.student_attendance_others_attendence);
+        setContentView(R.layout.attendance_report_monthly_student_other);
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         InstituteID = prefs.getLong("InstituteID",0);
+        UserTypeID = prefs.getInt("UserTypeID",0);
+        activityName = ShowAttendance.class.getName();
 
         selectedClass = new ClassModel();
         selectedShift = new ShiftModel();
@@ -267,7 +268,7 @@ public class ShowAttendance extends AppCompatActivity {
         student_find_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(isNetworkAvailable()) {
+                if(StaticHelperClass.isNetworkAvailable(ShowAttendance.this)) {
                     if(selectedMedium.getMediumID() == -2) {
                         Toast.makeText(ShowAttendance.this,"Please select a medium!!!",Toast.LENGTH_LONG).show();
                     } else if(selectedClass.getClassID() == -2) {
@@ -298,6 +299,33 @@ public class ShowAttendance extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
+        switch (UserTypeID) {
+            case 1:
+                Intent superAdminIntent = new Intent(ShowAttendance.this, TeacherMainScreen.class);
+                startActivity(superAdminIntent);
+                finish();
+                break;
+            case 2:
+                Intent instituteAdminIntent = new Intent(ShowAttendance.this, TeacherMainScreen.class);
+                startActivity(instituteAdminIntent);
+                finish();
+                break;
+            case 3:
+                Intent studentIntent = new Intent(ShowAttendance.this, StudentMainScreen.class);
+                startActivity(studentIntent);
+                finish();
+                break;
+            case 4:
+                Intent teacherIntent = new Intent(ShowAttendance.this, TeacherMainScreen.class);
+                startActivity(teacherIntent);
+                finish();
+                break;
+            case 5:
+                Intent guardianIntent = new Intent(ShowAttendance.this, StudentMainScreen.class);
+                startActivity(guardianIntent);
+                finish();
+                break;
+        }
         super.onBackPressed();
     }
 
@@ -506,14 +534,8 @@ public class ShowAttendance extends AppCompatActivity {
 
     }
 
-    private boolean isNetworkAvailable() {
-        ConnectivityManager connectivityManager = (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
-    }
-
     private void ShiftDataGetRequest() {
-        if (isNetworkAvailable()) {
+        if (StaticHelperClass.isNetworkAvailable(this)) {
             String shiftUrl = getString(R.string.baseUrl)+"/api/onEms/getInsShift/"+InstituteID;
 
             mShiftDialog = new ProgressDialog(this);
@@ -553,7 +575,7 @@ public class ShowAttendance extends AppCompatActivity {
     }
 
     private void MediumDataGetRequest() {
-        if(isNetworkAvailable()) {
+        if(StaticHelperClass.isNetworkAvailable(this)) {
             String mediumUrl = getString(R.string.baseUrl)+"/api/onEms/getInstituteMediumDdl/"+InstituteID;
 
             mMediumDialog = new ProgressDialog(this);
@@ -593,7 +615,7 @@ public class ShowAttendance extends AppCompatActivity {
     }
 
     private void ClassDataGetRequest() {
-        if(isNetworkAvailable()) {
+        if(StaticHelperClass.isNetworkAvailable(this)) {
 
             CheckSelectedData();
 
@@ -636,7 +658,7 @@ public class ShowAttendance extends AppCompatActivity {
     }
 
     private void DepartmentDataGetRequest() {
-        if(isNetworkAvailable()) {
+        if(StaticHelperClass.isNetworkAvailable(this)) {
 
             CheckSelectedData();
 
@@ -680,7 +702,7 @@ public class ShowAttendance extends AppCompatActivity {
     }
 
     private void SectionDataGetRequest() {
-        if(isNetworkAvailable()) {
+        if(StaticHelperClass.isNetworkAvailable(this)) {
 
             CheckSelectedData();
 

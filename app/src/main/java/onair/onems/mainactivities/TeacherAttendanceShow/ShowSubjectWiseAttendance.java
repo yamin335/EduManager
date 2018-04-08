@@ -29,7 +29,6 @@ import de.codecrafters.tableview.toolkit.SimpleTableDataAdapter;
 import de.codecrafters.tableview.toolkit.SimpleTableHeaderAdapter;
 import de.codecrafters.tableview.toolkit.TableDataRowBackgroundProviders;
 import onair.onems.R;
-import onair.onems.mainactivities.AllStudentAttendanceShow;
 
 /**
  * Created by hp on 1/2/2018.
@@ -54,7 +53,7 @@ public class ShowSubjectWiseAttendance extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.all_subject_wise_attendance);
+        setContentView(R.layout.attendance_report_subjectwise);
         tableView = (TableView) findViewById(R.id.tableView);
 
         simpleTableHeaderAdapter = new SimpleTableHeaderAdapter(this, "Subject Name", "Code ", "Status", "Teacher");
