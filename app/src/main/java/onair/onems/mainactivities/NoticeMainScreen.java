@@ -40,6 +40,7 @@ import onair.onems.attendance.TakeAttendance;
 import onair.onems.customadapters.ExpandableListAdapter;
 import onair.onems.customadapters.NoticeAdapter;
 import onair.onems.attendance.ShowAttendance;
+import onair.onems.icard.StudentiCardMain;
 import onair.onems.models.ExpandedMenuModel;
 import onair.onems.models.NoticeModel;
 
@@ -198,7 +199,7 @@ public class NoticeMainScreen extends AppCompatActivity implements NoticeAdapter
         listDataHeader.add(menuNotice);
 
         ExpandedMenuModel menuRoutine = new ExpandedMenuModel();
-        menuRoutine.setIconName("Routine");
+        menuRoutine.setIconName("Routiness");
         menuRoutine.setIconImg(R.drawable.nav_routine);
         listDataHeader.add(menuRoutine);
 

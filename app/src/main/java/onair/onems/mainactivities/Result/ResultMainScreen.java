@@ -42,16 +42,12 @@ import onair.onems.customadapters.MyDividerItemDecoration;
 import onair.onems.customadapters.ResultAdapter;
 import onair.onems.mainactivities.LoginScreen;
 import onair.onems.mainactivities.ReportAllStudentMain;
-import onair.onems.mainactivities.StudentiCardMain;
+import onair.onems.icard.StudentiCardMain;
 import onair.onems.attendance.TakeAttendance;
 import onair.onems.attendance.ShowAttendance;
 import onair.onems.mainactivities.TeacherMainScreen;
 import onair.onems.models.ExpandedMenuModel;
 import onair.onems.models.ResultModel;
-
-/**
- * Created by User on 2/11/2018.
- */
 
 public class ResultMainScreen extends AppCompatActivity implements ResultAdapter.ResultsAdapterListener{
 
@@ -207,7 +203,7 @@ public class ResultMainScreen extends AppCompatActivity implements ResultAdapter
         listDataHeader.add(menuNotice);
 
         ExpandedMenuModel menuRoutine = new ExpandedMenuModel();
-        menuRoutine.setIconName("Routine");
+        menuRoutine.setIconName("Routiness");
         menuRoutine.setIconImg(R.drawable.nav_routine);
         listDataHeader.add(menuRoutine);
 

@@ -52,7 +52,7 @@ public class TakeAttendanceAdapter extends RecyclerView.Adapter<TakeAttendanceAd
 
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.album_card, parent, false);
+        View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.attendance_taking_row_item, parent, false);
         return new MyViewHolder(itemView);
     }
 

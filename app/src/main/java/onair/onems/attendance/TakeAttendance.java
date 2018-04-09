@@ -68,7 +68,6 @@ public class TakeAttendance extends SideNavigationMenuParentActivity {
     private MediumModel selectedMedium = null;
     private SubjectModel selectedSubject = null;
     private DepartmentModel selectedDepartment = null;
-
     private boolean hasDepartment = false;
     private String selectedDate = "";
     private long InstituteID;

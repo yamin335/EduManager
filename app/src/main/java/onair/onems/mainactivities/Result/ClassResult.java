@@ -32,11 +32,10 @@ import java.util.List;
 import de.hdodenhof.circleimageview.CircleImageView;
 import onair.onems.R;
 import onair.onems.customadapters.ExpandableListAdapterStudent;
-import onair.onems.mainactivities.Fees.Fee;
-import onair.onems.mainactivities.Fees.FeesHistory;
+import onair.onems.Fee.Fee;
+import onair.onems.Fee.FeesHistory;
 import onair.onems.mainactivities.LoginScreen;
-import onair.onems.mainactivities.Routine.ClassRoutine;
-import onair.onems.mainactivities.StudentAttendance;
+import onair.onems.attendance.StudentAttendanceReport;
 import onair.onems.mainactivities.StudentMainScreen;
 import onair.onems.models.ExpandedMenuModel;
 
@@ -71,7 +70,7 @@ public class ClassResult extends AppCompatActivity
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         expandableList = (ExpandableListView) findViewById(R.id.navigationmenu);
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        View view = getLayoutInflater().inflate(R.layout.nav_header_student_attendance,null);
+        View view = getLayoutInflater().inflate(R.layout.onems_nav_header_main,null);
         ImageView profilePicture = (ImageView)view.findViewById(R.id.profilePicture);
         TextView userType = (TextView)view.findViewById(R.id.userType);
         TextView userName = (TextView)view.findViewById(R.id.userName);
@@ -148,7 +147,7 @@ public class ClassResult extends AppCompatActivity
                     DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
                     if (drawer.isDrawerOpen(GravityCompat.START)) {
                         drawer.closeDrawer(GravityCompat.START);
-                        Intent mainIntent = new Intent(ClassResult.this,StudentAttendance.class);
+                        Intent mainIntent = new Intent(ClassResult.this,StudentAttendanceReport.class);
                         ClassResult.this.startActivity(mainIntent);
                         finish();
                     }
@@ -157,10 +156,10 @@ public class ClassResult extends AppCompatActivity
                 {
                     DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
                     if (drawer.isDrawerOpen(GravityCompat.START)) {
-                        drawer.closeDrawer(GravityCompat.START);
-                        Intent mainIntent = new Intent(ClassResult.this, ClassRoutine.class);
-                        ClassResult.this.startActivity(mainIntent);
-                        finish();
+//                        drawer.closeDrawer(GravityCompat.START);
+//                        Intent mainIntent = new Intent(ClassResult.this, ClassRoutine.class);
+//                        ClassResult.this.startActivity(mainIntent);
+//                        finish();
                     }
                 }
                 return false;
@@ -187,7 +186,7 @@ public class ClassResult extends AppCompatActivity
         listDataHeader.add(menuNotice);
 
         ExpandedMenuModel menuRoutine = new ExpandedMenuModel();
-        menuRoutine.setIconName("Routine");
+        menuRoutine.setIconName("Routiness");
         menuRoutine.setIconImg(R.drawable.nav_routine);
         listDataHeader.add(menuRoutine);
 

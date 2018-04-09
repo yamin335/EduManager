@@ -166,8 +166,7 @@ public class TakeAttendanceDetails extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.done) {
-            if(StaticHelperClass.isNetworkAvailable(this))
-            {
+            if(StaticHelperClass.isNetworkAvailable(this)) {
                 AttendanceSheetModel attendanceSheetModel = new AttendanceSheetModel();
                 attendanceSheetModel.setSubAtdID(SubAtdID);
                 attendanceSheetModel.setSubjectID(Long.toString(SubjectID));

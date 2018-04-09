@@ -14,7 +14,6 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -97,7 +96,7 @@ public class LoginScreen extends AppCompatActivity
                 finish();
             }
         }
-        setContentView(R.layout.activity_login);
+        setContentView(R.layout.login_activity);
         dialog = new ProgressDialog(this);
         dialog.setTitle("Loading...");
         dialog.setMessage("Please Wait...");

@@ -27,10 +27,15 @@ import java.util.HashMap;
 import java.util.List;
 
 import onair.onems.R;
+import onair.onems.routine.RoutineMainScreen;
 import onair.onems.Services.GlideApp;
+import onair.onems.attendance.StudentAttendanceReport;
 import onair.onems.attendance.TakeAttendance;
 import onair.onems.customadapters.ExpandableListAdapter;
 import onair.onems.attendance.ShowAttendance;
+import onair.onems.icard.StudentiCardMain;
+import onair.onems.icard.StudentiCardNewEntry;
+import onair.onems.Fee.Fee;
 import onair.onems.models.ExpandedMenuModel;
 
 public class SideNavigationMenuParentActivity extends AppCompatActivity {
@@ -62,7 +67,7 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity {
         actionBar.setDisplayHomeAsUpEnabled(true);
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        View view = getLayoutInflater().inflate(R.layout.nav_header_main,null);
+        View view = getLayoutInflater().inflate(R.layout.onems_nav_header_main,null);
         navigationView.addHeaderView(view);
         if (navigationView != null) {
             setupDrawerContent(navigationView);
@@ -165,10 +170,386 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity {
 
     private void prepareSuperAdminSideMenu() {
 
+        listDataHeader = new ArrayList<>();
+        listDataChild = new HashMap<>();
+
+        // Adding data header
+        ExpandedMenuModel menuDashboard = new ExpandedMenuModel();
+        menuDashboard.setIconName("Dashboard");
+        menuDashboard.setIconImg(R.drawable.ic_dashboard);
+        listDataHeader.add(menuDashboard);
+
+        ExpandedMenuModel menuNotice = new ExpandedMenuModel();
+        menuNotice.setIconName("Notice");
+        menuNotice.setIconImg(R.drawable.nav_notice);
+        listDataHeader.add(menuNotice);
+
+        ExpandedMenuModel menuRoutine = new ExpandedMenuModel();
+        menuRoutine.setIconName("Routine");
+        menuRoutine.setIconImg(R.drawable.nav_routine);
+        listDataHeader.add(menuRoutine);
+
+        ExpandedMenuModel menuAttendance = new ExpandedMenuModel();
+        menuAttendance.setIconName("Attendance");
+        menuAttendance.setIconImg(R.drawable.nav_attendance);
+        listDataHeader.add(menuAttendance);
+
+        ExpandedMenuModel menuSyllabus = new ExpandedMenuModel();
+        menuSyllabus.setIconName("Syllabus");
+        menuSyllabus.setIconImg(R.drawable.nav_syllabus);
+        listDataHeader.add(menuSyllabus);
+
+        ExpandedMenuModel menuExam = new ExpandedMenuModel();
+        menuExam.setIconName("Exam");
+        menuExam.setIconImg(R.drawable.nav_exam);
+        listDataHeader.add(menuExam);
+
+        ExpandedMenuModel menuResult = new ExpandedMenuModel();
+        menuResult.setIconName("Result");
+        menuResult.setIconImg(R.drawable.nav_result);
+        listDataHeader.add(menuResult);
+
+        ExpandedMenuModel menuContact = new ExpandedMenuModel();
+        menuContact.setIconName("Contact");
+        menuContact.setIconImg(R.drawable.nav_contact);
+        listDataHeader.add(menuContact);
+
+        ExpandedMenuModel menuiCard = new ExpandedMenuModel();
+        menuiCard.setIconName("iCard");
+        menuiCard.setIconImg(R.drawable.ic_person);
+        listDataHeader.add(menuiCard);
+
+        ExpandedMenuModel menuStudentList = new ExpandedMenuModel();
+        menuStudentList.setIconName("Student List");
+        menuStudentList.setIconImg(R.drawable.ic_action_users);
+        listDataHeader.add(menuStudentList);
+
+        // Adding child data
+        List<String> headingDashboard = new ArrayList<>();
+        List<String> headingNotice = new ArrayList<>();
+        List<String> headingRoutine = new ArrayList<>();
+
+        List<String> headingAttendance = new ArrayList<>();
+        headingAttendance.add("Take Attendance");
+        headingAttendance.add("Show Attendance");
+
+        List<String> headingSyllabus = new ArrayList<>();
+        List<String> headingExam = new ArrayList<>();
+        List<String> headingResult = new ArrayList<>();
+        List<String> headingContact = new ArrayList<>();
+
+        List<String> headingiCard = new ArrayList<>();
+        headingiCard.add("Find Student");
+        headingiCard.add("Entry Student");
+
+        List<String> headingStudentList = new ArrayList<>();
+
+        // Header, Child data
+        listDataChild.put(listDataHeader.get(0), headingDashboard);
+        listDataChild.put(listDataHeader.get(1), headingNotice);
+        listDataChild.put(listDataHeader.get(2), headingRoutine);
+        listDataChild.put(listDataHeader.get(3), headingAttendance);
+        listDataChild.put(listDataHeader.get(4), headingSyllabus);
+        listDataChild.put(listDataHeader.get(5), headingExam);
+        listDataChild.put(listDataHeader.get(6), headingResult);
+        listDataChild.put(listDataHeader.get(7), headingContact);
+        listDataChild.put(listDataHeader.get(8), headingiCard);
+        listDataChild.put(listDataHeader.get(9), headingStudentList);
+
+        mMenuAdapter = new ExpandableListAdapter(this, listDataHeader, listDataChild, UserTypeID);
+        expandableList.setAdapter(mMenuAdapter);
+
+        expandableList.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
+            @Override
+            public boolean onGroupClick(ExpandableListView expandableListView, View view, int i, long l) {
+//                Log.d("DEBUG", "heading clicked"+i+"--"+l);
+
+                if((i == 0) && (l == 0)) {
+                    Intent intent = new Intent(getApplicationContext(), TeacherMainScreen.class);
+                    startActivity(intent);
+                    finish();
+                }
+
+                if((i == 2) && (l == 2)) {
+                    if(activityName.equals(RoutineMainScreen.class.getName())){
+                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                        if (drawer.isDrawerOpen(GravityCompat.START)) {
+                            drawer.closeDrawer(GravityCompat.START);
+                        }
+                    } else {
+                        Intent intent = new Intent(getApplicationContext(), RoutineMainScreen.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                }
+
+                if((i == 9) && (l == 9)) {
+                    if(activityName.equals(ReportAllStudentMain.class.getName())){
+                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                        if (drawer.isDrawerOpen(GravityCompat.START)) {
+                            drawer.closeDrawer(GravityCompat.START);
+                        }
+                    } else {
+                        Intent intent = new Intent(getApplicationContext(), ReportAllStudentMain.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                }
+                return false;
+            }
+        });
+
+        expandableList.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
+            @Override
+            public boolean onChildClick(ExpandableListView expandableListView, View view, int i, int i1, long l) {
+
+                if((i == 3) && (i1 == 0) && (l == 0)) {
+                    if(activityName.equals(TakeAttendance.class.getName())){
+                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                        if (drawer.isDrawerOpen(GravityCompat.START)) {
+                            drawer.closeDrawer(GravityCompat.START);
+                        }
+                    } else {
+                        Intent intent = new Intent(getApplicationContext(), TakeAttendance.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                }
+
+                if((i == 3) && (i1 == 1) && (l == 1)) {
+                    if(activityName.equals(ShowAttendance.class.getName())){
+                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                        if (drawer.isDrawerOpen(GravityCompat.START)) {
+                            drawer.closeDrawer(GravityCompat.START);
+                        }
+                    } else {
+                        Intent intent = new Intent(getApplicationContext(), ShowAttendance.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                }
+
+                if((i == 8) && (i1 == 0) && (l == 0)) {
+                    if(activityName.equals(StudentiCardMain.class.getName())){
+                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                        if (drawer.isDrawerOpen(GravityCompat.START)) {
+                            drawer.closeDrawer(GravityCompat.START);
+                        }
+                    } else {
+                        Intent intent = new Intent(getApplicationContext(), StudentiCardMain.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                }
+
+                if((i == 8) && (i1 == 1) && (l == 1)) {
+                    if(activityName.equals(StudentiCardNewEntry.class.getName())){
+                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                        if (drawer.isDrawerOpen(GravityCompat.START)) {
+                            drawer.closeDrawer(GravityCompat.START);
+                        }
+                    } else {
+                        Intent intent = new Intent(getApplicationContext(), StudentiCardNewEntry.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                }
+
+                return false;
+            }
+        });
     }
 
     private void prepareInstituteAdminSideMenu() {
 
+        listDataHeader = new ArrayList<>();
+        listDataChild = new HashMap<>();
+
+        // Adding data header
+        ExpandedMenuModel menuDashboard = new ExpandedMenuModel();
+        menuDashboard.setIconName("Dashboard");
+        menuDashboard.setIconImg(R.drawable.ic_dashboard);
+        listDataHeader.add(menuDashboard);
+
+        ExpandedMenuModel menuNotice = new ExpandedMenuModel();
+        menuNotice.setIconName("Notice");
+        menuNotice.setIconImg(R.drawable.nav_notice);
+        listDataHeader.add(menuNotice);
+
+        ExpandedMenuModel menuRoutine = new ExpandedMenuModel();
+        menuRoutine.setIconName("Routine");
+        menuRoutine.setIconImg(R.drawable.nav_routine);
+        listDataHeader.add(menuRoutine);
+
+        ExpandedMenuModel menuAttendance = new ExpandedMenuModel();
+        menuAttendance.setIconName("Attendance");
+        menuAttendance.setIconImg(R.drawable.nav_attendance);
+        listDataHeader.add(menuAttendance);
+
+        ExpandedMenuModel menuSyllabus = new ExpandedMenuModel();
+        menuSyllabus.setIconName("Syllabus");
+        menuSyllabus.setIconImg(R.drawable.nav_syllabus);
+        listDataHeader.add(menuSyllabus);
+
+        ExpandedMenuModel menuExam = new ExpandedMenuModel();
+        menuExam.setIconName("Exam");
+        menuExam.setIconImg(R.drawable.nav_exam);
+        listDataHeader.add(menuExam);
+
+        ExpandedMenuModel menuResult = new ExpandedMenuModel();
+        menuResult.setIconName("Result");
+        menuResult.setIconImg(R.drawable.nav_result);
+        listDataHeader.add(menuResult);
+
+        ExpandedMenuModel menuContact = new ExpandedMenuModel();
+        menuContact.setIconName("Contact");
+        menuContact.setIconImg(R.drawable.nav_contact);
+        listDataHeader.add(menuContact);
+
+        ExpandedMenuModel menuiCard = new ExpandedMenuModel();
+        menuiCard.setIconName("iCard");
+        menuiCard.setIconImg(R.drawable.ic_person);
+        listDataHeader.add(menuiCard);
+
+        ExpandedMenuModel menuStudentList = new ExpandedMenuModel();
+        menuStudentList.setIconName("Student List");
+        menuStudentList.setIconImg(R.drawable.ic_action_users);
+        listDataHeader.add(menuStudentList);
+
+        // Adding child data
+        List<String> headingDashboard = new ArrayList<>();
+        List<String> headingNotice = new ArrayList<>();
+        List<String> headingRoutine = new ArrayList<>();
+
+        List<String> headingAttendance = new ArrayList<>();
+        headingAttendance.add("Take Attendance");
+        headingAttendance.add("Show Attendance");
+
+        List<String> headingSyllabus = new ArrayList<>();
+        List<String> headingExam = new ArrayList<>();
+        List<String> headingResult = new ArrayList<>();
+        List<String> headingContact = new ArrayList<>();
+
+        List<String> headingiCard = new ArrayList<>();
+        headingiCard.add("Find Student");
+        headingiCard.add("Entry Student");
+
+        List<String> headingStudentList = new ArrayList<>();
+
+        // Header, Child data
+        listDataChild.put(listDataHeader.get(0), headingDashboard);
+        listDataChild.put(listDataHeader.get(1), headingNotice);
+        listDataChild.put(listDataHeader.get(2), headingRoutine);
+        listDataChild.put(listDataHeader.get(3), headingAttendance);
+        listDataChild.put(listDataHeader.get(4), headingSyllabus);
+        listDataChild.put(listDataHeader.get(5), headingExam);
+        listDataChild.put(listDataHeader.get(6), headingResult);
+        listDataChild.put(listDataHeader.get(7), headingContact);
+        listDataChild.put(listDataHeader.get(8), headingiCard);
+        listDataChild.put(listDataHeader.get(9), headingStudentList);
+
+        mMenuAdapter = new ExpandableListAdapter(this, listDataHeader, listDataChild, UserTypeID);
+        expandableList.setAdapter(mMenuAdapter);
+
+        expandableList.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
+            @Override
+            public boolean onGroupClick(ExpandableListView expandableListView, View view, int i, long l) {
+//                Log.d("DEBUG", "heading clicked"+i+"--"+l);
+
+                if((i == 0) && (l == 0)) {
+                    Intent intent = new Intent(getApplicationContext(), TeacherMainScreen.class);
+                    startActivity(intent);
+                    finish();
+                }
+
+                if((i == 2) && (l == 2)) {
+                    if(activityName.equals(RoutineMainScreen.class.getName())){
+                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                        if (drawer.isDrawerOpen(GravityCompat.START)) {
+                            drawer.closeDrawer(GravityCompat.START);
+                        }
+                    } else {
+                        Intent intent = new Intent(getApplicationContext(), RoutineMainScreen.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                }
+
+                if((i == 9) && (l == 9)) {
+                    if(activityName.equals(ReportAllStudentMain.class.getName())){
+                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                        if (drawer.isDrawerOpen(GravityCompat.START)) {
+                            drawer.closeDrawer(GravityCompat.START);
+                        }
+                    } else {
+                        Intent intent = new Intent(getApplicationContext(), ReportAllStudentMain.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                }
+                return false;
+            }
+        });
+
+        expandableList.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
+            @Override
+            public boolean onChildClick(ExpandableListView expandableListView, View view, int i, int i1, long l) {
+
+                if((i == 3) && (i1 == 0) && (l == 0)) {
+                    if(activityName.equals(TakeAttendance.class.getName())){
+                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                        if (drawer.isDrawerOpen(GravityCompat.START)) {
+                            drawer.closeDrawer(GravityCompat.START);
+                        }
+                    } else {
+                        Intent intent = new Intent(getApplicationContext(), TakeAttendance.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                }
+
+                if((i == 3) && (i1 == 1) && (l == 1)) {
+                    if(activityName.equals(ShowAttendance.class.getName())){
+                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                        if (drawer.isDrawerOpen(GravityCompat.START)) {
+                            drawer.closeDrawer(GravityCompat.START);
+                        }
+                    } else {
+                        Intent intent = new Intent(getApplicationContext(), ShowAttendance.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                }
+
+                if((i == 8) && (i1 == 0) && (l == 0)) {
+                    if(activityName.equals(StudentiCardMain.class.getName())){
+                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                        if (drawer.isDrawerOpen(GravityCompat.START)) {
+                            drawer.closeDrawer(GravityCompat.START);
+                        }
+                    } else {
+                        Intent intent = new Intent(getApplicationContext(), StudentiCardMain.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                }
+
+                if((i == 8) && (i1 == 1) && (l == 1)) {
+                    if(activityName.equals(StudentiCardNewEntry.class.getName())){
+                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                        if (drawer.isDrawerOpen(GravityCompat.START)) {
+                            drawer.closeDrawer(GravityCompat.START);
+                        }
+                    } else {
+                        Intent intent = new Intent(getApplicationContext(), StudentiCardNewEntry.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                }
+
+                return false;
+            }
+        });
     }
 
     private void prepareTeacherSideMenu() {
@@ -274,24 +655,28 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity {
                 }
 
                 if((i == 2) && (l == 2)) {
-                    Intent intent = new Intent(getApplicationContext(), RoutineMainScreen.class);
-                    startActivity(intent);
-                    finish();
-                } else if(activityName.equals(RoutineMainScreen.class.getName())){
-                    DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-                    if (drawer.isDrawerOpen(GravityCompat.START)) {
-                        drawer.closeDrawer(GravityCompat.START);
+                    if(activityName.equals(RoutineMainScreen.class.getName())){
+                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                        if (drawer.isDrawerOpen(GravityCompat.START)) {
+                            drawer.closeDrawer(GravityCompat.START);
+                        }
+                    } else {
+                        Intent intent = new Intent(getApplicationContext(), RoutineMainScreen.class);
+                        startActivity(intent);
+                        finish();
                     }
                 }
 
                 if((i == 9) && (l == 9)) {
-                    Intent intent = new Intent(getApplicationContext(), ReportAllStudentMain.class);
-                    startActivity(intent);
-                    finish();
-                } else if(activityName.equals(ReportAllStudentMain.class.getName())){
-                    DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-                    if (drawer.isDrawerOpen(GravityCompat.START)) {
-                        drawer.closeDrawer(GravityCompat.START);
+                    if(activityName.equals(ReportAllStudentMain.class.getName())){
+                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                        if (drawer.isDrawerOpen(GravityCompat.START)) {
+                            drawer.closeDrawer(GravityCompat.START);
+                        }
+                    } else {
+                        Intent intent = new Intent(getApplicationContext(), ReportAllStudentMain.class);
+                        startActivity(intent);
+                        finish();
                     }
                 }
                 return false;
@@ -303,46 +688,54 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity {
             public boolean onChildClick(ExpandableListView expandableListView, View view, int i, int i1, long l) {
 
                 if((i == 3) && (i1 == 0) && (l == 0)) {
-                    Intent intent = new Intent(getApplicationContext(), TakeAttendance.class);
-                    startActivity(intent);
-                    finish();
-                } else if(activityName.equals(TakeAttendance.class.getName())){
-                    DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-                    if (drawer.isDrawerOpen(GravityCompat.START)) {
-                        drawer.closeDrawer(GravityCompat.START);
+                    if(activityName.equals(TakeAttendance.class.getName())){
+                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                        if (drawer.isDrawerOpen(GravityCompat.START)) {
+                            drawer.closeDrawer(GravityCompat.START);
+                        }
+                    } else {
+                        Intent intent = new Intent(getApplicationContext(), TakeAttendance.class);
+                        startActivity(intent);
+                        finish();
                     }
                 }
 
                 if((i == 3) && (i1 == 1) && (l == 1)) {
-                    Intent intent = new Intent(getApplicationContext(), ShowAttendance.class);
-                    startActivity(intent);
-                    finish();
-                } else if(activityName.equals(ShowAttendance.class.getName())){
-                    DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-                    if (drawer.isDrawerOpen(GravityCompat.START)) {
-                        drawer.closeDrawer(GravityCompat.START);
+                    if(activityName.equals(ShowAttendance.class.getName())){
+                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                        if (drawer.isDrawerOpen(GravityCompat.START)) {
+                            drawer.closeDrawer(GravityCompat.START);
+                        }
+                    } else {
+                        Intent intent = new Intent(getApplicationContext(), ShowAttendance.class);
+                        startActivity(intent);
+                        finish();
                     }
                 }
 
                 if((i == 8) && (i1 == 0) && (l == 0)) {
-                    Intent intent = new Intent(getApplicationContext(), StudentiCardMain.class);
-                    startActivity(intent);
-                    finish();
-                } else if(activityName.equals(StudentiCardMain.class.getName())){
-                    DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-                    if (drawer.isDrawerOpen(GravityCompat.START)) {
-                        drawer.closeDrawer(GravityCompat.START);
+                    if(activityName.equals(StudentiCardMain.class.getName())){
+                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                        if (drawer.isDrawerOpen(GravityCompat.START)) {
+                            drawer.closeDrawer(GravityCompat.START);
+                        }
+                    } else {
+                        Intent intent = new Intent(getApplicationContext(), StudentiCardMain.class);
+                        startActivity(intent);
+                        finish();
                     }
                 }
 
                 if((i == 8) && (i1 == 1) && (l == 1)) {
-                    Intent intent = new Intent(getApplicationContext(), StudentiCardNewEntry.class);
-                    startActivity(intent);
-                    finish();
-                } else if(activityName.equals(StudentiCardNewEntry.class.getName())){
-                    DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-                    if (drawer.isDrawerOpen(GravityCompat.START)) {
-                        drawer.closeDrawer(GravityCompat.START);
+                    if(activityName.equals(StudentiCardNewEntry.class.getName())){
+                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                        if (drawer.isDrawerOpen(GravityCompat.START)) {
+                            drawer.closeDrawer(GravityCompat.START);
+                        }
+                    } else {
+                        Intent intent = new Intent(getApplicationContext(), StudentiCardNewEntry.class);
+                        startActivity(intent);
+                        finish();
                     }
                 }
 
@@ -354,10 +747,367 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity {
 
     private void prepareStudentSideMenu() {
 
+        listDataHeader = new ArrayList<>();
+        listDataChild = new HashMap<>();
+
+        // Adding data header
+        ExpandedMenuModel menuDashboard = new ExpandedMenuModel();
+        menuDashboard.setIconName("Dashboard");
+        menuDashboard.setIconImg(R.drawable.ic_dashboard);
+        listDataHeader.add(menuDashboard);
+
+        ExpandedMenuModel menuNotice = new ExpandedMenuModel();
+        menuNotice.setIconName("Notice");
+        menuNotice.setIconImg(R.drawable.nav_notice);
+        listDataHeader.add(menuNotice);
+
+        ExpandedMenuModel menuRoutine = new ExpandedMenuModel();
+        menuRoutine.setIconName("Routine");
+        menuRoutine.setIconImg(R.drawable.nav_routine);
+        listDataHeader.add(menuRoutine);
+
+        ExpandedMenuModel menuAttendance = new ExpandedMenuModel();
+        menuAttendance.setIconName("Attendance");
+        menuAttendance.setIconImg(R.drawable.nav_attendance);
+        listDataHeader.add(menuAttendance);
+
+        ExpandedMenuModel menuSyllabus = new ExpandedMenuModel();
+        menuSyllabus.setIconName("Syllabus");
+        menuSyllabus.setIconImg(R.drawable.nav_syllabus);
+        listDataHeader.add(menuSyllabus);
+
+        ExpandedMenuModel menuExam = new ExpandedMenuModel();
+        menuExam.setIconName("Exam");
+        menuExam.setIconImg(R.drawable.nav_exam);
+        listDataHeader.add(menuExam);
+
+        ExpandedMenuModel menuResult = new ExpandedMenuModel();
+        menuResult.setIconName("Result");
+        menuResult.setIconImg(R.drawable.nav_result);
+        listDataHeader.add(menuResult);
+
+        ExpandedMenuModel menuFee = new ExpandedMenuModel();
+        menuFee.setIconName("Fee");
+        menuFee.setIconImg(R.drawable.nav_fee);
+        listDataHeader.add(menuFee);
+
+        ExpandedMenuModel menuContact = new ExpandedMenuModel();
+        menuContact.setIconName("Contact");
+        menuContact.setIconImg(R.drawable.nav_contact);
+        listDataHeader.add(menuContact);
+
+        // Adding child data
+        List<String> headingDashboard = new ArrayList<>();
+        List<String> headingNotice = new ArrayList<>();
+        List<String> headingRoutine = new ArrayList<>();
+        List<String> headingAttendance = new ArrayList<>();
+        List<String> headingSyllabus = new ArrayList<>();
+        List<String> headingExam = new ArrayList<>();
+        List<String> headingResult = new ArrayList<>();
+        List<String> headingFee = new ArrayList<>();
+        List<String> headingContact = new ArrayList<>();
+
+        // Header, Child data
+        listDataChild.put(listDataHeader.get(0), headingDashboard);
+        listDataChild.put(listDataHeader.get(1), headingNotice);
+        listDataChild.put(listDataHeader.get(2), headingRoutine);
+        listDataChild.put(listDataHeader.get(3), headingAttendance);
+        listDataChild.put(listDataHeader.get(4), headingSyllabus);
+        listDataChild.put(listDataHeader.get(5), headingExam);
+        listDataChild.put(listDataHeader.get(6), headingResult);
+        listDataChild.put(listDataHeader.get(7), headingFee);
+        listDataChild.put(listDataHeader.get(8), headingContact);
+
+        mMenuAdapter = new ExpandableListAdapter(this, listDataHeader, listDataChild, UserTypeID);
+        expandableList.setAdapter(mMenuAdapter);
+
+        expandableList.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
+            @Override
+            public boolean onGroupClick(ExpandableListView expandableListView, View view, int i, long l) {
+//                Log.d("DEBUG", "heading clicked"+i+"--"+l);
+
+                if((i == 0) && (l == 0)) {
+                    Intent intent = new Intent(getApplicationContext(), StudentMainScreen.class);
+                    startActivity(intent);
+                    finish();
+                }
+
+                if((i == 2) && (l == 2)) {
+                    if(activityName.equals(RoutineMainScreen.class.getName())){
+                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                        if (drawer.isDrawerOpen(GravityCompat.START)) {
+                            drawer.closeDrawer(GravityCompat.START);
+                        }
+                    } else {
+                        Intent intent = new Intent(getApplicationContext(), RoutineMainScreen.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                }
+
+                if((i == 3) && (l == 3)) {
+                    if(activityName.equals(StudentAttendanceReport.class.getName())){
+                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                        if (drawer.isDrawerOpen(GravityCompat.START)) {
+                            drawer.closeDrawer(GravityCompat.START);
+                        }
+                    } else {
+                        Intent intent = new Intent(getApplicationContext(), StudentAttendanceReport.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                }
+
+                if((i == 7) && (l == 7)) {
+                    if(activityName.equals(Fee.class.getName())){
+                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                        if (drawer.isDrawerOpen(GravityCompat.START)) {
+                            drawer.closeDrawer(GravityCompat.START);
+                        }
+                    } else {
+                        Intent intent = new Intent(getApplicationContext(), Fee.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                }
+                return false;
+            }
+        });
+
+        expandableList.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
+            @Override
+            public boolean onChildClick(ExpandableListView expandableListView, View view, int i, int i1, long l) {
+
+//                if((i == 3) && (i1 == 0) && (l == 0)) {
+//                    Intent intent = new Intent(getApplicationContext(), TakeAttendance.class);
+//                    startActivity(intent);
+//                    finish();
+//                } else if(activityName.equals(TakeAttendance.class.getName())){
+//                    DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+//                    if (drawer.isDrawerOpen(GravityCompat.START)) {
+//                        drawer.closeDrawer(GravityCompat.START);
+//                    }
+//                }
+//
+//                if((i == 3) && (i1 == 1) && (l == 1)) {
+//                    Intent intent = new Intent(getApplicationContext(), ShowAttendance.class);
+//                    startActivity(intent);
+//                    finish();
+//                } else if(activityName.equals(ShowAttendance.class.getName())){
+//                    DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+//                    if (drawer.isDrawerOpen(GravityCompat.START)) {
+//                        drawer.closeDrawer(GravityCompat.START);
+//                    }
+//                }
+//
+//                if((i == 8) && (i1 == 0) && (l == 0)) {
+//                    Intent intent = new Intent(getApplicationContext(), StudentiCardMain.class);
+//                    startActivity(intent);
+//                    finish();
+//                } else if(activityName.equals(StudentiCardMain.class.getName())){
+//                    DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+//                    if (drawer.isDrawerOpen(GravityCompat.START)) {
+//                        drawer.closeDrawer(GravityCompat.START);
+//                    }
+//                }
+//
+//                if((i == 8) && (i1 == 1) && (l == 1)) {
+//                    Intent intent = new Intent(getApplicationContext(), StudentiCardNewEntry.class);
+//                    startActivity(intent);
+//                    finish();
+//                } else if(activityName.equals(StudentiCardNewEntry.class.getName())){
+//                    DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+//                    if (drawer.isDrawerOpen(GravityCompat.START)) {
+//                        drawer.closeDrawer(GravityCompat.START);
+//                    }
+//                }
+
+                return false;
+            }
+        });
+
     }
 
     private void prepareGuardianSideMenu() {
 
+        listDataHeader = new ArrayList<>();
+        listDataChild = new HashMap<>();
+
+        // Adding data header
+        ExpandedMenuModel menuDashboard = new ExpandedMenuModel();
+        menuDashboard.setIconName("Dashboard");
+        menuDashboard.setIconImg(R.drawable.ic_dashboard);
+        listDataHeader.add(menuDashboard);
+
+        ExpandedMenuModel menuNotice = new ExpandedMenuModel();
+        menuNotice.setIconName("Notice");
+        menuNotice.setIconImg(R.drawable.nav_notice);
+        listDataHeader.add(menuNotice);
+
+        ExpandedMenuModel menuRoutine = new ExpandedMenuModel();
+        menuRoutine.setIconName("Routine");
+        menuRoutine.setIconImg(R.drawable.nav_routine);
+        listDataHeader.add(menuRoutine);
+
+        ExpandedMenuModel menuAttendance = new ExpandedMenuModel();
+        menuAttendance.setIconName("Attendance");
+        menuAttendance.setIconImg(R.drawable.nav_attendance);
+        listDataHeader.add(menuAttendance);
+
+        ExpandedMenuModel menuSyllabus = new ExpandedMenuModel();
+        menuSyllabus.setIconName("Syllabus");
+        menuSyllabus.setIconImg(R.drawable.nav_syllabus);
+        listDataHeader.add(menuSyllabus);
+
+        ExpandedMenuModel menuExam = new ExpandedMenuModel();
+        menuExam.setIconName("Exam");
+        menuExam.setIconImg(R.drawable.nav_exam);
+        listDataHeader.add(menuExam);
+
+        ExpandedMenuModel menuResult = new ExpandedMenuModel();
+        menuResult.setIconName("Result");
+        menuResult.setIconImg(R.drawable.nav_result);
+        listDataHeader.add(menuResult);
+
+        ExpandedMenuModel menuFee = new ExpandedMenuModel();
+        menuFee.setIconName("Fee");
+        menuFee.setIconImg(R.drawable.nav_fee);
+        listDataHeader.add(menuFee);
+
+        ExpandedMenuModel menuContact = new ExpandedMenuModel();
+        menuContact.setIconName("Contact");
+        menuContact.setIconImg(R.drawable.nav_contact);
+        listDataHeader.add(menuContact);
+
+        // Adding child data
+        List<String> headingDashboard = new ArrayList<>();
+        List<String> headingNotice = new ArrayList<>();
+        List<String> headingRoutine = new ArrayList<>();
+        List<String> headingAttendance = new ArrayList<>();
+        List<String> headingSyllabus = new ArrayList<>();
+        List<String> headingExam = new ArrayList<>();
+        List<String> headingResult = new ArrayList<>();
+        List<String> headingFee = new ArrayList<>();
+        List<String> headingContact = new ArrayList<>();
+
+        // Header, Child data
+        listDataChild.put(listDataHeader.get(0), headingDashboard);
+        listDataChild.put(listDataHeader.get(1), headingNotice);
+        listDataChild.put(listDataHeader.get(2), headingRoutine);
+        listDataChild.put(listDataHeader.get(3), headingAttendance);
+        listDataChild.put(listDataHeader.get(4), headingSyllabus);
+        listDataChild.put(listDataHeader.get(5), headingExam);
+        listDataChild.put(listDataHeader.get(6), headingResult);
+        listDataChild.put(listDataHeader.get(7), headingFee);
+        listDataChild.put(listDataHeader.get(8), headingContact);
+
+        mMenuAdapter = new ExpandableListAdapter(this, listDataHeader, listDataChild, UserTypeID);
+        expandableList.setAdapter(mMenuAdapter);
+
+        expandableList.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
+            @Override
+            public boolean onGroupClick(ExpandableListView expandableListView, View view, int i, long l) {
+//                Log.d("DEBUG", "heading clicked"+i+"--"+l);
+
+                if((i == 0) && (l == 0)) {
+                    Intent intent = new Intent(getApplicationContext(), StudentMainScreen.class);
+                    startActivity(intent);
+                    finish();
+                }
+
+                if((i == 2) && (l == 2)) {
+                    if(activityName.equals(RoutineMainScreen.class.getName())){
+                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                        if (drawer.isDrawerOpen(GravityCompat.START)) {
+                            drawer.closeDrawer(GravityCompat.START);
+                        }
+                    } else {
+                        Intent intent = new Intent(getApplicationContext(), RoutineMainScreen.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                }
+
+                if((i == 3) && (l == 3)) {
+                    if(activityName.equals(StudentAttendanceReport.class.getName())){
+                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                        if (drawer.isDrawerOpen(GravityCompat.START)) {
+                            drawer.closeDrawer(GravityCompat.START);
+                        }
+                    } else {
+                        Intent intent = new Intent(getApplicationContext(), StudentAttendanceReport.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                }
+
+                if((i == 7) && (l == 7)) {
+                    if(activityName.equals(Fee.class.getName())){
+                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                        if (drawer.isDrawerOpen(GravityCompat.START)) {
+                            drawer.closeDrawer(GravityCompat.START);
+                        }
+                    } else {
+                        Intent intent = new Intent(getApplicationContext(), Fee.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                }
+                return false;
+            }
+        });
+
+        expandableList.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
+            @Override
+            public boolean onChildClick(ExpandableListView expandableListView, View view, int i, int i1, long l) {
+
+//                if((i == 3) && (i1 == 0) && (l == 0)) {
+//                    Intent intent = new Intent(getApplicationContext(), TakeAttendance.class);
+//                    startActivity(intent);
+//                    finish();
+//                } else if(activityName.equals(TakeAttendance.class.getName())){
+//                    DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+//                    if (drawer.isDrawerOpen(GravityCompat.START)) {
+//                        drawer.closeDrawer(GravityCompat.START);
+//                    }
+//                }
+//
+//                if((i == 3) && (i1 == 1) && (l == 1)) {
+//                    Intent intent = new Intent(getApplicationContext(), ShowAttendance.class);
+//                    startActivity(intent);
+//                    finish();
+//                } else if(activityName.equals(ShowAttendance.class.getName())){
+//                    DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+//                    if (drawer.isDrawerOpen(GravityCompat.START)) {
+//                        drawer.closeDrawer(GravityCompat.START);
+//                    }
+//                }
+//
+//                if((i == 8) && (i1 == 0) && (l == 0)) {
+//                    Intent intent = new Intent(getApplicationContext(), StudentiCardMain.class);
+//                    startActivity(intent);
+//                    finish();
+//                } else if(activityName.equals(StudentiCardMain.class.getName())){
+//                    DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+//                    if (drawer.isDrawerOpen(GravityCompat.START)) {
+//                        drawer.closeDrawer(GravityCompat.START);
+//                    }
+//                }
+//
+//                if((i == 8) && (i1 == 1) && (l == 1)) {
+//                    Intent intent = new Intent(getApplicationContext(), StudentiCardNewEntry.class);
+//                    startActivity(intent);
+//                    finish();
+//                } else if(activityName.equals(StudentiCardNewEntry.class.getName())){
+//                    DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+//                    if (drawer.isDrawerOpen(GravityCompat.START)) {
+//                        drawer.closeDrawer(GravityCompat.START);
+//                    }
+//                }
+
+                return false;
+            }
+        });
     }
 
 }

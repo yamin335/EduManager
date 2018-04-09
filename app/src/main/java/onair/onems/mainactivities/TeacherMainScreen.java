@@ -12,7 +12,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import onair.onems.R;
+import onair.onems.routine.RoutineMainScreen;
 import onair.onems.attendance.TakeAttendance;
+import onair.onems.icard.StudentiCardMain;
 
 public class TeacherMainScreen extends AppCompatActivity {
 
@@ -23,7 +25,7 @@ public class TeacherMainScreen extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.teacher_dashboard);
+        setContentView(R.layout.dashboard_teacher);
 
         Button attendance = (Button)findViewById(R.id.attendance);
         Button iCard = (Button)findViewById(R.id.iCard);
@@ -53,7 +55,7 @@ public class TeacherMainScreen extends AppCompatActivity {
             }
         });
 
-        // Routine module start point
+        // Routiness module start point
         routine.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

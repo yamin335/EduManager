@@ -12,8 +12,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import onair.onems.R;
-import onair.onems.mainactivities.Fees.Fee;
-import onair.onems.mainactivities.Fees.StudentList;
+import onair.onems.attendance.StudentAttendanceReport;
 
 
 public class StudentMainScreen extends AppCompatActivity {
@@ -25,7 +24,7 @@ public class StudentMainScreen extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.student_dashboard);
+        setContentView(R.layout.dashboard_student);
         InstituteName=(TextView) findViewById(R.id.InstituteName);
         userType = (TextView) findViewById(R.id.userType);
         SharedPreferences sharedPre = PreferenceManager.getDefaultSharedPreferences(this);
@@ -88,7 +87,7 @@ public class StudentMainScreen extends AppCompatActivity {
         {
             @Override
             public void onClick(View v) {
-                Intent mainIntent = new Intent(StudentMainScreen.this, StudentAttendance.class);
+                Intent mainIntent = new Intent(StudentMainScreen.this, StudentAttendanceReport.class);
                 StudentMainScreen.this.startActivity(mainIntent);
                 finish();
             }

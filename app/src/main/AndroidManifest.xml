@@ -51,16 +51,16 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".mainactivities.StudentAttendance"
+            android:name=".attendance.StudentAttendanceReport"
             android:label="Attendance"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".mainactivities.Fees.StudentList"
+            android:name=".Fee.StudentList"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".mainactivities.Fees.Fee"
+            android:name=".Fee.Fee"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="adjustResize" />
@@ -75,12 +75,12 @@
         <activity
             android:name=".mainactivities.SubjectWiseAttendance"
             android:label="Attendance"
-            android:parentActivityName=".mainactivities.StudentAttendance"
+            android:parentActivityName=".attendance.StudentAttendanceReport"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="onair.onems.mainactivities.StudentAttendance" />
+                android:value="onair.onems.attendance.StudentAttendanceReport" />
         </activity>
         <activity
             android:name=".attendance.StudentAttendanceAllDays"
@@ -96,137 +96,100 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"/>
         <activity
-            android:name=".mainactivities.TeacherAttendanceShow.ShowAllStudent"
-            android:label="Attendance"
-            android:parentActivityName=".attendance.ShowAttendance"
-            android:screenOrientation="portrait">
-
-            <!-- The meta-data element is needed for versions lower than 4.1 -->
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="onair.onems.attendance.ShowAttendance" />
-        </activity>
-        <activity
-            android:name=".mainactivities.TeacherAttendanceShow.DateAttendance"
-            android:label="Attendance"
-            android:parentActivityName=".mainactivities.TeacherAttendanceShow.ShowAllStudent"
-            android:screenOrientation="portrait">
-
-            <!-- The meta-data element is needed for versions lower than 4.1 -->
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="onair.onems.mainactivities.TeacherAttendanceShow.ShowAllStudent" />
-        </activity>
-        <activity
-            android:name=".mainactivities.TeacherAttendanceShow.ShowSubjectWiseAttendance"
-            android:label="Attendance"
-            android:parentActivityName=".mainactivities.TeacherAttendanceShow.DateAttendance"
-            android:screenOrientation="portrait">
-
-            <!-- The meta-data element is needed for versions lower than 4.1 -->
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="onair.onems.mainactivities.TeacherAttendanceShow.DateAttendance" />
-        </activity>
-        <activity
-            android:name=".mainactivities.StudentiCardMain"
+            android:name=".icard.StudentiCardMain"
             android:label="iCard"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".mainactivities.StudentiCardDetails"
+            android:name=".icard.StudentiCardDetails"
             android:label="Details Information"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".mainactivities.StudentiCardDetailsEdit"
+            android:name=".icard.StudentiCardDetailsEdit"
             android:label="Edit Information"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".mainactivities.StudentiCardNewEntry"
+            android:name=".icard.StudentiCardNewEntry"
             android:label="Entry Student"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".mainactivities.Fees.FeesDetails"
-            android:label="Fees Details"
-            android:parentActivityName=".mainactivities.Fees.Fee"
-            android:screenOrientation="portrait">
-
-            <!-- The meta-data element is needed for versions lower than 4.1 -->
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="onair.onems.mainactivities.Fees.Fee" />
-        </activity>
-        <activity
-            android:name=".mainactivities.Fees.FineDetails"
-            android:label="Fine Details"
-            android:parentActivityName=".mainactivities.Fees.Fee"
-            android:screenOrientation="portrait">
-
-            <!-- The meta-data element is needed for versions lower than 4.1 -->
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="onair.onems.mainactivities.Fees.Fee" />
-        </activity>
-        <activity
-            android:name=".mainactivities.Fees.payment"
-            android:label="Payment"
-            android:parentActivityName=".mainactivities.Fees.Fee"
-            android:screenOrientation="portrait">
-
-            <!-- The meta-data element is needed for versions lower than 4.1 -->
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="onair.onems.mainactivities.Fees.Fee" />
-        </activity>
-        <activity
-            android:name=".mainactivities.Fees.FeesHistory"
-            android:label="Fees History"
-            android:parentActivityName=".mainactivities.Fees.Fee"
-            android:screenOrientation="portrait">
-
-            <!-- The meta-data element is needed for versions lower than 4.1 -->
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="onair.onems.mainactivities.Fees.Fee" />
-        </activity>
-        <activity
-            android:name=".mainactivities.Fees.MontlyHistory"
-            android:label="Monthly History"
-            android:parentActivityName=".mainactivities.Fees.FeesHistory"
-            android:screenOrientation="portrait">
-
-            <!-- The meta-data element is needed for versions lower than 4.1 -->
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="onair.onems.mainactivities.Fees.FeesHistory" />
-        </activity>
-        <activity
-            android:name=".mainactivities.Fees.TotalFees"
-            android:label="Fees History"
-            android:parentActivityName=".mainactivities.Fees.MontlyHistory"
-            android:screenOrientation="portrait">
-
-            <!-- The meta-data element is needed for versions lower than 4.1 -->
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="onair.onems.mainactivities.Fees.MontlyHistory" />
-        </activity>
-        <activity
-            android:name=".mainactivities.Fees.TotalFine"
-            android:label="Fine History"
-            android:parentActivityName=".mainactivities.Fees.MontlyHistory"
-            android:screenOrientation="portrait">
-
-            <!-- The meta-data element is needed for versions lower than 4.1 -->
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="onair.onems.mainactivities.Fees.MontlyHistory" />
-        </activity>
-        <activity
-            android:name=".mainactivities.Routine.ClassRoutine"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="adjustResize" />
+            android:theme="@style/AppTheme.NoActionBar"/>
+        <activity
+            android:name=".Fee.FeesDetails"
+            android:label="Fees Details"
+            android:parentActivityName=".Fee.Fee"
+            android:screenOrientation="portrait">
+
+            <!-- The meta-data element is needed for versions lower than 4.1 -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="onair.onems.Fee.Fee" />
+        </activity>
+        <activity
+            android:name=".Fee.FineDetails"
+            android:label="Fine Details"
+            android:parentActivityName=".Fee.Fee"
+            android:screenOrientation="portrait">
+
+            <!-- The meta-data element is needed for versions lower than 4.1 -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="onair.onems.Fee.Fee" />
+        </activity>
+        <activity
+            android:name=".Fee.payment"
+            android:label="Payment"
+            android:parentActivityName=".Fee.Fee"
+            android:screenOrientation="portrait">
+
+            <!-- The meta-data element is needed for versions lower than 4.1 -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="onair.onems.Fee.Fee" />
+        </activity>
+        <activity
+            android:name=".Fee.FeesHistory"
+            android:label="Fees History"
+            android:parentActivityName=".Fee.Fee"
+            android:screenOrientation="portrait">
+
+            <!-- The meta-data element is needed for versions lower than 4.1 -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="onair.onems.Fee.Fee" />
+        </activity>
+        <activity
+            android:name=".Fee.MontlyHistory"
+            android:label="Monthly History"
+            android:parentActivityName=".Fee.FeesHistory"
+            android:screenOrientation="portrait">
+
+            <!-- The meta-data element is needed for versions lower than 4.1 -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="onair.onems.Fee.FeesHistory" />
+        </activity>
+        <activity
+            android:name=".Fee.TotalFees"
+            android:label="Fees History"
+            android:parentActivityName=".Fee.MontlyHistory"
+            android:screenOrientation="portrait">
+
+            <!-- The meta-data element is needed for versions lower than 4.1 -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="onair.onems.Fee.MontlyHistory" />
+        </activity>
+        <activity
+            android:name=".Fee.TotalFine"
+            android:label="Fine History"
+            android:parentActivityName=".Fee.MontlyHistory"
+            android:screenOrientation="portrait">
+
+            <!-- The meta-data element is needed for versions lower than 4.1 -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="onair.onems.Fee.MontlyHistory" />
+        </activity>
         <activity
             android:name=".mainactivities.Result.ClassResult"
             android:screenOrientation="portrait"
@@ -309,7 +272,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".mainactivities.RoutineMainScreen"
+            android:name=".routine.RoutineMainScreen"
             android:label="Class Routine"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar">

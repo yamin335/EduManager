@@ -85,7 +85,7 @@ public class ExpandableListAdapterStudent extends BaseExpandableListAdapter {
         ExpandedMenuModel headerTitle = (ExpandedMenuModel) getGroup(groupPosition);
         if (convertView == null) {
             LayoutInflater infalInflater = (LayoutInflater) this.mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            convertView = infalInflater.inflate(R.layout.listheader, null);
+            convertView = infalInflater.inflate(R.layout.side_menu_row_item, null);
         }
         TextView lblListHeader = (TextView) convertView.findViewById(R.id.submenu);
         ImageView headerIcon = (ImageView) convertView.findViewById(R.id.iconimage);
@@ -120,7 +120,7 @@ public class ExpandableListAdapterStudent extends BaseExpandableListAdapter {
         if (convertView == null) {
             LayoutInflater infalInflater = (LayoutInflater) this.mContext
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            convertView = infalInflater.inflate(R.layout.list_submenu, null);
+            convertView = infalInflater.inflate(R.layout.side_submenu_row_item, null);
         }
 
         TextView txtListChild = (TextView) convertView

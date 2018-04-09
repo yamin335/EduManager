@@ -1,4 +1,4 @@
-package onair.onems.attendance;
+package onair.onems.icard;
 
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -10,18 +10,21 @@ import android.support.annotation.Nullable;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -31,69 +34,84 @@ import java.util.Map;
 import onair.onems.R;
 import onair.onems.Services.StaticHelperClass;
 import onair.onems.mainactivities.SideNavigationMenuParentActivity;
-import onair.onems.mainactivities.StudentMainScreen;
 import onair.onems.mainactivities.TeacherMainScreen;
 import onair.onems.models.ClassModel;
 import onair.onems.models.DepartmentModel;
 import onair.onems.models.MediumModel;
-import onair.onems.models.MonthModel;
 import onair.onems.models.SectionModel;
 import onair.onems.models.ShiftModel;
+import onair.onems.models.SpinnerStudentInformation;
 import onair.onems.network.MySingleton;
 
-public class ShowAttendance extends SideNavigationMenuParentActivity {
-    private Spinner spinnerClass, spinnerShift, spinnerSection, spinnerMedium, spinnerDepartment, spinnerMonth;
-    private ProgressDialog mShiftDialog, mMediumDialog, mClassDialog, mDepartmentDialog, mSectionDialog, mMonthDialog;
+public class StudentiCardMain extends SideNavigationMenuParentActivity {
+
+    private Spinner spinnerClass, spinnerShift, spinnerSection, spinnerMedium, spinnerDepartment, spinnerStudent;
+    private ProgressDialog mShiftDialog, mMediumDialog, mClassDialog, mDepartmentDialog, mSectionDialog, mStudentListGetDialog;
+
     private ArrayList<ClassModel> allClassArrayList;
     private ArrayList<ShiftModel> allShiftArrayList;
     private ArrayList<SectionModel> allSectionArrayList;
     private ArrayList<MediumModel> allMediumArrayList;
     private ArrayList<DepartmentModel> allDepartmentArrayList;
-    private ArrayList<MonthModel> allMonthArrayList;
+    private ArrayList<SpinnerStudentInformation> allStudentArrayList;
+
     private String[] tempClassArray = {"Select Class"};
     private String[] tempShiftArray = {"Select Shift"};
     private String[] tempSectionArray = {"Select Section"};
     private String[] tempDepartmentArray = {"Select Department"};
     private String[] tempMediumArray = {"Select Medium"};
-    private String[] tempMonthArray = {"Select Month"};
-    private ClassModel selectedClass = null;
-    private ShiftModel selectedShift = null;
-    private SectionModel selectedSection = null;
-    private MediumModel selectedMedium = null;
-    private DepartmentModel selectedDepartment = null;
-    private MonthModel selectedMonth = null;
+    private String[] tempStudentArray = {"Select Student"};
+
+    private ClassModel selectedClass;
+    private ShiftModel selectedShift;
+    private SectionModel selectedSection;
+    private MediumModel selectedMedium;
+    private DepartmentModel selectedDepartment;
+    private SpinnerStudentInformation selectedStudent = null;
+
     private long InstituteID;
+
+    public static final String MyPREFERENCES = "LogInKey";
+    public static SharedPreferences sharedPreferences;
+
     private int firstClass = 0, firstShift = 0, firstSection = 0, firstMedium = 0,
-            firstDepartment = 0, UserTypeID;
+            firstDepartment = 0;
+
+    private MenuItem notificationBell;
+    private TextView notificationCounter;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        activityName = ShowAttendance.class.getName();
+        activityName = StudentiCardMain.class.getName();
 
         LayoutInflater inflater = (LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        final View childActivityLayout = inflater.inflate(R.layout.attendance_report_monthly_student_other, null);
+        final View childActivityLayout = inflater.inflate(R.layout.icard_main_screen, null);
         LinearLayout parentActivityLayout = (LinearLayout) findViewById(R.id.contentMain);
         parentActivityLayout.addView(childActivityLayout, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         InstituteID = prefs.getLong("InstituteID",0);
-        UserTypeID = prefs.getInt("UserTypeID",0);
 
         selectedClass = new ClassModel();
         selectedShift = new ShiftModel();
         selectedSection = new SectionModel();
         selectedMedium = new MediumModel();
         selectedDepartment = new DepartmentModel();
-        selectedMonth = new MonthModel();
+
+        Button showStudentData, newEntry, editStudentData;
 
         spinnerClass = (Spinner)findViewById(R.id.spinnerClass);
         spinnerShift = (Spinner)findViewById(R.id.spinnerShift);
         spinnerSection = (Spinner)findViewById(R.id.spinnerSection);
         spinnerMedium =(Spinner)findViewById(R.id.spinnerMedium);
         spinnerDepartment =(Spinner)findViewById(R.id.spinnerDepartment);
-        spinnerMonth = (Spinner)findViewById(R.id.spinnerMonth);
-        Button student_find_button=(Button)findViewById(R.id.show_button);
+        spinnerStudent = (Spinner)findViewById(R.id.spinnerStudent);
+
+        showStudentData = (Button)findViewById(R.id.showStudentData);
+        editStudentData = (Button)findViewById(R.id.editStudentInfo);
+        newEntry = (Button)findViewById(R.id.newEntry);
 
         ArrayAdapter<String> class_spinner_adapter = new ArrayAdapter<>(this, R.layout.spinner_item, tempClassArray);
         class_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -115,13 +133,12 @@ public class ShowAttendance extends SideNavigationMenuParentActivity {
         medium_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerMedium.setAdapter(medium_spinner_adapter);
 
-        ArrayAdapter<String> month_spinner_adapter = new ArrayAdapter<>(this, R.layout.spinner_item, tempMonthArray);
-        month_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerMonth.setAdapter(month_spinner_adapter);
+        ArrayAdapter<String> student_spinner_adapter = new ArrayAdapter<>(this, R.layout.spinner_item, tempStudentArray);
+        student_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerStudent.setAdapter(student_spinner_adapter);
 
         ShiftDataGetRequest();
         MediumDataGetRequest();
-        MonthDataGetRequest();
 
         spinnerShift.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -130,12 +147,14 @@ public class ShowAttendance extends SideNavigationMenuParentActivity {
                 if(position != 0) {
                     try {
                         selectedShift = allShiftArrayList.get(position-1);
+                        selectedStudent = null;
                     } catch (IndexOutOfBoundsException e) {
-                        Toast.makeText(ShowAttendance.this,"No shift found !!!",Toast.LENGTH_LONG).show();
+                        Toast.makeText(StudentiCardMain.this,"No shift found !!!",Toast.LENGTH_LONG).show();
                     }
                 } else {
                     if(firstShift++>1) {
                         selectedShift = new ShiftModel();
+                        selectedStudent = null;
                     }
                 }
             }
@@ -145,7 +164,6 @@ public class ShowAttendance extends SideNavigationMenuParentActivity {
 
             }
         });
-
 
         spinnerMedium.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -158,8 +176,10 @@ public class ShowAttendance extends SideNavigationMenuParentActivity {
                         selectedDepartment = new DepartmentModel();
                         selectedSection = new SectionModel();
                         ClassDataGetRequest();
+                        StudentDataGetRequest();
+                        selectedStudent = null;
                     } catch (IndexOutOfBoundsException e) {
-                        Toast.makeText(ShowAttendance.this,"No medium found !!!",Toast.LENGTH_LONG).show();
+                        Toast.makeText(StudentiCardMain.this,"No medium found !!!",Toast.LENGTH_LONG).show();
                     }
                 } else {
                     if(firstMedium++>1) {
@@ -167,6 +187,7 @@ public class ShowAttendance extends SideNavigationMenuParentActivity {
                         selectedClass = new ClassModel();
                         selectedDepartment = new DepartmentModel();
                         selectedSection = new SectionModel();
+                        selectedStudent = null;
                     }
                 }
             }
@@ -187,14 +208,17 @@ public class ShowAttendance extends SideNavigationMenuParentActivity {
                         selectedDepartment = new DepartmentModel();
                         selectedSection = new SectionModel();
                         DepartmentDataGetRequest();
+                        StudentDataGetRequest();
+                        selectedStudent = null;
                     } catch (IndexOutOfBoundsException e) {
-                        Toast.makeText(ShowAttendance.this,"No class found !!!",Toast.LENGTH_LONG).show();
+                        Toast.makeText(StudentiCardMain.this,"No class found !!!",Toast.LENGTH_LONG).show();
                     }
                 } else {
                     if(firstClass++>1) {
                         selectedClass = new ClassModel();
                         selectedDepartment = new DepartmentModel();
                         selectedSection = new SectionModel();
+                        selectedStudent = null;
                     }
                 }
             }
@@ -214,13 +238,16 @@ public class ShowAttendance extends SideNavigationMenuParentActivity {
                         selectedDepartment = allDepartmentArrayList.get(position-1);
                         selectedSection = new SectionModel();
                         SectionDataGetRequest();
+                        StudentDataGetRequest();
+                        selectedStudent = null;
                     } catch (IndexOutOfBoundsException e) {
-                        Toast.makeText(ShowAttendance.this,"No shift found !!!",Toast.LENGTH_LONG).show();
+                        Toast.makeText(StudentiCardMain.this,"No shift found !!!",Toast.LENGTH_LONG).show();
                     }
                 } else {
                     if(firstDepartment++>1) {
                         selectedDepartment = new DepartmentModel();
                         selectedSection = new SectionModel();
+                        selectedStudent = null;
                     }
                 }
             }
@@ -230,6 +257,7 @@ public class ShowAttendance extends SideNavigationMenuParentActivity {
 
             }
         });
+
 
         spinnerSection.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -238,12 +266,15 @@ public class ShowAttendance extends SideNavigationMenuParentActivity {
                 if(position != 0) {
                     try {
                         selectedSection = allSectionArrayList.get(position-1);
+                        StudentDataGetRequest();
+                        selectedStudent = null;
                     } catch (IndexOutOfBoundsException e) {
-                        Toast.makeText(ShowAttendance.this,"No section found !!!",Toast.LENGTH_LONG).show();
+                        Toast.makeText(StudentiCardMain.this,"No section found !!!",Toast.LENGTH_LONG).show();
                     }
                 } else {
                     if(firstSection++>1) {
                         selectedSection = new SectionModel();
+                        selectedStudent = null;
                     }
                 }
             }
@@ -254,18 +285,18 @@ public class ShowAttendance extends SideNavigationMenuParentActivity {
             }
         });
 
-        spinnerMonth.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        spinnerStudent.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
                 if(position != 0) {
                     try {
-                        selectedMonth = allMonthArrayList.get(position-1);
+                        selectedStudent = allStudentArrayList.get(position-1);
                     } catch (IndexOutOfBoundsException e) {
-                        Toast.makeText(ShowAttendance.this,"No section found !!!",Toast.LENGTH_LONG).show();
+                        Toast.makeText(StudentiCardMain.this,"No student found !!!",Toast.LENGTH_LONG).show();
                     }
                 } else {
-                    selectedMonth = new MonthModel();
+                    selectedStudent = null;
                 }
             }
 
@@ -275,75 +306,67 @@ public class ShowAttendance extends SideNavigationMenuParentActivity {
             }
         });
 
-        student_find_button.setOnClickListener(new View.OnClickListener() {
+        newEntry.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(StaticHelperClass.isNetworkAvailable(ShowAttendance.this)) {
-                    if(selectedMedium.getMediumID() == -2) {
-                        Toast.makeText(ShowAttendance.this,"Please select a medium!!!",Toast.LENGTH_LONG).show();
-                    } else if(selectedClass.getClassID() == -2) {
-                        Toast.makeText(ShowAttendance.this,"Please select a class!!!",Toast.LENGTH_LONG).show();
-                    } else if((selectedDepartment.getDepartmentID() == -2)&&(allDepartmentArrayList.size()>0)) {
-                        Toast.makeText(ShowAttendance.this,"Please select a department!!!",Toast.LENGTH_LONG).show();
-                    } else if((selectedSection.getSectionID() == -2)&&(allSectionArrayList.size()>0)) {
-                        Toast.makeText(ShowAttendance.this,"Please select a section!!!",Toast.LENGTH_LONG).show();
-                    } else if(selectedMonth.getMonthID() == 0) {
-                        Toast.makeText(ShowAttendance.this,"Please select a month!!!",Toast.LENGTH_LONG).show();
-                    } else {
-                        Intent intent = new Intent(ShowAttendance.this, StudentAttendanceShow.class);
-                        intent.putExtra("ShiftID", selectedShift.getShiftID());
-                        intent.putExtra("MediumID", selectedMedium.getMediumID());
-                        intent.putExtra("ClassID", selectedClass.getClassID());
-                        intent.putExtra("DepartmentID", selectedDepartment.getDepartmentID());
-                        intent.putExtra("SectionID", selectedSection.getSectionID());
-                        intent.putExtra("MonthID", selectedMonth.getMonthID());
-                        startActivity(intent);
-                    }
+                if(StaticHelperClass.isNetworkAvailable(StudentiCardMain.this)) {
+                    Intent intent = new Intent(StudentiCardMain.this, StudentiCardNewEntry.class);
+                    startActivity(intent);
                 } else {
-                    Toast.makeText(ShowAttendance.this,"Please check your internet connection and select again!!! ",
-                            Toast.LENGTH_LONG).show();
+                    Toast.makeText(StudentiCardMain.this,"Please check your internet connection !!! ",Toast.LENGTH_LONG).show();
                 }
             }
         });
-    }
 
-    @Override
-    public void onBackPressed() {
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else {
-            switch (UserTypeID) {
-                case 1:
-                    Intent superAdminIntent = new Intent(ShowAttendance.this, TeacherMainScreen.class);
-                    startActivity(superAdminIntent);
-                    finish();
-                    break;
-                case 2:
-                    Intent instituteAdminIntent = new Intent(ShowAttendance.this, TeacherMainScreen.class);
-                    startActivity(instituteAdminIntent);
-                    finish();
-                    break;
-                case 3:
-                    Intent studentIntent = new Intent(ShowAttendance.this, StudentMainScreen.class);
-                    startActivity(studentIntent);
-                    finish();
-                    break;
-                case 4:
-                    Intent teacherIntent = new Intent(ShowAttendance.this, TeacherMainScreen.class);
-                    startActivity(teacherIntent);
-                    finish();
-                    break;
-                case 5:
-                    Intent guardianIntent = new Intent(ShowAttendance.this, StudentMainScreen.class);
-                    startActivity(guardianIntent);
-                    finish();
-                    break;
+        editStudentData.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(StaticHelperClass.isNetworkAvailable(StudentiCardMain.this)) {
+                    if(selectedStudent != null) {
+                        CheckSelectedData();
+                        Bundle bundle = new Bundle();
+                        bundle.putString("UserID", selectedStudent.getUserID());
+                        bundle.putString("SectionID", Long.toString(selectedSection.getSectionID()));
+                        bundle.putString("ClassID", Long.toString(selectedClass.getClassID()));
+                        bundle.putString("ShiftID", Long.toString(selectedShift.getShiftID()));
+                        bundle.putString("MediumID", Long.toString(selectedMedium.getMediumID()));
+                        bundle.putString("DepartmentID", Long.toString(selectedDepartment.getDepartmentID()));
+                        Intent intent = new Intent(StudentiCardMain.this, StudentiCardDetailsEdit.class);
+                        intent.putExtras(bundle);
+                        startActivity(intent);
+                    } else if(selectedStudent == null) {
+                        Toast.makeText(StudentiCardMain.this,"Please select a student !!! ",Toast.LENGTH_LONG).show();
+                    }
+                } else {
+                    Toast.makeText(StudentiCardMain.this,"Please check your internet connection!!!",Toast.LENGTH_LONG).show();
+                }
             }
-        }
+        });
 
-        super.onBackPressed();
+        showStudentData.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(StaticHelperClass.isNetworkAvailable(StudentiCardMain.this)) {
+                    if(selectedStudent != null) {
+                        CheckSelectedData();
+                        Bundle bundle = new Bundle();
+                        bundle.putString("UserID", selectedStudent.getUserID());
+                        bundle.putString("SectionID", Long.toString(selectedSection.getSectionID()));
+                        bundle.putString("ClassID", Long.toString(selectedClass.getClassID()));
+                        bundle.putString("ShiftID", Long.toString(selectedShift.getShiftID()));
+                        bundle.putString("MediumID", Long.toString(selectedMedium.getMediumID()));
+                        bundle.putString("DepartmentID", Long.toString(selectedDepartment.getDepartmentID()));
+                        Intent intent = new Intent(StudentiCardMain.this, StudentiCardDetails.class);
+                        intent.putExtras(bundle);
+                        startActivity(intent);
+                    } else if(selectedStudent == null) {
+                        Toast.makeText(StudentiCardMain.this,"Please select a student !!! ",Toast.LENGTH_LONG).show();
+                    }
+                } else {
+                    Toast.makeText(StudentiCardMain.this,"Please check your internet connection!!!",Toast.LENGTH_LONG).show();
+                }
+            }
+        });
     }
 
     void parseShiftJsonData(String jsonString) {
@@ -513,42 +536,54 @@ public class ShowAttendance extends SideNavigationMenuParentActivity {
         }
     }
 
-    void parseMonthJsonData(String jsonString) {
-
+    void parseStudentJsonData(String jsonString) {
         try {
-            allMonthArrayList = new ArrayList<>();
-            JSONArray MonthJsonArray = new JSONArray(jsonString);
-            ArrayList<String> monthArrayList = new ArrayList<>();
-            monthArrayList.add("Select Month");
-            for(int i = 0; i < MonthJsonArray.length(); ++i) {
-                JSONObject monthJsonObject = MonthJsonArray.getJSONObject(i);
-                MonthModel monthModel = new MonthModel(monthJsonObject.getString("MonthID"), monthJsonObject.getString("MonthName"));
-                allMonthArrayList.add(monthModel);
-                monthArrayList.add(monthModel.getMonthName());
+            allStudentArrayList = new ArrayList<>();
+            JSONArray studentJsonArray = new JSONArray(jsonString);
+            ArrayList<String> studentArrayList = new ArrayList<>();
+            studentArrayList.add("Select Student");
+            for(int i = 0; i < studentJsonArray.length(); ++i) {
+                JSONObject studentJsonObject = studentJsonArray.getJSONObject(i);
+                SpinnerStudentInformation spinnerStudentInformation = new SpinnerStudentInformation();
+                spinnerStudentInformation.setRollNo(studentJsonObject.getString("RollNo"));
+                spinnerStudentInformation.setUserName(studentJsonObject.getString("UserName"));
+                spinnerStudentInformation.setUserID(studentJsonObject.getString("UserID"));
+                spinnerStudentInformation.setIsImageCaptured(studentJsonObject.getBoolean("IsImageCaptured"));
+                allStudentArrayList.add(spinnerStudentInformation);
+                String s = "";
+                if(spinnerStudentInformation.getIsImageCaptured())
+                {
+                    s = " (Done)";
+                }
+                studentArrayList.add(spinnerStudentInformation.getRollNo()+" - "+spinnerStudentInformation.getUserName()+s);
             }
-
-            if(allMonthArrayList.size() == 1){
-                selectedMonth = allMonthArrayList.get(0);
-            }
-
             try {
-                String[] strings = new String[monthArrayList.size()];
-                strings = monthArrayList.toArray(strings);
-                ArrayAdapter<String> month_spinner_adapter = new ArrayAdapter<>(this,R.layout.spinner_item, strings);
-                month_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                spinnerMonth.setAdapter(month_spinner_adapter);
-                mMonthDialog.dismiss();
+                String[] strings = new String[studentArrayList.size()];
+                strings = studentArrayList.toArray(strings);
+                ArrayAdapter<String> student_spinner_adapter = new ArrayAdapter<>(this,R.layout.spinner_item, strings);
+                student_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                spinnerStudent.setAdapter(student_spinner_adapter);
+                mStudentListGetDialog.dismiss();
             } catch (IndexOutOfBoundsException e) {
-                mMonthDialog.dismiss();
-                Toast.makeText(this,"No class found !!!",Toast.LENGTH_LONG).show();
+                mStudentListGetDialog.dismiss();
+                Toast.makeText(this,"No student found !!!",Toast.LENGTH_LONG).show();
             }
-
         } catch (JSONException e) {
+            mStudentListGetDialog.dismiss();
             Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
-            mMonthDialog.dismiss();
-
         }
+    }
 
+    @Override
+    public void onBackPressed() {
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+            Intent mainIntent = new Intent(StudentiCardMain.this,TeacherMainScreen.class);
+            startActivity(mainIntent);
+            finish();
+        }
     }
 
     private void ShiftDataGetRequest() {
@@ -556,9 +591,9 @@ public class ShowAttendance extends SideNavigationMenuParentActivity {
             String shiftUrl = getString(R.string.baseUrl)+"/api/onEms/getInsShift/"+InstituteID;
 
             mShiftDialog = new ProgressDialog(this);
-            mShiftDialog.setTitle("Loading...");
+            mShiftDialog.setTitle("Loading shift...");
             mShiftDialog.setMessage("Please Wait...");
-            mShiftDialog.setCancelable(false);
+            mShiftDialog.setCancelable(true);
             mShiftDialog.setIcon(R.drawable.onair);
             mShiftDialog.show();
             //Preparing Shift data from server
@@ -586,7 +621,7 @@ public class ShowAttendance extends SideNavigationMenuParentActivity {
             };
             MySingleton.getInstance(this).addToRequestQueue(stringShiftRequest);
         } else {
-            Toast.makeText(ShowAttendance.this,"Please check your internet connection and select again!!! ",
+            Toast.makeText(StudentiCardMain.this,"Please check your internet connection and select again!!! ",
                     Toast.LENGTH_LONG).show();
         }
     }
@@ -596,9 +631,9 @@ public class ShowAttendance extends SideNavigationMenuParentActivity {
             String mediumUrl = getString(R.string.baseUrl)+"/api/onEms/getInstituteMediumDdl/"+InstituteID;
 
             mMediumDialog = new ProgressDialog(this);
-            mMediumDialog.setTitle("Loading...");
+            mMediumDialog.setTitle("Loading medium...");
             mMediumDialog.setMessage("Please Wait...");
-            mMediumDialog.setCancelable(false);
+            mMediumDialog.setCancelable(true);
             mMediumDialog.setIcon(R.drawable.onair);
             mMediumDialog.show();
             //Preparing Medium data from server
@@ -626,7 +661,7 @@ public class ShowAttendance extends SideNavigationMenuParentActivity {
             };
             MySingleton.getInstance(this).addToRequestQueue(stringMediumRequest);
         } else {
-            Toast.makeText(ShowAttendance.this,"Please check your internet connection and select again!!! ",
+            Toast.makeText(StudentiCardMain.this,"Please check your internet connection and select again!!! ",
                     Toast.LENGTH_LONG).show();
         }
     }
@@ -639,9 +674,9 @@ public class ShowAttendance extends SideNavigationMenuParentActivity {
             String classUrl = getString(R.string.baseUrl)+"/api/onEms/MediumWiseClassDDL/"+InstituteID+"/"+selectedMedium.getMediumID();
 
             mClassDialog = new ProgressDialog(this);
-            mClassDialog.setTitle("Loading...");
+            mClassDialog.setTitle("Loading class...");
             mClassDialog.setMessage("Please Wait...");
-            mClassDialog.setCancelable(false);
+            mClassDialog.setCancelable(true);
             mClassDialog.setIcon(R.drawable.onair);
             mClassDialog.show();
             //Preparing claas data from server
@@ -669,7 +704,7 @@ public class ShowAttendance extends SideNavigationMenuParentActivity {
             };
             MySingleton.getInstance(this).addToRequestQueue(stringClassRequest);
         } else {
-            Toast.makeText(ShowAttendance.this,"Please check your internet connection and select again!!! ",
+            Toast.makeText(StudentiCardMain.this,"Please check your internet connection and select again!!! ",
                     Toast.LENGTH_LONG).show();
         }
     }
@@ -683,9 +718,9 @@ public class ShowAttendance extends SideNavigationMenuParentActivity {
                     selectedClass.getClassID()+"/"+selectedMedium.getMediumID();
 
             mDepartmentDialog = new ProgressDialog(this);
-            mDepartmentDialog.setTitle("Loading...");
+            mDepartmentDialog.setTitle("Loading department...");
             mDepartmentDialog.setMessage("Please Wait...");
-            mDepartmentDialog.setCancelable(false);
+            mDepartmentDialog.setCancelable(true);
             mDepartmentDialog.setIcon(R.drawable.onair);
             mDepartmentDialog.show();
             //Preparing Department data from server
@@ -713,7 +748,7 @@ public class ShowAttendance extends SideNavigationMenuParentActivity {
             };
             MySingleton.getInstance(this).addToRequestQueue(stringDepartmentRequest);
         } else {
-            Toast.makeText(ShowAttendance.this,"Please check your internet connection and select again!!! ",
+            Toast.makeText(StudentiCardMain.this,"Please check your internet connection and select again!!! ",
                     Toast.LENGTH_LONG).show();
         }
     }
@@ -727,9 +762,9 @@ public class ShowAttendance extends SideNavigationMenuParentActivity {
                     selectedClass.getClassID()+"/"+selectedDepartment.getDepartmentID();
 
             mSectionDialog = new ProgressDialog(this);
-            mSectionDialog.setTitle("Loading...");
+            mSectionDialog.setTitle("Loading section...");
             mSectionDialog.setMessage("Please Wait...");
-            mSectionDialog.setCancelable(false);
+            mSectionDialog.setCancelable(true);
             mSectionDialog.setIcon(R.drawable.onair);
             mSectionDialog.show();
             //Preparing section data from server
@@ -757,66 +792,71 @@ public class ShowAttendance extends SideNavigationMenuParentActivity {
             };
             MySingleton.getInstance(this).addToRequestQueue(stringSectionRequest);
         } else {
-            Toast.makeText(ShowAttendance.this,"Please check your internet connection and select again!!! ",
+            Toast.makeText(StudentiCardMain.this,"Please check your internet connection and select again!!! ",
                     Toast.LENGTH_LONG).show();
         }
     }
 
-    void MonthDataGetRequest(){
-        String monthUrl=getString(R.string.baseUrl)+"/api/onEms/getMonth";
-        mMonthDialog = new ProgressDialog(this);
-        mMonthDialog.setTitle("Loading...");
-        mMonthDialog.setMessage("Please Wait...");
-        mMonthDialog.setCancelable(false);
-        mMonthDialog.setIcon(R.drawable.onair);
-        mMonthDialog.show();
-        StringRequest stringMonthRequest = new StringRequest(Request.Method.GET, monthUrl,
-                new Response.Listener<String>()
-                {
-                    @Override
-                    public void onResponse(String response)
-                    {
+    private void StudentDataGetRequest() {
+        if(StaticHelperClass.isNetworkAvailable(this)) {
+            CheckSelectedData();
 
-                        parseMonthJsonData(response);
+            String studentUrl = getString(R.string.baseUrl)+"/api/onEms/getStudent"+"/"+InstituteID+"/"+
+                    selectedClass.getClassID()+"/"+selectedSection.getSectionID()+"/"+
+                    selectedDepartment.getDepartmentID()+"/"+selectedMedium.getMediumID()+"/"+
+                    selectedShift.getShiftID()+"/"+"0";
 
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
+            mStudentListGetDialog = new ProgressDialog(this);
+            mStudentListGetDialog.setTitle("Loading student...");
+            mStudentListGetDialog.setMessage("Please Wait...");
+            mStudentListGetDialog.setCancelable(true);
+            mStudentListGetDialog.setIcon(R.drawable.onair);
+            mStudentListGetDialog.show();
 
-                mMonthDialog.dismiss();
-            }
-        })
-        {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String>  params = new HashMap<>();
-                params.put("Authorization", "Request_From_onEMS_Android_app");
-                return params;
-            }
-        };
-        MySingleton.getInstance(this).addToRequestQueue(stringMonthRequest);
+            //Preparing Student data from server
+            StringRequest stringStudentRequest = new StringRequest(Request.Method.GET, studentUrl,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+
+                            parseStudentJsonData(response);
+
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    mStudentListGetDialog.dismiss();
+                }
+            })
+            {
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    Map<String, String>  params = new HashMap<>();
+                    params.put("Authorization", "Request_From_onEMS_Android_app");
+                    return params;
+                }
+            };
+            MySingleton.getInstance(this).addToRequestQueue(stringStudentRequest);
+        } else {
+            Toast.makeText(StudentiCardMain.this,"Please check your internet connection and select again!!! ",
+                    Toast.LENGTH_LONG).show();
+        }
     }
 
     private void CheckSelectedData(){
-        if(selectedClass.getClassID() == -2)
-        {
+        if(selectedClass.getClassID() == -2) {
             selectedClass.setClassID("0");
         }
-        if(selectedShift.getShiftID() == -2)
-        {
+        if(selectedShift.getShiftID() == -2) {
             selectedShift.setShiftID("0");
         }
-        if(selectedSection.getSectionID() == -2)
-        {
+        if(selectedSection.getSectionID() == -2) {
             selectedSection.setSectionID("0");
         }
-        if(selectedMedium.getMediumID() == -2)
-        {
+        if(selectedMedium.getMediumID() == -2) {
             selectedMedium.setMediumID("0");
         }
-        if(selectedDepartment.getDepartmentID() == -2)
-        {
+        if(selectedDepartment.getDepartmentID() == -2) {
             selectedDepartment.setDepartmentID("0");
         }
     }

@@ -48,6 +48,7 @@ import onair.onems.customadapters.ContactsAdapter;
 import onair.onems.customadapters.ExpandableListAdapter;
 import onair.onems.customadapters.MyDividerItemDecoration;
 import onair.onems.attendance.ShowAttendance;
+import onair.onems.icard.StudentiCardMain;
 import onair.onems.models.Contact;
 import onair.onems.models.ExpandedMenuModel;
 
@@ -263,7 +264,7 @@ public class ContactsMainScreen extends AppCompatActivity implements ContactsAda
         listDataHeader.add(menuNotice);
 
         ExpandedMenuModel menuRoutine = new ExpandedMenuModel();
-        menuRoutine.setIconName("Routine");
+        menuRoutine.setIconName("Routiness");
         menuRoutine.setIconImg(R.drawable.nav_routine);
         listDataHeader.add(menuRoutine);
 

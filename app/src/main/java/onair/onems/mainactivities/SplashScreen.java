@@ -29,7 +29,7 @@ public class SplashScreen extends AppCompatActivity {
             getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                     WindowManager.LayoutParams.FLAG_FULLSCREEN);
         }
-        setContentView(R.layout.activity_splash);
+        setContentView(R.layout.splash_activity);
         AppName = (TextView)findViewById(R.id.splashText);
         CopyRight = (TextView)findViewById(R.id.copyright);
         Logo = (ImageView)findViewById(R.id.splashImage);

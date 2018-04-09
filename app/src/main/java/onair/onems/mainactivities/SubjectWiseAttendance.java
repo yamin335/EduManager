@@ -19,7 +19,6 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -30,6 +29,7 @@ import de.codecrafters.tableview.toolkit.SimpleTableDataAdapter;
 import de.codecrafters.tableview.toolkit.SimpleTableHeaderAdapter;
 import de.codecrafters.tableview.toolkit.TableDataRowBackgroundProviders;
 import onair.onems.R;
+import onair.onems.attendance.StudentAttendanceReport;
 
 public class SubjectWiseAttendance extends AppCompatActivity
 {
@@ -86,7 +86,7 @@ public class SubjectWiseAttendance extends AppCompatActivity
 
     }
     public boolean onOptionsItemSelected(MenuItem item){
-        Intent myIntent = new Intent(getApplicationContext(), StudentAttendance.class);
+        Intent myIntent = new Intent(getApplicationContext(), StudentAttendanceReport.class);
         startActivityForResult(myIntent, 0);
         finish();
         return true;
