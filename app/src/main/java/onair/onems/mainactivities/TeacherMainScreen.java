@@ -12,9 +12,11 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import onair.onems.R;
+import onair.onems.result.ResultMainScreen;
 import onair.onems.routine.RoutineMainScreen;
 import onair.onems.attendance.TakeAttendance;
 import onair.onems.icard.StudentiCardMain;
+import onair.onems.syllabus.SyllabusMainScreen;
 
 public class TeacherMainScreen extends AppCompatActivity {
 
@@ -79,9 +81,9 @@ public class TeacherMainScreen extends AppCompatActivity {
         result.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                Intent mainIntent = new Intent(TeacherMainScreen.this,ResultMainScreen.class);
-//                TeacherMainScreen.this.startActivity(mainIntent);
-//                finish();
+                Intent mainIntent = new Intent(TeacherMainScreen.this,ResultMainScreen.class);
+                TeacherMainScreen.this.startActivity(mainIntent);
+                finish();
             }
         });
 

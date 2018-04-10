@@ -28,7 +28,7 @@
         app:layout_constraintBottom_toTopOf="@+id/teacherName"
         app:layout_constraintEnd_toEndOf="@+id/teacherName"
         app:layout_constraintStart_toStartOf="@+id/teacherName"
-        app:srcCompat="@drawable/barack" />
+        app:srcCompat="@drawable/shashangka" />
 
     <ImageView
         android:id="@+id/imageView4"

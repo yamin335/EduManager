@@ -29,7 +29,7 @@ public class StudentAttendanceReport extends SideNavigationMenuParentActivity {
         activityName = StudentAttendanceReport.class.getName();
 
         LayoutInflater inflater = (LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        final View childActivityLayout = inflater.inflate(R.layout.attendance_report_student_activity_main, null);
+        final View childActivityLayout = inflater.inflate(R.layout.attendance_report_content_main, null);
         LinearLayout parentActivityLayout = (LinearLayout) findViewById(R.id.contentMain);
         parentActivityLayout.addView(childActivityLayout, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
 

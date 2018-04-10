@@ -18,15 +18,13 @@ import android.view.View;
 import android.widget.ExpandableListView;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
 import onair.onems.R;
+import onair.onems.fee.FeesHistory;
 import onair.onems.routine.RoutineMainScreen;
 import onair.onems.Services.GlideApp;
 import onair.onems.attendance.StudentAttendanceReport;
@@ -35,8 +33,9 @@ import onair.onems.customadapters.ExpandableListAdapter;
 import onair.onems.attendance.ShowAttendance;
 import onair.onems.icard.StudentiCardMain;
 import onair.onems.icard.StudentiCardNewEntry;
-import onair.onems.Fee.Fee;
+import onair.onems.fee.FeeMainScreen;
 import onair.onems.models.ExpandedMenuModel;
+import onair.onems.studentlist.ReportAllStudentMain;
 
 public class SideNavigationMenuParentActivity extends AppCompatActivity {
     private DrawerLayout mDrawerLayout;
@@ -787,7 +786,7 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity {
         listDataHeader.add(menuResult);
 
         ExpandedMenuModel menuFee = new ExpandedMenuModel();
-        menuFee.setIconName("Fee");
+        menuFee.setIconName("fee");
         menuFee.setIconImg(R.drawable.nav_fee);
         listDataHeader.add(menuFee);
 
@@ -804,7 +803,11 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity {
         List<String> headingSyllabus = new ArrayList<>();
         List<String> headingExam = new ArrayList<>();
         List<String> headingResult = new ArrayList<>();
+
         List<String> headingFee = new ArrayList<>();
+        headingFee.add("Fee Payment");
+        headingFee.add("Fee History");
+
         List<String> headingContact = new ArrayList<>();
 
         // Header, Child data
@@ -857,19 +860,6 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity {
                         finish();
                     }
                 }
-
-                if((i == 7) && (l == 7)) {
-                    if(activityName.equals(Fee.class.getName())){
-                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-                        if (drawer.isDrawerOpen(GravityCompat.START)) {
-                            drawer.closeDrawer(GravityCompat.START);
-                        }
-                    } else {
-                        Intent intent = new Intent(getApplicationContext(), Fee.class);
-                        startActivity(intent);
-                        finish();
-                    }
-                }
                 return false;
             }
         });
@@ -878,50 +868,31 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity {
             @Override
             public boolean onChildClick(ExpandableListView expandableListView, View view, int i, int i1, long l) {
 
-//                if((i == 3) && (i1 == 0) && (l == 0)) {
-//                    Intent intent = new Intent(getApplicationContext(), TakeAttendance.class);
-//                    startActivity(intent);
-//                    finish();
-//                } else if(activityName.equals(TakeAttendance.class.getName())){
-//                    DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-//                    if (drawer.isDrawerOpen(GravityCompat.START)) {
-//                        drawer.closeDrawer(GravityCompat.START);
-//                    }
-//                }
-//
-//                if((i == 3) && (i1 == 1) && (l == 1)) {
-//                    Intent intent = new Intent(getApplicationContext(), ShowAttendance.class);
-//                    startActivity(intent);
-//                    finish();
-//                } else if(activityName.equals(ShowAttendance.class.getName())){
-//                    DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-//                    if (drawer.isDrawerOpen(GravityCompat.START)) {
-//                        drawer.closeDrawer(GravityCompat.START);
-//                    }
-//                }
-//
-//                if((i == 8) && (i1 == 0) && (l == 0)) {
-//                    Intent intent = new Intent(getApplicationContext(), StudentiCardMain.class);
-//                    startActivity(intent);
-//                    finish();
-//                } else if(activityName.equals(StudentiCardMain.class.getName())){
-//                    DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-//                    if (drawer.isDrawerOpen(GravityCompat.START)) {
-//                        drawer.closeDrawer(GravityCompat.START);
-//                    }
-//                }
-//
-//                if((i == 8) && (i1 == 1) && (l == 1)) {
-//                    Intent intent = new Intent(getApplicationContext(), StudentiCardNewEntry.class);
-//                    startActivity(intent);
-//                    finish();
-//                } else if(activityName.equals(StudentiCardNewEntry.class.getName())){
-//                    DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-//                    if (drawer.isDrawerOpen(GravityCompat.START)) {
-//                        drawer.closeDrawer(GravityCompat.START);
-//                    }
-//                }
+                if((i == 7) && (i1 == 0) && (l == 0)) {
+                    if(activityName.equals(FeeMainScreen.class.getName())){
+                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                        if (drawer.isDrawerOpen(GravityCompat.START)) {
+                            drawer.closeDrawer(GravityCompat.START);
+                        }
+                    } else {
+                        Intent intent = new Intent(getApplicationContext(), FeeMainScreen.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                }
 
+                if((i == 7) && (i1 == 1) && (l == 1)) {
+                    if(activityName.equals(FeesHistory.class.getName())){
+                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                        if (drawer.isDrawerOpen(GravityCompat.START)) {
+                            drawer.closeDrawer(GravityCompat.START);
+                        }
+                    } else {
+                        Intent intent = new Intent(getApplicationContext(), FeesHistory.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                }
                 return false;
             }
         });
@@ -970,7 +941,7 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity {
         listDataHeader.add(menuResult);
 
         ExpandedMenuModel menuFee = new ExpandedMenuModel();
-        menuFee.setIconName("Fee");
+        menuFee.setIconName("fee");
         menuFee.setIconImg(R.drawable.nav_fee);
         listDataHeader.add(menuFee);
 
@@ -987,7 +958,11 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity {
         List<String> headingSyllabus = new ArrayList<>();
         List<String> headingExam = new ArrayList<>();
         List<String> headingResult = new ArrayList<>();
+
         List<String> headingFee = new ArrayList<>();
+        headingFee.add("Fee Payment");
+        headingFee.add("Fee History");
+
         List<String> headingContact = new ArrayList<>();
 
         // Header, Child data
@@ -1040,19 +1015,6 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity {
                         finish();
                     }
                 }
-
-                if((i == 7) && (l == 7)) {
-                    if(activityName.equals(Fee.class.getName())){
-                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-                        if (drawer.isDrawerOpen(GravityCompat.START)) {
-                            drawer.closeDrawer(GravityCompat.START);
-                        }
-                    } else {
-                        Intent intent = new Intent(getApplicationContext(), Fee.class);
-                        startActivity(intent);
-                        finish();
-                    }
-                }
                 return false;
             }
         });
@@ -1061,50 +1023,31 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity {
             @Override
             public boolean onChildClick(ExpandableListView expandableListView, View view, int i, int i1, long l) {
 
-//                if((i == 3) && (i1 == 0) && (l == 0)) {
-//                    Intent intent = new Intent(getApplicationContext(), TakeAttendance.class);
-//                    startActivity(intent);
-//                    finish();
-//                } else if(activityName.equals(TakeAttendance.class.getName())){
-//                    DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-//                    if (drawer.isDrawerOpen(GravityCompat.START)) {
-//                        drawer.closeDrawer(GravityCompat.START);
-//                    }
-//                }
-//
-//                if((i == 3) && (i1 == 1) && (l == 1)) {
-//                    Intent intent = new Intent(getApplicationContext(), ShowAttendance.class);
-//                    startActivity(intent);
-//                    finish();
-//                } else if(activityName.equals(ShowAttendance.class.getName())){
-//                    DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-//                    if (drawer.isDrawerOpen(GravityCompat.START)) {
-//                        drawer.closeDrawer(GravityCompat.START);
-//                    }
-//                }
-//
-//                if((i == 8) && (i1 == 0) && (l == 0)) {
-//                    Intent intent = new Intent(getApplicationContext(), StudentiCardMain.class);
-//                    startActivity(intent);
-//                    finish();
-//                } else if(activityName.equals(StudentiCardMain.class.getName())){
-//                    DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-//                    if (drawer.isDrawerOpen(GravityCompat.START)) {
-//                        drawer.closeDrawer(GravityCompat.START);
-//                    }
-//                }
-//
-//                if((i == 8) && (i1 == 1) && (l == 1)) {
-//                    Intent intent = new Intent(getApplicationContext(), StudentiCardNewEntry.class);
-//                    startActivity(intent);
-//                    finish();
-//                } else if(activityName.equals(StudentiCardNewEntry.class.getName())){
-//                    DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-//                    if (drawer.isDrawerOpen(GravityCompat.START)) {
-//                        drawer.closeDrawer(GravityCompat.START);
-//                    }
-//                }
+                if((i == 7) && (i1 == 0) && (l == 0)) {
+                    if(activityName.equals(FeeMainScreen.class.getName())){
+                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                        if (drawer.isDrawerOpen(GravityCompat.START)) {
+                            drawer.closeDrawer(GravityCompat.START);
+                        }
+                    } else {
+                        Intent intent = new Intent(getApplicationContext(), FeeMainScreen.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                }
 
+                if((i == 7) && (i1 == 1) && (l == 1)) {
+                    if(activityName.equals(FeesHistory.class.getName())){
+                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                        if (drawer.isDrawerOpen(GravityCompat.START)) {
+                            drawer.closeDrawer(GravityCompat.START);
+                        }
+                    } else {
+                        Intent intent = new Intent(getApplicationContext(), FeesHistory.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                }
                 return false;
             }
         });

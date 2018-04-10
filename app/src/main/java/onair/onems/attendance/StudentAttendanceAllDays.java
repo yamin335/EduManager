@@ -29,7 +29,7 @@ import de.codecrafters.tableview.toolkit.SimpleTableDataAdapter;
 import de.codecrafters.tableview.toolkit.SimpleTableHeaderAdapter;
 import de.codecrafters.tableview.toolkit.TableDataRowBackgroundProviders;
 import onair.onems.R;
-import onair.onems.models.StudentAttendanceReportModels.DailyAttendanceModel;
+import onair.onems.models.DailyAttendanceModel;
 import onair.onems.network.MySingleton;
 
 public class StudentAttendanceAllDays extends AppCompatActivity

@@ -11,15 +11,18 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+
+import onair.onems.fee.FeeMainScreen;
 import onair.onems.R;
 import onair.onems.attendance.StudentAttendanceReport;
+import onair.onems.routine.RoutineMainScreen;
 
 
 public class StudentMainScreen extends AppCompatActivity {
 
     TextView InstituteName;
     TextView userType;
-    long user;
+    int user;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState)
     {
@@ -33,7 +36,7 @@ public class StudentMainScreen extends AppCompatActivity {
         editor.putInt("monthselectindex",1);
         editor.putString("yearselectindex","2018");
         editor.apply();
-        user = sharedPre.getLong("UserTypeID",0);
+        user = sharedPre.getInt("UserTypeID",0);
         if(user == 3)
         {
             userType.setText("Student");
@@ -68,12 +71,12 @@ public class StudentMainScreen extends AppCompatActivity {
             @Override
             public void onClick(View v)
             {
-//                if(user == 3)
-//                {
-//                    Intent mainIntent = new Intent(StudentMainScreen.this, RoutineMainScreen.class);
-//                    startActivity(mainIntent);
-//                    finish();
-//                }
+                if(user == 3)
+                {
+                    Intent mainIntent = new Intent(StudentMainScreen.this, RoutineMainScreen.class);
+                    startActivity(mainIntent);
+                    finish();
+                }
 //                else
 //                {
 //                    Intent mainIntent = new Intent(StudentMainScreen.this,StudentList.class);
@@ -119,12 +122,12 @@ public class StudentMainScreen extends AppCompatActivity {
             @Override
             public void onClick(View v)
             {
-//                if(user == 3)
-//                {
-//                    Intent mainIntent = new Intent(StudentMainScreen.this,Fee.class);
-//                    StudentMainScreen.this.startActivity(mainIntent);
-//                    finish();
-//                }
+                if(user == 3)
+                {
+                    Intent mainIntent = new Intent(StudentMainScreen.this,FeeMainScreen.class);
+                    StudentMainScreen.this.startActivity(mainIntent);
+                    finish();
+                }
 //                else
 //                {
 //                    Intent mainIntent = new Intent(StudentMainScreen.this,StudentList.class);

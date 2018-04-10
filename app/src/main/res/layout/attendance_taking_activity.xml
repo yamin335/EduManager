@@ -8,7 +8,7 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
     <LinearLayout
-        android:id="@+id/classLayout"
+        android:id="@+id/shiftLayout"
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:layout_marginBottom="20dp"
@@ -25,7 +25,7 @@
         android:layout_alignParentTop="true">
 
         <Spinner
-            android:id="@+id/spinnerClass"
+            android:id="@+id/spinnerShift"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:backgroundTint="#000000"
@@ -47,7 +47,7 @@
         android:paddingLeft="20dp"
         android:paddingRight="10dp"
         android:paddingStart="20dp"
-        android:layout_below="@+id/classLayout">
+        android:layout_below="@+id/shiftLayout">
 
         <Spinner
             android:id="@+id/spinnerMedium"
@@ -60,7 +60,7 @@
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/shiftLayout"
+        android:id="@+id/classLayout"
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:layout_marginBottom="20dp"
@@ -76,7 +76,7 @@
         android:layout_below="@+id/mediumLayout">
 
         <Spinner
-            android:id="@+id/spinnerShift"
+            android:id="@+id/spinnerClass"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:backgroundTint="#000000"
@@ -98,7 +98,7 @@
         android:paddingLeft="20dp"
         android:paddingRight="10dp"
         android:paddingStart="20dp"
-        android:layout_below="@+id/shiftLayout">
+        android:layout_below="@+id/classLayout">
 
         <Spinner
             android:id="@+id/spinnerDepartment"

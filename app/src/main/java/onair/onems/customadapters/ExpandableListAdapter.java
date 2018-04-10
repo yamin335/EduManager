@@ -93,8 +93,8 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
 
         } else if(UserTypeID == 3) {
             switch (groupPosition) {
-                case 0:
-                    indicator.setVisibility(View.INVISIBLE);
+                case 7:
+                    indicator.setVisibility(View.VISIBLE);
                     break;
                 default:
                     indicator.setVisibility(View.INVISIBLE);
