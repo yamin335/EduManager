@@ -71,9 +71,6 @@ public class StudentiCardMain extends SideNavigationMenuParentActivity {
 
     private long InstituteID;
 
-    public static final String MyPREFERENCES = "LogInKey";
-    public static SharedPreferences sharedPreferences;
-
     private int firstClass = 0, firstShift = 0, firstSection = 0, firstMedium = 0,
             firstDepartment = 0;
 
