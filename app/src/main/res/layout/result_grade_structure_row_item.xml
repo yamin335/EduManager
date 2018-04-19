@@ -1,43 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     android:layout_width="match_parent"
-    android:layout_height="50dp"
+    android:layout_height="wrap_content"
     android:orientation="horizontal"
-    xmlns:android="http://schemas.android.com/apk/res/android">
-
-    <TextView
-        android:id="@+id/subject"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:paddingBottom="3dp"
-        android:paddingEnd="5dp"
-        android:paddingLeft="5dp"
-        android:paddingRight="5dp"
-        android:paddingStart="5dp"
-        android:paddingTop="3dp"
-        android:text="Subject"
-        android:layout_weight="1"
-        android:gravity="center"
-        android:layout_gravity="center"/>
-
-    <TextView
-        android:id="@+id/mark"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:paddingBottom="3dp"
-        android:paddingEnd="5dp"
-        android:paddingLeft="5dp"
-        android:paddingRight="5dp"
-        android:paddingStart="5dp"
-        android:paddingTop="3dp"
-        android:text="Mark"
-        android:layout_weight="1"
-        android:gravity="center"
-        android:layout_gravity="center"/>
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:paddingBottom="10dp"
+    android:paddingTop="10dp">
 
     <TextView
         android:id="@+id/grade"
-        android:layout_width="wrap_content"
+        android:layout_width="80dp"
         android:layout_height="wrap_content"
         android:paddingBottom="3dp"
         android:paddingEnd="5dp"
@@ -46,13 +18,12 @@
         android:paddingStart="5dp"
         android:paddingTop="3dp"
         android:text="Grade"
-        android:layout_weight="1"
         android:gravity="center"
         android:layout_gravity="center"/>
 
     <TextView
-        android:id="@+id/comment"
-        android:layout_width="wrap_content"
+        android:id="@+id/gpa"
+        android:layout_width="80dp"
         android:layout_height="wrap_content"
         android:paddingBottom="3dp"
         android:paddingEnd="5dp"
@@ -60,8 +31,22 @@
         android:paddingRight="5dp"
         android:paddingStart="5dp"
         android:paddingTop="3dp"
-        android:text="Comment"
-        android:layout_weight="1"
+        android:text="GPA"
         android:gravity="center"
+        android:layout_gravity="center"/>
+
+    <TextView
+        android:id="@+id/markRange"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:paddingBottom="3dp"
+        android:paddingEnd="5dp"
+        android:paddingLeft="5dp"
+        android:paddingRight="5dp"
+        android:paddingStart="5dp"
+        android:paddingTop="3dp"
+        android:text="Mark Range"
+        android:gravity="center"
+        android:layout_weight="1"
         android:layout_gravity="center"/>
 </LinearLayout>

@@ -173,7 +173,7 @@ public class StudentiCardMain extends SideNavigationMenuParentActivity {
                         selectedDepartment = new DepartmentModel();
                         selectedSection = new SectionModel();
                         ClassDataGetRequest();
-                        StudentDataGetRequest();
+//                        StudentDataGetRequest();
                         selectedStudent = null;
                     } catch (IndexOutOfBoundsException e) {
                         Toast.makeText(StudentiCardMain.this,"No medium found !!!",Toast.LENGTH_LONG).show();
@@ -590,7 +590,7 @@ public class StudentiCardMain extends SideNavigationMenuParentActivity {
             mShiftDialog = new ProgressDialog(this);
             mShiftDialog.setTitle("Loading shift...");
             mShiftDialog.setMessage("Please Wait...");
-            mShiftDialog.setCancelable(true);
+            mShiftDialog.setCancelable(false);
             mShiftDialog.setIcon(R.drawable.onair);
             mShiftDialog.show();
             //Preparing Shift data from server
@@ -630,7 +630,7 @@ public class StudentiCardMain extends SideNavigationMenuParentActivity {
             mMediumDialog = new ProgressDialog(this);
             mMediumDialog.setTitle("Loading medium...");
             mMediumDialog.setMessage("Please Wait...");
-            mMediumDialog.setCancelable(true);
+            mMediumDialog.setCancelable(false);
             mMediumDialog.setIcon(R.drawable.onair);
             mMediumDialog.show();
             //Preparing Medium data from server
@@ -673,7 +673,7 @@ public class StudentiCardMain extends SideNavigationMenuParentActivity {
             mClassDialog = new ProgressDialog(this);
             mClassDialog.setTitle("Loading class...");
             mClassDialog.setMessage("Please Wait...");
-            mClassDialog.setCancelable(true);
+            mClassDialog.setCancelable(false);
             mClassDialog.setIcon(R.drawable.onair);
             mClassDialog.show();
             //Preparing claas data from server
@@ -717,7 +717,7 @@ public class StudentiCardMain extends SideNavigationMenuParentActivity {
             mDepartmentDialog = new ProgressDialog(this);
             mDepartmentDialog.setTitle("Loading department...");
             mDepartmentDialog.setMessage("Please Wait...");
-            mDepartmentDialog.setCancelable(true);
+            mDepartmentDialog.setCancelable(false);
             mDepartmentDialog.setIcon(R.drawable.onair);
             mDepartmentDialog.show();
             //Preparing Department data from server
@@ -761,7 +761,7 @@ public class StudentiCardMain extends SideNavigationMenuParentActivity {
             mSectionDialog = new ProgressDialog(this);
             mSectionDialog.setTitle("Loading section...");
             mSectionDialog.setMessage("Please Wait...");
-            mSectionDialog.setCancelable(true);
+            mSectionDialog.setCancelable(false);
             mSectionDialog.setIcon(R.drawable.onair);
             mSectionDialog.show();
             //Preparing section data from server
@@ -806,7 +806,7 @@ public class StudentiCardMain extends SideNavigationMenuParentActivity {
             mStudentListGetDialog = new ProgressDialog(this);
             mStudentListGetDialog.setTitle("Loading student...");
             mStudentListGetDialog.setMessage("Please Wait...");
-            mStudentListGetDialog.setCancelable(true);
+            mStudentListGetDialog.setCancelable(false);
             mStudentListGetDialog.setIcon(R.drawable.onair);
             mStudentListGetDialog.show();
 

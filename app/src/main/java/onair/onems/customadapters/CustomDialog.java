@@ -6,30 +6,41 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
+import android.widget.TextView;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import onair.onems.R;
 
-/**
- * Created by onAir on 13-Feb-18.
- */
-
 public class CustomDialog extends Dialog implements View.OnClickListener {
-    public Activity c;
-    public Dialog d;
-    public Button ok;
+    private JSONObject result;
 
-    public CustomDialog(Activity a) {
+    public CustomDialog(Activity a, JSONObject result) {
         super(a);
-        // TODO Auto-generated constructor stub
-        this.c = a;
+        this.result = result;
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        setContentView(R.layout.subject_details_result_dialog);
-        ok = (Button) findViewById(R.id.btn_ok);
+        setContentView(R.layout.result_details_dialog);
+        TextView mcqMark = (TextView)findViewById(R.id.mcq);
+        TextView writtenMark = (TextView)findViewById(R.id.written);
+        TextView attendanceMark = (TextView)findViewById(R.id.attendance);
+        TextView practicalMark = (TextView)findViewById(R.id.practical);
+        TextView totalMark = (TextView)findViewById(R.id.total);
+        try {
+            mcqMark.setText(result.getString("MCQ"));
+            writtenMark.setText(result.getString("Written"));
+            attendanceMark.setText(result.getString("Attendance"));
+            practicalMark.setText(result.getString("Precticle"));
+            totalMark.setText(result.getString("Total"));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        Button ok = (Button) findViewById(R.id.btn_ok);
         ok.setOnClickListener(this);
 
     }

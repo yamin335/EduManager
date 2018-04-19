@@ -85,7 +85,7 @@ public class StudentAttendanceAllDays extends AppCompatActivity
         id.setText("ID: "+RFID);
 
         monthAttendanceUrl = getString(R.string.baseUrl)+"/api/onEms/getStudentMonthlyDeviceAttendance/"+
-                ShiftID+"/"+MediumID+"/"+ClassID+"/"+SectionID+"/"+DepartmentID+"/"+MonthID+"/"+RFID+"/"+InstituteID;
+                ShiftID+"/"+MediumID+"/"+ClassID+"/"+SectionID+"/"+DepartmentID+"/"+MonthID+"/"+UserID+"/"+InstituteID;
         // Add Header of The Table
 
         simpleTableHeaderAdapter = new SimpleTableHeaderAdapter(this, "SI","Date","Present", "Late(m)");

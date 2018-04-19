@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import onair.onems.R;
 import onair.onems.fee.FeesHistory;
+import onair.onems.result.ResultMainScreen;
 import onair.onems.routine.RoutineMainScreen;
 import onair.onems.Services.GlideApp;
 import onair.onems.attendance.StudentAttendanceReport;
@@ -277,6 +278,19 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity {
                         }
                     } else {
                         Intent intent = new Intent(getApplicationContext(), RoutineMainScreen.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                }
+
+                if((i == 6) && (l == 6)) {
+                    if(activityName.equals(ResultMainScreen.class.getName())){
+                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                        if (drawer.isDrawerOpen(GravityCompat.START)) {
+                            drawer.closeDrawer(GravityCompat.START);
+                        }
+                    } else {
+                        Intent intent = new Intent(getApplicationContext(), ResultMainScreen.class);
                         startActivity(intent);
                         finish();
                     }

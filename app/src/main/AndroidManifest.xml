@@ -84,7 +84,7 @@
             android:name=".attendance.ShowAttendance"
             android:label="Attendance Report"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar"/>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".icard.StudentiCardMain"
             android:label="iCard"
@@ -102,7 +102,7 @@
             android:name=".icard.StudentiCardNewEntry"
             android:label="Entry Student"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar"/>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".fee.FeesDetails"
             android:label="Fees Details"
@@ -184,7 +184,7 @@
             android:name=".studentlist.ReportAllStudentMain"
             android:label="Student List"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"></activity>
         <activity
             android:name=".studentlist.ReportAllStudentList"
             android:label="Student List"
@@ -216,33 +216,11 @@
             android:name=".result.ResultMainScreen"
             android:label="Result"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar">
-            <meta-data
-                android:name="android.app.searchable"
-                android:resource="@xml/searchable" />
-
-            <intent-filter>
-                <action android:name="android.intent.action.SEARCH" />
-            </intent-filter>
-        </activity>
+            android:theme="@style/AppTheme.NoActionBar"></activity>
         <activity
             android:name=".result.SubjectWiseResult"
-            android:label="Subject wise Marks "
-            android:parentActivityName=".result.ResultMainScreen"
-            android:screenOrientation="portrait">
-
-            <!-- The meta-data element is needed for versions lower than 4.1 -->
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="onair.onems.result.ResultMainScreen" />
-            <meta-data
-                android:name="android.app.searchable"
-                android:resource="@xml/searchable" />
-
-            <intent-filter>
-                <action android:name="android.intent.action.SEARCH" />
-            </intent-filter>
-        </activity>
+            android:label="Result"
+            android:screenOrientation="portrait"></activity>
         <activity
             android:name=".contacts.ContactsMainScreen"
             android:label="Contacts"
@@ -260,21 +238,16 @@
             android:name=".routine.RoutineMainScreen"
             android:label="Class Routine"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar">
-
-        </activity>
+            android:theme="@style/AppTheme.NoActionBar"></activity>
         <activity
             android:name=".mainactivities.SideNavigationMenuParentActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar">
-
-        </activity>
+            android:theme="@style/AppTheme.NoActionBar"></activity>
         <activity
             android:name=".syllabus.SyllabusMainScreen"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar">
-
-        </activity>
+            android:theme="@style/AppTheme.NoActionBar"></activity>
+        <activity android:name=".result.ResultGradeStructure"></activity>
     </application>
 
 </manifest>
