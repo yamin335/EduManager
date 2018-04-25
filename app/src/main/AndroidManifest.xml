@@ -184,7 +184,7 @@
             android:name=".studentlist.ReportAllStudentMain"
             android:label="Student List"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".studentlist.ReportAllStudentList"
             android:label="Student List"
@@ -216,11 +216,11 @@
             android:name=".result.ResultMainScreen"
             android:label="Result"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".result.SubjectWiseResult"
             android:label="Result"
-            android:screenOrientation="portrait"></activity>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".contacts.ContactsMainScreen"
             android:label="Contacts"
@@ -238,16 +238,28 @@
             android:name=".routine.RoutineMainScreen"
             android:label="Class Routine"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".mainactivities.SideNavigationMenuParentActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".syllabus.SyllabusMainScreen"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
-        <activity android:name=".result.ResultGradeStructure"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".result.ResultGradeStructure"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".exam.ExamRoutineMainScreen"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".attendance.AttendanceAdminDashboard"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar">
+
+        </activity>
     </application>
 
 </manifest>

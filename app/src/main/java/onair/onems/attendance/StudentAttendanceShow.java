@@ -93,6 +93,7 @@ public class StudentAttendanceShow extends AppCompatActivity {
                 intent.putExtra("DepartmentID", selectedStudent.getDepartmentID());
                 intent.putExtra("SectionID", selectedStudent.getSectionID());
                 intent.putExtra("MonthID", MonthID);
+                intent.putExtra("ImageUrl", selectedStudent.getImageUrl());
                 startActivity(intent);
             }
         });
@@ -116,6 +117,7 @@ public class StudentAttendanceShow extends AppCompatActivity {
                 singleStudent.setClassID(studentJsonObject.getString("ClassID"));
                 singleStudent.setDepartmentID(studentJsonObject.getString("DepartmentID"));
                 singleStudent.setSectionID(studentJsonObject.getString("SectionID"));
+                singleStudent.setImageUrl(studentJsonObject.getString("ImageUrl"));
                 studentList.add(singleStudent);
                 DATA_TO_SHOW[i][0]= String.valueOf((i+1));
                 DATA_TO_SHOW[i][1]= singleStudent.getUserFullName();

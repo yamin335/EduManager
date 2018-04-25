@@ -12,6 +12,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import onair.onems.R;
+import onair.onems.attendance.AttendanceAdminDashboard;
+import onair.onems.exam.ExamRoutineMainScreen;
+import onair.onems.notice.NoticeMainScreen;
 import onair.onems.result.ResultMainScreen;
 import onair.onems.routine.RoutineMainScreen;
 import onair.onems.attendance.TakeAttendance;
@@ -37,23 +40,27 @@ public class TeacherMainScreen extends AppCompatActivity {
         Button result = (Button)findViewById(R.id.result);
         Button contact = (Button)findViewById(R.id.contact);
         Button routine = (Button)findViewById(R.id.routine);
+        Button exam = (Button)findViewById(R.id.exam);
 
         SharedPreferences sharedPre = PreferenceManager.getDefaultSharedPreferences(this);
         String InstituteNameString = sharedPre.getString("InstituteName","");
         InstituteName.setText(InstituteNameString);
-        int user = sharedPre.getInt("UserTypeID",0);
-        if(user == 4)
-        {
+        final int user = sharedPre.getInt("UserTypeID",0);
+        if(user == 4) {
             userType.setText("Teacher");
+        } else if(user == 1){
+            userType.setText("Super Admin");
+        } else if(user == 2){
+            userType.setText("Institute Admin");
         }
 
         // Notice module start point
         notice.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                Intent mainIntent = new Intent(TeacherMainScreen.this,NoticeMainScreen.class);
-//                TeacherMainScreen.this.startActivity(mainIntent);
-//                finish();
+                Intent mainIntent = new Intent(TeacherMainScreen.this,NoticeMainScreen.class);
+                TeacherMainScreen.this.startActivity(mainIntent);
+                finish();
             }
         });
 
@@ -71,7 +78,22 @@ public class TeacherMainScreen extends AppCompatActivity {
         attendance.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent mainIntent = new Intent(TeacherMainScreen.this,TakeAttendance.class);
+                if(user == 1) {
+                    Intent mainIntent = new Intent(TeacherMainScreen.this,AttendanceAdminDashboard.class);
+                    TeacherMainScreen.this.startActivity(mainIntent);
+                    finish();
+                } else {
+                    Intent mainIntent = new Intent(TeacherMainScreen.this,TakeAttendance.class);
+                    TeacherMainScreen.this.startActivity(mainIntent);
+                    finish();
+                }
+            }
+        });
+
+        exam.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent mainIntent = new Intent(TeacherMainScreen.this,ExamRoutineMainScreen.class);
                 TeacherMainScreen.this.startActivity(mainIntent);
                 finish();
             }
@@ -91,9 +113,9 @@ public class TeacherMainScreen extends AppCompatActivity {
         contact.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent mainIntent = new Intent(TeacherMainScreen.this, SyllabusMainScreen.class);
-                startActivity(mainIntent);
-                finish();
+//                Intent mainIntent = new Intent(TeacherMainScreen.this, SyllabusMainScreen.class);
+//                startActivity(mainIntent);
+//                finish();
 //                Intent mainIntent = new Intent(TeacherMainScreen.this,ContactsMainScreen.class);
 //                TeacherMainScreen.this.startActivity(mainIntent);
 //                finish();

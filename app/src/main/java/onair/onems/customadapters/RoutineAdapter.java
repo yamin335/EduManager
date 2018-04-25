@@ -1,6 +1,8 @@
 package onair.onems.customadapters;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,6 +12,12 @@ import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.transition.Transition;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -17,6 +25,8 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 import onair.onems.R;
+import onair.onems.Services.GlideApp;
+import onair.onems.icard.StudentiCardDetails;
 
 public class RoutineAdapter extends RecyclerView.Adapter<RoutineAdapter.MyViewHolder> {
     private Context context;
@@ -24,6 +34,7 @@ public class RoutineAdapter extends RecyclerView.Adapter<RoutineAdapter.MyViewHo
     private JSONArray allPeriodJsonArray;
     private int periodNumber;
     private long UserTypeID;
+    private Bitmap TeacherImage;
 
     class MyViewHolder extends RecyclerView.ViewHolder {
         TextView periodName;
@@ -44,6 +55,23 @@ public class RoutineAdapter extends RecyclerView.Adapter<RoutineAdapter.MyViewHo
 
         try {
             this.allPeriodJsonArray = new JSONArray(periods);
+            if(allPeriodJsonArray.length()>0 && UserTypeID != 3) {
+                GlideApp.with(context)
+                        .asBitmap()
+                        .load(context.getString(R.string.baseUrl)+"/"+allPeriodJsonArray.getJSONObject(0).getString("ImageUrl").replace("\\","/"))
+                        .into(new SimpleTarget<Bitmap>() {
+                            @Override
+                            public void onResourceReady(Bitmap resource, Transition<? super Bitmap> transition) {
+                                if(resource != null) {
+                                    TeacherImage = resource;
+                                }
+                            }
+                            @Override
+                            public void onLoadFailed(Drawable errorDrawable) {
+                                super.onLoadFailed(errorDrawable);
+                            }
+                        });
+            }
             countPeriodNumber(allPeriodJsonArray);
         } catch (JSONException e) {
             e.printStackTrace();
@@ -149,6 +177,7 @@ public class RoutineAdapter extends RecyclerView.Adapter<RoutineAdapter.MyViewHo
         TextView teacherName = rowView.findViewById(R.id.teacherName);
         TextView className = rowView.findViewById(R.id.className);
         ImageView teacherImage = rowView.findViewById(R.id.teacherImage);
+        teacherImage.setImageBitmap(TeacherImage);
         if(UserTypeID == 3) {
             className.setVisibility(View.GONE);
         } else if(UserTypeID == 4) {

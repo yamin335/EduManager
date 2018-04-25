@@ -9,6 +9,7 @@ import android.preference.PreferenceManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.android.volley.AuthFailureError;
@@ -16,6 +17,9 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.RequestOptions;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -29,6 +33,7 @@ import de.codecrafters.tableview.toolkit.SimpleTableDataAdapter;
 import de.codecrafters.tableview.toolkit.SimpleTableHeaderAdapter;
 import de.codecrafters.tableview.toolkit.TableDataRowBackgroundProviders;
 import onair.onems.R;
+import onair.onems.Services.GlideApp;
 import onair.onems.models.DailyAttendanceModel;
 import onair.onems.network.MySingleton;
 
@@ -52,6 +57,7 @@ public class StudentAttendanceAllDays extends AppCompatActivity
         TextView name=(TextView) findViewById(R.id.name);
         TextView roll=(TextView) findViewById(R.id.roll);
         TextView id=(TextView) findViewById(R.id.Id);
+        ImageView studentImage = findViewById(R.id.studentImage);
 
         dialog = new ProgressDialog(this);
         dialog.setTitle("Loading...");
@@ -79,6 +85,15 @@ public class StudentAttendanceAllDays extends AppCompatActivity
         UserFullName = intent.getStringExtra("UserFullName");
         RollNo = intent.getStringExtra("RollNo");
         UserID = intent.getStringExtra("UserID");
+        String ImageUrl = intent.getStringExtra("ImageUrl");
+
+
+        GlideApp.with(this)
+                .load(getString(R.string.baseUrl)+"/"+ImageUrl.replace("\\","/")).apply(RequestOptions.circleCropTransform())
+                .diskCacheStrategy(DiskCacheStrategy.NONE)
+                .skipMemoryCache(true)
+                .into(studentImage);
+
         // get Internal Data using SharedPreferences end
         name.setText(""+UserFullName);
         roll.setText("Roll: "+RollNo);

@@ -284,7 +284,7 @@ public class SelfAttendanceReport extends Fragment {
         if(isNetworkAvailable()) {
             dialog.show();
             String monthAttendanceUrl = getString(R.string.baseUrl)+"/api/onEms/getStudentMonthlyDeviceAttendance/"+
-                    ShiftID+"/"+MediumID+"/"+ClassID+"/"+SectionID+"/"+DepartmentID+"/"+ MonthID+"/"+RFID+"/"+InstituteID;
+                    ShiftID+"/"+MediumID+"/"+ClassID+"/"+SectionID+"/"+DepartmentID+"/"+ MonthID+"/"+UserID+"/"+InstituteID;
             StringRequest stringRequest = new StringRequest(Request.Method.GET, monthAttendanceUrl,
                     new Response.Listener<String>() {
                         @Override

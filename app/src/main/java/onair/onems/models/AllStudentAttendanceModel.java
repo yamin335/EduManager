@@ -1,8 +1,5 @@
 package onair.onems.models;
 
-/**
- * Created by onAir on 15-Mar-18.
- */
 
 public class AllStudentAttendanceModel {
     private String UserID = "";
@@ -14,6 +11,7 @@ public class AllStudentAttendanceModel {
     private long MediumID = 0;
     private long ShiftID = 0;
     private long ClassID = 0;
+    private String ImageUrl = "";
 
     public AllStudentAttendanceModel(){
         super();
@@ -127,5 +125,13 @@ public class AllStudentAttendanceModel {
     public long getClassID()
     {
         return ClassID;
+    }
+
+    public void setImageUrl(String ImageUrl) {
+        this.ImageUrl = ImageUrl;
+    }
+
+    public String getImageUrl() {
+        return ImageUrl;
     }
 }

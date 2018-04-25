@@ -38,12 +38,9 @@ public class StudentMainScreen extends AppCompatActivity {
         editor.putString("yearselectindex","2018");
         editor.apply();
         user = sharedPre.getInt("UserTypeID",0);
-        if(user == 3)
-        {
+        if(user == 3) {
             userType.setText("Student");
-        }
-        else
-        {
+        } else if(user == 5){
             userType.setText("Guardian");
         }
 
@@ -67,12 +64,11 @@ public class StudentMainScreen extends AppCompatActivity {
 //            }
 //        });
 
-        Class_routine.setOnClickListener(new View.OnClickListener()
-        {
+        Class_routine.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v)
             {
-                if(user == 3)
+                if(user == 3 || user == 5)
                 {
                     Intent mainIntent = new Intent(StudentMainScreen.this, RoutineMainScreen.class);
                     startActivity(mainIntent);
@@ -123,12 +119,12 @@ public class StudentMainScreen extends AppCompatActivity {
             @Override
             public void onClick(View v)
             {
-                if(user == 3)
-                {
-                    Intent mainIntent = new Intent(StudentMainScreen.this,FeeMainScreen.class);
-                    StudentMainScreen.this.startActivity(mainIntent);
-                    finish();
-                }
+//                if(user == 3)
+//                {
+//                    Intent mainIntent = new Intent(StudentMainScreen.this,FeeMainScreen.class);
+//                    StudentMainScreen.this.startActivity(mainIntent);
+//                    finish();
+//                }
 //                else
 //                {
 //                    Intent mainIntent = new Intent(StudentMainScreen.this,StudentList.class);

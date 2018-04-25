@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="20dp"
+    android:background="@drawable/notice_dialog">
+
+    <TextView
+        android:id="@+id/noticeTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_gravity="center"
+        android:text="Exam Title"
+        android:textColor="@android:color/white"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"/>
+    <View
+        android:layout_below="@id/noticeTitle"
+        android:id="@+id/noticeTitleUnderline"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="@android:color/white"
+        android:layout_gravity="center"
+        android:layout_marginBottom="5dp"
+        android:layout_centerHorizontal="true"/>
+
+    <ScrollView
+        android:id="@+id/noticeDetails"
+        android:layout_width="match_parent"
+        android:layout_height="306dp"
+        android:layout_below="@id/noticeTitleUnderline"
+        android:layout_centerVertical="true"
+        android:padding="5dp"
+        android:scrollbarThumbVertical="@drawable/scrollbar_white"
+        android:scrollbarFadeDuration="3000">
+        <TextView
+            android:id="@+id/noticeShow"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:textColor="@android:color/white"
+            android:textSize="18sp"
+            android:layout_margin="5dp"/>
+    </ScrollView>
+
+    <Button
+        android:id="@+id/btn_ok"
+        android:layout_width="100dp"
+        android:layout_height="30dp"
+        android:background="@drawable/button"
+        android:clickable="true"
+        android:focusable="true"
+        android:text="OK"
+        android:textColor="#ffffff"
+        android:textStyle="bold"
+        android:layout_margin="10dp"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"/>
+
+</RelativeLayout>

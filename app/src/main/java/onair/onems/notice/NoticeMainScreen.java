@@ -1,8 +1,11 @@
 package onair.onems.notice;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -15,6 +18,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
@@ -29,21 +33,35 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import onair.onems.R;
 import onair.onems.Services.GlideApp;
 import onair.onems.Services.StaticHelperClass;
 import onair.onems.attendance.TakeAttendance;
 import onair.onems.contacts.ContactsMainScreen;
+import onair.onems.customadapters.CustomDialog;
+import onair.onems.customadapters.CustomNoticeDialog;
 import onair.onems.customadapters.ExpandableListAdapter;
+import onair.onems.customadapters.MyDividerItemDecoration;
 import onair.onems.customadapters.NoticeAdapter;
 import onair.onems.attendance.ShowAttendance;
+import onair.onems.customadapters.SubjectWiseResultAdapter;
 import onair.onems.icard.StudentiCardMain;
 import onair.onems.mainactivities.LoginScreen;
 import onair.onems.mainactivities.SideNavigationMenuParentActivity;
@@ -51,15 +69,18 @@ import onair.onems.mainactivities.StudentMainScreen;
 import onair.onems.mainactivities.TeacherMainScreen;
 import onair.onems.models.ExpandedMenuModel;
 import onair.onems.models.NoticeModel;
+import onair.onems.network.MySingleton;
+import onair.onems.result.SubjectWiseResult;
 import onair.onems.studentlist.ReportAllStudentMain;
 
 public class NoticeMainScreen extends SideNavigationMenuParentActivity implements NoticeAdapter.NoticeAdapterListener{
 
     private RecyclerView recyclerView;
-    private ArrayList<NoticeModel> noticeList;
+    private ArrayList<JSONObject> noticeList;
     private NoticeAdapter mAdapter;
     private long InstituteID;
     private int UserTypeID;
+    private ProgressDialog mNoticeDialog;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -75,30 +96,10 @@ public class NoticeMainScreen extends SideNavigationMenuParentActivity implement
         InstituteID = prefs.getLong("InstituteID",0);
         UserTypeID = prefs.getInt("UserTypeID",0);
 
-        if(!StaticHelperClass.isNetworkAvailable(this))
-        {
-            Toast.makeText(NoticeMainScreen.this,"Please check your internet connection and open app again!!! ",Toast.LENGTH_LONG).show();
-        }
-
         recyclerView = (RecyclerView)findViewById(R.id.recycler_view);
         noticeList = new ArrayList<>();
-        mAdapter = new NoticeAdapter(this, noticeList, this);
 
-        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this);
-        recyclerView.setLayoutManager(mLayoutManager);
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
-        recyclerView.setAdapter(mAdapter);
-        prepareNoticeList();
-    }
-
-    private void prepareNoticeList() {
-        for(int i = 0; i < 20; ++i) {
-            NoticeModel noticeModel = new NoticeModel();
-            noticeModel.setTitle(noticeModel.getTitle()+"--"+i);
-            noticeList.add(noticeModel);
-        }
-        // refreshing recycler view
-        mAdapter.notifyDataSetChanged();
+        NoticeDataGetRequest();
     }
 
     @Override
@@ -130,7 +131,73 @@ public class NoticeMainScreen extends SideNavigationMenuParentActivity implement
     }
 
     @Override
-    public void onNoticeSelected(NoticeModel noticeModel) {
-        Toast.makeText(getApplicationContext(), "Selected: " + noticeModel.getTitle() + ", " + noticeModel.getDate(), Toast.LENGTH_LONG).show();
+    public void onNoticeSelected(JSONObject notice) {
+//        Toast.makeText(getApplicationContext(), "Selected: " + noticeModel.getTitle() + ", " + noticeModel.getDate(), Toast.LENGTH_LONG).show();
+        CustomNoticeDialog customNoticeDialog = new CustomNoticeDialog(this, notice);
+        customNoticeDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        customNoticeDialog.setCancelable(false);
+        customNoticeDialog.show();
+    }
+
+    private void NoticeDataGetRequest() {
+        if (StaticHelperClass.isNetworkAvailable(this)) {
+
+            String noticeDataGetUrl = getString(R.string.baseUrl)+"/api/onEms/spGetDashNotice/"
+                    +UserTypeID+"/"+InstituteID;
+
+            mNoticeDialog = new ProgressDialog(this);
+            mNoticeDialog.setTitle("Loading session...");
+            mNoticeDialog.setMessage("Please Wait...");
+            mNoticeDialog.setCancelable(false);
+            mNoticeDialog.setIcon(R.drawable.onair);
+
+            //Preparing Shift data from server
+            StringRequest stringNoticeRequest = new StringRequest(Request.Method.GET, noticeDataGetUrl,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+                            prepareNoticeList(response);
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    mNoticeDialog.dismiss();
+                }
+            })
+            {
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    Map<String, String>  params = new HashMap<>();
+                    params.put("Authorization", "Request_From_onEMS_Android_app");
+                    return params;
+                }
+            };
+            MySingleton.getInstance(this).addToRequestQueue(stringNoticeRequest);
+        } else {
+            Toast.makeText(NoticeMainScreen.this,"Please check your internet connection and select again!!! ",
+                    Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private void prepareNoticeList(String result) {
+        try {
+            noticeList = new ArrayList<>();
+            JSONArray noticeJsonArray = new JSONArray(result);
+            for(int i = 0; i<noticeJsonArray.length(); i++) {
+                noticeList.add(noticeJsonArray.getJSONObject(i));
+            }
+
+            mAdapter = new NoticeAdapter(this, noticeList, this);
+
+            RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
+            recyclerView.setLayoutManager(mLayoutManager);
+            recyclerView.setItemAnimator(new DefaultItemAnimator());
+            recyclerView.setAdapter(mAdapter);
+            mAdapter.notifyDataSetChanged();
+            mNoticeDialog.dismiss();
+        } catch (JSONException e) {
+            e.printStackTrace();
+            mNoticeDialog.dismiss();
+        }
     }
 }

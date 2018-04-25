@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import onair.onems.R;
 import onair.onems.fee.FeesHistory;
+import onair.onems.result.ResultGradeStructure;
 import onair.onems.result.ResultMainScreen;
 import onair.onems.routine.RoutineMainScreen;
 import onair.onems.Services.GlideApp;
@@ -235,7 +236,11 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity {
 
         List<String> headingSyllabus = new ArrayList<>();
         List<String> headingExam = new ArrayList<>();
+
         List<String> headingResult = new ArrayList<>();
+        headingResult.add("Show Result");
+        headingResult.add("Grading System");
+
         List<String> headingContact = new ArrayList<>();
 
         List<String> headingiCard = new ArrayList<>();
@@ -283,19 +288,6 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity {
                     }
                 }
 
-                if((i == 6) && (l == 6)) {
-                    if(activityName.equals(ResultMainScreen.class.getName())){
-                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-                        if (drawer.isDrawerOpen(GravityCompat.START)) {
-                            drawer.closeDrawer(GravityCompat.START);
-                        }
-                    } else {
-                        Intent intent = new Intent(getApplicationContext(), ResultMainScreen.class);
-                        startActivity(intent);
-                        finish();
-                    }
-                }
-
                 if((i == 9) && (l == 9)) {
                     if(activityName.equals(ReportAllStudentMain.class.getName())){
                         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -337,6 +329,32 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity {
                         }
                     } else {
                         Intent intent = new Intent(getApplicationContext(), ShowAttendance.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                }
+
+                if((i == 6) && (i1 == 0) && (l == 0)) {
+                    if(activityName.equals(ResultMainScreen.class.getName())){
+                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                        if (drawer.isDrawerOpen(GravityCompat.START)) {
+                            drawer.closeDrawer(GravityCompat.START);
+                        }
+                    } else {
+                        Intent intent = new Intent(getApplicationContext(), ResultMainScreen.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                }
+
+                if((i == 6) && (i1 == 1) && (l == 1)) {
+                    if(activityName.equals(ResultGradeStructure.class.getName())){
+                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                        if (drawer.isDrawerOpen(GravityCompat.START)) {
+                            drawer.closeDrawer(GravityCompat.START);
+                        }
+                    } else {
+                        Intent intent = new Intent(getApplicationContext(), ResultGradeStructure.class);
                         startActivity(intent);
                         finish();
                     }
@@ -375,6 +393,7 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity {
 
     private void prepareInstituteAdminSideMenu() {
 
+
         listDataHeader = new ArrayList<>();
         listDataChild = new HashMap<>();
 
@@ -440,7 +459,11 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity {
 
         List<String> headingSyllabus = new ArrayList<>();
         List<String> headingExam = new ArrayList<>();
+
         List<String> headingResult = new ArrayList<>();
+        headingResult.add("Show Result");
+        headingResult.add("Grading System");
+
         List<String> headingContact = new ArrayList<>();
 
         List<String> headingiCard = new ArrayList<>();
@@ -529,6 +552,32 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity {
                         }
                     } else {
                         Intent intent = new Intent(getApplicationContext(), ShowAttendance.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                }
+
+                if((i == 6) && (i1 == 0) && (l == 0)) {
+                    if(activityName.equals(ResultMainScreen.class.getName())){
+                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                        if (drawer.isDrawerOpen(GravityCompat.START)) {
+                            drawer.closeDrawer(GravityCompat.START);
+                        }
+                    } else {
+                        Intent intent = new Intent(getApplicationContext(), ResultMainScreen.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                }
+
+                if((i == 6) && (i1 == 1) && (l == 1)) {
+                    if(activityName.equals(ResultGradeStructure.class.getName())){
+                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                        if (drawer.isDrawerOpen(GravityCompat.START)) {
+                            drawer.closeDrawer(GravityCompat.START);
+                        }
+                    } else {
+                        Intent intent = new Intent(getApplicationContext(), ResultGradeStructure.class);
                         startActivity(intent);
                         finish();
                     }
@@ -567,6 +616,7 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity {
 
     private void prepareTeacherSideMenu() {
 
+
         listDataHeader = new ArrayList<>();
         listDataChild = new HashMap<>();
 
@@ -632,7 +682,11 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity {
 
         List<String> headingSyllabus = new ArrayList<>();
         List<String> headingExam = new ArrayList<>();
+
         List<String> headingResult = new ArrayList<>();
+        headingResult.add("Show Result");
+        headingResult.add("Grading System");
+
         List<String> headingContact = new ArrayList<>();
 
         List<String> headingiCard = new ArrayList<>();
@@ -721,6 +775,32 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity {
                         }
                     } else {
                         Intent intent = new Intent(getApplicationContext(), ShowAttendance.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                }
+
+                if((i == 6) && (i1 == 0) && (l == 0)) {
+                    if(activityName.equals(ResultMainScreen.class.getName())){
+                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                        if (drawer.isDrawerOpen(GravityCompat.START)) {
+                            drawer.closeDrawer(GravityCompat.START);
+                        }
+                    } else {
+                        Intent intent = new Intent(getApplicationContext(), ResultMainScreen.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                }
+
+                if((i == 6) && (i1 == 1) && (l == 1)) {
+                    if(activityName.equals(ResultGradeStructure.class.getName())){
+                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                        if (drawer.isDrawerOpen(GravityCompat.START)) {
+                            drawer.closeDrawer(GravityCompat.START);
+                        }
+                    } else {
+                        Intent intent = new Intent(getApplicationContext(), ResultGradeStructure.class);
                         startActivity(intent);
                         finish();
                     }
@@ -816,7 +896,10 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity {
         List<String> headingAttendance = new ArrayList<>();
         List<String> headingSyllabus = new ArrayList<>();
         List<String> headingExam = new ArrayList<>();
+
         List<String> headingResult = new ArrayList<>();
+        headingResult.add("Show Result");
+        headingResult.add("Grading System");
 
         List<String> headingFee = new ArrayList<>();
         headingFee.add("Fee Payment");
@@ -881,6 +964,32 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity {
         expandableList.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
             @Override
             public boolean onChildClick(ExpandableListView expandableListView, View view, int i, int i1, long l) {
+
+                if((i == 6) && (i1 == 0) && (l == 0)) {
+                    if(activityName.equals(ResultMainScreen.class.getName())){
+                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                        if (drawer.isDrawerOpen(GravityCompat.START)) {
+                            drawer.closeDrawer(GravityCompat.START);
+                        }
+                    } else {
+                        Intent intent = new Intent(getApplicationContext(), ResultMainScreen.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                }
+
+                if((i == 6) && (i1 == 1) && (l == 1)) {
+                    if(activityName.equals(ResultGradeStructure.class.getName())){
+                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                        if (drawer.isDrawerOpen(GravityCompat.START)) {
+                            drawer.closeDrawer(GravityCompat.START);
+                        }
+                    } else {
+                        Intent intent = new Intent(getApplicationContext(), ResultGradeStructure.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                }
 
                 if((i == 7) && (i1 == 0) && (l == 0)) {
                     if(activityName.equals(FeeMainScreen.class.getName())){
@@ -971,7 +1080,10 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity {
         List<String> headingAttendance = new ArrayList<>();
         List<String> headingSyllabus = new ArrayList<>();
         List<String> headingExam = new ArrayList<>();
+
         List<String> headingResult = new ArrayList<>();
+        headingResult.add("Show Result");
+        headingResult.add("Grading System");
 
         List<String> headingFee = new ArrayList<>();
         headingFee.add("Fee Payment");
@@ -1036,6 +1148,32 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity {
         expandableList.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
             @Override
             public boolean onChildClick(ExpandableListView expandableListView, View view, int i, int i1, long l) {
+
+                if((i == 6) && (i1 == 0) && (l == 0)) {
+                    if(activityName.equals(ResultMainScreen.class.getName())){
+                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                        if (drawer.isDrawerOpen(GravityCompat.START)) {
+                            drawer.closeDrawer(GravityCompat.START);
+                        }
+                    } else {
+                        Intent intent = new Intent(getApplicationContext(), ResultMainScreen.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                }
+
+                if((i == 6) && (i1 == 1) && (l == 1)) {
+                    if(activityName.equals(ResultGradeStructure.class.getName())){
+                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                        if (drawer.isDrawerOpen(GravityCompat.START)) {
+                            drawer.closeDrawer(GravityCompat.START);
+                        }
+                    } else {
+                        Intent intent = new Intent(getApplicationContext(), ResultGradeStructure.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                }
 
                 if((i == 7) && (i1 == 0) && (l == 0)) {
                     if(activityName.equals(FeeMainScreen.class.getName())){

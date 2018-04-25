@@ -9,6 +9,9 @@ import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.TextView;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,19 +21,18 @@ import onair.onems.models.NoticeModel;
 public class NoticeAdapter extends RecyclerView.Adapter<NoticeAdapter.MyViewHolder>
         implements Filterable {
     private Context context;
-    private List<NoticeModel> noticeList;
-    private List<NoticeModel> noticeListFiltered;
+    private List<JSONObject> noticeList;
+    private List<JSONObject> noticeListFiltered;
     private NoticeAdapterListener listener;
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
-        public TextView title, subtitle, date, time;
+        public TextView title, subtitle, date;
 
         public MyViewHolder(View view) {
             super(view);
             title = view.findViewById(R.id.noticeTitle);
             subtitle = view.findViewById(R.id.noticeSubtitle);
             date = view.findViewById(R.id.noticeDate);
-            time = view.findViewById(R.id.noticeTime);
 
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -43,7 +45,7 @@ public class NoticeAdapter extends RecyclerView.Adapter<NoticeAdapter.MyViewHold
     }
 
 
-    public NoticeAdapter(Context context, List<NoticeModel> noticeList, NoticeAdapterListener listener) {
+    public NoticeAdapter(Context context, List<JSONObject> noticeList, NoticeAdapterListener listener) {
         this.context = context;
         this.listener = listener;
         this.noticeList = noticeList;
@@ -60,11 +62,14 @@ public class NoticeAdapter extends RecyclerView.Adapter<NoticeAdapter.MyViewHold
 
     @Override
     public void onBindViewHolder(MyViewHolder holder, final int position) {
-        final NoticeModel noticeModel = noticeListFiltered.get(position);
-        holder.title.setText(noticeModel.getTitle());
-        holder.subtitle.setText(noticeModel.getSubtitle());
-        holder.date.setText(noticeModel.getDate());
-        holder.time.setText(noticeModel.getTime());
+        final JSONObject notice = noticeListFiltered.get(position);
+        try {
+            holder.title.setText(notice.getString("NoticeHead"));
+            holder.subtitle.setText(notice.getString("NoticeBody"));
+            holder.date.setText(notice.getString("NoticeDate"));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -81,16 +86,18 @@ public class NoticeAdapter extends RecyclerView.Adapter<NoticeAdapter.MyViewHold
                 if (charString.isEmpty()) {
                     noticeListFiltered = noticeList;
                 } else {
-                    List<NoticeModel> filteredList = new ArrayList<>();
-                    for (NoticeModel row : noticeList) {
+                    List<JSONObject> filteredList = new ArrayList<>();
+                    for (JSONObject row : noticeList) {
 
-                        // name match condition. this might differ depending on your requirement
-                        // here we are looking for name or phone number match
-                        if (row.getTitle().toLowerCase().contains(charString.toLowerCase()) ||
-                                row.getDate().toLowerCase().contains(charString.toLowerCase())||
-                                row.getTime().toLowerCase().contains(charString.toLowerCase())) {
-                            filteredList.add(row);
+                        try{
+                            if (row.getString("NoticeHead").toLowerCase().contains(charString.toLowerCase()) ||
+                                    row.getString("NoticeDate").toLowerCase().contains(charString.toLowerCase())) {
+                                filteredList.add(row);
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
                         }
+
                     }
 
                     noticeListFiltered = filteredList;
@@ -103,13 +110,13 @@ public class NoticeAdapter extends RecyclerView.Adapter<NoticeAdapter.MyViewHold
 
             @Override
             protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
-                noticeListFiltered = (ArrayList<NoticeModel>) filterResults.values;
+                noticeListFiltered = (ArrayList<JSONObject>) filterResults.values;
                 notifyDataSetChanged();
             }
         };
     }
 
     public interface NoticeAdapterListener {
-        void onNoticeSelected(NoticeModel noticeModel);
+        void onNoticeSelected(JSONObject notice);
     }
 }
