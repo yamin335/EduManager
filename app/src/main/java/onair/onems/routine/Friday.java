@@ -20,10 +20,14 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.HashMap;
 import java.util.Map;
 import onair.onems.R;
-import onair.onems.customadapters.RoutineAdapter;
 import onair.onems.network.MySingleton;
 
 public class Friday extends Fragment {
@@ -67,12 +71,27 @@ public class Friday extends Fragment {
         if(isNetworkAvailable()) {
 
             String fridayRoutineDataGetUrl = "";
-            if(UserTypeID == 3) {
+            if(UserTypeID == 1) {
+
+            } else if(UserTypeID == 2) {
+
+            } else if(UserTypeID == 3) {
                 fridayRoutineDataGetUrl = getString(R.string.baseUrl)+"/api/onEms/spGetDashClassRoutine/"+ShiftID
                         +"/"+MediumID+"/"+ClassID+"/"+SectionID+"/"+DepartmentID+"/7/"+InstituteID;
             } else if(UserTypeID == 4) {
                 fridayRoutineDataGetUrl = getString(R.string.baseUrl)+"/api/onEms/spGetDashTeacherClassRoutine/"+UserID
                         +"/7/"+InstituteID;
+            } else if(UserTypeID == 5) {
+                try {
+                    JSONObject selectedStudent = new JSONObject(getActivity().getSharedPreferences("CURRENT_STUDENT", Context.MODE_PRIVATE)
+                            .getString("guardianSelectedStudent", "{}"));
+                    fridayRoutineDataGetUrl = getString(R.string.baseUrl)+"/api/onEms/spGetDashClassRoutine/"+
+                            selectedStudent.getString("ShiftID")+"/"+selectedStudent.getString("MediumID")
+                            +"/"+selectedStudent.getString("ClassID")+"/"+selectedStudent.getString("SectionID")
+                            +"/"+selectedStudent.getString("DepartmentID")+"/7/"+InstituteID;
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
 
             final ProgressDialog fridayRoutineGetDialog = new ProgressDialog(getActivity());

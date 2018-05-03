@@ -23,10 +23,6 @@ import onair.onems.syllabus.SyllabusMainScreen;
 
 public class TeacherMainScreen extends AppCompatActivity {
 
-    public static final String MyPREFERENCES = "LogInKey";
-    public static SharedPreferences sharedPreferences;
-
-
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,7 +60,7 @@ public class TeacherMainScreen extends AppCompatActivity {
             }
         });
 
-        // Routiness module start point
+        // Routine module start point
         routine.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -78,7 +74,7 @@ public class TeacherMainScreen extends AppCompatActivity {
         attendance.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(user == 1) {
+                if(user == 1||user == 2) {
                     Intent mainIntent = new Intent(TeacherMainScreen.this,AttendanceAdminDashboard.class);
                     TeacherMainScreen.this.startActivity(mainIntent);
                     finish();
@@ -103,7 +99,7 @@ public class TeacherMainScreen extends AppCompatActivity {
         result.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent mainIntent = new Intent(TeacherMainScreen.this,ResultMainScreen.class);
+                Intent mainIntent = new Intent(TeacherMainScreen.this, ResultMainScreen.class);
                 TeacherMainScreen.this.startActivity(mainIntent);
                 finish();
             }
@@ -125,7 +121,7 @@ public class TeacherMainScreen extends AppCompatActivity {
         iCard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent mainIntent = new Intent(TeacherMainScreen.this,StudentiCardMain.class);
+                Intent mainIntent = new Intent(TeacherMainScreen.this, StudentiCardMain.class);
                 TeacherMainScreen.this.startActivity(mainIntent);
                 finish();
             }

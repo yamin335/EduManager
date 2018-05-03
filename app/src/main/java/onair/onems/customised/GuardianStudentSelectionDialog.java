@@ -1,25 +1,19 @@
-package onair.onems.customadapters;
+package onair.onems.customised;
 
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.View;
 import android.view.Window;
-import android.widget.Button;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-
 import onair.onems.R;
-import onair.onems.mainactivities.LoginScreen;
 import onair.onems.mainactivities.StudentMainScreen;
 
 public class GuardianStudentSelectionDialog extends Dialog implements

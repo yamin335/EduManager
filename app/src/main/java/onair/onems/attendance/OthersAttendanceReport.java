@@ -1,11 +1,8 @@
 package onair.onems.attendance;
 
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
@@ -29,6 +26,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import onair.onems.R;
+import onair.onems.Services.StaticHelperClass;
 import onair.onems.models.ClassModel;
 import onair.onems.models.DepartmentModel;
 import onair.onems.models.MediumModel;
@@ -122,11 +120,6 @@ public class OthersAttendanceReport extends Fragment {
         ArrayAdapter<String> month_spinner_adapter = new ArrayAdapter<>(getActivity(), R.layout.spinner_item, tempMonthArray);
         month_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerMonth.setAdapter(month_spinner_adapter);
-
-        if(!isNetworkAvailable())
-        {
-            Toast.makeText(getActivity(),"Please check your internet connection and open app again!!! ",Toast.LENGTH_LONG).show();
-        }
 
         ShiftDataGetRequest();
         MediumDataGetRequest();
@@ -251,7 +244,9 @@ public class OthersAttendanceReport extends Fragment {
                         Toast.makeText(getActivity(),"No section found !!!",Toast.LENGTH_LONG).show();
                     }
                 } else {
-                    selectedSection = new SectionModel();
+                    if(firstSection++>1){
+                        selectedSection = new SectionModel();
+                    }
                 }
             }
 
@@ -513,14 +508,8 @@ public class OthersAttendanceReport extends Fragment {
 
     }
 
-    private boolean isNetworkAvailable() {
-        ConnectivityManager connectivityManager = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
-    }
-
     private void ShiftDataGetRequest() {
-        if (isNetworkAvailable()) {
+        if (StaticHelperClass.isNetworkAvailable(getActivity())) {
             String shiftUrl = getString(R.string.baseUrl)+"/api/onEms/getInsShift/"+InstituteID;
 
             mShiftDialog = new ProgressDialog(getActivity());
@@ -560,7 +549,7 @@ public class OthersAttendanceReport extends Fragment {
     }
 
     private void MediumDataGetRequest() {
-        if(isNetworkAvailable()) {
+        if(StaticHelperClass.isNetworkAvailable(getActivity())) {
             String mediumUrl = getString(R.string.baseUrl)+"/api/onEms/getInstituteMediumDdl/"+InstituteID;
 
             mMediumDialog = new ProgressDialog(getActivity());
@@ -600,7 +589,7 @@ public class OthersAttendanceReport extends Fragment {
     }
 
     private void ClassDataGetRequest() {
-        if(isNetworkAvailable()) {
+        if(StaticHelperClass.isNetworkAvailable(getActivity())) {
 
             CheckSelectedData();
 
@@ -643,7 +632,7 @@ public class OthersAttendanceReport extends Fragment {
     }
 
     private void DepartmentDataGetRequest() {
-        if(isNetworkAvailable()) {
+        if(StaticHelperClass.isNetworkAvailable(getActivity())) {
 
             CheckSelectedData();
 
@@ -687,7 +676,7 @@ public class OthersAttendanceReport extends Fragment {
     }
 
     private void SectionDataGetRequest() {
-        if(isNetworkAvailable()) {
+        if(StaticHelperClass.isNetworkAvailable(getActivity())) {
 
             CheckSelectedData();
 
@@ -730,7 +719,7 @@ public class OthersAttendanceReport extends Fragment {
         }
     }
     void MonthDataGetRequest(){
-        if(isNetworkAvailable()) {
+        if(StaticHelperClass.isNetworkAvailable(getActivity())) {
             mMonthDialog = new ProgressDialog(getActivity());
             mMonthDialog.setTitle("Loading...");
             mMonthDialog.setMessage("Please Wait...");

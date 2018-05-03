@@ -1,4 +1,4 @@
-package onair.onems.customadapters;
+package onair.onems.result;
 
 import android.content.Context;
 import android.graphics.Color;

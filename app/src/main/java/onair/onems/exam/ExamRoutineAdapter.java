@@ -1,4 +1,4 @@
-package onair.onems.customadapters;
+package onair.onems.exam;
 
 import android.app.Activity;
 import android.content.Context;
@@ -10,10 +10,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -26,8 +24,6 @@ import onair.onems.R;
 public class ExamRoutineAdapter extends RecyclerView.Adapter<ExamRoutineAdapter.MyViewHolder> {
     private Activity parentActivity;
     private Context context;
-    private JSONArray periodJsonArray;
-    private JSONArray allPeriodJsonArray;
     private int classNumber;
     private int sessionNumber;
     private ArrayList<String> differentClassName;
@@ -46,7 +42,7 @@ public class ExamRoutineAdapter extends RecyclerView.Adapter<ExamRoutineAdapter.
         }
     }
 
-    public ExamRoutineAdapter(Context context, String classes, Activity parentActivity) {
+    ExamRoutineAdapter(Context context, String classes, Activity parentActivity) {
         this.context = context;
         this.parentActivity = parentActivity;
         try {

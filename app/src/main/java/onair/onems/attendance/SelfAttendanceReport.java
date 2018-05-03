@@ -36,6 +36,7 @@ import de.codecrafters.tableview.toolkit.SimpleTableDataAdapter;
 import de.codecrafters.tableview.toolkit.SimpleTableHeaderAdapter;
 import de.codecrafters.tableview.toolkit.TableDataRowBackgroundProviders;
 import onair.onems.R;
+import onair.onems.Services.StaticHelperClass;
 import onair.onems.models.MonthModel;
 import onair.onems.models.DailyAttendanceModel;
 import onair.onems.network.MySingleton;
@@ -43,7 +44,7 @@ import onair.onems.network.MySingleton;
 public class SelfAttendanceReport extends Fragment {
     private TableView tableView;
     private Spinner spinnerMonth;
-    private String RFID="", UserID="";
+    private String UserID="";
     private ProgressDialog dialog;
     private Configuration config;
     private long SectionID, ClassID, ShiftID, MediumID, DepartmentID, InstituteID;
@@ -53,6 +54,7 @@ public class SelfAttendanceReport extends Fragment {
     private MonthModel selectedMonth = null;
     private ArrayList<DailyAttendanceModel> dailyAttendanceList;
     private DailyAttendanceModel selectedDay;
+    private int UserTypeID;
 
     public SelfAttendanceReport()
     {
@@ -73,7 +75,6 @@ public class SelfAttendanceReport extends Fragment {
         tableView.setColumnCount(4);
 
         SharedPreferences sharedPre = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        RFID=sharedPre.getString("RFID","");
         ShiftID=sharedPre.getLong("ShiftID",0);
         MediumID=sharedPre.getLong("MediumID",0);
         ClassID=sharedPre.getLong("ClassID",0);
@@ -81,6 +82,22 @@ public class SelfAttendanceReport extends Fragment {
         DepartmentID=sharedPre.getLong("DepartmentID",0);
         InstituteID=sharedPre.getLong("InstituteID",0);
         UserID = sharedPre.getString("UserID","");
+        UserTypeID = sharedPre.getInt("UserTypeID",0);
+
+        if(UserTypeID == 5){
+            try {
+                JSONObject selectedStudent = new JSONObject(getActivity().getSharedPreferences("CURRENT_STUDENT", Context.MODE_PRIVATE)
+                        .getString("guardianSelectedStudent", "{}"));
+                ShiftID = selectedStudent.getLong("ShiftID");
+                MediumID = selectedStudent.getLong("MediumID");
+                ClassID = selectedStudent.getLong("ClassID");
+                SectionID = selectedStudent.getLong("SectionID");
+                DepartmentID = selectedStudent.getLong("DepartmentID");
+                UserID = selectedStudent.getString("UserID");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
 
         selectedMonth = new MonthModel();
 
@@ -88,10 +105,6 @@ public class SelfAttendanceReport extends Fragment {
         ArrayAdapter<String> month_spinner_adapter = new ArrayAdapter<>(getActivity(), R.layout.spinner_item, tempMonthArray);
         month_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerMonth.setAdapter(month_spinner_adapter);
-        if(!isNetworkAvailable())
-        {
-            Toast.makeText(getActivity(),"Please check your internet connection and open app again!!! ",Toast.LENGTH_LONG).show();
-        }
 
         dialog = new ProgressDialog(getActivity());
         dialog.setTitle("Loading...");
@@ -141,19 +154,14 @@ public class SelfAttendanceReport extends Fragment {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
-                if(position != 0)
-                {
+                if(position != 0) {
                     try {
                         selectedMonth = allMonthArrayList.get(position-1);
                         MonthlyAttendanceDataGetRequest(selectedMonth.getMonthID());
-                    }
-                    catch (IndexOutOfBoundsException e)
-                    {
+                    } catch (IndexOutOfBoundsException e) {
                         Toast.makeText(getActivity(),"No section found !!!",Toast.LENGTH_LONG).show();
                     }
-                }
-                else
-                {
+                } else {
                     selectedMonth = new MonthModel();
                 }
             }
@@ -246,7 +254,7 @@ public class SelfAttendanceReport extends Fragment {
     }
 
     void MonthDataGetRequest(){
-        if(isNetworkAvailable()) {
+        if(StaticHelperClass.isNetworkAvailable(getActivity())) {
             dialog.show();
             String monthUrl=getString(R.string.baseUrl)+"/api/onEms/getMonth";
             StringRequest stringMonthRequest = new StringRequest(Request.Method.GET, monthUrl,
@@ -281,7 +289,7 @@ public class SelfAttendanceReport extends Fragment {
     }
 
     void MonthlyAttendanceDataGetRequest(int MonthID){
-        if(isNetworkAvailable()) {
+        if(StaticHelperClass.isNetworkAvailable(getActivity())) {
             dialog.show();
             String monthAttendanceUrl = getString(R.string.baseUrl)+"/api/onEms/getStudentMonthlyDeviceAttendance/"+
                     ShiftID+"/"+MediumID+"/"+ClassID+"/"+SectionID+"/"+DepartmentID+"/"+ MonthID+"/"+UserID+"/"+InstituteID;
@@ -310,11 +318,5 @@ public class SelfAttendanceReport extends Fragment {
             Toast.makeText(getActivity(),"Please check your internet connection and select again!!! ",
                     Toast.LENGTH_LONG).show();
         }
-    }
-
-    private boolean isNetworkAvailable() {
-        ConnectivityManager connectivityManager = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 }

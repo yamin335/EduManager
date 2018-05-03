@@ -1,4 +1,4 @@
-package onair.onems.customadapters;
+package onair.onems.notice;
 
 import android.app.Activity;
 import android.app.Dialog;

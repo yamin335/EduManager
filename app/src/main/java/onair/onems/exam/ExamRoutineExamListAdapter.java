@@ -1,4 +1,4 @@
-package onair.onems.customadapters;
+package onair.onems.exam;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import java.util.ArrayList;
@@ -18,19 +19,20 @@ public class ExamRoutineExamListAdapter extends RecyclerView.Adapter<ExamRoutine
     private int examNumber;
     private ArrayList<JSONObject> differentExams;
     private ArrayList<Integer> differentExamId;
+    private ArrayList<ArrayList<JSONObject>> examWiseExamResult;
 
     class MyViewHolder extends RecyclerView.ViewHolder {
         TextView examName;
 
         MyViewHolder(View view) {
             super(view);
-            examName = view.findViewById(R.id.examName);
+            examName = view.findViewById(R.id.exam);
 
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     // send selected contact in callback
-                    listener.onExamSelected(differentExams.get(getAdapterPosition()));
+                    listener.onExamSelected(examWiseExamResult.get(getAdapterPosition()));
                 }
             });
         }
@@ -67,7 +69,7 @@ public class ExamRoutineExamListAdapter extends RecyclerView.Adapter<ExamRoutine
     }
 
     public interface ExamRoutineExamListAdapterListener {
-        void onExamSelected(JSONObject exam);
+        void onExamSelected(ArrayList<JSONObject> examList);
     }
 
     private void countDifferentExams(ArrayList<JSONObject> examList) {
@@ -84,5 +86,19 @@ public class ExamRoutineExamListAdapter extends RecyclerView.Adapter<ExamRoutine
             }
         }
         examNumber = differentExamId.size();
+
+        examWiseExamResult = new ArrayList<>();
+
+        for (int i = 0; i < examNumber; i++) {
+            examWiseExamResult.add(i, new ArrayList<JSONObject>());
+        }
+
+        for (int i =0; i < examList.size(); i++) {
+            try {
+                examWiseExamResult.get(differentExamId.indexOf(examList.get(i).getInt("ExamID"))).add(examList.get(i));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

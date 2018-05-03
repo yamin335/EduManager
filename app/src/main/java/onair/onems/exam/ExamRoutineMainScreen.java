@@ -7,7 +7,6 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -28,17 +27,12 @@ import java.util.Map;
 
 import onair.onems.R;
 import onair.onems.Services.StaticHelperClass;
-import onair.onems.customadapters.ExamRoutineAdapter;
 import onair.onems.mainactivities.SideNavigationMenuParentActivity;
 import onair.onems.mainactivities.StudentMainScreen;
 import onair.onems.mainactivities.TeacherMainScreen;
 import onair.onems.network.MySingleton;
-import onair.onems.result.ResultMainScreen;
 
 public class ExamRoutineMainScreen extends SideNavigationMenuParentActivity {
-
-    private long InstituteID;
-    private int UserTypeID;
     private ProgressDialog mExamRoutineDialog;
     private RecyclerView recyclerView;
     @Override
@@ -51,10 +45,6 @@ public class ExamRoutineMainScreen extends SideNavigationMenuParentActivity {
         final View childActivityLayout = inflater.inflate(R.layout.exam_routine_main_screen, null);
         LinearLayout parentActivityLayout = (LinearLayout) findViewById(R.id.contentMain);
         parentActivityLayout.addView(childActivityLayout, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
-
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        InstituteID = prefs.getLong("InstituteID",0);
-        UserTypeID = prefs.getInt("UserTypeID",0);
 
         recyclerView = findViewById(R.id.routineClasses);
 

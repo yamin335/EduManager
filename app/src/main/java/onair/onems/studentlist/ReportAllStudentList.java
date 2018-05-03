@@ -3,8 +3,6 @@ package onair.onems.studentlist;
 import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.content.Context;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -32,8 +30,6 @@ import java.util.Map;
 
 import onair.onems.R;
 import onair.onems.Services.StaticHelperClass;
-import onair.onems.attendance.TakeAttendance;
-import onair.onems.customadapters.ReportAllStudentShowListAdapter;
 import onair.onems.models.ReportAllStudentRowModel;
 import onair.onems.network.MySingleton;
 

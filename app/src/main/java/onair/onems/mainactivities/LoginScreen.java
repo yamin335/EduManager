@@ -29,7 +29,7 @@ import java.util.HashMap;
 import java.util.Map;
 import onair.onems.R;
 import onair.onems.Services.StaticHelperClass;
-import onair.onems.customadapters.GuardianStudentSelectionDialog;
+import onair.onems.customised.GuardianStudentSelectionDialog;
 import onair.onems.network.MySingleton;
 
 public class LoginScreen extends AppCompatActivity {

@@ -1,4 +1,4 @@
-package onair.onems.customadapters;
+package onair.onems.notice;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import onair.onems.R;
-import onair.onems.models.NoticeModel;
 
 public class NoticeAdapter extends RecyclerView.Adapter<NoticeAdapter.MyViewHolder>
         implements Filterable {

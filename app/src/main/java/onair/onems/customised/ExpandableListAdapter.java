@@ -1,4 +1,4 @@
-package onair.onems.customadapters;
+package onair.onems.customised;
 
 import android.content.Context;
 import android.util.Log;
@@ -88,9 +88,33 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
         ImageView indicator = (ImageView) convertView.findViewById(R.id.arrow);
 
         if(UserTypeID == 1) {
-
+            switch (groupPosition) {
+                case 3:
+                    indicator.setVisibility(View.VISIBLE);
+                    break;
+                case 6:
+                    indicator.setVisibility(View.VISIBLE);
+                    break;
+                case 8:
+                    indicator.setVisibility(View.VISIBLE);
+                    break;
+                default:
+                    indicator.setVisibility(View.INVISIBLE);
+            }
         } else if(UserTypeID == 2) {
-
+            switch (groupPosition) {
+                case 3:
+                    indicator.setVisibility(View.VISIBLE);
+                    break;
+                case 6:
+                    indicator.setVisibility(View.VISIBLE);
+                    break;
+                case 8:
+                    indicator.setVisibility(View.VISIBLE);
+                    break;
+                default:
+                    indicator.setVisibility(View.INVISIBLE);
+            }
         } else if(UserTypeID == 3) {
             switch (groupPosition) {
                 case 6:
@@ -117,7 +141,16 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
                     indicator.setVisibility(View.INVISIBLE);
             }
         } else if(UserTypeID == 5) {
-
+            switch (groupPosition) {
+                case 6:
+                    indicator.setVisibility(View.VISIBLE);
+                    break;
+                case 7:
+                    indicator.setVisibility(View.VISIBLE);
+                    break;
+                default:
+                    indicator.setVisibility(View.INVISIBLE);
+            }
         }
 
         if (isExpanded) {

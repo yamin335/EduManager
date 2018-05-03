@@ -1,19 +1,19 @@
-package onair.onems.customadapters;
+package onair.onems.exam;
 
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
-import android.widget.TextView;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -23,10 +23,12 @@ import onair.onems.R;
 public class ExamRoutineDialog extends Dialog implements View.OnClickListener, ExamRoutineExamListAdapter.ExamRoutineExamListAdapterListener {
     private ArrayList<JSONObject> examList;
     private Context context;
+    private Activity currentActivity;
     public ExamRoutineDialog(Activity a, ArrayList<JSONObject> examList, Context context) {
         super(a);
         this.examList = examList;
         this.context = context;
+        this.currentActivity = a;
     }
 
     @Override
@@ -61,8 +63,11 @@ public class ExamRoutineDialog extends Dialog implements View.OnClickListener, E
     }
 
     @Override
-    public void onExamSelected(JSONObject object) {
-        dismiss();
+    public void onExamSelected(ArrayList<JSONObject> examList) {
+        JSONArray exams = new JSONArray(examList);
+        Intent intent = new Intent(currentActivity, ExamDetails.class);
+        intent.putExtra("examList", exams.toString());
+        currentActivity.startActivity(intent);
     }
 }
 

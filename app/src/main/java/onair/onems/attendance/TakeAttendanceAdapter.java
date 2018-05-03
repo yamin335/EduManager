@@ -1,4 +1,4 @@
-package onair.onems.customadapters;
+package onair.onems.attendance;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;

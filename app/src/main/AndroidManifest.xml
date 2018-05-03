@@ -255,11 +255,12 @@
             android:name=".exam.ExamRoutineMainScreen"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".attendance.AttendanceAdminDashboard"
+        <activity
+            android:name=".attendance.AttendanceAdminDashboard"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar">
-
-        </activity>
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".exam.ExamDetails" />
+        <activity android:name=".exam.SubjectWiseExamRoutine"></activity>
     </application>
 
 </manifest>

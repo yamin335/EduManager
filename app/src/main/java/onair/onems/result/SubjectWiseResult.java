@@ -30,9 +30,7 @@ import java.util.Map;
 
 import onair.onems.R;
 import onair.onems.Services.StaticHelperClass;
-import onair.onems.customadapters.CustomDialog;
-import onair.onems.customadapters.MyDividerItemDecoration;
-import onair.onems.customadapters.SubjectWiseResultAdapter;
+import onair.onems.customised.MyDividerItemDecoration;
 import onair.onems.network.MySingleton;
 
 public class SubjectWiseResult extends AppCompatActivity implements SubjectWiseResultAdapter.SubjectWiseResultsAdapterListener{
@@ -58,11 +56,6 @@ public class SubjectWiseResult extends AppCompatActivity implements SubjectWiseR
         ExamID = intent.getStringExtra("ExamID");
         InstituteID = intent.getStringExtra("InstituteID");
 
-        if(!StaticHelperClass.isNetworkAvailable(this))
-        {
-            Toast.makeText(this,"Please check your internet connection and open app again!!! ",Toast.LENGTH_LONG).show();
-        }
-
         recyclerView = findViewById(R.id.recycler_view);
 
 
@@ -74,7 +67,7 @@ public class SubjectWiseResult extends AppCompatActivity implements SubjectWiseR
     public void onSubjectWiseResultSelected(JSONObject subjectWiseResul) {
         try {
             if(!subjectWiseResul.getString("SubjectName").equalsIgnoreCase("Total")) {
-                CustomDialog customDialog = new CustomDialog(this, subjectWiseResul);
+                ResultDetailsDialog customDialog = new ResultDetailsDialog(this, subjectWiseResul);
                 customDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                 customDialog.setCancelable(false);
                 customDialog.show();

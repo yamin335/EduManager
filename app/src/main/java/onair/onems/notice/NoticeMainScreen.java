@@ -6,31 +6,17 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
-import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SearchView;
-import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
-import android.widget.ExpandableListView;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
@@ -38,8 +24,6 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.request.RequestOptions;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -47,39 +31,20 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import onair.onems.R;
-import onair.onems.Services.GlideApp;
 import onair.onems.Services.StaticHelperClass;
-import onair.onems.attendance.TakeAttendance;
-import onair.onems.contacts.ContactsMainScreen;
-import onair.onems.customadapters.CustomDialog;
-import onair.onems.customadapters.CustomNoticeDialog;
-import onair.onems.customadapters.ExpandableListAdapter;
-import onair.onems.customadapters.MyDividerItemDecoration;
-import onair.onems.customadapters.NoticeAdapter;
-import onair.onems.attendance.ShowAttendance;
-import onair.onems.customadapters.SubjectWiseResultAdapter;
-import onair.onems.icard.StudentiCardMain;
-import onair.onems.mainactivities.LoginScreen;
 import onair.onems.mainactivities.SideNavigationMenuParentActivity;
 import onair.onems.mainactivities.StudentMainScreen;
 import onair.onems.mainactivities.TeacherMainScreen;
-import onair.onems.models.ExpandedMenuModel;
-import onair.onems.models.NoticeModel;
 import onair.onems.network.MySingleton;
-import onair.onems.result.SubjectWiseResult;
-import onair.onems.studentlist.ReportAllStudentMain;
 
 public class NoticeMainScreen extends SideNavigationMenuParentActivity implements NoticeAdapter.NoticeAdapterListener{
 
     private RecyclerView recyclerView;
     private ArrayList<JSONObject> noticeList;
     private NoticeAdapter mAdapter;
-    private long InstituteID;
-    private int UserTypeID;
     private ProgressDialog mNoticeDialog;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -89,14 +54,10 @@ public class NoticeMainScreen extends SideNavigationMenuParentActivity implement
 
         LayoutInflater inflater = (LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         final View childActivityLayout = inflater.inflate(R.layout.notice_content_main, null);
-        LinearLayout parentActivityLayout = (LinearLayout) findViewById(R.id.contentMain);
+        LinearLayout parentActivityLayout = findViewById(R.id.contentMain);
         parentActivityLayout.addView(childActivityLayout, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
 
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        InstituteID = prefs.getLong("InstituteID",0);
-        UserTypeID = prefs.getInt("UserTypeID",0);
-
-        recyclerView = (RecyclerView)findViewById(R.id.recycler_view);
+        recyclerView = findViewById(R.id.recycler_view);
         noticeList = new ArrayList<>();
 
         NoticeDataGetRequest();

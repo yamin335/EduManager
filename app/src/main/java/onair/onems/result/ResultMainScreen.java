@@ -401,6 +401,9 @@ public class ResultMainScreen extends SideNavigationMenuParentActivity{
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
+                    } else {
+                        Toast.makeText(ResultMainScreen.this,"Please select a student!!! ",
+                                Toast.LENGTH_LONG).show();
                     }
                 } else {
                     Toast.makeText(ResultMainScreen.this,"Please check your internet connection and select again!!! ",

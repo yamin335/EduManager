@@ -1,4 +1,4 @@
-package onair.onems.customadapters;
+package onair.onems.result;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -13,10 +13,10 @@ import org.json.JSONObject;
 
 import onair.onems.R;
 
-public class CustomDialog extends Dialog implements View.OnClickListener {
+public class ResultDetailsDialog extends Dialog implements View.OnClickListener {
     private JSONObject result;
 
-    public CustomDialog(Activity a, JSONObject result) {
+    public ResultDetailsDialog(Activity a, JSONObject result) {
         super(a);
         this.result = result;
     }

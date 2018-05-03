@@ -24,16 +24,12 @@ import onair.onems.mainactivities.StudentMainScreen;
 import onair.onems.mainactivities.TeacherMainScreen;
 
 public class RoutineMainScreen extends SideNavigationMenuParentActivity {
-    private int UserTypeID = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         activityName = RoutineMainScreen.class.getName();
-
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        UserTypeID = prefs.getInt("UserTypeID",0);
 
         LayoutInflater inflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         final View childActivityLayout = inflater.inflate(R.layout.routine_content_main, null);

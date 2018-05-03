@@ -123,7 +123,7 @@
                 android:layout_marginLeft="7dp"
                 android:layout_marginBottom="2dp"/>
 
-            <onair.onems.customadapters.CustomSeekBar
+            <onair.onems.customised.CustomSeekBar
                 android:id="@+id/brightness"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

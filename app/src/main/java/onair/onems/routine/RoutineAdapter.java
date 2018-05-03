@@ -1,4 +1,4 @@
-package onair.onems.customadapters;
+package onair.onems.routine;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -12,9 +12,7 @@ import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
 
@@ -26,7 +24,6 @@ import java.util.ArrayList;
 
 import onair.onems.R;
 import onair.onems.Services.GlideApp;
-import onair.onems.icard.StudentiCardDetails;
 
 public class RoutineAdapter extends RecyclerView.Adapter<RoutineAdapter.MyViewHolder> {
     private Context context;
