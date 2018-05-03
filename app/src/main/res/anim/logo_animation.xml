@@ -14,13 +14,13 @@
         android:toXScale="1"
         android:toYScale="1" />
 
-    <rotate
-        android:duration="700"
-        android:fromDegrees="-360"
-        android:interpolator="@android:anim/accelerate_interpolator"
-        android:pivotX="50%"
-        android:pivotY="50%"
-        android:toDegrees="0" />
+    <!--<rotate-->
+        <!--android:duration="700"-->
+        <!--android:fromDegrees="-360"-->
+        <!--android:interpolator="@android:anim/accelerate_interpolator"-->
+        <!--android:pivotX="50%"-->
+        <!--android:pivotY="50%"-->
+        <!--android:toDegrees="0" />-->
 
     <alpha
         android:duration="700"

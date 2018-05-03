@@ -15,7 +15,7 @@ import onair.onems.R;
 
 public class SplashScreen extends AppCompatActivity {
 
-    private final int SPLASH_DISPLAY_LENGTH = 3000;
+    private final int SPLASH_DISPLAY_LENGTH = 4000;
     private TextView AppName, CopyRight;
     private ImageView Logo;
     private Animation animation;
