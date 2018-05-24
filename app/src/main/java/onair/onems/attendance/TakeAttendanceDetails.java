@@ -194,8 +194,7 @@ public class TakeAttendanceDetails extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void postUsingVolley(String json)
-    {
+    public void postUsingVolley(String json) {
         dialog.show();
         try {
             postDataJsonObject = new JSONObject(json);
@@ -208,7 +207,7 @@ public class TakeAttendanceDetails extends AppCompatActivity {
                     public void onResponse(JSONArray response) {
                         dialog.dismiss();
                         try {
-                            Toast.makeText(TakeAttendanceDetails.this,"Data Successfully Updated with Response: "+response.getJSONObject(0).get("ReturnValue"),Toast.LENGTH_LONG).show();
+                            Toast.makeText(TakeAttendanceDetails.this,"Attendance successfully taken",Toast.LENGTH_LONG).show();
                             finish();
                         } catch (Exception e) {
 

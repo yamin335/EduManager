@@ -27,6 +27,7 @@ import de.codecrafters.tableview.toolkit.SimpleTableDataAdapter;
 import de.codecrafters.tableview.toolkit.SimpleTableHeaderAdapter;
 import de.codecrafters.tableview.toolkit.TableDataRowBackgroundProviders;
 import onair.onems.R;
+import onair.onems.Services.StaticHelperClass;
 import onair.onems.models.AllStudentAttendanceModel;
 import onair.onems.network.MySingleton;
 
@@ -141,28 +142,31 @@ public class StudentAttendanceShow extends AppCompatActivity {
     }
 
     public void AttendanceDataGetRequest(){
-        StringRequest stringRequest = new StringRequest(Request.Method.GET,AllStudentUrl ,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-
-                        parseAllStudentShowJsonData(response);
-
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                dialog.dismiss();
-            }
-        })
-        {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String>  params = new HashMap<>();
-                params.put("Authorization", "Request_From_onEMS_Android_app");
-                return params;
-            }
-        };
-        MySingleton.getInstance(this).addToRequestQueue(stringRequest);
+        if(StaticHelperClass.isNetworkAvailable(this)) {
+            StringRequest stringRequest = new StringRequest(Request.Method.GET,AllStudentUrl ,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+                            parseAllStudentShowJsonData(response);
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    dialog.dismiss();
+                }
+            })
+            {
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    Map<String, String>  params = new HashMap<>();
+                    params.put("Authorization", "Request_From_onEMS_Android_app");
+                    return params;
+                }
+            };
+            MySingleton.getInstance(this).addToRequestQueue(stringRequest);
+        } else {
+            Toast.makeText(StudentAttendanceShow.this,"Please check your internet connection and select again!!! ",
+                    Toast.LENGTH_LONG).show();
+        }
     }
 }

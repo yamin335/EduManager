@@ -23,6 +23,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -145,7 +147,10 @@ public class SubjectWiseResult extends AppCompatActivity implements SubjectWiseR
                 }
             }
 
-            totalGradePoint/=totalSubject;
+            if(totalSubject!=0) {
+                totalGradePoint/=totalSubject;
+                totalGradePoint = new BigDecimal(totalGradePoint).setScale(2, RoundingMode.HALF_UP).doubleValue();
+            }
 
             if((totalGradePoint>5.0)||(totalGradePoint==5.0)) {
                 totalGrade = "A+";
@@ -176,7 +181,6 @@ public class SubjectWiseResult extends AppCompatActivity implements SubjectWiseR
             recyclerView.setItemAnimator(new DefaultItemAnimator());
             recyclerView.addItemDecoration(new MyDividerItemDecoration(this, DividerItemDecoration.VERTICAL, 10));
             recyclerView.setAdapter(mAdapter);
-            mAdapter.notifyDataSetChanged();
             mResultDialog.dismiss();
         } catch (JSONException e) {
             e.printStackTrace();

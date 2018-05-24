@@ -69,11 +69,21 @@ android:fitsSystemWindows="true">
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="10dp"
         android:textColor="#F44336"
         android:gravity="center"
         android:id="@+id/error"
-        android:paddingBottom="35dp"/>
+        android:padding="1dp"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:textColor="#174b92"
+        android:text="FORGOT PASSWORD?"
+        android:layout_gravity="center"
+        android:id="@+id/forgotPassword"
+        android:padding="5dp"
+        android:textStyle="bold"
+        android:background="@drawable/cross_button_black"/>
 
 </LinearLayout>
 

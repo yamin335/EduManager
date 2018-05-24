@@ -12,6 +12,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import onair.onems.R;
+import onair.onems.login.LoginScreen;
 
 public class SplashScreen extends AppCompatActivity {
 

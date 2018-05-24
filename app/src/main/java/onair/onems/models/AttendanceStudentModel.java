@@ -1,11 +1,5 @@
 package onair.onems.models;
 
-import java.util.ArrayList;
-
-/**
- * Created by User on 12/21/2017.
- */
-
 public class AttendanceStudentModel {
 
     private String SubAtdDetailID;
@@ -74,9 +68,8 @@ public class AttendanceStudentModel {
 
     private int IsPresentID;
 
-    public AttendanceStudentModel()
-    {
-
+    public AttendanceStudentModel() {
+        this.IsPresent = 1;
     }
 
     public AttendanceStudentModel(String SubAtdDetailID, String SubAtdID, String UserFullName,
@@ -87,8 +80,7 @@ public class AttendanceStudentModel {
                                   String SessionID, String IsPresent, String Islate, String LateTime,
                                   String IsLeave, String IsAbsent, String Remarks, String Subject,
                                   String Department, String Medium, String Shift, String Class,
-                                  String DisplayDate, String isReadOnly, String IsPresentID)
-    {
+                                  String DisplayDate, String isReadOnly, String IsPresentID) {
         if(SubAtdDetailID.equals("null"))
         {
             this.SubAtdDetailID = "0";
@@ -199,13 +191,18 @@ public class AttendanceStudentModel {
             this.SessionID = Long.parseLong(SessionID);
         }
 
-        if(IsPresent.equals("null"))
-        {
-            this.IsPresent = 0;
-        }
-        else
-        {
-            this.IsPresent = Integer.parseInt(IsPresent);
+        switch (IsPresent) {
+            case "null":
+                if(this.SubAtdDetailID.equalsIgnoreCase("0") && this.SubAtdID.equalsIgnoreCase("0"))
+                this.IsPresent = 1;
+                break;
+            case "0":
+                if(this.SubAtdDetailID.equalsIgnoreCase("0") && this.SubAtdID.equalsIgnoreCase("0"))
+                this.IsPresent = 1;
+                break;
+            default:
+                this.IsPresent = Integer.parseInt(IsPresent);
+                break;
         }
 
         if(Islate.equals("null"))

@@ -13,6 +13,11 @@
         android:title="Log Out"
         app:showAsAction="never" />
     <item
+        android:id="@+id/changePassword"
+        android:orderInCategory="100"
+        android:title="Change Password"
+        app:showAsAction="never" />
+    <item
         android:id="@+id/action_student_change"
         android:orderInCategory="100"
         android:title="Change Student"

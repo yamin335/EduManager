@@ -7,6 +7,9 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.CALL_PHONE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
@@ -15,6 +18,15 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="${applicationId}.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/provider_paths"/>
+        </provider>
         <activity
             android:name=".mainactivities.SplashScreen"
             android:label="@string/app_name"
@@ -34,7 +46,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".mainactivities.LoginScreen"
+            android:name=".login.LoginScreen"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
@@ -52,21 +64,12 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".attendance.StudentAttendanceReport"
-            android:label="Attendance"
+            android:label="Attendance Report"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity
-            android:name=".fee.StudentList"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
-            android:name=".fee.FeeMainScreen"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".attendance.StudentAttendanceShow"
-            android:label="Attendance"
+            android:label="Attendance Report"
             android:screenOrientation="portrait" />
         <activity
             android:name=".attendance.TakeAttendanceDetails"
@@ -74,17 +77,22 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".attendance.StudentAttendanceAllDays"
-            android:label="Attendance"
+            android:label="Daily Attendance"
             android:screenOrientation="portrait" />
         <activity
             android:name=".attendance.StudentSubjectWiseAttendance"
-            android:label="Attendance"
+            android:label="Subject Wise Attendance"
             android:screenOrientation="portrait" />
         <activity
             android:name=".attendance.ShowAttendance"
             android:label="Attendance Report"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".attendance.AttendanceAdminDashboard"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:label="Attendance"/>
         <activity
             android:name=".icard.StudentiCardMain"
             android:label="iCard"
@@ -104,81 +112,49 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
+            android:name=".fee.StudentList"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".fee.FeeMainScreen"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustResize"
+            android:label="Fee"/>
+        <activity
             android:name=".fee.FeesDetails"
             android:label="Fees Details"
-            android:parentActivityName=".fee.FeeMainScreen"
             android:screenOrientation="portrait">
-
-            <!-- The meta-data element is needed for versions lower than 4.1 -->
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="onair.onems.fee.FeeMainScreen" />
         </activity>
         <activity
             android:name=".fee.FineDetails"
             android:label="Fine Details"
-            android:parentActivityName=".fee.FeeMainScreen"
             android:screenOrientation="portrait">
-
-            <!-- The meta-data element is needed for versions lower than 4.1 -->
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="onair.onems.fee.FeeMainScreen" />
         </activity>
         <activity
             android:name=".fee.payment"
             android:label="Payment"
-            android:parentActivityName=".fee.FeeMainScreen"
             android:screenOrientation="portrait">
-
-            <!-- The meta-data element is needed for versions lower than 4.1 -->
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="onair.onems.fee.FeeMainScreen" />
         </activity>
         <activity
             android:name=".fee.FeesHistory"
             android:label="Fees History"
-            android:parentActivityName=".fee.FeeMainScreen"
             android:screenOrientation="portrait">
-
-            <!-- The meta-data element is needed for versions lower than 4.1 -->
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="onair.onems.fee.FeeMainScreen" />
         </activity>
         <activity
             android:name=".fee.MontlyHistory"
             android:label="Monthly History"
-            android:parentActivityName=".fee.FeesHistory"
             android:screenOrientation="portrait">
-
-            <!-- The meta-data element is needed for versions lower than 4.1 -->
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="onair.onems.fee.FeesHistory" />
         </activity>
         <activity
             android:name=".fee.TotalFees"
             android:label="Fees History"
-            android:parentActivityName=".fee.MontlyHistory"
             android:screenOrientation="portrait">
-
-            <!-- The meta-data element is needed for versions lower than 4.1 -->
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="onair.onems.fee.MontlyHistory" />
         </activity>
         <activity
             android:name=".fee.TotalFine"
             android:label="Fine History"
-            android:parentActivityName=".fee.MontlyHistory"
             android:screenOrientation="portrait">
-
-            <!-- The meta-data element is needed for versions lower than 4.1 -->
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="onair.onems.fee.MontlyHistory" />
         </activity>
         <activity
             android:name=".studentlist.ReportAllStudentMain"
@@ -219,8 +195,13 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".result.SubjectWiseResult"
-            android:label="Result"
+            android:label="Subject wise Result"
             android:screenOrientation="portrait" />
+        <activity
+            android:name=".result.ResultGradeStructure"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:label="Grade Sheet"/>
         <activity
             android:name=".contacts.ContactsMainScreen"
             android:label="Contacts"
@@ -248,15 +229,7 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".result.ResultGradeStructure"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
             android:name=".exam.ExamRoutineMainScreen"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
-            android:name=".attendance.AttendanceAdminDashboard"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".exam.ExamDetails" />

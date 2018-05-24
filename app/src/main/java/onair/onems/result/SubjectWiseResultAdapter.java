@@ -37,11 +37,11 @@ public class SubjectWiseResultAdapter extends RecyclerView.Adapter<SubjectWiseRe
                     listener.onSubjectWiseResultSelected(subjectWiseResultList.get(getAdapterPosition()));
                 }
             });
-        }
+         }
     }
 
 
-    public SubjectWiseResultAdapter(Context context, List<JSONObject> subjectWiseResultModelList, SubjectWiseResultsAdapterListener listener) {
+    SubjectWiseResultAdapter(Context context, List<JSONObject> subjectWiseResultModelList, SubjectWiseResultsAdapterListener listener) {
         this.context = context;
         this.listener = listener;
         this.subjectWiseResultList = subjectWiseResultModelList;
@@ -59,7 +59,7 @@ public class SubjectWiseResultAdapter extends RecyclerView.Adapter<SubjectWiseRe
     public void onBindViewHolder(MyViewHolder holder, final int position) {
         JSONObject subjectWiseResult = subjectWiseResultList.get(position);
         try {
-            if(position == subjectWiseResultList.size()-1) {
+            if(subjectWiseResult.getString("SubjectName").equalsIgnoreCase("Total")) {
                 holder.SubjectName.setTextColor(Color.BLACK);
                 holder.SubjectName.setTypeface(null, Typeface.BOLD);
 
@@ -71,6 +71,18 @@ public class SubjectWiseResultAdapter extends RecyclerView.Adapter<SubjectWiseRe
 
                 holder.GradePoint.setTextColor(Color.BLACK);
                 holder.GradePoint.setTypeface(null, Typeface.BOLD);
+            } else {
+                holder.SubjectName.setTextColor(Color.parseColor("#01466c"));
+                holder.SubjectName.setTypeface(null, Typeface.NORMAL);
+
+                holder.Mark.setTextColor(Color.parseColor("#01466c"));
+                holder.Mark.setTypeface(null, Typeface.NORMAL);
+
+                holder.Grade.setTextColor(Color.parseColor("#01466c"));
+                holder.Grade.setTypeface(null, Typeface.NORMAL);
+
+                holder.GradePoint.setTextColor(Color.parseColor("#01466c"));
+                holder.GradePoint.setTypeface(null, Typeface.NORMAL);
             }
             holder.SubjectName.setText(subjectWiseResult.getString("SubjectName"));
             holder.Mark.setText(subjectWiseResult.getString("Total"));

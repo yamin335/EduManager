@@ -966,10 +966,10 @@ public class ResultMainScreen extends SideNavigationMenuParentActivity{
     private void ExamDataGetRequest() {
         if (StaticHelperClass.isNetworkAvailable(this)) {
 
-            String examUrl = getString(R.string.baseUrl)+"/api/onEms/getinsExameID/"+InstituteID;
+            String examUrl = getString(R.string.baseUrl)+"/api/onEms/getinsExameDDL/"+InstituteID;
 
             mExamDialog = new ProgressDialog(this);
-            mExamDialog.setTitle("Loading session...");
+            mExamDialog.setTitle("Loading exam...");
             mExamDialog.setMessage("Please Wait...");
             mExamDialog.setCancelable(false);
             mExamDialog.setIcon(R.drawable.onair);
@@ -1007,7 +1007,7 @@ public class ResultMainScreen extends SideNavigationMenuParentActivity{
     private void GetStudentListPostRequest() {
         if(StaticHelperClass.isNetworkAvailable(this)) {
             mStudentListGetDialog = new ProgressDialog(this);
-            mStudentListGetDialog.setTitle("Loading session...");
+            mStudentListGetDialog.setTitle("Loading student...");
             mStudentListGetDialog.setMessage("Please Wait...");
             mStudentListGetDialog.setCancelable(false);
             mStudentListGetDialog.setIcon(R.drawable.onair);

@@ -60,7 +60,7 @@ public class ExamRoutineExamDetailsAdapter extends RecyclerView.Adapter<ExamRout
     public void onBindViewHolder(MyViewHolder holder, final int position) {
         final JSONObject exam = examList.get(position);
         try {
-            holder.exam.setText(exam.getString("ExamName"));
+            holder.exam.setText(exam.getString("CustomName"));
             holder.date.setText(exam.getString("StartDate")+" - "+exam.getString("EndDate"));
             holder.shift.setText(exam.getString("ShiftName"));
             holder.medium.setText(exam.getString("MameName"));

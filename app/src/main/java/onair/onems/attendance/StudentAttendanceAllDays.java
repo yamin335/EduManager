@@ -34,6 +34,7 @@ import de.codecrafters.tableview.toolkit.SimpleTableHeaderAdapter;
 import de.codecrafters.tableview.toolkit.TableDataRowBackgroundProviders;
 import onair.onems.R;
 import onair.onems.Services.GlideApp;
+import onair.onems.Services.StaticHelperClass;
 import onair.onems.models.DailyAttendanceModel;
 import onair.onems.network.MySingleton;
 
@@ -48,6 +49,7 @@ public class StudentAttendanceAllDays extends AppCompatActivity
     private String RFID="", monthAttendanceUrl="", UserFullName="", RollNo="", UserID = "";
     private long InstituteID=0, SectionID=0, ClassID=0, MediumID=0, ShiftID=0, DepartmentID = 0;
     private int MonthID=0;
+    TextView totalClass, totalPresent, totalAbsent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +59,9 @@ public class StudentAttendanceAllDays extends AppCompatActivity
         TextView name=(TextView) findViewById(R.id.name);
         TextView roll=(TextView) findViewById(R.id.roll);
         TextView id=(TextView) findViewById(R.id.Id);
+        totalClass = findViewById(R.id.totalClass);
+        totalPresent = findViewById(R.id.totalPresent);
+        totalAbsent = findViewById(R.id.totalAbsent);
         ImageView studentImage = findViewById(R.id.studentImage);
 
         dialog = new ProgressDialog(this);
@@ -181,6 +186,11 @@ public class StudentAttendanceAllDays extends AppCompatActivity
             String[][] DATA_TO_SHOW = new String[dailyAttendanceJsonArray.length()][4];
             for(int i = 0; i < dailyAttendanceJsonArray.length(); ++i) {
                 JSONObject dailyAttendanceJsonObject = dailyAttendanceJsonArray.getJSONObject(i);
+                if(i == 0) {
+                    totalClass.setText("Total class: "+dailyAttendanceJsonObject.getString("TotalClassDay"));
+                    totalPresent.setText("Total present: "+dailyAttendanceJsonObject.getString("TotalPresent"));
+                    totalAbsent.setText("Total absent: "+dailyAttendanceJsonObject.getString("TotalAbsent"));
+                }
                 DailyAttendanceModel perDayAttendance = new DailyAttendanceModel();
                 perDayAttendance.setDate(dailyAttendanceJsonObject.getString("Date"));
                 perDayAttendance.setPresent(dailyAttendanceJsonObject.getString("Present"));
@@ -211,29 +221,34 @@ public class StudentAttendanceAllDays extends AppCompatActivity
     }
 
     public void AttendanceDataGetRequest(){
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, monthAttendanceUrl,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
+        if(StaticHelperClass.isNetworkAvailable(this)) {
+            StringRequest stringRequest = new StringRequest(Request.Method.GET, monthAttendanceUrl,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
 
-                        parseMonthlyAttendanceJsonData(response);
+                            parseMonthlyAttendanceJsonData(response);
 
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                dialog.dismiss();
-            }
-        })
-        {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String>  params = new HashMap<>();
-                params.put("Authorization", "Request_From_onEMS_Android_app");
-                return params;
-            }
-        };
-        MySingleton.getInstance(this).addToRequestQueue(stringRequest);
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    dialog.dismiss();
+                }
+            })
+            {
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    Map<String, String>  params = new HashMap<>();
+                    params.put("Authorization", "Request_From_onEMS_Android_app");
+                    return params;
+                }
+            };
+            MySingleton.getInstance(this).addToRequestQueue(stringRequest);
+        } else {
+            Toast.makeText(StudentAttendanceAllDays.this,"Please check your internet connection and select again!!! ",
+                    Toast.LENGTH_LONG).show();
+        }
     }
 
 }

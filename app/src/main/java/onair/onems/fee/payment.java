@@ -47,7 +47,7 @@ public class payment extends AppCompatActivity {
     }
     @Override
     public void onBackPressed() {
-        NavUtils.navigateUpFromSameTask(this);
+//        NavUtils.navigateUpFromSameTask(this);
         super.onBackPressed();
     }
     // Back parent Page code end

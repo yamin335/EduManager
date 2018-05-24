@@ -19,6 +19,7 @@ import onair.onems.attendance.StudentAttendanceReport;
 import onair.onems.notice.NoticeMainScreen;
 import onair.onems.result.ResultMainScreen;
 import onair.onems.routine.RoutineMainScreen;
+import onair.onems.syllabus.SyllabusMainScreen;
 
 
 public class StudentMainScreen extends AppCompatActivity {
@@ -74,7 +75,17 @@ public class StudentMainScreen extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent mainIntent = new Intent(StudentMainScreen.this, StudentAttendanceReport.class);
-                StudentMainScreen.this.startActivity(mainIntent);
+                startActivity(mainIntent);
+                finish();
+            }
+        });
+
+        // Syllabus module start point
+        syllabus.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent mainIntent = new Intent(StudentMainScreen.this, SyllabusMainScreen.class);
+                startActivity(mainIntent);
                 finish();
             }
         });
@@ -103,12 +114,12 @@ public class StudentMainScreen extends AppCompatActivity {
         Fees.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                if(user == 3)
-//                {
-//                    Intent mainIntent = new Intent(StudentMainScreen.this,FeeMainScreen.class);
-//                    StudentMainScreen.this.startActivity(mainIntent);
-//                    finish();
-//                }
+                if(user == 3)
+                {
+                    Intent mainIntent = new Intent(StudentMainScreen.this, FeeMainScreen.class);
+                    StudentMainScreen.this.startActivity(mainIntent);
+                    finish();
+                }
 //                else
 //                {
 //                    Intent mainIntent = new Intent(StudentMainScreen.this,StudentList.class);

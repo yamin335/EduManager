@@ -137,7 +137,7 @@
             android:layout_weight="1"
             android:gravity="center">
             <Button
-                android:id="@+id/syllebus"
+                android:id="@+id/syllabus"
                 android:layout_width="match_parent"
                 android:layout_height="105dp"
                 android:background="@drawable/menu_item_syllebus"

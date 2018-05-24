@@ -93,7 +93,6 @@ public class NoticeMainScreen extends SideNavigationMenuParentActivity implement
 
     @Override
     public void onNoticeSelected(JSONObject notice) {
-//        Toast.makeText(getApplicationContext(), "Selected: " + noticeModel.getTitle() + ", " + noticeModel.getDate(), Toast.LENGTH_LONG).show();
         CustomNoticeDialog customNoticeDialog = new CustomNoticeDialog(this, notice);
         customNoticeDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         customNoticeDialog.setCancelable(false);

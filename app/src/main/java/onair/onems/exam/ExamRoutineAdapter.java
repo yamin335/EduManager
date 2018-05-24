@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,6 +22,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 import onair.onems.R;
+import onair.onems.routine.RoutineClassAdapter;
 
 public class ExamRoutineAdapter extends RecyclerView.Adapter<ExamRoutineAdapter.MyViewHolder> {
     private Activity parentActivity;
@@ -33,12 +36,12 @@ public class ExamRoutineAdapter extends RecyclerView.Adapter<ExamRoutineAdapter.
 
     class MyViewHolder extends RecyclerView.ViewHolder {
         TextView className;
-        LinearLayout parentLinearLayout;
+        RecyclerView recyclerView;
 
         MyViewHolder(View view) {
             super(view);
             className = view.findViewById(R.id.className);
-            parentLinearLayout = view.findViewById(R.id.classWiseListView);
+            recyclerView = view.findViewById(R.id.sessionRecycler);
         }
     }
 
@@ -63,37 +66,45 @@ public class ExamRoutineAdapter extends RecyclerView.Adapter<ExamRoutineAdapter.
 
     @Override
     public void onBindViewHolder(final MyViewHolder holder, final int position) {
-        try {
-            String className = differentClassName.get(position);
-            holder.className.setText(className);
 
-            for(int i = 0; i < sessionWiseExamRoutine.get(position).size(); i++) {
-                View sessionView = getSessionRowItemView(sessionWiseExamRoutine.get(position).get(i).get(0).getString("SessionName"));
+        String className = differentClassName.get(position);
+        holder.className.setText(className);
 
-                final ArrayList<JSONObject> exams = sessionWiseExamRoutine.get(position).get(i);
+        SessionRoutineAdapter mAdapter = new SessionRoutineAdapter(parentActivity, sessionWiseExamRoutine.get(position), context);
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(context);
+        holder.recyclerView.setLayoutManager(mLayoutManager);
+        holder.recyclerView.setItemAnimator(new DefaultItemAnimator());
+        holder.recyclerView.setAdapter(mAdapter);
 
-                sessionView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-
-                        ExamRoutineDialog examRoutineDialog = new ExamRoutineDialog(parentActivity, exams, context);
-                        examRoutineDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-                        examRoutineDialog.setCancelable(false);
-                        examRoutineDialog.show();
-                    }
-                });
-
-                holder.parentLinearLayout.addView(sessionView, holder.parentLinearLayout.getChildCount() - 1);
-            }
-//            holder.periodTime.setText(periodJsonArray.getJSONObject(position).getString("StartTime")+" - "+periodJsonArray.getJSONObject(position).getString("EndTime"));
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+//        try {
+//
+//
+//            for(int i = 0; i < sessionWiseExamRoutine.get(position).size(); i++) {
+//                View sessionView = getSessionRowItemView(sessionWiseExamRoutine.get(position).get(i).get(0).getString("SessionName"));
+//
+//                final ArrayList<JSONObject> exams = sessionWiseExamRoutine.get(position).get(i);
+//
+//                sessionView.setOnClickListener(new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View v) {
+//
+//                        ExamRoutineDialog examRoutineDialog = new ExamRoutineDialog(parentActivity, exams, context);
+//                        examRoutineDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+//                        examRoutineDialog.setCancelable(false);
+//                        examRoutineDialog.show();
+//                    }
+//                });
+//
+//                holder.parentLinearLayout.addView(sessionView, holder.parentLinearLayout.getChildCount() - 1);
+//            }
+//        } catch (JSONException e) {
+//            e.printStackTrace();
+//        }
 
         holder.className.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(holder.parentLinearLayout.isShown()){
+                if(holder.recyclerView.isShown()){
                     Animation slideUp = AnimationUtils.loadAnimation(context, R.anim.slide_up);
                     slideUp.setAnimationListener(new Animation.AnimationListener() {
                         @Override
@@ -103,7 +114,7 @@ public class ExamRoutineAdapter extends RecyclerView.Adapter<ExamRoutineAdapter.
 
                         @Override
                         public void onAnimationEnd(Animation animation) {
-                            holder.parentLinearLayout.setVisibility(View.GONE);
+                            holder.recyclerView.setVisibility(View.GONE);
                         }
 
                         @Override
@@ -113,26 +124,26 @@ public class ExamRoutineAdapter extends RecyclerView.Adapter<ExamRoutineAdapter.
                     });
                     if(slideUp != null){
                         slideUp.reset();
-                        if(holder.parentLinearLayout != null){
-                            holder.parentLinearLayout.clearAnimation();
-                            holder.parentLinearLayout.startAnimation(slideUp);
+                        if(holder.recyclerView != null){
+                            holder.recyclerView.clearAnimation();
+                            holder.recyclerView.startAnimation(slideUp);
                         }
                     }
                 } else {
                     Animation slideDown = AnimationUtils.loadAnimation(context, R.anim.slide_down);
                     if(slideDown != null){
                         slideDown.reset();
-                        if(holder.parentLinearLayout != null){
-                            holder.parentLinearLayout.clearAnimation();
-                            holder.parentLinearLayout.startAnimation(slideDown);
+                        if(holder.recyclerView != null){
+                            holder.recyclerView.clearAnimation();
+                            holder.recyclerView.startAnimation(slideDown);
                         }
                     }
-                    holder.parentLinearLayout.setVisibility(View.VISIBLE);
-                    holder.parentLinearLayout.requestFocus();
+                    holder.recyclerView.setVisibility(View.VISIBLE);
+                    holder.recyclerView.requestFocus();
                 }
             }
         });
-        holder.parentLinearLayout.setVisibility(View.GONE);
+        holder.recyclerView.setVisibility(View.GONE);
     }
 
     @Override
@@ -195,15 +206,14 @@ public class ExamRoutineAdapter extends RecyclerView.Adapter<ExamRoutineAdapter.
                 }
             }
         }
-//        int number = sessionWiseExamRoutine.size();
     }
 
-    private View getSessionRowItemView(String string) {
-        LayoutInflater inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        final View rowView = inflater.inflate(R.layout.exam_routine_session_row_item, null);
-        TextView sessionName = rowView.findViewById(R.id.sessionName);
-        sessionName.setText(string);
-
-        return rowView;
-    }
+//    private View getSessionRowItemView(String string) {
+//        LayoutInflater inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+//        final View rowView = inflater.inflate(R.layout.exam_routine_session_row_item, null);
+//        TextView sessionName = rowView.findViewById(R.id.sessionName);
+//        sessionName.setText(string);
+//
+//        return rowView;
+//    }
 }

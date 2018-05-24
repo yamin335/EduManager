@@ -309,6 +309,7 @@ public class StudentiCardMain extends SideNavigationMenuParentActivity {
                 if(StaticHelperClass.isNetworkAvailable(StudentiCardMain.this)) {
                     Intent intent = new Intent(StudentiCardMain.this, StudentiCardNewEntry.class);
                     startActivity(intent);
+                    finish();
                 } else {
                     Toast.makeText(StudentiCardMain.this,"Please check your internet connection !!! ",Toast.LENGTH_LONG).show();
                 }

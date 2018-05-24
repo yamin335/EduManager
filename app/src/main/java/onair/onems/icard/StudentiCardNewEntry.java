@@ -1031,7 +1031,7 @@ public class StudentiCardNewEntry extends SideNavigationMenuParentActivity {
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            Intent mainIntent = new Intent(StudentiCardNewEntry.this, TeacherMainScreen.class);
+            Intent mainIntent = new Intent(StudentiCardNewEntry.this, StudentiCardMain.class);
             startActivity(mainIntent);
             finish();
         }

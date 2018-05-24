@@ -113,8 +113,13 @@ public class StudentSubjectWiseAttendance extends AppCompatActivity {
                 int status = subjectWiseAttendanceJsonObject.getInt("Status");
                 if (status == 1) {
                     DATA_TO_SHOW[i][2] = "Present";
-                } else
+                } else if(status == 2) {
                     DATA_TO_SHOW[i][2] = "Absent";
+                } else if(status == 3) {
+                    DATA_TO_SHOW[i][2] = "Late";
+                } else if(status == 0) {
+                    DATA_TO_SHOW[i][2] = "Leave";
+                }
                 DATA_TO_SHOW[i][3] = subjectWiseAttendanceJsonObject.getString("ClassTeacher");
             }
 

@@ -1,6 +1,7 @@
 package onair.onems.notice;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -44,15 +45,16 @@ public class NoticeAdapter extends RecyclerView.Adapter<NoticeAdapter.MyViewHold
     }
 
 
-    public NoticeAdapter(Context context, List<JSONObject> noticeList, NoticeAdapterListener listener) {
+    NoticeAdapter(Context context, List<JSONObject> noticeList, NoticeAdapterListener listener) {
         this.context = context;
         this.listener = listener;
         this.noticeList = noticeList;
         this.noticeListFiltered = noticeList;
     }
 
+    @NonNull
     @Override
-    public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.notice_row_item, parent, false);
 
@@ -60,7 +62,7 @@ public class NoticeAdapter extends RecyclerView.Adapter<NoticeAdapter.MyViewHold
     }
 
     @Override
-    public void onBindViewHolder(MyViewHolder holder, final int position) {
+    public void onBindViewHolder(@NonNull MyViewHolder holder, final int position) {
         final JSONObject notice = noticeListFiltered.get(position);
         try {
             holder.title.setText(notice.getString("NoticeHead"));

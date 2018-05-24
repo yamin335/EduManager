@@ -28,6 +28,7 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.Map;
 import onair.onems.R;
+import onair.onems.Services.StaticHelperClass;
 import onair.onems.network.MySingleton;
 
 public class Friday extends Fragment {
@@ -62,20 +63,26 @@ public class Friday extends Fragment {
         UserTypeID = prefs.getInt("UserTypeID",0);
         UserID = prefs.getString("UserID","0");
 
-        fridayRoutineDataGetRequest();
+        if(UserTypeID==1||UserTypeID==2) {
+            String routineData = getArguments().getString("fridayJsonArray");
+            mAdapter = new RoutineAdapter(getActivity(), routineData, UserTypeID);
+            RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity());
+            recyclerView.setLayoutManager(mLayoutManager);
+            recyclerView.setItemAnimator(new DefaultItemAnimator());
+            recyclerView.setHasFixedSize(true);
+            recyclerView.setAdapter(mAdapter);
+        } else if(UserTypeID==3||UserTypeID==4||UserTypeID==5) {
+            fridayRoutineDataGetRequest();
+        }
 
         return  rootView;
     }
 
     void fridayRoutineDataGetRequest() {
-        if(isNetworkAvailable()) {
+        if(StaticHelperClass.isNetworkAvailable(getActivity())) {
 
             String fridayRoutineDataGetUrl = "";
-            if(UserTypeID == 1) {
-
-            } else if(UserTypeID == 2) {
-
-            } else if(UserTypeID == 3) {
+            if(UserTypeID == 3) {
                 fridayRoutineDataGetUrl = getString(R.string.baseUrl)+"/api/onEms/spGetDashClassRoutine/"+ShiftID
                         +"/"+MediumID+"/"+ClassID+"/"+SectionID+"/"+DepartmentID+"/7/"+InstituteID;
             } else if(UserTypeID == 4) {
@@ -132,11 +139,5 @@ public class Friday extends Fragment {
         } else {
             Toast.makeText(getActivity(),"Please check your internet connection !!!",Toast.LENGTH_LONG).show();
         }
-    }
-
-    private boolean isNetworkAvailable() {
-        ConnectivityManager connectivityManager = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 }

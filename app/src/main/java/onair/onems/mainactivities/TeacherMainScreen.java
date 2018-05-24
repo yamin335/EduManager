@@ -37,6 +37,7 @@ public class TeacherMainScreen extends AppCompatActivity {
         Button contact = (Button)findViewById(R.id.contact);
         Button routine = (Button)findViewById(R.id.routine);
         Button exam = (Button)findViewById(R.id.exam);
+        Button syllabus = findViewById(R.id.syllabus);
 
         SharedPreferences sharedPre = PreferenceManager.getDefaultSharedPreferences(this);
         String InstituteNameString = sharedPre.getString("InstituteName","");
@@ -83,6 +84,16 @@ public class TeacherMainScreen extends AppCompatActivity {
                     TeacherMainScreen.this.startActivity(mainIntent);
                     finish();
                 }
+            }
+        });
+
+        // Syllabus module start point
+        syllabus.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent mainIntent = new Intent(TeacherMainScreen.this, SyllabusMainScreen.class);
+                startActivity(mainIntent);
+                finish();
             }
         });
 

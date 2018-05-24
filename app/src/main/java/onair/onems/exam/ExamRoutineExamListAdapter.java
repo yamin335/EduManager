@@ -57,7 +57,7 @@ public class ExamRoutineExamListAdapter extends RecyclerView.Adapter<ExamRoutine
     public void onBindViewHolder(MyViewHolder holder, final int position) {
         final JSONObject exam = differentExams.get(position);
         try {
-            holder.examName.setText(exam.getString("ExamName"));
+            holder.examName.setText(exam.getString("CustomName"));
         } catch (JSONException e) {
             e.printStackTrace();
         }
