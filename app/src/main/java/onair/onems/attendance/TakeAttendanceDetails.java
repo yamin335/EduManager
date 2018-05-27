@@ -1,6 +1,7 @@
 package onair.onems.attendance;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -9,9 +10,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.WindowManager;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -28,10 +32,11 @@ import java.util.Map;
 import onair.onems.R;
 import onair.onems.Services.StaticHelperClass;
 import onair.onems.customised.CustomRequest;
+import onair.onems.mainactivities.CommonToolbarParentActivity;
 import onair.onems.models.AttendanceSheetModel;
 import onair.onems.models.AttendanceStudentModel;
 import onair.onems.network.MySingleton;
-public class TakeAttendanceDetails extends AppCompatActivity {
+public class TakeAttendanceDetails extends CommonToolbarParentActivity {
 
     private TakeAttendanceAdapter adapter;
     private ArrayList<AttendanceStudentModel> attendanceSheetArrayList;
@@ -56,7 +61,12 @@ public class TakeAttendanceDetails extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.attendance_taking_activity_details);
+
+        LayoutInflater inflater = (LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        final View childActivityLayout = inflater.inflate(R.layout.attendance_taking_activity_details, null);
+        LinearLayout parentActivityLayout = findViewById(R.id.contentMain);
+        parentActivityLayout.addView(childActivityLayout, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
+
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
 
         dialog = new ProgressDialog(this);

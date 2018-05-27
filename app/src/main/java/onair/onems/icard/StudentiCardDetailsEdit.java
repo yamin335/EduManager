@@ -28,6 +28,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.system.ErrnoException;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.AdapterView;
@@ -37,6 +38,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.Spinner;
@@ -73,6 +75,7 @@ import java.util.Map;
 import onair.onems.R;
 import onair.onems.Services.GlideApp;
 import onair.onems.customised.CustomRequest;
+import onair.onems.mainactivities.CommonToolbarParentActivity;
 import onair.onems.models.BloodGroupModel;
 import onair.onems.models.ClassModel;
 import onair.onems.models.DepartmentModel;
@@ -84,7 +87,7 @@ import onair.onems.models.ShiftModel;
 import onair.onems.models.StudentInformationEntry;
 import onair.onems.network.MySingleton;
 
-public class StudentiCardDetailsEdit extends AppCompatActivity {
+public class StudentiCardDetailsEdit extends CommonToolbarParentActivity {
 
     private EditText t_name, t_email, t_address, t_parent, t_parentsPhone, t_roll,
             t_stuEmail, t_stuPhone, t_remarks;
@@ -167,7 +170,11 @@ public class StudentiCardDetailsEdit extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.icard_student_details_edit);
+
+        LayoutInflater inflater = (LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        final View childActivityLayout = inflater.inflate(R.layout.icard_student_details_edit, null);
+        LinearLayout parentActivityLayout = findViewById(R.id.contentMain);
+        parentActivityLayout.addView(childActivityLayout, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         InstituteID = prefs.getLong("InstituteID",0);

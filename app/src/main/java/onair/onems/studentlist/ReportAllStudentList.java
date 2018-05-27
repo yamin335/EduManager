@@ -11,8 +11,11 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
@@ -30,6 +33,7 @@ import java.util.Map;
 
 import onair.onems.R;
 import onair.onems.Services.StaticHelperClass;
+import onair.onems.mainactivities.CommonToolbarParentActivity;
 import onair.onems.models.ReportAllStudentRowModel;
 import onair.onems.network.MySingleton;
 
@@ -37,7 +41,7 @@ import onair.onems.network.MySingleton;
  * Created by User on 1/24/2018.
  */
 
-public class ReportAllStudentList extends AppCompatActivity implements ReportAllStudentShowListAdapter.ReportAllStudentShowListAdapterListener{
+public class ReportAllStudentList extends CommonToolbarParentActivity implements ReportAllStudentShowListAdapter.ReportAllStudentShowListAdapterListener{
 
     private ProgressDialog dialog;
     private RecyclerView recyclerView;
@@ -50,7 +54,11 @@ public class ReportAllStudentList extends AppCompatActivity implements ReportAll
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.report_all_student_list_activity_main);
+
+        LayoutInflater inflater = (LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        final View childActivityLayout = inflater.inflate(R.layout.report_all_student_list_activity_main, null);
+        LinearLayout parentActivityLayout = findViewById(R.id.contentMain);
+        parentActivityLayout.addView(childActivityLayout, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
 
         mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.activity_main_swipe_refresh_layout);
         mSwipeRefreshLayout.setColorSchemeColors(getResources().getColor(R.color.colorAccent));

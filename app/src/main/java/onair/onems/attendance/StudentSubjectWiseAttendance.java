@@ -1,6 +1,7 @@
 package onair.onems.attendance;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
@@ -8,7 +9,10 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -25,9 +29,10 @@ import de.codecrafters.tableview.toolkit.SimpleTableDataAdapter;
 import de.codecrafters.tableview.toolkit.SimpleTableHeaderAdapter;
 import de.codecrafters.tableview.toolkit.TableDataRowBackgroundProviders;
 import onair.onems.R;
+import onair.onems.mainactivities.CommonToolbarParentActivity;
 import onair.onems.network.MySingleton;
 
-public class StudentSubjectWiseAttendance extends AppCompatActivity {
+public class StudentSubjectWiseAttendance extends CommonToolbarParentActivity {
     private ProgressDialog dialog;
     private Configuration config;
     private TableView tableView;
@@ -38,7 +43,11 @@ public class StudentSubjectWiseAttendance extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.attendance_report_subjectwise);
+
+        LayoutInflater inflater = (LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        final View childActivityLayout = inflater.inflate(R.layout.attendance_report_subjectwise, null);
+        LinearLayout parentActivityLayout = findViewById(R.id.contentMain);
+        parentActivityLayout.addView(childActivityLayout, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
 
         SharedPreferences sharedPre = PreferenceManager.getDefaultSharedPreferences(this);
         InstituteID = sharedPre.getLong("InstituteID", 0);

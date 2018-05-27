@@ -66,7 +66,7 @@ public class ExamAdapter extends RecyclerView.Adapter<ExamAdapter.MyViewHolder> 
     public void onBindViewHolder(MyViewHolder holder, final int position) {
         try {
             JSONObject exam = exams.getJSONObject(position);
-            holder.examName.setText(exam.getString("ExamName"));
+            holder.examName.setText(exam.getString("CustomName"));
         } catch (JSONException e) {
             e.printStackTrace();
         }

@@ -16,13 +16,18 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.RequestOptions;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -36,6 +41,7 @@ import de.codecrafters.tableview.toolkit.SimpleTableDataAdapter;
 import de.codecrafters.tableview.toolkit.SimpleTableHeaderAdapter;
 import de.codecrafters.tableview.toolkit.TableDataRowBackgroundProviders;
 import onair.onems.R;
+import onair.onems.Services.GlideApp;
 import onair.onems.Services.StaticHelperClass;
 import onair.onems.models.MonthModel;
 import onair.onems.models.DailyAttendanceModel;
@@ -55,7 +61,8 @@ public class SelfAttendanceReport extends Fragment {
     private ArrayList<DailyAttendanceModel> dailyAttendanceList;
     private DailyAttendanceModel selectedDay;
     private int UserTypeID;
-
+    private TextView totalClass, totalPresent;
+    private String UserFullName, RollNo, RFID, ImageUrl;
     public SelfAttendanceReport()
     {
 
@@ -72,6 +79,12 @@ public class SelfAttendanceReport extends Fragment {
 
         View rootView = inflater.inflate(R.layout.attendance_report_self_attendance, container, false);
         tableView = (TableView)rootView.findViewById(R.id.tableView);
+        totalClass = rootView.findViewById(R.id.totalClass);
+        totalPresent = rootView.findViewById(R.id.totalPresent);
+        ImageView studentImage = rootView.findViewById(R.id.studentImage);
+        TextView name = rootView.findViewById(R.id.name);
+        TextView roll = rootView.findViewById(R.id.roll);
+        TextView id = rootView.findViewById(R.id.Id);
         tableView.setColumnCount(4);
 
         SharedPreferences sharedPre = PreferenceManager.getDefaultSharedPreferences(getActivity());
@@ -83,6 +96,10 @@ public class SelfAttendanceReport extends Fragment {
         InstituteID=sharedPre.getLong("InstituteID",0);
         UserID = sharedPre.getString("UserID","");
         UserTypeID = sharedPre.getInt("UserTypeID",0);
+        UserFullName = sharedPre.getString("UserFullName","");
+        RollNo = sharedPre.getString("RollNo","");
+        RFID = sharedPre.getString("RFID","");
+        ImageUrl = sharedPre.getString("ImageUrl","");
 
         if(UserTypeID == 5){
             try {
@@ -94,10 +111,24 @@ public class SelfAttendanceReport extends Fragment {
                 SectionID = selectedStudent.getLong("SectionID");
                 DepartmentID = selectedStudent.getLong("DepartmentID");
                 UserID = selectedStudent.getString("UserID");
+                UserFullName = selectedStudent.getString("UserFullName");
+                RollNo = selectedStudent.getString("RollNo");
+                RFID = selectedStudent.getString("RFID");
+                ImageUrl = selectedStudent.getString("ImageUrl");
             } catch (JSONException e) {
                 e.printStackTrace();
             }
         }
+
+        GlideApp.with(this)
+                .load(getString(R.string.baseUrl)+"/"+ImageUrl.replace("\\","/")).apply(RequestOptions.circleCropTransform())
+                .diskCacheStrategy(DiskCacheStrategy.NONE)
+                .skipMemoryCache(true)
+                .into(studentImage);
+
+        name.setText(UserFullName);
+        roll.setText(RollNo);
+        id.setText(RFID);
 
         selectedMonth = new MonthModel();
 
@@ -224,6 +255,10 @@ public class SelfAttendanceReport extends Fragment {
             String[][] DATA_TO_SHOW = new String[dailyAttendanceJsonArray.length()][4];
             for(int i = 0; i < dailyAttendanceJsonArray.length(); ++i) {
                 JSONObject dailyAttendanceJsonObject = dailyAttendanceJsonArray.getJSONObject(i);
+                if(i == 0) {
+                    totalClass.setText("Total class: "+dailyAttendanceJsonObject.getString("TotalClassDay"));
+                    totalPresent.setText("Total present: "+dailyAttendanceJsonObject.getString("TotalPresent"));
+                }
                 DailyAttendanceModel perDayAttendance = new DailyAttendanceModel();
                 perDayAttendance.setDate(dailyAttendanceJsonObject.getString("Date"));
                 perDayAttendance.setPresent(dailyAttendanceJsonObject.getString("Present"));

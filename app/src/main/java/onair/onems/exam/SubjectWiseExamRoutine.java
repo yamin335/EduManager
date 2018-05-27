@@ -1,12 +1,16 @@
 package onair.onems.exam;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
@@ -26,10 +30,11 @@ import java.util.Map;
 import onair.onems.R;
 import onair.onems.Services.StaticHelperClass;
 import onair.onems.customised.MyDividerItemDecoration;
+import onair.onems.mainactivities.CommonToolbarParentActivity;
 import onair.onems.network.MySingleton;
 import onair.onems.result.SubjectWiseResult;
 
-public class SubjectWiseExamRoutine extends AppCompatActivity {
+public class SubjectWiseExamRoutine extends CommonToolbarParentActivity {
 
     private String InstituteID;
     private String ExamRoutineID;
@@ -38,7 +43,11 @@ public class SubjectWiseExamRoutine extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.exam_routine_subject_wise);
+
+        LayoutInflater inflater = (LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        final View childActivityLayout = inflater.inflate(R.layout.exam_routine_subject_wise, null);
+        LinearLayout parentActivityLayout = findViewById(R.id.contentMain);
+        parentActivityLayout.addView(childActivityLayout, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
 
         InstituteID = getIntent().getStringExtra("InstituteID");
         ExamRoutineID = getIntent().getStringExtra("ExamRoutineID");

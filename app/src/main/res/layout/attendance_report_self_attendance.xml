@@ -3,8 +3,9 @@
     xmlns:table="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
-    android:background="#ffffff">
+    android:background="#01579B">
 
     <!--<com.jaredrummler.materialspinner.MaterialSpinner-->
         <!--android:id="@+id/spinner"-->
@@ -38,6 +39,71 @@
             android:backgroundTint="#000000"
             android:popupBackground="@drawable/drop_down_menu"
             android:spinnerMode="dropdown" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/studentImage"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            tools:ignore="RtlHardcoded" />
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_weight="1"
+            android:layout_marginTop="5dp">
+
+            <TextView
+                android:id="@+id/name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#ffffff"
+                android:textSize="14dp"
+                android:textStyle="bold"
+                tools:ignore="HardcodedText,RtlHardcoded,SpUsage" />
+            <TextView
+                android:id="@+id/roll"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#ffffff"
+                tools:ignore="HardcodedText,RtlHardcoded,SpUsage" />
+            <TextView
+                android:id="@+id/Id"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#ffffff"
+                tools:ignore="HardcodedText,RtlHardcoded,SpUsage" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingLeft="5dp"
+            android:paddingStart="5dp"
+            android:paddingEnd="0dp"
+            android:paddingRight="0dp"
+            android:layout_weight="1"
+            android:layout_marginTop="5dp">
+            <TextView
+                android:id="@+id/totalClass"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#ffffff"/>
+            <TextView
+                android:id="@+id/totalPresent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#ffffff"/>
+        </LinearLayout>
+
     </LinearLayout>
 
     <LinearLayout

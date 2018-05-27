@@ -35,6 +35,8 @@ public class DigitalContentAdapter extends RecyclerView.Adapter<RecyclerView.Vie
     private static final int FILE_TYPE = 2;
     private static final int AUDIO_TYPE = 3;
     private static final int VIDEO_TYPE = 4;
+    protected enum ContentType {SYLLABUS, LESSON}
+    private ContentType contentType;
 
     class MyViewHolder extends RecyclerView.ViewHolder {
         TextView contentName;
@@ -49,7 +51,8 @@ public class DigitalContentAdapter extends RecyclerView.Adapter<RecyclerView.Vie
     }
 
 
-    DigitalContentAdapter(Context context, AddFileToDownloader downloader, ArrayList<JSONObject> contentList) {
+    DigitalContentAdapter(Context context, AddFileToDownloader downloader, ArrayList<JSONObject> contentList, ContentType contentType) {
+        this.contentType = contentType;
         this.context = context;
         this.contentList = contentList;
         this.downloader = downloader;
@@ -95,7 +98,14 @@ public class DigitalContentAdapter extends RecyclerView.Adapter<RecyclerView.Vie
         try {
             JSONObject jsonObject = contentList.get(position);
             title = jsonObject.getString("FileName");
-            url = jsonObject.getString("SyllabusUrl");
+            switch (contentType){
+                case SYLLABUS:
+                    url = jsonObject.getString("SyllabusUrl");
+                    break;
+                case LESSON:
+                    url = jsonObject.getString("ContentUrl");
+                    break;
+            }
             url = url.replace("\\","/");
         } catch (JSONException e) {
             e.printStackTrace();
@@ -185,7 +195,14 @@ public class DigitalContentAdapter extends RecyclerView.Adapter<RecyclerView.Vie
         String SyllabusUrl = "";
         try {
             JSONObject jsonObject = contentList.get(position);
-            SyllabusUrl = jsonObject.getString("SyllabusUrl");
+            switch (contentType){
+                case SYLLABUS:
+                    SyllabusUrl = jsonObject.getString("SyllabusUrl");
+                    break;
+                case LESSON:
+                    SyllabusUrl = jsonObject.getString("ContentUrl");
+                    break;
+            }
         } catch (JSONException e) {
             e.printStackTrace();
         }

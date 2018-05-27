@@ -80,15 +80,16 @@ import static onair.onems.Services.StaticHelperClass.isNetworkAvailable;
 public class SyllabusMainScreen extends SideNavigationMenuParentActivity implements ExamAdapter.ExamAdapterListener, SubjectAdapter.SubjectAdapterListener,
         FloatingMenuDialog.FloatingMenuListener, DigitalContentAdapter.AddFileToDownloader{
 
-    private ProgressDialog mExamDialog, mSyllabusDialog, mSubjectDialog, mContentDialog;
+    private ProgressDialog mExamDialog, mSyllabusDialog, mSubjectDialog, mContentDialog, mLessonContentDialog;
     private String selectedSubjectID = null, selectedExamID = null;
-    private TextView error, topicValue, detailValue, syllabusTime;
+    private TextView error, lessonError, topicValue, detailValue, syllabusTime;
     private View shadow;
     private FloatingActionButton floatingMenu;
-    private RecyclerView recyclerView;
     private ArrayList<Long> refIdList = new ArrayList<>();
     private ArrayList<JSONObject> digitalContentUrls;
     private DigitalContentAdapter mAdapter;
+    private DigitalContentAdapter mLessonAdapter;
+    private ArrayList<JSONObject> lessonDigitalContentUrls;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -102,20 +103,30 @@ public class SyllabusMainScreen extends SideNavigationMenuParentActivity impleme
         parent.addView(rowView, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
 
         error = findViewById(R.id.empty);
+        lessonError = findViewById(R.id.lessonEmpty);
         topicValue = findViewById(R.id.topicValue);
         detailValue = findViewById(R.id.detailsValue);
         syllabusTime = findViewById(R.id.date);
-        recyclerView = findViewById(R.id.recycler);
+        RecyclerView recyclerView = findViewById(R.id.recycler);
+        RecyclerView lessonRecyclerView = findViewById(R.id.lessonRecycler);
         shadow = findViewById(R.id.dim);
         shadow.setVisibility(View.GONE);
 
         digitalContentUrls = new ArrayList<>();
-        mAdapter = new DigitalContentAdapter(this, this, digitalContentUrls);
-        RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(this, 4);
+        lessonDigitalContentUrls = new ArrayList<>();
+        mAdapter = new DigitalContentAdapter(this, this, digitalContentUrls, DigitalContentAdapter.ContentType.SYLLABUS);
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
         recyclerView.setLayoutManager(mLayoutManager);
-        recyclerView.addItemDecoration(new GridSpacingItemDecoration(4, dpToPx(10), true));
+//        RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(this, 4);
+//        recyclerView.addItemDecoration(new GridSpacingItemDecoration(4, dpToPx(10), true));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(mAdapter);
+
+        mLessonAdapter = new DigitalContentAdapter(this, this, lessonDigitalContentUrls, DigitalContentAdapter.ContentType.LESSON);
+        RecyclerView.LayoutManager mLessonLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
+        lessonRecyclerView.setLayoutManager(mLessonLayoutManager);
+        lessonRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        lessonRecyclerView.setAdapter(mLessonAdapter);
 
         floatingMenu = findViewById(R.id.showDate);
         floatingMenu.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#FF5722")));
@@ -151,7 +162,6 @@ public class SyllabusMainScreen extends SideNavigationMenuParentActivity impleme
             try {
                 JSONObject selectedStudent = new JSONObject(getSharedPreferences("CURRENT_STUDENT", Context.MODE_PRIVATE)
                         .getString("guardianSelectedStudent", "{}"));
-                InstituteID = selectedStudent.getLong("InstituteID");
                 LoggedUserMediumID = selectedStudent.getLong("MediumID");
                 LoggedUserClassID = selectedStudent.getLong("ClassID");
                 LoggedUserDepartmentID = selectedStudent.getLong("DepartmentID");
@@ -233,6 +243,8 @@ public class SyllabusMainScreen extends SideNavigationMenuParentActivity impleme
                 @Override
                 public void onErrorResponse(VolleyError error) {
                     mExamDialog.dismiss();
+                    Toast.makeText(SyllabusMainScreen.this,"Exam data not found!!! ",
+                            Toast.LENGTH_LONG).show();
                 }
             })
             {
@@ -260,6 +272,9 @@ public class SyllabusMainScreen extends SideNavigationMenuParentActivity impleme
             digitalContentUrls.clear();
             mAdapter.notifyDataSetChanged();
             error.setVisibility(View.VISIBLE);
+            lessonDigitalContentUrls.clear();
+            mLessonAdapter.notifyDataSetChanged();
+            lessonError.setVisibility(View.VISIBLE);
             Toast.makeText(SyllabusMainScreen.this,"Exam data not found!!! ",
                     Toast.LENGTH_LONG).show();
         }
@@ -300,6 +315,8 @@ public class SyllabusMainScreen extends SideNavigationMenuParentActivity impleme
                 @Override
                 public void onErrorResponse(VolleyError error) {
                     mSubjectDialog.dismiss();
+                    Toast.makeText(SyllabusMainScreen.this,"Subject data not found!!! ",
+                            Toast.LENGTH_LONG).show();
                 }
             })
             {
@@ -327,6 +344,9 @@ public class SyllabusMainScreen extends SideNavigationMenuParentActivity impleme
             digitalContentUrls.clear();
             mAdapter.notifyDataSetChanged();
             error.setVisibility(View.VISIBLE);
+            lessonDigitalContentUrls.clear();
+            mLessonAdapter.notifyDataSetChanged();
+            lessonError.setVisibility(View.VISIBLE);
             Toast.makeText(SyllabusMainScreen.this,"Subject data not found!!! ",
                     Toast.LENGTH_LONG).show();
         }
@@ -375,6 +395,8 @@ public class SyllabusMainScreen extends SideNavigationMenuParentActivity impleme
                 @Override
                 public void onErrorResponse(VolleyError error) {
                     mSyllabusDialog.dismiss();
+                    Toast.makeText(SyllabusMainScreen.this,"Syllabus data not found!!! ",
+                            Toast.LENGTH_LONG).show();
                 }
             })
             {
@@ -399,7 +421,8 @@ public class SyllabusMainScreen extends SideNavigationMenuParentActivity impleme
                 topicValue.setText(jsonObject.getString("Topic"));
                 detailValue.setText(jsonObject.getString("TopicDetail"));
                 syllabusTime.setText(jsonObject.getString("ClassDate")+", "+jsonObject.getString("ClassDay"));
-                digitalContentGetRequest(jsonObject.getString("SyllabusID"));
+                syllabusDigitalContentGetRequest(jsonObject.getString("SyllabusID"));
+                lessonPlanDigitalContentGetRequest(jsonObject.getString("SyllabusID"), jsonObject.getString("SyllabusDetailID"));
             } else {
                 topicValue.setText("");
                 detailValue.setText("");
@@ -407,6 +430,9 @@ public class SyllabusMainScreen extends SideNavigationMenuParentActivity impleme
                 digitalContentUrls.clear();
                 mAdapter.notifyDataSetChanged();
                 error.setVisibility(View.VISIBLE);
+                lessonDigitalContentUrls.clear();
+                mLessonAdapter.notifyDataSetChanged();
+                lessonError.setVisibility(View.VISIBLE);
                 Toast.makeText(SyllabusMainScreen.this,"Syllabus data not found!!! ",
                         Toast.LENGTH_LONG).show();
             }
@@ -416,7 +442,7 @@ public class SyllabusMainScreen extends SideNavigationMenuParentActivity impleme
         mSyllabusDialog.dismiss();
     }
 
-    private void digitalContentGetRequest(String SyllabusID) {
+    private void syllabusDigitalContentGetRequest(String SyllabusID) {
         if (StaticHelperClass.isNetworkAvailable(this)) {
 
             String url = getString(R.string.baseUrl)+"/api/onEms/getUrlMasterByID/"+SyllabusID;
@@ -440,6 +466,8 @@ public class SyllabusMainScreen extends SideNavigationMenuParentActivity impleme
                 @Override
                 public void onErrorResponse(VolleyError error) {
                     mContentDialog.dismiss();
+                    Toast.makeText(SyllabusMainScreen.this,"Digital content not found!!! ",
+                            Toast.LENGTH_LONG).show();
                 }
             })
             {
@@ -478,6 +506,72 @@ public class SyllabusMainScreen extends SideNavigationMenuParentActivity impleme
             e.printStackTrace();
         }
         mContentDialog.dismiss();
+    }
+
+    private void lessonPlanDigitalContentGetRequest(String SyllabusID, String SyllabusDetailID) {
+        if (StaticHelperClass.isNetworkAvailable(this)) {
+
+            String url = getString(R.string.baseUrl)+"/api/onEms/getUrlTopicDetailByID/"+SyllabusID+"/"+SyllabusDetailID;
+
+            mLessonContentDialog = new ProgressDialog(this);
+            mLessonContentDialog.setTitle("Loading digital content...");
+            mLessonContentDialog.setMessage("Please Wait...");
+            mLessonContentDialog.setCancelable(false);
+            mLessonContentDialog.setIcon(R.drawable.onair);
+
+            //Preparing digital content
+            StringRequest request = new StringRequest(Request.Method.GET, url,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+                            if(!response.equalsIgnoreCase("[]")){
+                                parseLessonDigitalContent(response);
+                            }
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    mLessonContentDialog.dismiss();
+                    Toast.makeText(SyllabusMainScreen.this,"Lesson plan digital content not found!!! ",
+                            Toast.LENGTH_LONG).show();
+                }
+            })
+            {
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    Map<String, String>  params = new HashMap<>();
+                    params.put("Authorization", "Request_From_onEMS_Android_app");
+                    return params;
+                }
+            };
+            MySingleton.getInstance(this).addToRequestQueue(request);
+        } else {
+            Toast.makeText(SyllabusMainScreen.this,"Please check your internet connection and select again!!! ",
+                    Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private void parseLessonDigitalContent(String digitalContents){
+        try {
+            if(!digitalContents.equalsIgnoreCase("[]")) {
+                lessonError.setVisibility(View.GONE);
+                JSONArray jsonArray = new JSONArray(digitalContents);
+                lessonDigitalContentUrls.clear();
+                for (int i = 0; i<jsonArray.length(); i++) {
+                    lessonDigitalContentUrls.add(jsonArray.getJSONObject(i));
+                }
+                mLessonAdapter.notifyDataSetChanged();
+            } else {
+                lessonError.setVisibility(View.VISIBLE);
+                lessonDigitalContentUrls.clear();
+                mLessonAdapter.notifyDataSetChanged();
+                Toast.makeText(SyllabusMainScreen.this,"Lesson plan digital content not found!!! ",
+                        Toast.LENGTH_LONG).show();
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        mLessonContentDialog.dismiss();
     }
 
     @Override

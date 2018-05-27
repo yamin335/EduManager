@@ -32,7 +32,7 @@ import onair.onems.network.MySingleton;
 
 public class Tuesday extends Fragment {
 
-    private long InstituteID, ShiftID, MediumID, ClassID, DepartmentID, SectionID, UserTypeID;
+    private long InstituteID, ShiftID, MediumID, ClassID, SDepartmentID, SectionID, UserTypeID;
     private RoutineAdapter mAdapter;
     private RecyclerView recyclerView;
     private String UserID;
@@ -57,12 +57,12 @@ public class Tuesday extends Fragment {
         ShiftID = prefs.getLong("ShiftID",0);
         MediumID = prefs.getLong("MediumID",0);
         ClassID = prefs.getLong("ClassID",0);
-        DepartmentID = prefs.getLong("DepartmentID",0);
+        SDepartmentID = prefs.getLong("SDepartmentID",0);
         SectionID = prefs.getLong("SectionID",0);
         UserTypeID = prefs.getInt("UserTypeID",0);
         UserID = prefs.getString("UserID","0");
 
-        if(UserTypeID==1||UserTypeID==2) {
+        if(UserTypeID==1||UserTypeID==2||UserTypeID==4) {
             String routineData = getArguments().getString("tuesdayJsonArray");
             mAdapter = new RoutineAdapter(getActivity(), routineData, UserTypeID);
             RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity());
@@ -70,7 +70,7 @@ public class Tuesday extends Fragment {
             recyclerView.setItemAnimator(new DefaultItemAnimator());
             recyclerView.setHasFixedSize(true);
             recyclerView.setAdapter(mAdapter);
-        } else if(UserTypeID==3||UserTypeID==4||UserTypeID==5) {
+        } else if(UserTypeID==3||UserTypeID==5) {
             tuesdayRoutineDataGetRequest();
         }
 
@@ -83,10 +83,7 @@ public class Tuesday extends Fragment {
             String tuesdayRoutineDataGetUrl = "";
             if(UserTypeID == 3) {
                 tuesdayRoutineDataGetUrl = getString(R.string.baseUrl)+"/api/onEms/spGetDashClassRoutine/"+ShiftID
-                        +"/"+MediumID+"/"+ClassID+"/"+SectionID+"/"+DepartmentID+"/4/"+InstituteID;
-            } else if(UserTypeID == 4) {
-                tuesdayRoutineDataGetUrl = getString(R.string.baseUrl)+"/api/onEms/spGetDashTeacherClassRoutine/"+UserID
-                        +"/4/"+InstituteID;
+                        +"/"+MediumID+"/"+ClassID+"/"+SectionID+"/"+SDepartmentID+"/4/"+InstituteID;
             } else if(UserTypeID == 5) {
                 try {
                     JSONObject selectedStudent = new JSONObject(getActivity().getSharedPreferences("CURRENT_STUDENT", Context.MODE_PRIVATE)

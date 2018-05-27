@@ -1,10 +1,14 @@
 package onair.onems.exam;
 
+import android.content.Context;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.LinearLayout;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -13,13 +17,18 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 import onair.onems.R;
+import onair.onems.mainactivities.CommonToolbarParentActivity;
 
-public class ExamDetails extends AppCompatActivity {
+public class ExamDetails extends CommonToolbarParentActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.exam_routine_exam_details_screen);
+
+        LayoutInflater inflater = (LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        final View childActivityLayout = inflater.inflate(R.layout.exam_routine_exam_details_screen, null);
+        LinearLayout parentActivityLayout = findViewById(R.id.contentMain);
+        parentActivityLayout.addView(childActivityLayout, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
 
         try {
             JSONArray examList = new JSONArray(getIntent().getStringExtra("examList"));

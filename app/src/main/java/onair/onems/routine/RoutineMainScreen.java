@@ -64,7 +64,7 @@ public class RoutineMainScreen extends SideNavigationMenuParentActivity {
         thursdayJsonArray = new JSONArray();
         fridayJsonArray = new JSONArray();
 
-        if(UserTypeID == 1||UserTypeID == 2){
+        if(UserTypeID == 1||UserTypeID == 2||UserTypeID == 4){
             if(StaticHelperClass.isNetworkAvailable(this)) {
                 dialog = new ProgressDialog(this);
                 dialog.setTitle("Loading Routine...");
@@ -73,8 +73,15 @@ public class RoutineMainScreen extends SideNavigationMenuParentActivity {
                 dialog.setIcon(R.drawable.onair);
                 dialog.show();
 
-                String routineUrl = getString(R.string.baseUrl)+"/api/onEms/spGetCommonClassRoutine/"
-                        +InstituteID;
+                String routineUrl = "";
+
+                if(UserTypeID == 1||UserTypeID == 2) {
+                    routineUrl = getString(R.string.baseUrl)+"/api/onEms/spGetCommonClassRoutine/"
+                            +InstituteID;
+                } else if(UserTypeID == 4) {
+                    routineUrl = getString(R.string.baseUrl)+"/api/onEms/spGetTeacherStudentMyClassRoutine/"
+                            +InstituteID+"/"+LoggedUserClassID+"/"+LoggedUserID;
+                }
 
                 StringRequest request = new StringRequest(Request.Method.GET, routineUrl,
                         new Response.Listener<String>() {
@@ -105,7 +112,7 @@ public class RoutineMainScreen extends SideNavigationMenuParentActivity {
         viewPager = (ViewPager) findViewById(R.id.pager);
         tabLayout = (TabLayout) findViewById(R.id.tabLayout);
 
-        if(UserTypeID!=1 && UserTypeID!=2){
+        if(UserTypeID!=1 && UserTypeID!=2&& UserTypeID!=4){
             setupViewPager(viewPager);
             tabLayout.setupWithViewPager(viewPager);
         }
@@ -172,7 +179,7 @@ public class RoutineMainScreen extends SideNavigationMenuParentActivity {
 
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
 
-        if(UserTypeID==1||UserTypeID==2) {
+        if(UserTypeID==1||UserTypeID==2||UserTypeID==4) {
             Bundle saturdayBundle = new Bundle();
             saturdayBundle.putString("saturdayJsonArray", saturdayJsonArray.toString());
             Saturday saturday = new Saturday();
@@ -214,7 +221,7 @@ public class RoutineMainScreen extends SideNavigationMenuParentActivity {
             Friday friday = new Friday();
             friday.setArguments(fridayBundle);
             adapter.addFragment(friday, "Fri");
-        } else if(UserTypeID==3||UserTypeID==4||UserTypeID==5) {
+        } else if(UserTypeID==3||UserTypeID==5) {
             adapter.addFragment(new Saturday(), "Sat");
             adapter.addFragment(new Sunday(), "Sun");
             adapter.addFragment(new Monday(), "Mon");

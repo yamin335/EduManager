@@ -123,7 +123,9 @@ public class RoutineClassAdapter extends RecyclerView.Adapter<RoutineClassAdapte
             try {
                 holder.subjectName.setText(object.getString("SubjectName").replace(",", ",\n"));
                 holder.classTime.setText(object.getString("StartTime")+" - "+object.getString("EndTime"));
-                holder.teacherName.setText("Teacher: "+object.getString("TeacherName").replace("_", ",\n"));
+                if(!object.getString("TeacherName").equalsIgnoreCase("")) {
+                    holder.teacherName.setText("Teacher: "+object.getString("TeacherName").replace("_", ",\n"));
+                }
 //                if(!object.getBoolean("IsBreak")) {
 //
 //                } else {
@@ -133,10 +135,30 @@ public class RoutineClassAdapter extends RecyclerView.Adapter<RoutineClassAdapte
                 e.printStackTrace();
             }
         } else if(UserTypeID == 4) {
+//            holder.teacherName.setVisibility(View.GONE);
+//            try {
+//                holder.className.setText("Class: "+object.getString("ClassName").replace(",", ",\n"));
+//                holder.subjectName.setText(object.getString("SubjectName"));
+//                holder.classTime.setText(object.getString("StartTime")+" - "+object.getString("EndTime"));
+//            } catch (JSONException e) {
+//                e.printStackTrace();
+//            }
             holder.teacherName.setVisibility(View.GONE);
             try {
-                holder.className.setText("Class: "+object.getString("ClassName").replace(",", ",\n"));
-                holder.subjectName.setText(object.getString("SubjectName"));
+                if(!object.getBoolean("IsBreak")){
+                    String value = object.getString("CSTName").split(":")[1];
+                    String[] s = value.split("_");
+                    holder.className.setText("Class: "+s[0]);
+                    String sbjctName = "";
+                    for (int i = 0; i<s.length; i++) {
+                        if(i!=0) {
+                            sbjctName = sbjctName.concat(s[i]).concat("\n");
+                        }
+                    }
+                    holder.subjectName.setText(sbjctName);
+                } else {
+                    holder.className.setText("Break");
+                }
                 holder.classTime.setText(object.getString("StartTime")+" - "+object.getString("EndTime"));
             } catch (JSONException e) {
                 e.printStackTrace();

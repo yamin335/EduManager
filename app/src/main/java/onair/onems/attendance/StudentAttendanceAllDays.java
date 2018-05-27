@@ -1,6 +1,7 @@
 package onair.onems.attendance;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
@@ -8,8 +9,11 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.android.volley.AuthFailureError;
@@ -35,10 +39,11 @@ import de.codecrafters.tableview.toolkit.TableDataRowBackgroundProviders;
 import onair.onems.R;
 import onair.onems.Services.GlideApp;
 import onair.onems.Services.StaticHelperClass;
+import onair.onems.mainactivities.CommonToolbarParentActivity;
 import onair.onems.models.DailyAttendanceModel;
 import onair.onems.network.MySingleton;
 
-public class StudentAttendanceAllDays extends AppCompatActivity
+public class StudentAttendanceAllDays extends CommonToolbarParentActivity
 {
     private ArrayList<DailyAttendanceModel> dailyAttendanceList;
     private DailyAttendanceModel selectedDay;
@@ -49,20 +54,24 @@ public class StudentAttendanceAllDays extends AppCompatActivity
     private String RFID="", monthAttendanceUrl="", UserFullName="", RollNo="", UserID = "";
     private long InstituteID=0, SectionID=0, ClassID=0, MediumID=0, ShiftID=0, DepartmentID = 0;
     private int MonthID=0;
-    TextView totalClass, totalPresent, totalAbsent;
+    private TextView totalClass, totalPresent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.attendance_report_all_days);
+
+        LayoutInflater inflater = (LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        final View childActivityLayout = inflater.inflate(R.layout.attendance_report_all_days, null);
+        LinearLayout parentActivityLayout = findViewById(R.id.contentMain);
+        parentActivityLayout.addView(childActivityLayout, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
+
         tableView = (TableView) findViewById(R.id.tableView);
+        totalClass = findViewById(R.id.totalClass);
+        totalPresent = findViewById(R.id.totalPresent);
+        ImageView studentImage = findViewById(R.id.studentImage);
         TextView name=(TextView) findViewById(R.id.name);
         TextView roll=(TextView) findViewById(R.id.roll);
         TextView id=(TextView) findViewById(R.id.Id);
-        totalClass = findViewById(R.id.totalClass);
-        totalPresent = findViewById(R.id.totalPresent);
-        totalAbsent = findViewById(R.id.totalAbsent);
-        ImageView studentImage = findViewById(R.id.studentImage);
 
         dialog = new ProgressDialog(this);
         dialog.setTitle("Loading...");
@@ -189,7 +198,6 @@ public class StudentAttendanceAllDays extends AppCompatActivity
                 if(i == 0) {
                     totalClass.setText("Total class: "+dailyAttendanceJsonObject.getString("TotalClassDay"));
                     totalPresent.setText("Total present: "+dailyAttendanceJsonObject.getString("TotalPresent"));
-                    totalAbsent.setText("Total absent: "+dailyAttendanceJsonObject.getString("TotalAbsent"));
                 }
                 DailyAttendanceModel perDayAttendance = new DailyAttendanceModel();
                 perDayAttendance.setDate(dailyAttendanceJsonObject.getString("Date"));

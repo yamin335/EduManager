@@ -93,10 +93,13 @@ public class NoticeMainScreen extends SideNavigationMenuParentActivity implement
 
     @Override
     public void onNoticeSelected(JSONObject notice) {
-        CustomNoticeDialog customNoticeDialog = new CustomNoticeDialog(this, notice);
-        customNoticeDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        customNoticeDialog.setCancelable(false);
-        customNoticeDialog.show();
+//        CustomNoticeDialog customNoticeDialog = new CustomNoticeDialog(this, notice);
+//        customNoticeDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+//        customNoticeDialog.setCancelable(false);
+//        customNoticeDialog.show();
+        Intent intent = new Intent(NoticeMainScreen.this, NoticeDetails.class);
+        intent.putExtra("notice", notice.toString());
+        startActivity(intent);
     }
 
     private void NoticeDataGetRequest() {
