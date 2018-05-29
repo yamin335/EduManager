@@ -78,7 +78,9 @@ public class StudentSubjectWiseAttendance extends CommonToolbarParentActivity {
         String Date = intent.getStringExtra("Date");
 
         // get Internal Data using SharedPreferences end
-        subjectWiseAttendanceUrl = getString(R.string.baseUrl) + "/api/onEms/getHrmSubWiseAtdByStudentID/" + ShiftID + "/" + MediumID + "/" + ClassID + "/" + SectionID +"/"+DepartmentID+ "/" + UserID + "/" + Date+"/"+InstituteID;
+        subjectWiseAttendanceUrl = getString(R.string.baseUrl)+"/api/onEms/getHrmSubWiseAtdByStudentID/"
+                +ShiftID + "/" + MediumID + "/" + ClassID + "/" + SectionID
+                +"/"+DepartmentID+ "/" + UserID + "/" + Date+"/"+InstituteID;
 
         int colorEvenRows = getResources().getColor(R.color.table_data_row_even);
         int colorOddRows = getResources().getColor(R.color.table_data_row_odd);

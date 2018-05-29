@@ -88,14 +88,18 @@ public class SelfAttendanceReport extends Fragment {
         tableView.setColumnCount(4);
 
         SharedPreferences sharedPre = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        UserTypeID = sharedPre.getInt("UserTypeID",0);
         ShiftID=sharedPre.getLong("ShiftID",0);
         MediumID=sharedPre.getLong("MediumID",0);
         ClassID=sharedPre.getLong("ClassID",0);
         SectionID=sharedPre.getLong("SectionID",0);
-        DepartmentID=sharedPre.getLong("DepartmentID",0);
+        if(UserTypeID == 3) {
+            DepartmentID=sharedPre.getLong("SDepartmentID",0);
+        } else {
+            DepartmentID=sharedPre.getLong("DepartmentID",0);
+        }
         InstituteID=sharedPre.getLong("InstituteID",0);
         UserID = sharedPre.getString("UserID","");
-        UserTypeID = sharedPre.getInt("UserTypeID",0);
         UserFullName = sharedPre.getString("UserFullName","");
         RollNo = sharedPre.getString("RollNo","");
         RFID = sharedPre.getString("RFID","");

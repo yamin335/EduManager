@@ -33,7 +33,7 @@ import onair.onems.network.MySingleton;
 
 public class Friday extends Fragment {
 
-    private long InstituteID, ShiftID, MediumID, ClassID, SDepartmentID, SectionID, UserTypeID;
+    private long InstituteID, ShiftID, MediumID, ClassID, DepartmentID, SectionID, UserTypeID;
     private RoutineAdapter mAdapter;
     private RecyclerView recyclerView;
     private String UserID;
@@ -58,9 +58,13 @@ public class Friday extends Fragment {
         ShiftID = prefs.getLong("ShiftID",0);
         MediumID = prefs.getLong("MediumID",0);
         ClassID = prefs.getLong("ClassID",0);
-        SDepartmentID = prefs.getLong("SDepartmentID",0);
         SectionID = prefs.getLong("SectionID",0);
         UserTypeID = prefs.getInt("UserTypeID",0);
+        if(UserTypeID == 3) {
+            DepartmentID = prefs.getLong("SDepartmentID",0);
+        } else {
+            DepartmentID = prefs.getLong("DepartmentID",0);
+        }
         UserID = prefs.getString("UserID","0");
 
         if(UserTypeID==1||UserTypeID==2||UserTypeID==4) {
@@ -84,7 +88,7 @@ public class Friday extends Fragment {
             String fridayRoutineDataGetUrl = "";
             if(UserTypeID == 3) {
                 fridayRoutineDataGetUrl = getString(R.string.baseUrl)+"/api/onEms/spGetDashClassRoutine/"+ShiftID
-                        +"/"+MediumID+"/"+ClassID+"/"+SectionID+"/"+SDepartmentID+"/7/"+InstituteID;
+                        +"/"+MediumID+"/"+ClassID+"/"+SectionID+"/"+DepartmentID+"/7/"+InstituteID;
             } else if(UserTypeID == 5) {
                 try {
                     JSONObject selectedStudent = new JSONObject(getActivity().getSharedPreferences("CURRENT_STUDENT", Context.MODE_PRIVATE)

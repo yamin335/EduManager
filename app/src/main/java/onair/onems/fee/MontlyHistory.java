@@ -27,7 +27,7 @@ public class MontlyHistory extends AppCompatActivity
     ProgressDialog dialog;
     int MonthID[];
     String[][] Fees_collection;
-    int monthselectindex,TotalFineAmount=0;
+    int monthselectindex,TotalFineAmount=0, UserTypeID;
     Button paymentButton;
     double total_fees=0, due_amount=10,total_amount=0,scholarship=0;
     long sectionID,classID,shiftID,mediumID,instituteID,depertmentID;
@@ -42,6 +42,7 @@ public class MontlyHistory extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.monlty_history);
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        UserTypeID = prefs.getInt("UserTypeID",0);
         RFID= prefs.getString("RFID","");
         shiftID= prefs.getLong("ShiftID",0);
         mediumID= prefs.getLong("MediumID",0);
@@ -49,7 +50,11 @@ public class MontlyHistory extends AppCompatActivity
         sectionID= prefs.getLong("SectionID",0);
         instituteID=prefs.getLong("InstituteID",0);
         monthselectindex= prefs.getInt("monthselectindex",0);
-        depertmentID=prefs.getLong("SDepartmentID",0);
+        if(UserTypeID == 3) {
+            depertmentID=prefs.getLong("SDepartmentID",0);
+        } else {
+            depertmentID = prefs.getLong("DepartmentID",0);
+        }
         listView = (ListView) findViewById(R.id.list_cards);
         fees_text=(TextView) findViewById(R.id.amount_fee);
         payment_text=(TextView) findViewById(R.id.payment_amount);

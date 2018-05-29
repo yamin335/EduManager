@@ -32,7 +32,7 @@ import onair.onems.network.MySingleton;
 
 public class Wednesday extends Fragment {
 
-    private long InstituteID, ShiftID, MediumID, ClassID, SDepartmentID, SectionID, UserTypeID;
+    private long InstituteID, ShiftID, MediumID, ClassID, DepartmentID, SectionID, UserTypeID;
     private RoutineAdapter mAdapter;
     private RecyclerView recyclerView;
     private String UserID;
@@ -57,7 +57,6 @@ public class Wednesday extends Fragment {
         ShiftID = prefs.getLong("ShiftID",0);
         MediumID = prefs.getLong("MediumID",0);
         ClassID = prefs.getLong("ClassID",0);
-        SDepartmentID = prefs.getLong("SDepartmentID",0);
         SectionID = prefs.getLong("SectionID",0);
         UserTypeID = prefs.getInt("UserTypeID",0);
         UserID = prefs.getString("UserID","0");
@@ -83,7 +82,7 @@ public class Wednesday extends Fragment {
             String wednesdayRoutineDataGetUrl = "";
             if(UserTypeID == 3) {
                 wednesdayRoutineDataGetUrl = getString(R.string.baseUrl)+"/api/onEms/spGetDashClassRoutine/"+ShiftID
-                        +"/"+MediumID+"/"+ClassID+"/"+SectionID+"/"+SDepartmentID+"/5/"+InstituteID;
+                        +"/"+MediumID+"/"+ClassID+"/"+SectionID+"/"+DepartmentID+"/5/"+InstituteID;
             } else if(UserTypeID == 5) {
                 try {
                     JSONObject selectedStudent = new JSONObject(getActivity().getSharedPreferences("CURRENT_STUDENT", Context.MODE_PRIVATE)

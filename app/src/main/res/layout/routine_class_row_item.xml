@@ -5,36 +5,39 @@
     android:layout_height="wrap_content"
     android:orientation="vertical">
     <TextView
-        android:id="@+id/className"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:gravity="center"
-        android:padding="2dp"
-        android:textAllCaps="false"
-        android:textColor="#3D4852"
-        android:textSize="15sp"
-        android:textStyle="bold"/>
-    <TextView
-        android:id="@+id/teacherName"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:gravity="center"
-        android:padding="2dp"
-        android:textColor="#3D4852"
-        android:textSize="15sp"/>
-    <TextView
         android:id="@+id/classTime"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="2dp"
         android:textColor="#606F7B"
-        android:textSize="12sp"
+        android:textSize="13sp"
         android:drawableLeft="@drawable/time"
         android:drawableStart="@drawable/time"
         android:gravity="center"
-        android:layout_gravity="center_horizontal"/>
+        android:layout_gravity="center"
+        android:layout_marginTop="3dp"/>
+    <TextView
+        android:id="@+id/className"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:gravity="center"
+        android:padding="2dp"
+        android:textAllCaps="false"
+        android:textColor="#3D4852"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        android:layout_gravity="center"/>
+    <TextView
+        android:id="@+id/teacherName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:gravity="center"
+        android:padding="2dp"
+        android:textColor="#3D4852"
+        android:textSize="15sp"
+        android:layout_gravity="center"/>
 
     <TextView
         android:id="@+id/subjectName"
@@ -45,6 +48,7 @@
         android:padding="2dp"
         android:textColor="#3D4852"
         android:textSize="15sp"
-        android:textStyle="bold"/>
+        android:textStyle="bold"
+        android:layout_gravity="center"/>
 
 </LinearLayout>

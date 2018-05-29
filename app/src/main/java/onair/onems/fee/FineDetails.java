@@ -44,7 +44,7 @@ public class FineDetails extends AppCompatActivity
     long sectionID,classID,shiftID,mediumID,instituteID,depertmentID;
     String RFID;
     SharedPreferences prefs;
-    int monthselectindex;
+    int monthselectindex, UserTypeID;
     ProgressDialog dialog;
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -62,6 +62,7 @@ public class FineDetails extends AppCompatActivity
         // colour of the Even and Odd row of the table End
 
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        UserTypeID = prefs.getInt("UserTypeID",0);
         RFID= prefs.getString("RFID","");
         shiftID= prefs.getLong("ShiftID",0);
         mediumID= prefs.getLong("MediumID",0);
@@ -69,7 +70,11 @@ public class FineDetails extends AppCompatActivity
         sectionID= prefs.getLong("SectionID",0);
         instituteID=prefs.getLong("InstituteID",0);
         monthselectindex= prefs.getInt("monthselectindex",0);
-        depertmentID=prefs.getLong("SDepartmentID",0);
+        if(UserTypeID == 3) {
+            depertmentID=prefs.getLong("SDepartmentID",0);
+        } else {
+            depertmentID = prefs.getLong("DepartmentID",0);
+        }
 
         dialog = new ProgressDialog(this);
         dialog.setMessage("Loading....");

@@ -53,7 +53,7 @@ public class FeesHistory extends AppCompatActivity
     ProgressDialog dialog;
     double total_fees[],balance[],payment[],fees[],fine[],discount[],scholarship[],total_fees_amount,previous_balance[],total_payment,total_balance;
     String year;
-    int monthID[];
+    int monthID[], UserTypeID;
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -61,6 +61,7 @@ public class FeesHistory extends AppCompatActivity
         setContentView(R.layout.fees_history);
         tableView = (TableView) findViewById(R.id.tableView);
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        UserTypeID = prefs.getInt("UserTypeID",0);
         RFID= prefs.getString("RFID","");
         shiftID= prefs.getLong("ShiftID",0);
         mediumID= prefs.getLong("MediumID",0);
@@ -68,7 +69,11 @@ public class FeesHistory extends AppCompatActivity
         sectionID= prefs.getLong("SectionID",0);
         instituteID=prefs.getLong("InstituteID",0);
         monthselectindex= prefs.getInt("monthselectindex",0);
-        depertmentID=prefs.getLong("SDepartmentID",0);
+        if(UserTypeID == 3) {
+            depertmentID=prefs.getLong("SDepartmentID",0);
+        } else {
+            depertmentID = prefs.getLong("DepartmentID",0);
+        }
         year=prefs.getString("yearselectindex","");
         UserID=prefs.getString("UserID","");
         dialog = new ProgressDialog(this);

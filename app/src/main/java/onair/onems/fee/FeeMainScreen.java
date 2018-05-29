@@ -46,7 +46,6 @@ public class FeeMainScreen extends SideNavigationMenuParentActivity {
     int monthselectindex,TotalFineAmount=0;
     Button paymentButton;
     double total_fees=0, due_amount=10,total_amount=0,scholarship=0;
-    long sectionID,classID,shiftID,mediumID,instituteID,depertmentID;
     String RFID,UserID;
     SharedPreferences  prefs;
     ListView listView;
@@ -82,14 +81,8 @@ public class FeeMainScreen extends SideNavigationMenuParentActivity {
         listView = (ListView) findViewById(R.id.list_cards);
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
         RFID= prefs.getString("RFID","");
-        shiftID= prefs.getLong("ShiftID",0);
-        mediumID= prefs.getLong("MediumID",0);
-        classID= prefs.getLong("ClassID",0);
-        sectionID= prefs.getLong("SectionID",0);
-        instituteID=prefs.getLong("InstituteID",0);
         UserID=prefs.getString("UserID","");
         monthselectindex= prefs.getInt("monthselectindex",0);
-        depertmentID=prefs.getLong("SDepartmentID",0);
         paymentButton=(Button)findViewById(R.id.btn_payment);
         paymentButton.setOnClickListener(new View.OnClickListener()
         {
@@ -160,7 +153,8 @@ public class FeeMainScreen extends SideNavigationMenuParentActivity {
         al.add("Paypal");
         ArrayAdapter adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, al);
         type_spinner.setAdapter(adapter);
-        monthFeesDetailsUrl = getString(R.string.baseUrl)+"/api/onEms/getMonthWiseFees/"+instituteID+"/"+shiftID+"/"+depertmentID+"/"+mediumID+"/"+classID+"/"+monthselectindex;
+        monthFeesDetailsUrl = getString(R.string.baseUrl)+"/api/onEms/getMonthWiseFees/"+InstituteID+"/"
+                +LoggedUserShiftID+"/"+LoggedUserDepartmentID+"/"+LoggedUserMediumID+"/"+LoggedUserClassID+"/"+monthselectindex;
         RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
 
         StringRequest stringRequestFee = new StringRequest(Request.Method.GET,  monthFeesDetailsUrl,
@@ -199,7 +193,9 @@ public class FeeMainScreen extends SideNavigationMenuParentActivity {
                 SharedPreferences.Editor editor = prefs.edit();
                 editor.putInt("monthselectindex",monthid);
                 editor.commit();
-                monthFeesDetailsUrl = getString(R.string.baseUrl)+"/api/onEms/getMonthWiseFees/"+instituteID+"/"+shiftID+"/"+depertmentID+"/"+mediumID+"/"+classID+"/"+monthselectindex;
+                monthFeesDetailsUrl = getString(R.string.baseUrl)+"/api/onEms/getMonthWiseFees/"+
+                        InstituteID+"/"+LoggedUserShiftID+"/"+LoggedUserDepartmentID+"/"+LoggedUserMediumID+
+                        "/"+LoggedUserClassID+"/"+monthselectindex;
                 RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
 
                 StringRequest stringRequest = new StringRequest(Request.Method.GET, monthFeesDetailsUrl,
@@ -290,7 +286,7 @@ public class FeeMainScreen extends SideNavigationMenuParentActivity {
         cardModels.add(new CardModel("Total Fees: ", Double.toString( total_fees)+" TK"));
 
 
-        monthScholarshipUrl = getString(R.string.baseUrl)+"/api/onEms/getScholarship/"+instituteID+"/"+UserID+"/"+monthselectindex;
+        monthScholarshipUrl = getString(R.string.baseUrl)+"/api/onEms/getScholarship/"+InstituteID+"/"+UserID+"/"+monthselectindex;
 
         RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
 
@@ -362,7 +358,7 @@ public class FeeMainScreen extends SideNavigationMenuParentActivity {
         }
         cardModels.add(new CardModel("Scholarship:", scholarship+" TK"));
 
-        monthFineDetailsUrl = getString(R.string.baseUrl)+"/api/onEms/getLateAndAbsent/"+instituteID;
+        monthFineDetailsUrl = getString(R.string.baseUrl)+"/api/onEms/getLateAndAbsent/"+InstituteID;
         RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
 
         StringRequest stringRequestfine = new StringRequest(Request.Method.GET,  monthFineDetailsUrl,
@@ -409,7 +405,9 @@ public class FeeMainScreen extends SideNavigationMenuParentActivity {
             }
             cardModels.add(new CardModel("Total Fine:", Double.toString( TotalFineAmount )+" TK"));
 
-            monthDueDetailsUrl = getString(R.string.baseUrl)+"/api/onEms/getPreviousDue/"+instituteID+"/"+shiftID+"/"+depertmentID+"/"+mediumID+"/"+classID+"/"+UserID+"/"+monthselectindex;
+            monthDueDetailsUrl = getString(R.string.baseUrl)+"/api/onEms/getPreviousDue/"+
+                    InstituteID+"/"+LoggedUserShiftID+"/"+LoggedUserDepartmentID+"/"+LoggedUserMediumID
+                    +"/"+LoggedUserClassID+"/"+UserID+"/"+monthselectindex;
             RequestQueue queue1 = Volley.newRequestQueue(getApplicationContext());
 
             StringRequest stringRequestfine = new StringRequest(Request.Method.GET,   monthDueDetailsUrl,

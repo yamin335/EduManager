@@ -4,14 +4,14 @@ public class ExamModel {
     private long ExamID = 0;
     private String ExamName = "";
     private long InsExamID = 0;
-    private String CustomName = "";
+    private int Sequence = 0;
     private int IsActive = 0;
 
     public ExamModel() {
 
     }
 
-    public ExamModel(String ExamID, String ExamName, String InsExamID, String CustomName, String IsActive) {
+    public ExamModel(String ExamID, String ExamName, String InsExamID, String Sequence, String IsActive) {
         if(ExamID.equals("null")) {
             this.ExamID = 0;
         } else {
@@ -26,7 +26,11 @@ public class ExamModel {
             this.InsExamID = Long.parseLong(InsExamID);
         }
 
-        this.CustomName = CustomName;
+        if(Sequence.equals("null")) {
+            this.Sequence = 0;
+        } else {
+            this.Sequence = Integer.parseInt(Sequence);
+        }
 
         if(IsActive.equals("null")) {
             this.IsActive = 0;
@@ -67,12 +71,16 @@ public class ExamModel {
         return InsExamID;
     }
 
-    public void setCustomName(String CustomName) {
-        this.CustomName = CustomName;
+    public void setSequence(String Sequence) {
+        if(Sequence.equals("null")) {
+            this.Sequence = 0;
+        } else {
+            this.Sequence = Integer.parseInt(Sequence);
+        }
     }
 
-    public String getCustomName() {
-        return CustomName;
+    public int getSequence() {
+        return Sequence;
     }
 
     public void setIsActive(String IsActive) {

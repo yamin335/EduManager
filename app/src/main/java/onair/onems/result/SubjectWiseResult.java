@@ -47,6 +47,7 @@ public class SubjectWiseResult extends CommonToolbarParentActivity implements Su
     private SubjectWiseResultAdapter mAdapter;
     private ProgressDialog mResultDialog;
     private String UserID, ShiftID, MediumID, ClassID, DepartmentID, SectionID, SessionID, ExamID, InstituteID;
+    private boolean isFail = false;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -139,20 +140,24 @@ public class SubjectWiseResult extends CommonToolbarParentActivity implements Su
             int totalSubject = 0;
 
             for(int i = 0; i<resultJsonArray.length(); i++) {
-                if(resultJsonArray.getJSONObject(i).getString("IsOptional").equalsIgnoreCase("true")
+                if(resultJsonArray.getJSONObject(i).getString("IsOptional").equalsIgnoreCase("1")
                         && (resultJsonArray.getJSONObject(i).getDouble("GradePoint")>2.0)) {
 
                     subjectWiseResultList.add(resultJsonArray.getJSONObject(i));
                     totalGradePoint += resultJsonArray.getJSONObject(i).getDouble("GradePoint")-2.0;
                     totalMarks+= resultJsonArray.getJSONObject(i).getInt("Total");
-
-                } else if(resultJsonArray.getJSONObject(i).getString("IsOptional").equalsIgnoreCase("false")){
+                    if(resultJsonArray.getJSONObject(i).getString("Grade").equalsIgnoreCase("F")) {
+                        isFail = true;
+                    }
+                } else if(resultJsonArray.getJSONObject(i).getString("IsOptional").equalsIgnoreCase("0")){
 
                     totalSubject++;
                     subjectWiseResultList.add(resultJsonArray.getJSONObject(i));
                     totalGradePoint += resultJsonArray.getJSONObject(i).getDouble("GradePoint");
                     totalMarks+= resultJsonArray.getJSONObject(i).getInt("Total");
-
+                    if(resultJsonArray.getJSONObject(i).getString("Grade").equalsIgnoreCase("F")) {
+                        isFail = true;
+                    }
                 }
             }
 

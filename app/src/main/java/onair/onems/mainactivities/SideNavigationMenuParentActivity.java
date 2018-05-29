@@ -75,7 +75,11 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity {
         LoggedUserShiftID = prefs.getLong("ShiftID",0);
         LoggedUserMediumID = prefs.getLong("MediumID",0);
         LoggedUserClassID = prefs.getLong("ClassID",0);
-        LoggedUserDepartmentID = prefs.getLong("DepartmentID",0);
+        if(UserTypeID == 3) {
+            LoggedUserDepartmentID = prefs.getLong("SDepartmentID",0);
+        } else {
+            LoggedUserDepartmentID = prefs.getLong("DepartmentID",0);
+        }
         LoggedUserSectionID = prefs.getLong("SectionID",0);
         LoggedUserSessionID = prefs.getLong("SessionID",0);
 
