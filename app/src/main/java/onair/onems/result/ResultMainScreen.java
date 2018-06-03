@@ -86,15 +86,10 @@ public class ResultMainScreen extends SideNavigationMenuParentActivity{
     private ExamModel selectedExam;
     private JSONObject selectedStudent;
 
-    private long InstituteID;
-
     private int firstClass = 0, firstShift = 0, firstSection = 0, firstMedium = 0,
             firstDepartment = 0, firstSession = 0, firstExam = 0;
 
-    private int UserTypeID;
-
     private JSONArray allStudentJsonArray;
-    private String UserID;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -102,15 +97,17 @@ public class ResultMainScreen extends SideNavigationMenuParentActivity{
 
         activityName = ResultMainScreen.class.getName();
 
+        if(UserTypeID == 3||UserTypeID==5) {
+            LayoutInflater inflater = (LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            final View childActivityLayout = inflater.inflate(R.layout.result_content_main, null);
+            LinearLayout parentActivityLayout = (LinearLayout) findViewById(R.id.contentMain);
+            parentActivityLayout.addView(childActivityLayout, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
+        }
+
         LayoutInflater inflater = (LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         final View childActivityLayout = inflater.inflate(R.layout.result_content_main, null);
         LinearLayout parentActivityLayout = (LinearLayout) findViewById(R.id.contentMain);
         parentActivityLayout.addView(childActivityLayout, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
-
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        InstituteID = prefs.getLong("InstituteID",0);
-        UserTypeID = prefs.getInt("UserTypeID",0);
-        UserID = prefs.getString("UserID","");
 
         allSessionArrayList = new ArrayList<>();
         allShiftArrayList = new ArrayList<>();
@@ -1037,7 +1034,7 @@ public class ResultMainScreen extends SideNavigationMenuParentActivity{
                     params.put("pageSize", "10000");
                     params.put("IsPaging", "0");
                     params.put("InstituteID", Long.toString(InstituteID));
-                    params.put("LoggedUserID", UserID);
+                    params.put("LoggedUserID", LoggedUserID);
                     params.put("UserID", "0");
                     params.put("ClassID", Long.toString(selectedClass.getClassID()));
                     params.put("SectionID", Long.toString(selectedSection.getSectionID()));

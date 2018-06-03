@@ -1,7 +1,6 @@
 package onair.onems.syllabus;
 
 import android.app.Activity;
-import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -55,7 +54,7 @@ public class SubjectAdapter extends RecyclerView.Adapter<SubjectAdapter.MyViewHo
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.syllabus_exam_row_item, parent, false);
+                .inflate(R.layout.selection_row_item, parent, false);
 
         return new MyViewHolder(itemView);
     }

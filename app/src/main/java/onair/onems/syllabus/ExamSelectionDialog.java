@@ -3,9 +3,6 @@ package onair.onems.syllabus;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
-import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -15,14 +12,9 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.TextView;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-
 import onair.onems.R;
-import onair.onems.exam.ExamDetails;
-import onair.onems.exam.ExamRoutineExamListAdapter;
 
 public class ExamSelectionDialog extends Dialog implements View.OnClickListener, ExamAdapter.ExamAdapterListener{
     private Context context;
@@ -39,7 +31,7 @@ public class ExamSelectionDialog extends Dialog implements View.OnClickListener,
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        setContentView(R.layout.syllabus_exam_selection);
+        setContentView(R.layout.selection_dialog);
         RecyclerView recyclerView = findViewById(R.id.recycler);
         TextView header = findViewById(R.id.header);
         header.setText("Select Exam");

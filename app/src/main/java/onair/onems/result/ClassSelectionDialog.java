@@ -1,4 +1,4 @@
-package onair.onems.syllabus;
+package onair.onems.result;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -16,16 +16,15 @@ import org.json.JSONObject;
 
 import onair.onems.R;
 
-public class SubjectSelectionDialog extends Dialog implements View.OnClickListener, SubjectAdapter.SubjectAdapterListener{
+public class ClassSelectionDialog extends Dialog implements View.OnClickListener, ClassAdapter.ClassAdapterListener{
     private Context context;
-    private String subjectData;
     private Activity currentActivity;
-
-    SubjectSelectionDialog(Activity currentActivity, String subjectData, Context context) {
+    private String classes;
+    ClassSelectionDialog(Activity currentActivity, String classes, Context context) {
         super(currentActivity);
         this.context = context;
-        this.subjectData = subjectData;
         this.currentActivity = currentActivity;
+        this.classes = classes;
     }
 
     @Override
@@ -35,11 +34,11 @@ public class SubjectSelectionDialog extends Dialog implements View.OnClickListen
         setContentView(R.layout.selection_dialog);
         RecyclerView recyclerView = findViewById(R.id.recycler);
         TextView header = findViewById(R.id.header);
-        header.setText("Select Subject");
+        header.setText("Select Class");
         Button cross = (Button) findViewById(R.id.cross);
         cross.setOnClickListener(this);
 
-        SubjectAdapter mAdapter = new SubjectAdapter(currentActivity, subjectData, this);
+        ClassAdapter mAdapter = new ClassAdapter(currentActivity, classes, this);
 
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(context);
         recyclerView.setLayoutManager(mLayoutManager);
@@ -59,7 +58,7 @@ public class SubjectSelectionDialog extends Dialog implements View.OnClickListen
     }
 
     @Override
-    public void onSubjectSelected(JSONObject subject) {
+    public void onClassSelected(JSONObject exam) {
         dismiss();
     }
 }

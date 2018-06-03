@@ -131,8 +131,8 @@ public class SelfAttendanceReport extends Fragment {
                 .into(studentImage);
 
         name.setText(UserFullName);
-        roll.setText(RollNo);
-        id.setText(RFID);
+        roll.setText("Roll: "+RollNo);
+        id.setText("ID: "+RFID);
 
         selectedMonth = new MonthModel();
 

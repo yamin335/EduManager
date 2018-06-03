@@ -71,23 +71,23 @@
         <activity
             android:name=".attendance.StudentAttendanceShow"
             android:label="Attendance Report"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".attendance.TakeAttendanceDetails"
             android:label="Take Attendance"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar"/>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".attendance.StudentAttendanceAllDays"
             android:label="Daily Attendance"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".attendance.StudentSubjectWiseAttendance"
             android:label="Subject Wise Attendance"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".attendance.ShowAttendance"
             android:label="Attendance Report"
@@ -106,13 +106,13 @@
         <activity
             android:name=".icard.StudentiCardDetails"
             android:label="Details Information"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".icard.StudentiCardDetailsEdit"
             android:label="Edit Information"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".icard.StudentiCardNewEntry"
             android:label="Entry Student"
@@ -164,8 +164,8 @@
         <activity
             android:name=".studentlist.ReportAllStudentList"
             android:label="Student List"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar">
 
             <!-- The meta-data element is needed for versions lower than 4.1 -->
             <meta-data
@@ -197,8 +197,8 @@
         <activity
             android:name=".result.SubjectWiseResult"
             android:label="Subject wise Result"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".result.ResultGradeStructure"
             android:label="Grade Sheet"
@@ -234,17 +234,21 @@
             android:name=".exam.ExamRoutineMainScreen"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".exam.ExamDetails"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".exam.SubjectWiseExamRoutine"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:screenOrientation="portrait" />
-        <activity android:name=".notice.NoticeDetails"
+        <activity
+            android:name=".exam.ExamDetails"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:label="Notice Details"/>
-        <activity android:name=".mainactivities.CommonToolbarParentActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".exam.SubjectWiseExamRoutine"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".notice.NoticeDetails"
+            android:label="Notice Details"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".mainactivities.CommonToolbarParentActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar">
 

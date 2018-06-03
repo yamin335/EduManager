@@ -35,6 +35,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.animation.Animation;
@@ -77,7 +78,7 @@ import onair.onems.routine.RoutineMainScreen;
 import static onair.onems.Services.StaticHelperClass.dpToPx;
 import static onair.onems.Services.StaticHelperClass.isNetworkAvailable;
 
-public class SyllabusMainScreen extends SideNavigationMenuParentActivity implements ExamAdapter.ExamAdapterListener, SubjectAdapter.SubjectAdapterListener,
+public class SyllabusMainScreen extends SideNavigationMenuParentActivity implements View.OnTouchListener, ExamAdapter.ExamAdapterListener, SubjectAdapter.SubjectAdapterListener,
         FloatingMenuDialog.FloatingMenuListener, DigitalContentAdapter.AddFileToDownloader{
 
     private ProgressDialog mExamDialog, mSyllabusDialog, mSubjectDialog, mContentDialog, mLessonContentDialog;
@@ -90,6 +91,9 @@ public class SyllabusMainScreen extends SideNavigationMenuParentActivity impleme
     private DigitalContentAdapter mAdapter;
     private DigitalContentAdapter mLessonAdapter;
     private ArrayList<JSONObject> lessonDigitalContentUrls;
+    private float dX;
+    private float dY;
+    private int lastAction;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -131,30 +135,14 @@ public class SyllabusMainScreen extends SideNavigationMenuParentActivity impleme
         floatingMenu = findViewById(R.id.showDate);
         floatingMenu.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#FF5722")));
         floatingMenu.setRippleColor(Color.parseColor("#e50b00"));
+        floatingMenu.setOnTouchListener(this);
 
-        floatingMenu.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                floatingMenu.setImageResource(R.drawable.ic_clear);
-                shadow.setVisibility(View.VISIBLE);
-                FloatingMenuDialog floatingMenuDialog = new FloatingMenuDialog(SyllabusMainScreen.this,
-                        SyllabusMainScreen.this, SyllabusMainScreen.this);
-                floatingMenuDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-                floatingMenuDialog.setCancelable(true);
-                floatingMenuDialog.getWindow().getAttributes().gravity = Gravity.TOP | Gravity.END;
-                floatingMenuDialog.getWindow().getAttributes().x = dpToPx(5);
-                floatingMenuDialog.getWindow().getAttributes().y = dpToPx(113);
-                floatingMenuDialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
-                floatingMenuDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-                    @Override
-                    public void onDismiss(DialogInterface dialog) {
-                        shadow.setVisibility(View.GONE);
-                        floatingMenu.setImageResource(R.drawable.ic_keyboard_arrow_down);
-                    }
-                });
-                floatingMenuDialog.show();
-            }
-        });
+//        floatingMenu.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//
+//            }
+//        });
 
 
 
@@ -172,6 +160,50 @@ public class SyllabusMainScreen extends SideNavigationMenuParentActivity impleme
         }
         examDataGetRequest();
         registerReceiver(onComplete, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
+    }
+
+    @Override
+    public boolean onTouch(View view, MotionEvent event) {
+        switch (event.getActionMasked()) {
+            case MotionEvent.ACTION_DOWN:
+                dX = view.getX() - event.getRawX();
+                dY = view.getY() - event.getRawY();
+                lastAction = MotionEvent.ACTION_DOWN;
+                break;
+
+            case MotionEvent.ACTION_MOVE:
+                view.setY(event.getRawY() + dY);
+                view.setX(event.getRawX() + dX);
+                lastAction = MotionEvent.ACTION_MOVE;
+                break;
+
+            case MotionEvent.ACTION_UP:
+                if (lastAction == MotionEvent.ACTION_DOWN){
+                    floatingMenu.setImageResource(R.drawable.ic_clear);
+                    shadow.setVisibility(View.VISIBLE);
+                    FloatingMenuDialog floatingMenuDialog = new FloatingMenuDialog(SyllabusMainScreen.this,
+                            SyllabusMainScreen.this, SyllabusMainScreen.this);
+                    floatingMenuDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                    floatingMenuDialog.setCancelable(true);
+                    floatingMenuDialog.getWindow().getAttributes().gravity = Gravity.TOP | Gravity.END;
+                    floatingMenuDialog.getWindow().getAttributes().x = dpToPx(5);
+                    floatingMenuDialog.getWindow().getAttributes().y = dpToPx(113);
+                    floatingMenuDialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+                    floatingMenuDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                        @Override
+                        public void onDismiss(DialogInterface dialog) {
+                            shadow.setVisibility(View.GONE);
+                            floatingMenu.setImageResource(R.drawable.ic_keyboard_arrow_down);
+                        }
+                    });
+                    floatingMenuDialog.show();
+                }
+                break;
+
+            default:
+                return false;
+        }
+        return true;
     }
 
     BroadcastReceiver onComplete = new BroadcastReceiver() {

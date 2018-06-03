@@ -1,6 +1,7 @@
-package onair.onems.syllabus;
+package onair.onems.result;
 
 import android.app.Activity;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,26 +13,27 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import onair.onems.R;
+import onair.onems.syllabus.SyllabusMainScreen;
 
-public class ExamAdapter extends RecyclerView.Adapter<ExamAdapter.MyViewHolder> {
-    private JSONArray exams;
-    private ExamAdapterListener selectedListener;
-    private ExamAdapterListener dismissListener;
+public class MediumAdapter extends RecyclerView.Adapter<MediumAdapter.MyViewHolder> {
+    private JSONArray mediums;
+    private MediumAdapterListener selectedListener;
+    private MediumAdapterListener dismissListener;
 
     class MyViewHolder extends RecyclerView.ViewHolder {
-        TextView examName;
+        TextView mediumName;
 
         MyViewHolder(View view) {
             super(view);
-            examName = view.findViewById(R.id.name);
+            mediumName = view.findViewById(R.id.name);
 
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     // send selected exam in callback
                     try {
-                        selectedListener.onExamSelected(exams.getJSONObject(getAdapterPosition()));
-                        dismissListener.onExamSelected(exams.getJSONObject(getAdapterPosition()));
+                        selectedListener.onMediumSelected(mediums.getJSONObject(getAdapterPosition()));
+                        dismissListener.onMediumSelected(mediums.getJSONObject(getAdapterPosition()));
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -41,18 +43,19 @@ public class ExamAdapter extends RecyclerView.Adapter<ExamAdapter.MyViewHolder> 
     }
 
 
-    ExamAdapter(Activity currentActivity, String exams, ExamAdapterListener dismissListener) {
+    MediumAdapter(Activity currentActivity, String mediums, MediumAdapterListener dismissListener) {
         this.dismissListener = dismissListener;
-        this.selectedListener = (SyllabusMainScreen)currentActivity;
+        this.selectedListener = (ResultGradeStructure)currentActivity;
         try {
-            this.exams = new JSONArray(exams);
+            this.mediums = new JSONArray(mediums);
         } catch (JSONException e) {
             e.printStackTrace();
         }
     }
 
+    @NonNull
     @Override
-    public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.selection_row_item, parent, false);
 
@@ -60,10 +63,10 @@ public class ExamAdapter extends RecyclerView.Adapter<ExamAdapter.MyViewHolder> 
     }
 
     @Override
-    public void onBindViewHolder(MyViewHolder holder, final int position) {
+    public void onBindViewHolder(@NonNull MyViewHolder holder, final int position) {
         try {
-            JSONObject exam = exams.getJSONObject(position);
-            holder.examName.setText(exam.getString("CustomName"));
+            JSONObject medium = mediums.getJSONObject(position);
+            holder.mediumName.setText(medium.getString("MameName"));
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -71,10 +74,10 @@ public class ExamAdapter extends RecyclerView.Adapter<ExamAdapter.MyViewHolder> 
 
     @Override
     public int getItemCount() {
-        return exams.length();
+        return mediums.length();
     }
 
-    public interface ExamAdapterListener {
-        void onExamSelected(JSONObject exam);
+    public interface MediumAdapterListener {
+        void onMediumSelected(JSONObject medium);
     }
 }

@@ -1,4 +1,4 @@
-package onair.onems.syllabus;
+package onair.onems.result;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -15,17 +15,17 @@ import android.widget.TextView;
 import org.json.JSONObject;
 
 import onair.onems.R;
+import onair.onems.syllabus.ExamAdapter;
 
-public class SubjectSelectionDialog extends Dialog implements View.OnClickListener, SubjectAdapter.SubjectAdapterListener{
+public class MediumSelectionDialog extends Dialog implements View.OnClickListener, MediumAdapter.MediumAdapterListener{
     private Context context;
-    private String subjectData;
     private Activity currentActivity;
-
-    SubjectSelectionDialog(Activity currentActivity, String subjectData, Context context) {
+    private String mediums;
+    MediumSelectionDialog(Activity currentActivity, String mediums, Context context) {
         super(currentActivity);
         this.context = context;
-        this.subjectData = subjectData;
         this.currentActivity = currentActivity;
+        this.mediums = mediums;
     }
 
     @Override
@@ -35,11 +35,11 @@ public class SubjectSelectionDialog extends Dialog implements View.OnClickListen
         setContentView(R.layout.selection_dialog);
         RecyclerView recyclerView = findViewById(R.id.recycler);
         TextView header = findViewById(R.id.header);
-        header.setText("Select Subject");
+        header.setText("Select Medium");
         Button cross = (Button) findViewById(R.id.cross);
         cross.setOnClickListener(this);
 
-        SubjectAdapter mAdapter = new SubjectAdapter(currentActivity, subjectData, this);
+        MediumAdapter mAdapter = new MediumAdapter(currentActivity, mediums, this);
 
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(context);
         recyclerView.setLayoutManager(mLayoutManager);
@@ -59,7 +59,7 @@ public class SubjectSelectionDialog extends Dialog implements View.OnClickListen
     }
 
     @Override
-    public void onSubjectSelected(JSONObject subject) {
+    public void onMediumSelected(JSONObject exam) {
         dismiss();
     }
 }
