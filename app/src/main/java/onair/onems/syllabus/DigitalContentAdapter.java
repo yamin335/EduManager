@@ -35,7 +35,7 @@ public class DigitalContentAdapter extends RecyclerView.Adapter<RecyclerView.Vie
     private static final int FILE_TYPE = 2;
     private static final int AUDIO_TYPE = 3;
     private static final int VIDEO_TYPE = 4;
-    protected enum ContentType {SYLLABUS, LESSON}
+    public enum ContentType {SYLLABUS, LESSON, HOMEWORK}
     private ContentType contentType;
 
     class MyViewHolder extends RecyclerView.ViewHolder {
@@ -51,7 +51,7 @@ public class DigitalContentAdapter extends RecyclerView.Adapter<RecyclerView.Vie
     }
 
 
-    DigitalContentAdapter(Context context, AddFileToDownloader downloader, ArrayList<JSONObject> contentList, ContentType contentType) {
+    public DigitalContentAdapter(Context context, AddFileToDownloader downloader, ArrayList<JSONObject> contentList, ContentType contentType) {
         this.contentType = contentType;
         this.context = context;
         this.contentList = contentList;
@@ -104,6 +104,9 @@ public class DigitalContentAdapter extends RecyclerView.Adapter<RecyclerView.Vie
                     break;
                 case LESSON:
                     url = jsonObject.getString("ContentUrl");
+                    break;
+                case HOMEWORK:
+                    url = jsonObject.getString("FileURL");
                     break;
             }
             url = url.replace("\\","/");
@@ -201,6 +204,9 @@ public class DigitalContentAdapter extends RecyclerView.Adapter<RecyclerView.Vie
                     break;
                 case LESSON:
                     SyllabusUrl = jsonObject.getString("ContentUrl");
+                    break;
+                case HOMEWORK:
+                    SyllabusUrl = jsonObject.getString("FileURL");
                     break;
             }
         } catch (JSONException e) {

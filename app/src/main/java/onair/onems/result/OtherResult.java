@@ -1,30 +1,17 @@
 package onair.onems.result;
 
 import android.app.ProgressDialog;
-
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-
 import android.os.Bundle;
-import android.preference.PreferenceManager;
-
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.view.ViewPager;
-import android.support.v4.widget.DrawerLayout;
-
 import android.view.LayoutInflater;
 import android.view.View;
-
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -40,17 +27,10 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import onair.onems.R;
 import onair.onems.Services.StaticHelperClass;
-import onair.onems.attendance.OthersAttendanceReport;
-import onair.onems.attendance.SelfAttendanceReport;
-import onair.onems.attendance.StudentAttendanceReport;
-import onair.onems.mainactivities.SideNavigationMenuParentActivity;
-import onair.onems.mainactivities.StudentMainScreen;
-import onair.onems.mainactivities.TeacherMainScreen;
 import onair.onems.models.ClassModel;
 import onair.onems.models.DepartmentModel;
 import onair.onems.models.ExamModel;
@@ -60,7 +40,7 @@ import onair.onems.models.SessionModel;
 import onair.onems.models.ShiftModel;
 import onair.onems.network.MySingleton;
 
-public class ResultMainScreen extends SideNavigationMenuParentActivity{
+public class OtherResult extends Fragment {
 
     private Spinner spinnerClass, spinnerShift, spinnerSection,
             spinnerMedium, spinnerDepartment, spinnerStudent,
@@ -99,442 +79,364 @@ public class ResultMainScreen extends SideNavigationMenuParentActivity{
             firstDepartment = 0, firstSession = 0, firstExam = 0;
 
     private JSONArray allStudentJsonArray;
+    private long InstituteID;
+    private String LoggedUserID = "";
 
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Bundle bundle = getArguments();
+        InstituteID = bundle.getLong("InstituteID");
+        LoggedUserID = bundle.getString("LoggedUserID");
+    }
 
-        activityName = ResultMainScreen.class.getName();
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View rootView = inflater.inflate(R.layout.result_content_main, container, false);
 
-        if(UserTypeID == 3||UserTypeID==5) {
-            LayoutInflater inflater = (LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            final View childActivityLayout = inflater.inflate(R.layout.result_student_content_main, null);
-            LinearLayout parentActivityLayout = (LinearLayout) findViewById(R.id.contentMain);
-            parentActivityLayout.addView(childActivityLayout, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
+        allSessionArrayList = new ArrayList<>();
+        allShiftArrayList = new ArrayList<>();
+        allMediumArrayList = new ArrayList<>();
+        allClassArrayList = new ArrayList<>();
+        allDepartmentArrayList = new ArrayList<>();
+        allSectionArrayList = new ArrayList<>();
+        allExamArrayList = new ArrayList<>();
 
-            ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
-            setupViewPager(viewPager);
-            TabLayout tabLayout = (TabLayout) findViewById(R.id.tabLayout);
-            tabLayout.setupWithViewPager(viewPager);
-        } else if(UserTypeID == 1||UserTypeID == 2||UserTypeID == 4) {
-            LayoutInflater inflater = (LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            final View childActivityLayout = inflater.inflate(R.layout.result_content_main, null);
-            LinearLayout parentActivityLayout = (LinearLayout) findViewById(R.id.contentMain);
-            parentActivityLayout.addView(childActivityLayout, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
+        selectedClass = new ClassModel();
+        selectedShift = new ShiftModel();
+        selectedSection = new SectionModel();
+        selectedMedium = new MediumModel();
+        selectedDepartment = new DepartmentModel();
+        selectedSession = new SessionModel();
+        selectedExam = new ExamModel();
+        selectedStudent = null;
 
-            allSessionArrayList = new ArrayList<>();
-            allShiftArrayList = new ArrayList<>();
-            allMediumArrayList = new ArrayList<>();
-            allClassArrayList = new ArrayList<>();
-            allDepartmentArrayList = new ArrayList<>();
-            allSectionArrayList = new ArrayList<>();
-            allExamArrayList = new ArrayList<>();
+        spinnerClass = (Spinner)rootView.findViewById(R.id.spinnerClass);
+        spinnerShift = (Spinner)rootView.findViewById(R.id.spinnerShift);
+        spinnerSection = (Spinner)rootView.findViewById(R.id.spinnerSection);
+        spinnerMedium =(Spinner)rootView.findViewById(R.id.spinnerMedium);
+        spinnerDepartment =(Spinner)rootView.findViewById(R.id.spinnerDepartment);
+        spinnerStudent = (Spinner)rootView.findViewById(R.id.spinnerStudent);
+        spinnerSession = (Spinner)rootView.findViewById(R.id.spinnerSession);
+        spinnerExam = (Spinner)rootView.findViewById(R.id.spinnerExam);
 
-            selectedClass = new ClassModel();
-            selectedShift = new ShiftModel();
-            selectedSection = new SectionModel();
-            selectedMedium = new MediumModel();
-            selectedDepartment = new DepartmentModel();
-            selectedSession = new SessionModel();
-            selectedExam = new ExamModel();
-            selectedStudent = null;
+        Button showResult = (Button)rootView.findViewById(R.id.showResult);
 
-            spinnerClass = (Spinner)findViewById(R.id.spinnerClass);
-            spinnerShift = (Spinner)findViewById(R.id.spinnerShift);
-            spinnerSection = (Spinner)findViewById(R.id.spinnerSection);
-            spinnerMedium =(Spinner)findViewById(R.id.spinnerMedium);
-            spinnerDepartment =(Spinner)findViewById(R.id.spinnerDepartment);
-            spinnerStudent = (Spinner)findViewById(R.id.spinnerStudent);
-            spinnerSession = (Spinner)findViewById(R.id.spinnerSession);
-            spinnerExam = (Spinner)findViewById(R.id.spinnerExam);
+        ArrayAdapter<String> class_spinner_adapter = new ArrayAdapter<>(getActivity(), R.layout.spinner_item, tempClassArray);
+        class_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerClass.setAdapter(class_spinner_adapter);
 
-            Button showResult = (Button)findViewById(R.id.showResult);
+        ArrayAdapter<String> shift_spinner_adapter = new ArrayAdapter<>(getActivity(), R.layout.spinner_item, tempShiftArray);
+        shift_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerShift.setAdapter(shift_spinner_adapter);
 
-            ArrayAdapter<String> class_spinner_adapter = new ArrayAdapter<>(this, R.layout.spinner_item, tempClassArray);
-            class_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-            spinnerClass.setAdapter(class_spinner_adapter);
+        ArrayAdapter<String> section_spinner_adapter = new ArrayAdapter<>(getActivity(), R.layout.spinner_item, tempSectionArray);
+        section_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerSection.setAdapter(section_spinner_adapter);
 
-            ArrayAdapter<String> shift_spinner_adapter = new ArrayAdapter<>(this, R.layout.spinner_item, tempShiftArray);
-            shift_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-            spinnerShift.setAdapter(shift_spinner_adapter);
+        ArrayAdapter<String> department_spinner_adapter = new ArrayAdapter<>(getActivity(), R.layout.spinner_item, tempDepartmentArray);
+        department_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerDepartment.setAdapter(department_spinner_adapter);
 
-            ArrayAdapter<String> section_spinner_adapter = new ArrayAdapter<>(this, R.layout.spinner_item, tempSectionArray);
-            section_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-            spinnerSection.setAdapter(section_spinner_adapter);
+        ArrayAdapter<String> medium_spinner_adapter = new ArrayAdapter<>(getActivity(), R.layout.spinner_item, tempMediumArray);
+        medium_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerMedium.setAdapter(medium_spinner_adapter);
 
-            ArrayAdapter<String> department_spinner_adapter = new ArrayAdapter<>(this, R.layout.spinner_item, tempDepartmentArray);
-            department_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-            spinnerDepartment.setAdapter(department_spinner_adapter);
+        ArrayAdapter<String> student_spinner_adapter = new ArrayAdapter<>(getActivity(), R.layout.spinner_item, tempStudentArray);
+        student_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerStudent.setAdapter(student_spinner_adapter);
 
-            ArrayAdapter<String> medium_spinner_adapter = new ArrayAdapter<>(this, R.layout.spinner_item, tempMediumArray);
-            medium_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-            spinnerMedium.setAdapter(medium_spinner_adapter);
+        ArrayAdapter<String> session_spinner_adapter = new ArrayAdapter<>(getActivity(), R.layout.spinner_item, tempSessionArray);
+        session_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerSession.setAdapter(session_spinner_adapter);
 
-            ArrayAdapter<String> student_spinner_adapter = new ArrayAdapter<>(this, R.layout.spinner_item, tempStudentArray);
-            student_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-            spinnerStudent.setAdapter(student_spinner_adapter);
+        ArrayAdapter<String> exam_spinner_adapter = new ArrayAdapter<>(getActivity(), R.layout.spinner_item, tempExamArray);
+        exam_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerExam.setAdapter(exam_spinner_adapter);
 
-            ArrayAdapter<String> session_spinner_adapter = new ArrayAdapter<>(this, R.layout.spinner_item, tempSessionArray);
-            session_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-            spinnerSession.setAdapter(session_spinner_adapter);
+        spinnerSession.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
-            ArrayAdapter<String> exam_spinner_adapter = new ArrayAdapter<>(this, R.layout.spinner_item, tempExamArray);
-            exam_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-            spinnerExam.setAdapter(exam_spinner_adapter);
-
-            spinnerSession.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                @Override
-                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
-                    if(position != 0) {
-                        try {
-                            selectedSession = allSessionArrayList.get(position-1);
-                            selectedStudent = null;
-                        } catch (IndexOutOfBoundsException e) {
-                            Toast.makeText(ResultMainScreen.this,"No shift found !!!",Toast.LENGTH_LONG).show();
-                        }
-                    } else {
-                        if(firstSession++>1) {
-                            selectedSession = new SessionModel();
-                            selectedStudent = null;
-                        }
+                if(position != 0) {
+                    try {
+                        selectedSession = allSessionArrayList.get(position-1);
+                        selectedStudent = null;
+                    } catch (IndexOutOfBoundsException e) {
+                        Toast.makeText(getActivity(),"No shift found !!!",Toast.LENGTH_LONG).show();
                     }
-                }
-
-                @Override
-                public void onNothingSelected(AdapterView<?> parent) {
-
-                }
-            });
-
-            spinnerShift.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                @Override
-                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
-                    if(position != 0) {
-                        try {
-                            selectedShift = allShiftArrayList.get(position-1);
-                            selectedStudent = null;
-                        } catch (IndexOutOfBoundsException e) {
-                            Toast.makeText(ResultMainScreen.this,"No shift found !!!",Toast.LENGTH_LONG).show();
-                        }
-                    } else {
-                        if(firstShift++>1) {
-                            selectedShift = new ShiftModel();
-                            selectedStudent = null;
-                        }
-                    }
-                }
-
-                @Override
-                public void onNothingSelected(AdapterView<?> parent) {
-
-                }
-            });
-
-            spinnerMedium.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                @Override
-                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
-                    if(position != 0) {
-                        try {
-                            selectedMedium = allMediumArrayList.get(position-1);
-                            selectedClass = new ClassModel();
-                            selectedDepartment = new DepartmentModel();
-                            selectedSection = new SectionModel();
-                            ClassDataGetRequest();
-                            selectedExam = new ExamModel();
-                            selectedStudent = null;
-                        } catch (IndexOutOfBoundsException e) {
-                            Toast.makeText(ResultMainScreen.this,"No medium found !!!",Toast.LENGTH_LONG).show();
-                        }
-                    } else {
-                        if(firstMedium++>1) {
-                            selectedMedium = new MediumModel();
-                            selectedClass = new ClassModel();
-                            selectedDepartment = new DepartmentModel();
-                            selectedSection = new SectionModel();
-                            selectedExam = new ExamModel();
-                            selectedStudent = null;
-                        }
-                    }
-                }
-
-                @Override
-                public void onNothingSelected(AdapterView<?> parent) {
-
-                }
-            });
-
-            spinnerClass.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                @Override
-                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
-                    if(position != 0) {
-                        try {
-                            selectedClass = allClassArrayList.get(position-1);
-                            selectedDepartment = new DepartmentModel();
-                            selectedSection = new SectionModel();
-                            DepartmentDataGetRequest();
-                            ExamDataGetRequest();
-                            selectedExam = new ExamModel();
-                            selectedStudent = null;
-                        } catch (IndexOutOfBoundsException e) {
-                            Toast.makeText(ResultMainScreen.this,"No class found !!!",Toast.LENGTH_LONG).show();
-                        }
-                    } else {
-                        if(firstClass++>1) {
-                            selectedClass = new ClassModel();
-                            selectedDepartment = new DepartmentModel();
-                            selectedSection = new SectionModel();
-                            selectedExam = new ExamModel();
-                            selectedStudent = null;
-                        }
-                    }
-                }
-
-                @Override
-                public void onNothingSelected(AdapterView<?> parent) {
-
-                }
-            });
-
-            spinnerDepartment.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                @Override
-                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
-                    if(position != 0) {
-                        try {
-                            selectedDepartment = allDepartmentArrayList.get(position-1);
-                            selectedSection = new SectionModel();
-                            SectionDataGetRequest();
-                            selectedStudent = null;
-                        } catch (IndexOutOfBoundsException e) {
-                            Toast.makeText(ResultMainScreen.this,"No shift found !!!",Toast.LENGTH_LONG).show();
-                        }
-                    } else {
-                        if(firstDepartment++>1) {
-                            selectedDepartment = new DepartmentModel();
-                            selectedSection = new SectionModel();
-                            selectedStudent = null;
-                        }
-                    }
-                }
-
-                @Override
-                public void onNothingSelected(AdapterView<?> parent) {
-
-                }
-            });
-
-
-            spinnerSection.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                @Override
-                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
-                    if(position != 0) {
-                        try {
-                            selectedSection = allSectionArrayList.get(position-1);
-                            selectedStudent = null;
-                        } catch (IndexOutOfBoundsException e) {
-                            Toast.makeText(ResultMainScreen.this,"No section found !!!",Toast.LENGTH_LONG).show();
-                        }
-                    } else {
-                        if(firstSection++>1) {
-                            selectedSection = new SectionModel();
-                            selectedStudent = null;
-                        }
-                    }
-                }
-
-                @Override
-                public void onNothingSelected(AdapterView<?> parent) {
-
-                }
-            });
-
-            spinnerExam.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                @Override
-                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
-                    if(position != 0) {
-                        try {
-                            selectedExam = allExamArrayList.get(position-1);
-                            GetStudentListPostRequest();
-                            selectedStudent = null;
-                        } catch (IndexOutOfBoundsException e) {
-                            Toast.makeText(ResultMainScreen.this,"No Exam found !!!",Toast.LENGTH_LONG).show();
-                        }
-                    } else {
-                        if(firstExam++>1) {
-                            selectedExam = new ExamModel();
-                            selectedStudent = null;
-                        }
-                    }
-                }
-
-                @Override
-                public void onNothingSelected(AdapterView<?> parent) {
-
-                }
-            });
-
-            spinnerStudent.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                @Override
-                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
-                    if(position != 0) {
-                        try {
-                            try {
-                                selectedStudent = allStudentJsonArray.getJSONObject(position-1);
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                        } catch (IndexOutOfBoundsException e) {
-                            Toast.makeText(ResultMainScreen.this,"No student found !!!",Toast.LENGTH_LONG).show();
-                        }
-                    } else {
+                } else {
+                    if(firstSession++>1) {
+                        selectedSession = new SessionModel();
                         selectedStudent = null;
                     }
                 }
+            }
 
-                @Override
-                public void onNothingSelected(AdapterView<?> parent) {
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
 
-                }
-            });
+            }
+        });
 
-            showResult.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if(StaticHelperClass.isNetworkAvailable(ResultMainScreen.this)) {
-                        if(allSessionArrayList.size()>0 && selectedSession.getSessionID() == 0){
-                            Toast.makeText(ResultMainScreen.this,"Please select session!!! ",
-                                    Toast.LENGTH_LONG).show();
-                        } else if(allMediumArrayList.size()>0 && (selectedMedium.getMediumID() == -2 || selectedMedium.getMediumID() == 0)) {
-                            Toast.makeText(ResultMainScreen.this,"Please select medium!!! ",
-                                    Toast.LENGTH_LONG).show();
-                        } else if(allClassArrayList.size()>0 && (selectedClass.getClassID() == -2 || selectedClass.getClassID() == 0)) {
-                            Toast.makeText(ResultMainScreen.this,"Please select class!!! ",
-                                    Toast.LENGTH_LONG).show();
-                        } else if(allDepartmentArrayList.size()>0 && (selectedDepartment.getDepartmentID() == -2 || selectedDepartment.getDepartmentID() == 0)) {
-                            Toast.makeText(ResultMainScreen.this,"Please select department!!! ",
-                                    Toast.LENGTH_LONG).show();
-                        } else if(allSectionArrayList.size()>0 && (selectedSection.getSectionID() == -2 || selectedSection.getSectionID() == 0)) {
-                            Toast.makeText(ResultMainScreen.this,"Please select section!!! ",
-                                    Toast.LENGTH_LONG).show();
-                        } else if(allExamArrayList.size()>0 && selectedExam.getExamID() == 0) {
-                            Toast.makeText(ResultMainScreen.this,"Please select exam!!! ",
-                                    Toast.LENGTH_LONG).show();
-                        } else if(selectedStudent == null){
-                            Toast.makeText(ResultMainScreen.this,"Please select a student!!! ",
-                                    Toast.LENGTH_LONG).show();
-                        } else {
-                            try {
-                                Intent intent = new Intent(ResultMainScreen.this, SubjectWiseResult.class);
-                                intent.putExtra("UserID", selectedStudent.getString("UserID").equalsIgnoreCase("null")? "0":selectedStudent.getString("UserID"));
-                                intent.putExtra("ShiftID", selectedStudent.getString("ShiftID").equalsIgnoreCase("null")? "0":selectedStudent.getString("ShiftID"));
-                                intent.putExtra("MediumID", selectedStudent.getString("MediumID").equalsIgnoreCase("null")? "0":selectedStudent.getString("MediumID"));
-                                intent.putExtra("ClassID", selectedStudent.getString("ClassID").equalsIgnoreCase("null")? "0":selectedStudent.getString("ClassID"));
-                                intent.putExtra("DepartmentID", selectedStudent.getString("DepartmentID").equalsIgnoreCase("null")? "0":selectedStudent.getString("DepartmentID"));
-                                intent.putExtra("SectionID", selectedStudent.getString("SectionID").equalsIgnoreCase("null")? "0":selectedStudent.getString("SectionID"));
-                                intent.putExtra("SessionID", selectedStudent.getString("SessionID").equalsIgnoreCase("null")? "0":selectedStudent.getString("SessionID"));
-                                intent.putExtra("ExamID", Long.toString(selectedExam.getExamID()));
-                                intent.putExtra("InstituteID", selectedStudent.getString("InstituteID").equalsIgnoreCase("null")? "0":selectedStudent.getString("InstituteID"));
-                                startActivity(intent);
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    } else {
-                        Toast.makeText(ResultMainScreen.this,"Please check your internet connection and select again!!! ",
-                                Toast.LENGTH_LONG).show();
+        spinnerShift.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                if(position != 0) {
+                    try {
+                        selectedShift = allShiftArrayList.get(position-1);
+                        selectedStudent = null;
+                    } catch (IndexOutOfBoundsException e) {
+                        Toast.makeText(getActivity(),"No shift found !!!",Toast.LENGTH_LONG).show();
+                    }
+                } else {
+                    if(firstShift++>1) {
+                        selectedShift = new ShiftModel();
+                        selectedStudent = null;
                     }
                 }
-            });
+            }
 
-            SessionDataGetRequest();
-            ShiftDataGetRequest();
-            MediumDataGetRequest();
-        }
-    }
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
 
-    private void setupViewPager(ViewPager viewPager) {
+            }
+        });
 
-        ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
-        adapter.addFragment(new SelfResult(), "SELF RESULT");
-        Bundle bundle = new Bundle();
-        bundle.putLong("InstituteID", InstituteID);
-        bundle.putString("LoggedUserID", LoggedUserID);
-        OtherResult otherResult = new OtherResult();
-        otherResult.setArguments(bundle);
-        adapter.addFragment(otherResult, "OTHERS RESULT");
-        viewPager.setAdapter(adapter);
-    }
+        spinnerMedium.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
-    class ViewPagerAdapter extends FragmentPagerAdapter {
-        private final List<Fragment> mFragmentList = new ArrayList<>();
-        private final List<String> mFragmentTitleList = new ArrayList<>();
+                if(position != 0) {
+                    try {
+                        selectedMedium = allMediumArrayList.get(position-1);
+                        selectedClass = new ClassModel();
+                        selectedDepartment = new DepartmentModel();
+                        selectedSection = new SectionModel();
+                        ClassDataGetRequest();
+                        selectedExam = new ExamModel();
+                        selectedStudent = null;
+                    } catch (IndexOutOfBoundsException e) {
+                        Toast.makeText(getActivity(),"No medium found !!!",Toast.LENGTH_LONG).show();
+                    }
+                } else {
+                    if(firstMedium++>1) {
+                        selectedMedium = new MediumModel();
+                        selectedClass = new ClassModel();
+                        selectedDepartment = new DepartmentModel();
+                        selectedSection = new SectionModel();
+                        selectedExam = new ExamModel();
+                        selectedStudent = null;
+                    }
+                }
+            }
 
-        ViewPagerAdapter(FragmentManager manager) {
-            super(manager);
-        }
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
 
-        @Override
-        public Fragment getItem(int position) {
-            return mFragmentList.get(position);
-        }
+            }
+        });
 
-        @Override
-        public int getCount() {
-            return mFragmentList.size();
-        }
+        spinnerClass.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
-        void addFragment(Fragment fragment, String title) {
-            mFragmentList.add(fragment);
-            mFragmentTitleList.add(title);
-        }
+                if(position != 0) {
+                    try {
+                        selectedClass = allClassArrayList.get(position-1);
+                        selectedDepartment = new DepartmentModel();
+                        selectedSection = new SectionModel();
+                        DepartmentDataGetRequest();
+                        ExamDataGetRequest();
+                        selectedExam = new ExamModel();
+                        selectedStudent = null;
+                    } catch (IndexOutOfBoundsException e) {
+                        Toast.makeText(getActivity(),"No class found !!!",Toast.LENGTH_LONG).show();
+                    }
+                } else {
+                    if(firstClass++>1) {
+                        selectedClass = new ClassModel();
+                        selectedDepartment = new DepartmentModel();
+                        selectedSection = new SectionModel();
+                        selectedExam = new ExamModel();
+                        selectedStudent = null;
+                    }
+                }
+            }
 
-        @Override
-        public CharSequence getPageTitle(int position)
-        {
-            return mFragmentTitleList.get(position);
-        }
-    }
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
 
-    @Override
-    public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else if(UserTypeID == 1) {
-            Intent mainIntent = new Intent(ResultMainScreen.this,TeacherMainScreen.class);
-            startActivity(mainIntent);
-            finish();
-        } else if(UserTypeID == 2) {
-            Intent mainIntent = new Intent(ResultMainScreen.this,TeacherMainScreen.class);
-            startActivity(mainIntent);
-            finish();
-        } else if(UserTypeID == 3) {
-            Intent mainIntent = new Intent(ResultMainScreen.this,StudentMainScreen.class);
-            startActivity(mainIntent);
-            finish();
-        } else if(UserTypeID == 4) {
-            Intent mainIntent = new Intent(ResultMainScreen.this,TeacherMainScreen.class);
-            startActivity(mainIntent);
-            finish();
-        } else if(UserTypeID == 5) {
-            Intent mainIntent = new Intent(ResultMainScreen.this,StudentMainScreen.class);
-            startActivity(mainIntent);
-            finish();
-        }
+            }
+        });
+
+        spinnerDepartment.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                if(position != 0) {
+                    try {
+                        selectedDepartment = allDepartmentArrayList.get(position-1);
+                        selectedSection = new SectionModel();
+                        SectionDataGetRequest();
+                        selectedStudent = null;
+                    } catch (IndexOutOfBoundsException e) {
+                        Toast.makeText(getActivity(),"No shift found !!!",Toast.LENGTH_LONG).show();
+                    }
+                } else {
+                    if(firstDepartment++>1) {
+                        selectedDepartment = new DepartmentModel();
+                        selectedSection = new SectionModel();
+                        selectedStudent = null;
+                    }
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+
+        spinnerSection.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                if(position != 0) {
+                    try {
+                        selectedSection = allSectionArrayList.get(position-1);
+                        selectedStudent = null;
+                    } catch (IndexOutOfBoundsException e) {
+                        Toast.makeText(getActivity(),"No section found !!!",Toast.LENGTH_LONG).show();
+                    }
+                } else {
+                    if(firstSection++>1) {
+                        selectedSection = new SectionModel();
+                        selectedStudent = null;
+                    }
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+        spinnerExam.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                if(position != 0) {
+                    try {
+                        selectedExam = allExamArrayList.get(position-1);
+                        GetStudentListPostRequest();
+                        selectedStudent = null;
+                    } catch (IndexOutOfBoundsException e) {
+                        Toast.makeText(getActivity(),"No Exam found !!!",Toast.LENGTH_LONG).show();
+                    }
+                } else {
+                    if(firstExam++>1) {
+                        selectedExam = new ExamModel();
+                        selectedStudent = null;
+                    }
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+        spinnerStudent.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                if(position != 0) {
+                    try {
+                        try {
+                            selectedStudent = allStudentJsonArray.getJSONObject(position-1);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    } catch (IndexOutOfBoundsException e) {
+                        Toast.makeText(getActivity(),"No student found !!!",Toast.LENGTH_LONG).show();
+                    }
+                } else {
+                    selectedStudent = null;
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+        showResult.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(StaticHelperClass.isNetworkAvailable(getActivity())) {
+                    if(allSessionArrayList.size()>0 && selectedSession.getSessionID() == 0){
+                        Toast.makeText(getActivity(),"Please select session!!! ",
+                                Toast.LENGTH_LONG).show();
+                    } else if(allMediumArrayList.size()>0 && (selectedMedium.getMediumID() == -2 || selectedMedium.getMediumID() == 0)) {
+                        Toast.makeText(getActivity(),"Please select medium!!! ",
+                                Toast.LENGTH_LONG).show();
+                    } else if(allClassArrayList.size()>0 && (selectedClass.getClassID() == -2 || selectedClass.getClassID() == 0)) {
+                        Toast.makeText(getActivity(),"Please select class!!! ",
+                                Toast.LENGTH_LONG).show();
+                    } else if(allDepartmentArrayList.size()>0 && (selectedDepartment.getDepartmentID() == -2 || selectedDepartment.getDepartmentID() == 0)) {
+                        Toast.makeText(getActivity(),"Please select department!!! ",
+                                Toast.LENGTH_LONG).show();
+                    } else if(allSectionArrayList.size()>0 && (selectedSection.getSectionID() == -2 || selectedSection.getSectionID() == 0)) {
+                        Toast.makeText(getActivity(),"Please select section!!! ",
+                                Toast.LENGTH_LONG).show();
+                    } else if(allExamArrayList.size()>0 && selectedExam.getExamID() == 0) {
+                        Toast.makeText(getActivity(),"Please select exam!!! ",
+                                Toast.LENGTH_LONG).show();
+                    } else if(selectedStudent == null){
+                        Toast.makeText(getActivity(),"Please select a student!!! ",
+                                Toast.LENGTH_LONG).show();
+                    } else {
+                        try {
+                            Intent intent = new Intent(getActivity(), SubjectWiseResult.class);
+                            intent.putExtra("UserID", selectedStudent.getString("UserID").equalsIgnoreCase("null")? "0":selectedStudent.getString("UserID"));
+                            intent.putExtra("ShiftID", selectedStudent.getString("ShiftID").equalsIgnoreCase("null")? "0":selectedStudent.getString("ShiftID"));
+                            intent.putExtra("MediumID", selectedStudent.getString("MediumID").equalsIgnoreCase("null")? "0":selectedStudent.getString("MediumID"));
+                            intent.putExtra("ClassID", selectedStudent.getString("ClassID").equalsIgnoreCase("null")? "0":selectedStudent.getString("ClassID"));
+                            intent.putExtra("DepartmentID", selectedStudent.getString("DepartmentID").equalsIgnoreCase("null")? "0":selectedStudent.getString("DepartmentID"));
+                            intent.putExtra("SectionID", selectedStudent.getString("SectionID").equalsIgnoreCase("null")? "0":selectedStudent.getString("SectionID"));
+                            intent.putExtra("SessionID", selectedStudent.getString("SessionID").equalsIgnoreCase("null")? "0":selectedStudent.getString("SessionID"));
+                            intent.putExtra("ExamID", Long.toString(selectedExam.getExamID()));
+                            intent.putExtra("InstituteID", selectedStudent.getString("InstituteID").equalsIgnoreCase("null")? "0":selectedStudent.getString("InstituteID"));
+                            startActivity(intent);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                } else {
+                    Toast.makeText(getActivity(),"Please check your internet connection and select again!!! ",
+                            Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+
+        SessionDataGetRequest();
+        ShiftDataGetRequest();
+        MediumDataGetRequest();
+        return rootView;
     }
 
     private void SessionDataGetRequest() {
-        if (StaticHelperClass.isNetworkAvailable(this)) {
+        if (StaticHelperClass.isNetworkAvailable(getActivity())) {
             String sessionUrl = getString(R.string.baseUrl)+"/api/onEms/getallsession";
 
-            mSessionDialog = new ProgressDialog(this);
+            mSessionDialog = new ProgressDialog(getActivity());
             mSessionDialog.setTitle("Loading session...");
             mSessionDialog.setMessage("Please Wait...");
             mSessionDialog.setCancelable(false);
@@ -551,7 +453,7 @@ public class ResultMainScreen extends SideNavigationMenuParentActivity{
                 @Override
                 public void onErrorResponse(VolleyError error) {
                     mSessionDialog.dismiss();
-                    Toast.makeText(ResultMainScreen.this,"Session not found!!! ",
+                    Toast.makeText(getActivity(),"Session not found!!! ",
                             Toast.LENGTH_LONG).show();
                 }
             })
@@ -563,9 +465,9 @@ public class ResultMainScreen extends SideNavigationMenuParentActivity{
                     return params;
                 }
             };
-            MySingleton.getInstance(this).addToRequestQueue(stringSessionRequest);
+            MySingleton.getInstance(getActivity()).addToRequestQueue(stringSessionRequest);
         } else {
-            Toast.makeText(ResultMainScreen.this,"Please check your internet connection and select again!!! ",
+            Toast.makeText(getActivity(),"Please check your internet connection and select again!!! ",
                     Toast.LENGTH_LONG).show();
         }
     }
@@ -588,23 +490,23 @@ public class ResultMainScreen extends SideNavigationMenuParentActivity{
             try {
                 String[] strings = new String[sessionArrayList.size()];
                 strings = sessionArrayList.toArray(strings);
-                ArrayAdapter<String> session_spinner_adapter = new ArrayAdapter<>(this,R.layout.spinner_item, strings);
+                ArrayAdapter<String> session_spinner_adapter = new ArrayAdapter<>(getActivity(),R.layout.spinner_item, strings);
                 session_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinnerSession.setAdapter(session_spinner_adapter);
             } catch (IndexOutOfBoundsException e) {
-                Toast.makeText(this,"No session found !!!",Toast.LENGTH_LONG).show();
+                Toast.makeText(getActivity(),"No section found !!!",Toast.LENGTH_LONG).show();
             }
         } catch (JSONException e) {
-            Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity(),""+e,Toast.LENGTH_LONG).show();
         }
         mSessionDialog.dismiss();
     }
 
     private void ShiftDataGetRequest() {
-        if (StaticHelperClass.isNetworkAvailable(this)) {
+        if (StaticHelperClass.isNetworkAvailable(getActivity())) {
             String shiftUrl = getString(R.string.baseUrl)+"/api/onEms/getInsShift/"+InstituteID;
 
-            mShiftDialog = new ProgressDialog(this);
+            mShiftDialog = new ProgressDialog(getActivity());
             mShiftDialog.setTitle("Loading shift...");
             mShiftDialog.setMessage("Please Wait...");
             mShiftDialog.setCancelable(true);
@@ -623,7 +525,7 @@ public class ResultMainScreen extends SideNavigationMenuParentActivity{
                 @Override
                 public void onErrorResponse(VolleyError error) {
                     mShiftDialog.dismiss();
-                    Toast.makeText(ResultMainScreen.this,"Shift not found!!! ",
+                    Toast.makeText(getActivity(),"Shift not found!!! ",
                             Toast.LENGTH_LONG).show();
                 }
             })
@@ -635,9 +537,9 @@ public class ResultMainScreen extends SideNavigationMenuParentActivity{
                     return params;
                 }
             };
-            MySingleton.getInstance(this).addToRequestQueue(stringShiftRequest);
+            MySingleton.getInstance(getActivity()).addToRequestQueue(stringShiftRequest);
         } else {
-            Toast.makeText(ResultMainScreen.this,"Please check your internet connection and select again!!! ",
+            Toast.makeText(getActivity(),"Please check your internet connection and select again!!! ",
                     Toast.LENGTH_LONG).show();
         }
     }
@@ -660,23 +562,23 @@ public class ResultMainScreen extends SideNavigationMenuParentActivity{
             try {
                 String[] strings = new String[shiftArrayList.size()];
                 strings = shiftArrayList.toArray(strings);
-                ArrayAdapter<String> shift_spinner_adapter = new ArrayAdapter<>(this,R.layout.spinner_item, strings);
+                ArrayAdapter<String> shift_spinner_adapter = new ArrayAdapter<>(getActivity(),R.layout.spinner_item, strings);
                 shift_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinnerShift.setAdapter(shift_spinner_adapter);
             } catch (IndexOutOfBoundsException e) {
-                Toast.makeText(this,"No shift found !!!",Toast.LENGTH_LONG).show();
+                Toast.makeText(getActivity(),"No shift found !!!",Toast.LENGTH_LONG).show();
             }
         } catch (JSONException e) {
-            Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity(),""+e,Toast.LENGTH_LONG).show();
         }
         mShiftDialog.dismiss();
     }
 
     private void MediumDataGetRequest() {
-        if(StaticHelperClass.isNetworkAvailable(this)) {
+        if(StaticHelperClass.isNetworkAvailable(getActivity())) {
             String mediumUrl = getString(R.string.baseUrl)+"/api/onEms/getInstituteMediumDdl/"+InstituteID;
 
-            mMediumDialog = new ProgressDialog(this);
+            mMediumDialog = new ProgressDialog(getActivity());
             mMediumDialog.setTitle("Loading medium...");
             mMediumDialog.setMessage("Please Wait...");
             mMediumDialog.setCancelable(true);
@@ -695,7 +597,7 @@ public class ResultMainScreen extends SideNavigationMenuParentActivity{
                 @Override
                 public void onErrorResponse(VolleyError error) {
                     mMediumDialog.dismiss();
-                    Toast.makeText(ResultMainScreen.this,"Medium not found!!! ",
+                    Toast.makeText(getActivity(),"Medium not found!!! ",
                             Toast.LENGTH_LONG).show();
                 }
             })
@@ -707,9 +609,9 @@ public class ResultMainScreen extends SideNavigationMenuParentActivity{
                     return params;
                 }
             };
-            MySingleton.getInstance(this).addToRequestQueue(stringMediumRequest);
+            MySingleton.getInstance(getActivity()).addToRequestQueue(stringMediumRequest);
         } else {
-            Toast.makeText(ResultMainScreen.this,"Please check your internet connection and select again!!! ",
+            Toast.makeText(getActivity(),"Please check your internet connection and select again!!! ",
                     Toast.LENGTH_LONG).show();
         }
     }
@@ -734,26 +636,26 @@ public class ResultMainScreen extends SideNavigationMenuParentActivity{
             try {
                 String[] strings = new String[mediumnArrayList.size()];
                 strings = mediumnArrayList.toArray(strings);
-                ArrayAdapter<String> medium_spinner_adapter = new ArrayAdapter<>(this,R.layout.spinner_item, strings);
+                ArrayAdapter<String> medium_spinner_adapter = new ArrayAdapter<>(getActivity(),R.layout.spinner_item, strings);
                 medium_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinnerMedium.setAdapter(medium_spinner_adapter);
             } catch (IndexOutOfBoundsException e) {
-                Toast.makeText(this,"No medium found !!!",Toast.LENGTH_LONG).show();
+                Toast.makeText(getActivity(),"No medium found !!!",Toast.LENGTH_LONG).show();
             }
         } catch (JSONException e) {
-            Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity(),""+e,Toast.LENGTH_LONG).show();
         }
         mMediumDialog.dismiss();
     }
 
     private void ClassDataGetRequest() {
-        if(StaticHelperClass.isNetworkAvailable(this)) {
+        if(StaticHelperClass.isNetworkAvailable(getActivity())) {
 
             CheckSelectedData();
 
             String classUrl = getString(R.string.baseUrl)+"/api/onEms/MediumWiseClassDDL/"+InstituteID+"/"+selectedMedium.getMediumID();
 
-            mClassDialog = new ProgressDialog(this);
+            mClassDialog = new ProgressDialog(getActivity());
             mClassDialog.setTitle("Loading class...");
             mClassDialog.setMessage("Please Wait...");
             mClassDialog.setCancelable(true);
@@ -772,7 +674,7 @@ public class ResultMainScreen extends SideNavigationMenuParentActivity{
                 @Override
                 public void onErrorResponse(VolleyError error) {
                     mClassDialog.dismiss();
-                    Toast.makeText(ResultMainScreen.this,"Class not found!!! ",
+                    Toast.makeText(getActivity(),"Class not found!!! ",
                             Toast.LENGTH_LONG).show();
                 }
             })
@@ -784,9 +686,9 @@ public class ResultMainScreen extends SideNavigationMenuParentActivity{
                     return params;
                 }
             };
-            MySingleton.getInstance(this).addToRequestQueue(stringClassRequest);
+            MySingleton.getInstance(getActivity()).addToRequestQueue(stringClassRequest);
         } else {
-            Toast.makeText(ResultMainScreen.this,"Please check your internet connection and select again!!! ",
+            Toast.makeText(getActivity(),"Please check your internet connection and select again!!! ",
                     Toast.LENGTH_LONG).show();
         }
     }
@@ -810,27 +712,27 @@ public class ResultMainScreen extends SideNavigationMenuParentActivity{
             try {
                 String[] strings = new String[classArrayList.size()];
                 strings = classArrayList.toArray(strings);
-                ArrayAdapter<String> class_spinner_adapter = new ArrayAdapter<>(this,R.layout.spinner_item, strings);
+                ArrayAdapter<String> class_spinner_adapter = new ArrayAdapter<>(getActivity(),R.layout.spinner_item, strings);
                 class_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinnerClass.setAdapter(class_spinner_adapter);
             } catch (IndexOutOfBoundsException e) {
-                Toast.makeText(this,"No class found !!!",Toast.LENGTH_LONG).show();
+                Toast.makeText(getActivity(),"No class found !!!",Toast.LENGTH_LONG).show();
             }
         } catch (JSONException e) {
-            Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity(),""+e,Toast.LENGTH_LONG).show();
         }
         mClassDialog.dismiss();
     }
 
     private void DepartmentDataGetRequest() {
-        if(StaticHelperClass.isNetworkAvailable(this)) {
+        if(StaticHelperClass.isNetworkAvailable(getActivity())) {
 
             CheckSelectedData();
 
             String departmentUrl = getString(R.string.baseUrl)+"/api/onEms/ClassWiseDepartmentDDL/"+InstituteID+"/"+
                     selectedClass.getClassID()+"/"+selectedMedium.getMediumID();
 
-            mDepartmentDialog = new ProgressDialog(this);
+            mDepartmentDialog = new ProgressDialog(getActivity());
             mDepartmentDialog.setTitle("Loading department...");
             mDepartmentDialog.setMessage("Please Wait...");
             mDepartmentDialog.setCancelable(true);
@@ -849,7 +751,7 @@ public class ResultMainScreen extends SideNavigationMenuParentActivity{
                 @Override
                 public void onErrorResponse(VolleyError error) {
                     mDepartmentDialog.dismiss();
-                    Toast.makeText(ResultMainScreen.this,"Department not found!!! ",
+                    Toast.makeText(getActivity(),"Department not found!!! ",
                             Toast.LENGTH_LONG).show();
                 }
             })
@@ -861,9 +763,9 @@ public class ResultMainScreen extends SideNavigationMenuParentActivity{
                     return params;
                 }
             };
-            MySingleton.getInstance(this).addToRequestQueue(stringDepartmentRequest);
+            MySingleton.getInstance(getActivity()).addToRequestQueue(stringDepartmentRequest);
         } else {
-            Toast.makeText(ResultMainScreen.this,"Please check your internet connection and select again!!! ",
+            Toast.makeText(getActivity(),"Please check your internet connection and select again!!! ",
                     Toast.LENGTH_LONG).show();
         }
     }
@@ -890,27 +792,27 @@ public class ResultMainScreen extends SideNavigationMenuParentActivity{
             try {
                 String[] strings = new String[departmentArrayList.size()];
                 strings = departmentArrayList.toArray(strings);
-                ArrayAdapter<String> department_spinner_adapter = new ArrayAdapter<>(this,R.layout.spinner_item, strings);
+                ArrayAdapter<String> department_spinner_adapter = new ArrayAdapter<>(getActivity(),R.layout.spinner_item, strings);
                 department_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinnerDepartment.setAdapter(department_spinner_adapter);
             } catch (IndexOutOfBoundsException e) {
-                Toast.makeText(this,"No department found !!!",Toast.LENGTH_LONG).show();
+                Toast.makeText(getActivity(),"No department found !!!",Toast.LENGTH_LONG).show();
             }
         } catch (JSONException e) {
-            Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity(),""+e,Toast.LENGTH_LONG).show();
         }
         mDepartmentDialog.dismiss();
     }
 
     private void SectionDataGetRequest() {
-        if(StaticHelperClass.isNetworkAvailable(this)) {
+        if(StaticHelperClass.isNetworkAvailable(getActivity())) {
 
             CheckSelectedData();
 
             String sectionUrl = getString(R.string.baseUrl)+"/api/onEms/getInsSection/"+InstituteID+"/"+
                     selectedClass.getClassID()+"/"+selectedDepartment.getDepartmentID();
 
-            mSectionDialog = new ProgressDialog(this);
+            mSectionDialog = new ProgressDialog(getActivity());
             mSectionDialog.setTitle("Loading section...");
             mSectionDialog.setMessage("Please Wait...");
             mSectionDialog.setCancelable(true);
@@ -929,7 +831,7 @@ public class ResultMainScreen extends SideNavigationMenuParentActivity{
                 @Override
                 public void onErrorResponse(VolleyError error) {
                     mSectionDialog.dismiss();
-                    Toast.makeText(ResultMainScreen.this,"Section not found!!! ",
+                    Toast.makeText(getActivity(),"Section not found!!! ",
                             Toast.LENGTH_LONG).show();
                 }
             })
@@ -941,9 +843,9 @@ public class ResultMainScreen extends SideNavigationMenuParentActivity{
                     return params;
                 }
             };
-            MySingleton.getInstance(this).addToRequestQueue(stringSectionRequest);
+            MySingleton.getInstance(getActivity()).addToRequestQueue(stringSectionRequest);
         } else {
-            Toast.makeText(ResultMainScreen.this,"Please check your internet connection and select again!!! ",
+            Toast.makeText(getActivity(),"Please check your internet connection and select again!!! ",
                     Toast.LENGTH_LONG).show();
         }
     }
@@ -966,25 +868,25 @@ public class ResultMainScreen extends SideNavigationMenuParentActivity{
             try {
                 String[] strings = new String[sectionArrayList.size()];
                 strings = sectionArrayList.toArray(strings);
-                ArrayAdapter<String> section_spinner_adapter = new ArrayAdapter<>(this,R.layout.spinner_item, strings);
+                ArrayAdapter<String> section_spinner_adapter = new ArrayAdapter<>(getActivity(),R.layout.spinner_item, strings);
                 section_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinnerSection.setAdapter(section_spinner_adapter);
             } catch (IndexOutOfBoundsException e) {
-                Toast.makeText(this,"No section found !!!",Toast.LENGTH_LONG).show();
+                Toast.makeText(getActivity(),"No section found !!!",Toast.LENGTH_LONG).show();
             }
         } catch (JSONException e) {
-            Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity(),""+e,Toast.LENGTH_LONG).show();
         }
         mSectionDialog.dismiss();
     }
 
     private void ExamDataGetRequest() {
-        if (StaticHelperClass.isNetworkAvailable(this)) {
+        if (StaticHelperClass.isNetworkAvailable(getActivity())) {
 
             String examUrl = getString(R.string.baseUrl)+"/api/onEms/getClassWiseInsExame/"
                     +InstituteID+"/"+selectedMedium.getMediumID()+"/"+selectedClass.getClassID();
 
-            mExamDialog = new ProgressDialog(this);
+            mExamDialog = new ProgressDialog(getActivity());
             mExamDialog.setTitle("Loading exam...");
             mExamDialog.setMessage("Please Wait...");
             mExamDialog.setCancelable(false);
@@ -1003,7 +905,7 @@ public class ResultMainScreen extends SideNavigationMenuParentActivity{
                 @Override
                 public void onErrorResponse(VolleyError error) {
                     mExamDialog.dismiss();
-                    Toast.makeText(ResultMainScreen.this,"Exam not found!!! ",
+                    Toast.makeText(getActivity(),"Exam not found!!! ",
                             Toast.LENGTH_LONG).show();
                 }
             })
@@ -1015,9 +917,9 @@ public class ResultMainScreen extends SideNavigationMenuParentActivity{
                     return params;
                 }
             };
-            MySingleton.getInstance(this).addToRequestQueue(stringExamRequest);
+            MySingleton.getInstance(getActivity()).addToRequestQueue(stringExamRequest);
         } else {
-            Toast.makeText(ResultMainScreen.this,"Please check your internet connection and select again!!! ",
+            Toast.makeText(getActivity(),"Please check your internet connection and select again!!! ",
                     Toast.LENGTH_LONG).show();
         }
     }
@@ -1044,21 +946,21 @@ public class ResultMainScreen extends SideNavigationMenuParentActivity{
             try {
                 String[] strings = new String[examArrayList.size()];
                 strings = examArrayList.toArray(strings);
-                ArrayAdapter<String> exam_spinner_adapter = new ArrayAdapter<>(this,R.layout.spinner_item, strings);
+                ArrayAdapter<String> exam_spinner_adapter = new ArrayAdapter<>(getActivity(),R.layout.spinner_item, strings);
                 exam_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinnerExam.setAdapter(exam_spinner_adapter);
             } catch (IndexOutOfBoundsException e) {
-                Toast.makeText(this,"No section found !!!",Toast.LENGTH_LONG).show();
+                Toast.makeText(getActivity(),"No section found !!!",Toast.LENGTH_LONG).show();
             }
         } catch (JSONException e) {
-            Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity(),""+e,Toast.LENGTH_LONG).show();
         }
         mExamDialog.dismiss();
     }
 
     private void GetStudentListPostRequest() {
-        if(StaticHelperClass.isNetworkAvailable(this)) {
-            mStudentListGetDialog = new ProgressDialog(this);
+        if(StaticHelperClass.isNetworkAvailable(getActivity())) {
+            mStudentListGetDialog = new ProgressDialog(getActivity());
             mStudentListGetDialog.setTitle("Loading student...");
             mStudentListGetDialog.setMessage("Please Wait...");
             mStudentListGetDialog.setCancelable(false);
@@ -1080,7 +982,7 @@ public class ResultMainScreen extends SideNavigationMenuParentActivity{
                 @Override
                 public void onErrorResponse(VolleyError error) {
                     mStudentListGetDialog.dismiss();
-                    Toast.makeText(ResultMainScreen.this,"Student not found!!! ",
+                    Toast.makeText(getActivity(),"Student not found!!! ",
                             Toast.LENGTH_LONG).show();
                 }
             }) {
@@ -1109,10 +1011,10 @@ public class ResultMainScreen extends SideNavigationMenuParentActivity{
                     return params;
                 }
             };
-            MySingleton.getInstance(this).addToRequestQueue(stringStudentListPostRequest);
+            MySingleton.getInstance(getActivity()).addToRequestQueue(stringStudentListPostRequest);
 
         } else {
-            Toast.makeText(ResultMainScreen.this,"Please check your internet connection and select again!!! ",
+            Toast.makeText(getActivity(),"Please check your internet connection and select again!!! ",
                     Toast.LENGTH_LONG).show();
         }
     }
@@ -1131,14 +1033,14 @@ public class ResultMainScreen extends SideNavigationMenuParentActivity{
             try {
                 String[] strings = new String[studentArrayList.size()];
                 strings = studentArrayList.toArray(strings);
-                ArrayAdapter<String> student_spinner_adapter = new ArrayAdapter<>(this,R.layout.spinner_item, strings);
+                ArrayAdapter<String> student_spinner_adapter = new ArrayAdapter<>(getActivity(),R.layout.spinner_item, strings);
                 student_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinnerStudent.setAdapter(student_spinner_adapter);
             } catch (IndexOutOfBoundsException e) {
-                Toast.makeText(this,"No student found !!!",Toast.LENGTH_LONG).show();
+                Toast.makeText(getActivity(),"No student found !!!",Toast.LENGTH_LONG).show();
             }
         } catch (JSONException e) {
-            Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity(),""+e,Toast.LENGTH_LONG).show();
         }
         mStudentListGetDialog.dismiss();
     }
@@ -1160,6 +1062,4 @@ public class ResultMainScreen extends SideNavigationMenuParentActivity{
             selectedDepartment.setDepartmentID("0");
         }
     }
-
-
 }

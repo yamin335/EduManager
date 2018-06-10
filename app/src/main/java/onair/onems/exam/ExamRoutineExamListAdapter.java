@@ -7,7 +7,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import java.util.ArrayList;
@@ -26,7 +25,7 @@ public class ExamRoutineExamListAdapter extends RecyclerView.Adapter<ExamRoutine
 
         MyViewHolder(View view) {
             super(view);
-            examName = view.findViewById(R.id.exam);
+            examName = view.findViewById(R.id.homework);
 
             view.setOnClickListener(new View.OnClickListener() {
                 @Override

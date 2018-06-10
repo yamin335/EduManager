@@ -16,6 +16,7 @@ import onair.onems.exam.ExamRoutineMainScreen;
 import onair.onems.fee.FeeMainScreen;
 import onair.onems.R;
 import onair.onems.attendance.StudentAttendanceReport;
+import onair.onems.homework.HomeworkMainScreen;
 import onair.onems.notice.NoticeMainScreen;
 import onair.onems.result.ResultMainScreen;
 import onair.onems.routine.RoutineMainScreen;
@@ -45,7 +46,7 @@ public class StudentMainScreen extends AppCompatActivity {
         Button routine= findViewById(R.id.routine);
         Button Attendance = findViewById(R.id.attendance);
         Button syllabus = findViewById(R.id.syllabus);
-        Button exam = findViewById(R.id.exam);
+        Button homework = findViewById(R.id.homework);
         Button result = findViewById(R.id.result);
         Button Fees = findViewById(R.id.fee);
         Button contact = findViewById(R.id.contact);
@@ -91,10 +92,10 @@ public class StudentMainScreen extends AppCompatActivity {
         });
 
         // Exam module start point
-        exam.setOnClickListener(new View.OnClickListener() {
+        homework.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent mainIntent = new Intent(StudentMainScreen.this, ExamRoutineMainScreen.class);
+                Intent mainIntent = new Intent(StudentMainScreen.this, HomeworkMainScreen.class);
                 StudentMainScreen.this.startActivity(mainIntent);
                 finish();
             }

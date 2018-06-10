@@ -163,21 +163,22 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:gravity="center">
+
             <Button
-                android:id="@+id/exam"
+                android:id="@+id/homework"
                 android:layout_width="match_parent"
                 android:layout_height="105dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
                 android:background="@drawable/menu_item_exam"
                 android:drawableTop="@drawable/routine"
                 android:elevation="100dp"
                 android:fontFamily="sans-serif-condensed"
                 android:padding="10dp"
-                android:text="Exam"
+                android:text="Homework"
                 android:textAllCaps="false"
                 android:textColor="@android:color/white"
-                android:textSize="20sp"
-                android:layout_marginLeft="20dp"
-                android:layout_marginRight="20dp"/>
+                android:textSize="20sp" />
 
         </LinearLayout>
         <LinearLayout

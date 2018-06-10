@@ -19,7 +19,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
     private int UserTypeID;
     // child data in format of header title, child title
     private HashMap<ExpandedMenuModel, List<String>> mListDataChild;
-//    ExpandableListView expandList;
+    // ExpandableListView expandList;
 
     public ExpandableListAdapter(Context context, List<ExpandedMenuModel> listDataHeader,
                                  HashMap<ExpandedMenuModel, List<String>> listChildData, int UserTypeID) {
@@ -89,7 +89,13 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
 
         if(UserTypeID == 1) {
             switch (groupPosition) {
+                case 2:
+                    indicator.setVisibility(View.VISIBLE);
+                    break;
                 case 3:
+                    indicator.setVisibility(View.VISIBLE);
+                    break;
+                case 5:
                     indicator.setVisibility(View.VISIBLE);
                     break;
                 case 6:
@@ -103,7 +109,13 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
             }
         } else if(UserTypeID == 2) {
             switch (groupPosition) {
+                case 2:
+                    indicator.setVisibility(View.VISIBLE);
+                    break;
                 case 3:
+                    indicator.setVisibility(View.VISIBLE);
+                    break;
+                case 5:
                     indicator.setVisibility(View.VISIBLE);
                     break;
                 case 6:
@@ -117,6 +129,12 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
             }
         } else if(UserTypeID == 3) {
             switch (groupPosition) {
+                case 2:
+                    indicator.setVisibility(View.VISIBLE);
+                    break;
+                case 5:
+                    indicator.setVisibility(View.VISIBLE);
+                    break;
                 case 6:
                     indicator.setVisibility(View.VISIBLE);
                     break;
@@ -128,7 +146,13 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
             }
         } else if(UserTypeID == 4) {
             switch (groupPosition) {
+                case 2:
+                    indicator.setVisibility(View.VISIBLE);
+                    break;
                 case 3:
+                    indicator.setVisibility(View.VISIBLE);
+                    break;
+                case 5:
                     indicator.setVisibility(View.VISIBLE);
                     break;
                 case 6:
@@ -142,6 +166,12 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
             }
         } else if(UserTypeID == 5) {
             switch (groupPosition) {
+                case 2:
+                    indicator.setVisibility(View.VISIBLE);
+                    break;
+                case 5:
+                    indicator.setVisibility(View.VISIBLE);
+                    break;
                 case 6:
                     indicator.setVisibility(View.VISIBLE);
                     break;

@@ -14,6 +14,7 @@ import android.widget.TextView;
 import onair.onems.R;
 import onair.onems.attendance.AttendanceAdminDashboard;
 import onair.onems.exam.ExamRoutineMainScreen;
+import onair.onems.homework.HomeworkMainScreen;
 import onair.onems.notice.NoticeMainScreen;
 import onair.onems.result.ResultMainScreen;
 import onair.onems.routine.RoutineMainScreen;
@@ -36,7 +37,7 @@ public class TeacherMainScreen extends AppCompatActivity {
         Button result = (Button)findViewById(R.id.result);
         Button contact = (Button)findViewById(R.id.contact);
         Button routine = (Button)findViewById(R.id.routine);
-        Button exam = (Button)findViewById(R.id.exam);
+        Button homework = (Button)findViewById(R.id.homework);
         Button syllabus = findViewById(R.id.syllabus);
 
         SharedPreferences sharedPre = PreferenceManager.getDefaultSharedPreferences(this);
@@ -97,10 +98,10 @@ public class TeacherMainScreen extends AppCompatActivity {
             }
         });
 
-        exam.setOnClickListener(new View.OnClickListener() {
+        homework.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent mainIntent = new Intent(TeacherMainScreen.this,ExamRoutineMainScreen.class);
+                Intent mainIntent = new Intent(TeacherMainScreen.this,HomeworkMainScreen.class);
                 TeacherMainScreen.this.startActivity(mainIntent);
                 finish();
             }

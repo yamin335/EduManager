@@ -28,7 +28,7 @@ public class ExamRoutineExamDetailsAdapter extends RecyclerView.Adapter<ExamRout
 
         MyViewHolder(View view) {
             super(view);
-            exam = view.findViewById(R.id.exam);
+            exam = view.findViewById(R.id.homework);
             date = view.findViewById(R.id.date);
             shift = view.findViewById(R.id.shift);
             medium = view.findViewById(R.id.medium);

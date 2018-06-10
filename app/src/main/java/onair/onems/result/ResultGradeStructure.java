@@ -265,6 +265,7 @@ public class ResultGradeStructure extends SideNavigationMenuParentActivity
             mResultDialog.setMessage("Please Wait...");
             mResultDialog.setCancelable(false);
             mResultDialog.setIcon(R.drawable.onair);
+            mResultDialog.show();
 
             //Preparing Shift data from server
             StringRequest stringResultRequest = new StringRequest(Request.Method.GET, resultGradeDataGetUrl,
@@ -277,6 +278,8 @@ public class ResultGradeStructure extends SideNavigationMenuParentActivity
                 @Override
                 public void onErrorResponse(VolleyError error) {
                     mResultDialog.dismiss();
+                    Toast.makeText(ResultGradeStructure.this,"Grade sheet not found!!! ",
+                            Toast.LENGTH_LONG).show();
                 }
             })
             {
@@ -302,11 +305,10 @@ public class ResultGradeStructure extends SideNavigationMenuParentActivity
                 ResultGradeSheet.add(resultJsonArray.getJSONObject(i));
             }
             mAdapter.notifyDataSetChanged();
-            mResultDialog.dismiss();
         } catch (JSONException e) {
             e.printStackTrace();
-            mResultDialog.dismiss();
         }
+        mResultDialog.dismiss();
     }
 
     private void MediumDataGetRequest() {

@@ -77,7 +77,7 @@ public class RoutineMainScreen extends SideNavigationMenuParentActivity {
 
                 if(UserTypeID == 1||UserTypeID == 2) {
                     routineUrl = getString(R.string.baseUrl)+"/api/onEms/spGetCommonClassRoutine/"
-                            +InstituteID;
+                            +InstituteID+"/"+"0";
                 } else if(UserTypeID == 4) {
                     routineUrl = getString(R.string.baseUrl)+"/api/onEms/spGetTeacherStudentMyClassRoutine/"
                             +InstituteID+"/"+LoggedUserClassID+"/"+LoggedUserID;

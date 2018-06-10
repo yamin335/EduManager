@@ -42,12 +42,12 @@ import onair.onems.network.MySingleton;
 
 public class SubjectWiseResult extends CommonToolbarParentActivity implements SubjectWiseResultAdapter.SubjectWiseResultsAdapterListener{
 
-    private RecyclerView recyclerView;
     private List<JSONObject> subjectWiseResultList;
     private SubjectWiseResultAdapter mAdapter;
-    private ProgressDialog mResultDialog;
+    private ProgressDialog mResultDialog, mGradeDialog;
     private String UserID, ShiftID, MediumID, ClassID, DepartmentID, SectionID, SessionID, ExamID, InstituteID;
     private boolean isFail = false;
+    private JSONArray resultGradingSystem;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,11 +68,17 @@ public class SubjectWiseResult extends CommonToolbarParentActivity implements Su
         ExamID = intent.getStringExtra("ExamID");
         InstituteID = intent.getStringExtra("InstituteID");
 
-        recyclerView = findViewById(R.id.recycler_view);
+        RecyclerView recyclerView = findViewById(R.id.recycler_view);
+        subjectWiseResultList = new ArrayList<>();
+        mAdapter = new SubjectWiseResultAdapter(this, subjectWiseResultList, this);
 
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
+        recyclerView.setLayoutManager(mLayoutManager);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.addItemDecoration(new MyDividerItemDecoration(this, DividerItemDecoration.VERTICAL, 10));
+        recyclerView.setAdapter(mAdapter);
 
-        ResultDataGetRequest();
-
+        ResultGradeDataGetRequest();
     }
 
     @Override
@@ -132,7 +138,7 @@ public class SubjectWiseResult extends CommonToolbarParentActivity implements Su
 
     private void prepareResult(String result) {
         try {
-            subjectWiseResultList = new ArrayList<>();
+            subjectWiseResultList.clear();
             JSONArray resultJsonArray = new JSONArray(result);
             int totalMarks = 0;
             double totalGradePoint = 0.0;
@@ -166,39 +172,110 @@ public class SubjectWiseResult extends CommonToolbarParentActivity implements Su
                 totalGradePoint = new BigDecimal(totalGradePoint).setScale(2, RoundingMode.HALF_UP).doubleValue();
             }
 
-            if((totalGradePoint>5.0)||(totalGradePoint==5.0)) {
-                totalGrade = "A+";
-            } else if((totalGradePoint>=4.0)&&(totalGradePoint<5.0)) {
-                totalGrade = "A";
-            }else if((totalGradePoint>=3.5)&&(totalGradePoint<4.0)) {
-                totalGrade = "A-";
-            }else if((totalGradePoint>=3.0)&&(totalGradePoint<3.5)) {
-                totalGrade = "B";
-            }else if((totalGradePoint>=2.0)&&(totalGradePoint<3.0)) {
-                totalGrade = "C";
-            }else if((totalGradePoint>=1.0)&&(totalGradePoint<2.0)) {
-                totalGrade = "D";
-            }else {
+//            if((totalGradePoint>5.0)||(totalGradePoint==5.0)) {
+//                totalGrade = "A+";
+//            } else if((totalGradePoint>=4.0)&&(totalGradePoint<5.0)) {
+//                totalGrade = "A";
+//            }else if((totalGradePoint>=3.5)&&(totalGradePoint<4.0)) {
+//                totalGrade = "A-";
+//            }else if((totalGradePoint>=3.0)&&(totalGradePoint<3.5)) {
+//                totalGrade = "B";
+//            }else if((totalGradePoint>=2.0)&&(totalGradePoint<3.0)) {
+//                totalGrade = "C";
+//            }else if((totalGradePoint>=1.0)&&(totalGradePoint<2.0)) {
+//                totalGrade = "D";
+//            }else {
+//                totalGrade = "F";
+//            }
+
+            if(isFail) {
                 totalGrade = "F";
+            } else {
+                totalGrade = getTotalGrade(totalGradePoint);
             }
+
             JSONObject totalResult = new JSONObject();
             totalResult.put("SubjectName", "Total");
             totalResult.put("Total",Integer.toString(totalMarks));
             totalResult.put("Grade", totalGrade);
             totalResult.put("GradePoint", totalGradePoint);
             subjectWiseResultList.add(totalResult);
-
-            mAdapter = new SubjectWiseResultAdapter(this, subjectWiseResultList, this);
-
-            RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
-            recyclerView.setLayoutManager(mLayoutManager);
-            recyclerView.setItemAnimator(new DefaultItemAnimator());
-            recyclerView.addItemDecoration(new MyDividerItemDecoration(this, DividerItemDecoration.VERTICAL, 10));
-            recyclerView.setAdapter(mAdapter);
-            mResultDialog.dismiss();
+            mAdapter.notifyDataSetChanged();
         } catch (JSONException e) {
             e.printStackTrace();
-            mResultDialog.dismiss();
         }
+        mResultDialog.dismiss();
+    }
+
+    private void ResultGradeDataGetRequest(){
+        if (StaticHelperClass.isNetworkAvailable(this)) {
+            String resultGradeDataGetUrl = getString(R.string.baseUrl)+"/api/onEms/getinsGradeForReport/"+InstituteID+"/"+MediumID+"/"+ClassID;
+            mGradeDialog = new ProgressDialog(this);
+            mGradeDialog.setTitle("Loading Grade Sheet...");
+            mGradeDialog.setMessage("Please Wait...");
+            mGradeDialog.setCancelable(false);
+            mGradeDialog.setIcon(R.drawable.onair);
+            mGradeDialog.show();
+
+            //Preparing Shift data from server
+            StringRequest stringResultRequest = new StringRequest(Request.Method.GET, resultGradeDataGetUrl,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+                            prepareResultGradeSheet(response);
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    mGradeDialog.dismiss();
+                    Toast.makeText(SubjectWiseResult.this,"Grade sheet not found!!! ",
+                            Toast.LENGTH_LONG).show();
+                }
+            })
+            {
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    Map<String, String>  params = new HashMap<>();
+                    params.put("Authorization", "Request_From_onEMS_Android_app");
+                    return params;
+                }
+            };
+            MySingleton.getInstance(this).addToRequestQueue(stringResultRequest);
+        } else {
+            Toast.makeText(this,"Please check your internet connection and select again!!! ",
+                    Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private void prepareResultGradeSheet(String result) {
+        mGradeDialog.dismiss();
+        try {
+            resultGradingSystem = new JSONArray(result);
+            ResultDataGetRequest();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private String getTotalGrade(double totalGradePoint){
+        String totalGrade = "F";
+        for (int i = 0; i<resultGradingSystem.length(); i++) {
+            try {
+                if(i==0 && totalGradePoint>=resultGradingSystem.getJSONObject(i).getDouble("GPA")) {
+                    return resultGradingSystem.getJSONObject(i).getString("GradeName");
+                } else if(i>0 && i<(resultGradingSystem.length()-1) &&
+                        totalGradePoint>=resultGradingSystem.getJSONObject(i).getDouble("GPA") &&
+                        totalGradePoint<resultGradingSystem.getJSONObject(i-1).getDouble("GPA")) {
+                    return resultGradingSystem.getJSONObject(i).getString("GradeName");
+                } else if(i==(resultGradingSystem.length()-1) &&
+                        totalGradePoint<=resultGradingSystem.getJSONObject(i).getDouble("GPA") &&
+                        totalGradePoint<resultGradingSystem.getJSONObject(i-1).getDouble("GPA")) {
+                    return resultGradingSystem.getJSONObject(i).getString("GradeName");
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        return totalGrade;
     }
 }

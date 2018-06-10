@@ -34,6 +34,8 @@ import onair.onems.customised.GuardianStudentSelectionDialog;
 import onair.onems.exam.ExamRoutineMainScreen;
 import onair.onems.fee.FeeMainScreen;
 import onair.onems.fee.FeesHistory;
+import onair.onems.homework.HomeworkMainScreen;
+import onair.onems.lesson_plan.LessonPlanMainScreen;
 import onair.onems.login.LoginScreen;
 import onair.onems.notice.NoticeMainScreen;
 import onair.onems.result.ResultGradeStructure;
@@ -277,10 +279,10 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity {
         menuSyllabus.setIconImg(R.drawable.nav_syllabus);
         listDataHeader.add(menuSyllabus);
 
-        ExpandedMenuModel menuExam = new ExpandedMenuModel();
-        menuExam.setIconName("Exam");
-        menuExam.setIconImg(R.drawable.nav_exam);
-        listDataHeader.add(menuExam);
+        ExpandedMenuModel menuHomework = new ExpandedMenuModel();
+        menuHomework.setIconName("Homework");
+        menuHomework.setIconImg(R.drawable.nav_exam);
+        listDataHeader.add(menuHomework);
 
         ExpandedMenuModel menuResult = new ExpandedMenuModel();
         menuResult.setIconName("Result");
@@ -305,7 +307,10 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity {
         // Adding child data
         List<String> headingDashboard = new ArrayList<>();
         List<String> headingNotice = new ArrayList<>();
+
         List<String> headingRoutine = new ArrayList<>();
+        headingRoutine.add("Class Routine");
+        headingRoutine.add("Exam Routine");
 
         List<String> headingAttendance = new ArrayList<>();
         headingAttendance.add("Total Report");
@@ -313,7 +318,10 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity {
         headingAttendance.add("Show Attendance");
 
         List<String> headingSyllabus = new ArrayList<>();
-        List<String> headingExam = new ArrayList<>();
+
+        List<String> headingHomework = new ArrayList<>();
+        headingHomework.add("Homework");
+        headingHomework.add("Lesson Plan");
 
         List<String> headingResult = new ArrayList<>();
         headingResult.add("Show Result");
@@ -333,7 +341,7 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity {
         listDataChild.put(listDataHeader.get(2), headingRoutine);
         listDataChild.put(listDataHeader.get(3), headingAttendance);
         listDataChild.put(listDataHeader.get(4), headingSyllabus);
-        listDataChild.put(listDataHeader.get(5), headingExam);
+        listDataChild.put(listDataHeader.get(5), headingHomework);
         listDataChild.put(listDataHeader.get(6), headingResult);
         listDataChild.put(listDataHeader.get(7), headingContact);
         listDataChild.put(listDataHeader.get(8), headingiCard);
@@ -366,19 +374,6 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity {
                     }
                 }
 
-                if((i == 2) && (l == 2)) {
-                    if(activityName.equals(RoutineMainScreen.class.getName())){
-                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-                        if (drawer.isDrawerOpen(GravityCompat.START)) {
-                            drawer.closeDrawer(GravityCompat.START);
-                        }
-                    } else {
-                        Intent intent = new Intent(getApplicationContext(), RoutineMainScreen.class);
-                        startActivity(intent);
-                        finish();
-                    }
-                }
-
                 if((i == 4) && (l == 4)) {
                     if(activityName.equals(SyllabusMainScreen.class.getName())){
                         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -387,19 +382,6 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity {
                         }
                     } else {
                         Intent intent = new Intent(getApplicationContext(), SyllabusMainScreen.class);
-                        startActivity(intent);
-                        finish();
-                    }
-                }
-
-                if((i == 5) && (l == 5)) {
-                    if(activityName.equals(ExamRoutineMainScreen.class.getName())){
-                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-                        if (drawer.isDrawerOpen(GravityCompat.START)) {
-                            drawer.closeDrawer(GravityCompat.START);
-                        }
-                    } else {
-                        Intent intent = new Intent(getApplicationContext(), ExamRoutineMainScreen.class);
                         startActivity(intent);
                         finish();
                     }
@@ -424,6 +406,32 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity {
         expandableList.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
             @Override
             public boolean onChildClick(ExpandableListView expandableListView, View view, int i, int i1, long l) {
+
+                if((i == 2) && (i1 == 0) && (l == 0)) {
+                    if(activityName.equals(RoutineMainScreen.class.getName())){
+                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                        if (drawer.isDrawerOpen(GravityCompat.START)) {
+                            drawer.closeDrawer(GravityCompat.START);
+                        }
+                    } else {
+                        Intent intent = new Intent(getApplicationContext(), RoutineMainScreen.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                }
+
+                if((i == 2) && (i1 == 1) && (l == 1)) {
+                    if(activityName.equals(ExamRoutineMainScreen.class.getName())){
+                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                        if (drawer.isDrawerOpen(GravityCompat.START)) {
+                            drawer.closeDrawer(GravityCompat.START);
+                        }
+                    } else {
+                        Intent intent = new Intent(getApplicationContext(), ExamRoutineMainScreen.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                }
 
                 if((i == 3) && (i1 == 0) && (l == 0)) {
                     if(activityName.equals(AttendanceAdminDashboard.class.getName())){
@@ -459,6 +467,32 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity {
                         }
                     } else {
                         Intent intent = new Intent(getApplicationContext(), ShowAttendance.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                }
+
+                if((i == 5) && (i1 == 0) && (l == 0)) {
+                    if(activityName.equals(HomeworkMainScreen.class.getName())){
+                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                        if (drawer.isDrawerOpen(GravityCompat.START)) {
+                            drawer.closeDrawer(GravityCompat.START);
+                        }
+                    } else {
+                        Intent intent = new Intent(getApplicationContext(), HomeworkMainScreen.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                }
+
+                if((i == 5) && (i1 == 1) && (l == 1)) {
+                    if(activityName.equals(LessonPlanMainScreen.class.getName())){
+                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                        if (drawer.isDrawerOpen(GravityCompat.START)) {
+                            drawer.closeDrawer(GravityCompat.START);
+                        }
+                    } else {
+                        Intent intent = new Intent(getApplicationContext(), LessonPlanMainScreen.class);
                         startActivity(intent);
                         finish();
                     }
@@ -552,10 +586,10 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity {
         menuSyllabus.setIconImg(R.drawable.nav_syllabus);
         listDataHeader.add(menuSyllabus);
 
-        ExpandedMenuModel menuExam = new ExpandedMenuModel();
-        menuExam.setIconName("Exam");
-        menuExam.setIconImg(R.drawable.nav_exam);
-        listDataHeader.add(menuExam);
+        ExpandedMenuModel menuHomework = new ExpandedMenuModel();
+        menuHomework.setIconName("Homework");
+        menuHomework.setIconImg(R.drawable.nav_exam);
+        listDataHeader.add(menuHomework);
 
         ExpandedMenuModel menuResult = new ExpandedMenuModel();
         menuResult.setIconName("Result");
@@ -581,6 +615,8 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity {
         List<String> headingDashboard = new ArrayList<>();
         List<String> headingNotice = new ArrayList<>();
         List<String> headingRoutine = new ArrayList<>();
+        headingRoutine.add("Class Routine");
+        headingRoutine.add("Exam Routine");
 
         List<String> headingAttendance = new ArrayList<>();
         headingAttendance.add("Total Report");
@@ -588,7 +624,10 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity {
         headingAttendance.add("Show Attendance");
 
         List<String> headingSyllabus = new ArrayList<>();
-        List<String> headingExam = new ArrayList<>();
+
+        List<String> headingHomework = new ArrayList<>();
+        headingHomework.add("Homework");
+        headingHomework.add("Lesson Plan");
 
         List<String> headingResult = new ArrayList<>();
         headingResult.add("Show Result");
@@ -608,7 +647,7 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity {
         listDataChild.put(listDataHeader.get(2), headingRoutine);
         listDataChild.put(listDataHeader.get(3), headingAttendance);
         listDataChild.put(listDataHeader.get(4), headingSyllabus);
-        listDataChild.put(listDataHeader.get(5), headingExam);
+        listDataChild.put(listDataHeader.get(5), headingHomework);
         listDataChild.put(listDataHeader.get(6), headingResult);
         listDataChild.put(listDataHeader.get(7), headingContact);
         listDataChild.put(listDataHeader.get(8), headingiCard);
@@ -641,19 +680,6 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity {
                     }
                 }
 
-                if((i == 2) && (l == 2)) {
-                    if(activityName.equals(RoutineMainScreen.class.getName())){
-                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-                        if (drawer.isDrawerOpen(GravityCompat.START)) {
-                            drawer.closeDrawer(GravityCompat.START);
-                        }
-                    } else {
-                        Intent intent = new Intent(getApplicationContext(), RoutineMainScreen.class);
-                        startActivity(intent);
-                        finish();
-                    }
-                }
-
                 if((i == 4) && (l == 4)) {
                     if(activityName.equals(SyllabusMainScreen.class.getName())){
                         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -662,19 +688,6 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity {
                         }
                     } else {
                         Intent intent = new Intent(getApplicationContext(), SyllabusMainScreen.class);
-                        startActivity(intent);
-                        finish();
-                    }
-                }
-
-                if((i == 5) && (l == 5)) {
-                    if(activityName.equals(ExamRoutineMainScreen.class.getName())){
-                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-                        if (drawer.isDrawerOpen(GravityCompat.START)) {
-                            drawer.closeDrawer(GravityCompat.START);
-                        }
-                    } else {
-                        Intent intent = new Intent(getApplicationContext(), ExamRoutineMainScreen.class);
                         startActivity(intent);
                         finish();
                     }
@@ -699,6 +712,32 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity {
         expandableList.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
             @Override
             public boolean onChildClick(ExpandableListView expandableListView, View view, int i, int i1, long l) {
+
+                if((i == 2) && (i1 == 0) && (l == 0)) {
+                    if(activityName.equals(RoutineMainScreen.class.getName())){
+                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                        if (drawer.isDrawerOpen(GravityCompat.START)) {
+                            drawer.closeDrawer(GravityCompat.START);
+                        }
+                    } else {
+                        Intent intent = new Intent(getApplicationContext(), RoutineMainScreen.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                }
+
+                if((i == 2) && (i1 == 1) && (l == 1)) {
+                    if(activityName.equals(ExamRoutineMainScreen.class.getName())){
+                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                        if (drawer.isDrawerOpen(GravityCompat.START)) {
+                            drawer.closeDrawer(GravityCompat.START);
+                        }
+                    } else {
+                        Intent intent = new Intent(getApplicationContext(), ExamRoutineMainScreen.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                }
 
                 if((i == 3) && (i1 == 0) && (l == 0)) {
                     if(activityName.equals(AttendanceAdminDashboard.class.getName())){
@@ -734,6 +773,32 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity {
                         }
                     } else {
                         Intent intent = new Intent(getApplicationContext(), ShowAttendance.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                }
+
+                if((i == 5) && (i1 == 0) && (l == 0)) {
+                    if(activityName.equals(HomeworkMainScreen.class.getName())){
+                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                        if (drawer.isDrawerOpen(GravityCompat.START)) {
+                            drawer.closeDrawer(GravityCompat.START);
+                        }
+                    } else {
+                        Intent intent = new Intent(getApplicationContext(), HomeworkMainScreen.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                }
+
+                if((i == 5) && (i1 == 1) && (l == 1)) {
+                    if(activityName.equals(LessonPlanMainScreen.class.getName())){
+                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                        if (drawer.isDrawerOpen(GravityCompat.START)) {
+                            drawer.closeDrawer(GravityCompat.START);
+                        }
+                    } else {
+                        Intent intent = new Intent(getApplicationContext(), LessonPlanMainScreen.class);
                         startActivity(intent);
                         finish();
                     }
@@ -827,10 +892,10 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity {
         menuSyllabus.setIconImg(R.drawable.nav_syllabus);
         listDataHeader.add(menuSyllabus);
 
-        ExpandedMenuModel menuExam = new ExpandedMenuModel();
-        menuExam.setIconName("Exam");
-        menuExam.setIconImg(R.drawable.nav_exam);
-        listDataHeader.add(menuExam);
+        ExpandedMenuModel menuHomework = new ExpandedMenuModel();
+        menuHomework.setIconName("Homework");
+        menuHomework.setIconImg(R.drawable.nav_exam);
+        listDataHeader.add(menuHomework);
 
         ExpandedMenuModel menuResult = new ExpandedMenuModel();
         menuResult.setIconName("Result");
@@ -856,13 +921,18 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity {
         List<String> headingDashboard = new ArrayList<>();
         List<String> headingNotice = new ArrayList<>();
         List<String> headingRoutine = new ArrayList<>();
+        headingRoutine.add("Class Routine");
+        headingRoutine.add("Exam Routine");
 
         List<String> headingAttendance = new ArrayList<>();
         headingAttendance.add("Take Attendance");
         headingAttendance.add("Show Attendance");
 
         List<String> headingSyllabus = new ArrayList<>();
-        List<String> headingExam = new ArrayList<>();
+
+        List<String> headingHomework = new ArrayList<>();
+        headingHomework.add("Homework");
+        headingHomework.add("Lesson Plan");
 
         List<String> headingResult = new ArrayList<>();
         headingResult.add("Show Result");
@@ -882,7 +952,7 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity {
         listDataChild.put(listDataHeader.get(2), headingRoutine);
         listDataChild.put(listDataHeader.get(3), headingAttendance);
         listDataChild.put(listDataHeader.get(4), headingSyllabus);
-        listDataChild.put(listDataHeader.get(5), headingExam);
+        listDataChild.put(listDataHeader.get(5), headingHomework);
         listDataChild.put(listDataHeader.get(6), headingResult);
         listDataChild.put(listDataHeader.get(7), headingContact);
         listDataChild.put(listDataHeader.get(8), headingiCard);
@@ -915,19 +985,6 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity {
                     }
                 }
 
-                if((i == 2) && (l == 2)) {
-                    if(activityName.equals(RoutineMainScreen.class.getName())){
-                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-                        if (drawer.isDrawerOpen(GravityCompat.START)) {
-                            drawer.closeDrawer(GravityCompat.START);
-                        }
-                    } else {
-                        Intent intent = new Intent(getApplicationContext(), RoutineMainScreen.class);
-                        startActivity(intent);
-                        finish();
-                    }
-                }
-
                 if((i == 4) && (l == 4)) {
                     if(activityName.equals(SyllabusMainScreen.class.getName())){
                         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -936,19 +993,6 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity {
                         }
                     } else {
                         Intent intent = new Intent(getApplicationContext(), SyllabusMainScreen.class);
-                        startActivity(intent);
-                        finish();
-                    }
-                }
-
-                if((i == 5) && (l == 5)) {
-                    if(activityName.equals(ExamRoutineMainScreen.class.getName())){
-                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-                        if (drawer.isDrawerOpen(GravityCompat.START)) {
-                            drawer.closeDrawer(GravityCompat.START);
-                        }
-                    } else {
-                        Intent intent = new Intent(getApplicationContext(), ExamRoutineMainScreen.class);
                         startActivity(intent);
                         finish();
                     }
@@ -974,6 +1018,32 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity {
             @Override
             public boolean onChildClick(ExpandableListView expandableListView, View view, int i, int i1, long l) {
 
+                if((i == 2) && (i1 == 0) && (l == 0)) {
+                    if(activityName.equals(RoutineMainScreen.class.getName())){
+                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                        if (drawer.isDrawerOpen(GravityCompat.START)) {
+                            drawer.closeDrawer(GravityCompat.START);
+                        }
+                    } else {
+                        Intent intent = new Intent(getApplicationContext(), RoutineMainScreen.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                }
+
+                if((i == 2) && (i1 == 1) && (l == 1)) {
+                    if(activityName.equals(ExamRoutineMainScreen.class.getName())){
+                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                        if (drawer.isDrawerOpen(GravityCompat.START)) {
+                            drawer.closeDrawer(GravityCompat.START);
+                        }
+                    } else {
+                        Intent intent = new Intent(getApplicationContext(), ExamRoutineMainScreen.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                }
+
                 if((i == 3) && (i1 == 0) && (l == 0)) {
                     if(activityName.equals(TakeAttendance.class.getName())){
                         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -995,6 +1065,32 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity {
                         }
                     } else {
                         Intent intent = new Intent(getApplicationContext(), ShowAttendance.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                }
+
+                if((i == 5) && (i1 == 0) && (l == 0)) {
+                    if(activityName.equals(HomeworkMainScreen.class.getName())){
+                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                        if (drawer.isDrawerOpen(GravityCompat.START)) {
+                            drawer.closeDrawer(GravityCompat.START);
+                        }
+                    } else {
+                        Intent intent = new Intent(getApplicationContext(), HomeworkMainScreen.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                }
+
+                if((i == 5) && (i1 == 1) && (l == 1)) {
+                    if(activityName.equals(LessonPlanMainScreen.class.getName())){
+                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                        if (drawer.isDrawerOpen(GravityCompat.START)) {
+                            drawer.closeDrawer(GravityCompat.START);
+                        }
+                    } else {
+                        Intent intent = new Intent(getApplicationContext(), LessonPlanMainScreen.class);
                         startActivity(intent);
                         finish();
                     }
@@ -1089,10 +1185,10 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity {
         menuSyllabus.setIconImg(R.drawable.nav_syllabus);
         listDataHeader.add(menuSyllabus);
 
-        ExpandedMenuModel menuExam = new ExpandedMenuModel();
-        menuExam.setIconName("Exam");
-        menuExam.setIconImg(R.drawable.nav_exam);
-        listDataHeader.add(menuExam);
+        ExpandedMenuModel menuHomework = new ExpandedMenuModel();
+        menuHomework.setIconName("Homework");
+        menuHomework.setIconImg(R.drawable.nav_exam);
+        listDataHeader.add(menuHomework);
 
         ExpandedMenuModel menuResult = new ExpandedMenuModel();
         menuResult.setIconName("Result");
@@ -1113,9 +1209,15 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity {
         List<String> headingDashboard = new ArrayList<>();
         List<String> headingNotice = new ArrayList<>();
         List<String> headingRoutine = new ArrayList<>();
+        headingRoutine.add("Class Routine");
+        headingRoutine.add("Exam Routine");
+
         List<String> headingAttendance = new ArrayList<>();
         List<String> headingSyllabus = new ArrayList<>();
-        List<String> headingExam = new ArrayList<>();
+
+        List<String> headingHomework = new ArrayList<>();
+        headingHomework.add("Homework");
+        headingHomework.add("Lesson Plan");
 
         List<String> headingResult = new ArrayList<>();
         headingResult.add("Show Result");
@@ -1133,7 +1235,7 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity {
         listDataChild.put(listDataHeader.get(2), headingRoutine);
         listDataChild.put(listDataHeader.get(3), headingAttendance);
         listDataChild.put(listDataHeader.get(4), headingSyllabus);
-        listDataChild.put(listDataHeader.get(5), headingExam);
+        listDataChild.put(listDataHeader.get(5), headingHomework);
         listDataChild.put(listDataHeader.get(6), headingResult);
         listDataChild.put(listDataHeader.get(7), headingFee);
         listDataChild.put(listDataHeader.get(8), headingContact);
@@ -1165,19 +1267,6 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity {
                     }
                 }
 
-                if((i == 2) && (l == 2)) {
-                    if(activityName.equals(RoutineMainScreen.class.getName())){
-                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-                        if (drawer.isDrawerOpen(GravityCompat.START)) {
-                            drawer.closeDrawer(GravityCompat.START);
-                        }
-                    } else {
-                        Intent intent = new Intent(getApplicationContext(), RoutineMainScreen.class);
-                        startActivity(intent);
-                        finish();
-                    }
-                }
-
                 if((i == 3) && (l == 3)) {
                     if(activityName.equals(StudentAttendanceReport.class.getName())){
                         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -1204,7 +1293,28 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity {
                     }
                 }
 
-                if((i == 5) && (l == 5)) {
+                return false;
+            }
+        });
+
+        expandableList.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
+            @Override
+            public boolean onChildClick(ExpandableListView expandableListView, View view, int i, int i1, long l) {
+
+                if((i == 2) && (i1 == 0) && (l == 0)) {
+                    if(activityName.equals(RoutineMainScreen.class.getName())){
+                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                        if (drawer.isDrawerOpen(GravityCompat.START)) {
+                            drawer.closeDrawer(GravityCompat.START);
+                        }
+                    } else {
+                        Intent intent = new Intent(getApplicationContext(), RoutineMainScreen.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                }
+
+                if((i == 2) && (i1 == 1) && (l == 1)) {
                     if(activityName.equals(ExamRoutineMainScreen.class.getName())){
                         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
                         if (drawer.isDrawerOpen(GravityCompat.START)) {
@@ -1216,13 +1326,32 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity {
                         finish();
                     }
                 }
-                return false;
-            }
-        });
 
-        expandableList.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
-            @Override
-            public boolean onChildClick(ExpandableListView expandableListView, View view, int i, int i1, long l) {
+                if((i == 5) && (i1 == 0) && (l == 0)) {
+                    if(activityName.equals(HomeworkMainScreen.class.getName())){
+                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                        if (drawer.isDrawerOpen(GravityCompat.START)) {
+                            drawer.closeDrawer(GravityCompat.START);
+                        }
+                    } else {
+                        Intent intent = new Intent(getApplicationContext(), HomeworkMainScreen.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                }
+
+                if((i == 5) && (i1 == 1) && (l == 1)) {
+                    if(activityName.equals(LessonPlanMainScreen.class.getName())){
+                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                        if (drawer.isDrawerOpen(GravityCompat.START)) {
+                            drawer.closeDrawer(GravityCompat.START);
+                        }
+                    } else {
+                        Intent intent = new Intent(getApplicationContext(), LessonPlanMainScreen.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                }
 
                 if((i == 6) && (i1 == 0) && (l == 0)) {
                     if(activityName.equals(ResultMainScreen.class.getName())){
@@ -1312,10 +1441,10 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity {
         menuSyllabus.setIconImg(R.drawable.nav_syllabus);
         listDataHeader.add(menuSyllabus);
 
-        ExpandedMenuModel menuExam = new ExpandedMenuModel();
-        menuExam.setIconName("Exam");
-        menuExam.setIconImg(R.drawable.nav_exam);
-        listDataHeader.add(menuExam);
+        ExpandedMenuModel menuHomework = new ExpandedMenuModel();
+        menuHomework.setIconName("Homework");
+        menuHomework.setIconImg(R.drawable.nav_exam);
+        listDataHeader.add(menuHomework);
 
         ExpandedMenuModel menuResult = new ExpandedMenuModel();
         menuResult.setIconName("Result");
@@ -1336,9 +1465,15 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity {
         List<String> headingDashboard = new ArrayList<>();
         List<String> headingNotice = new ArrayList<>();
         List<String> headingRoutine = new ArrayList<>();
+        headingRoutine.add("Class Routine");
+        headingRoutine.add("Exam Routine");
+
         List<String> headingAttendance = new ArrayList<>();
         List<String> headingSyllabus = new ArrayList<>();
-        List<String> headingExam = new ArrayList<>();
+
+        List<String> headingHomework = new ArrayList<>();
+        headingHomework.add("Homework");
+        headingHomework.add("Lesson Plan");
 
         List<String> headingResult = new ArrayList<>();
         headingResult.add("Show Result");
@@ -1356,7 +1491,7 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity {
         listDataChild.put(listDataHeader.get(2), headingRoutine);
         listDataChild.put(listDataHeader.get(3), headingAttendance);
         listDataChild.put(listDataHeader.get(4), headingSyllabus);
-        listDataChild.put(listDataHeader.get(5), headingExam);
+        listDataChild.put(listDataHeader.get(5), headingHomework);
         listDataChild.put(listDataHeader.get(6), headingResult);
         listDataChild.put(listDataHeader.get(7), headingFee);
         listDataChild.put(listDataHeader.get(8), headingContact);
@@ -1388,19 +1523,6 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity {
                     }
                 }
 
-                if((i == 2) && (l == 2)) {
-                    if(activityName.equals(RoutineMainScreen.class.getName())){
-                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-                        if (drawer.isDrawerOpen(GravityCompat.START)) {
-                            drawer.closeDrawer(GravityCompat.START);
-                        }
-                    } else {
-                        Intent intent = new Intent(getApplicationContext(), RoutineMainScreen.class);
-                        startActivity(intent);
-                        finish();
-                    }
-                }
-
                 if((i == 3) && (l == 3)) {
                     if(activityName.equals(StudentAttendanceReport.class.getName())){
                         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -1427,7 +1549,28 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity {
                     }
                 }
 
-                if((i == 5) && (l == 5)) {
+                return false;
+            }
+        });
+
+        expandableList.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
+            @Override
+            public boolean onChildClick(ExpandableListView expandableListView, View view, int i, int i1, long l) {
+
+                if((i == 2) && (i1 == 0) && (l == 0)) {
+                    if(activityName.equals(RoutineMainScreen.class.getName())){
+                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                        if (drawer.isDrawerOpen(GravityCompat.START)) {
+                            drawer.closeDrawer(GravityCompat.START);
+                        }
+                    } else {
+                        Intent intent = new Intent(getApplicationContext(), RoutineMainScreen.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                }
+
+                if((i == 2) && (i1 == 1) && (l == 1)) {
                     if(activityName.equals(ExamRoutineMainScreen.class.getName())){
                         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
                         if (drawer.isDrawerOpen(GravityCompat.START)) {
@@ -1439,13 +1582,32 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity {
                         finish();
                     }
                 }
-                return false;
-            }
-        });
 
-        expandableList.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
-            @Override
-            public boolean onChildClick(ExpandableListView expandableListView, View view, int i, int i1, long l) {
+                if((i == 5) && (i1 == 0) && (l == 0)) {
+                    if(activityName.equals(HomeworkMainScreen.class.getName())){
+                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                        if (drawer.isDrawerOpen(GravityCompat.START)) {
+                            drawer.closeDrawer(GravityCompat.START);
+                        }
+                    } else {
+                        Intent intent = new Intent(getApplicationContext(), HomeworkMainScreen.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                }
+
+                if((i == 5) && (i1 == 1) && (l == 1)) {
+                    if(activityName.equals(LessonPlanMainScreen.class.getName())){
+                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                        if (drawer.isDrawerOpen(GravityCompat.START)) {
+                            drawer.closeDrawer(GravityCompat.START);
+                        }
+                    } else {
+                        Intent intent = new Intent(getApplicationContext(), LessonPlanMainScreen.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                }
 
                 if((i == 6) && (i1 == 0) && (l == 0)) {
                     if(activityName.equals(ResultMainScreen.class.getName())){
