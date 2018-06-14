@@ -63,6 +63,7 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity {
     public long InstituteID, LoggedUserShiftID, LoggedUserMediumID, LoggedUserClassID,
             LoggedUserDepartmentID, LoggedUserSectionID, LoggedUserSessionID;
     public String activityName = "", LoggedUserID, UserName;
+    public static final int MENU_ITEM_CHANGE_STUDENT = 4;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -178,10 +179,34 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity {
             case 4: getMenuInflater().inflate(R.menu.main, menu);
                 break;
 
-            case 5: getMenuInflater().inflate(R.menu.main_guardian, menu);
+            case 5: getMenuInflater().inflate(R.menu.main, menu);
+                menu.add(0, MENU_ITEM_CHANGE_STUDENT, 3, "Change Student")
+                        .setIcon(R.drawable.nav_attendance)
+                        .setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
                 break;
         }
         return true;
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        switch (UserTypeID) {
+            case 1:
+                break;
+
+            case 2:
+                break;
+
+            case 3:
+                break;
+
+            case 4:
+                break;
+
+            case 5:
+                break;
+        }
+        return super.onPrepareOptionsMenu(menu);
     }
 
     @Override
@@ -205,7 +230,7 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity {
                 break;
 
             case 5:
-                if(id == R.id.action_student_change) {
+                if(id == MENU_ITEM_CHANGE_STUDENT) {
                     String string = getSharedPreferences("GUARDIAN_STUDENTS", Context.MODE_PRIVATE)
                             .getString("guardianStudentList", "[]");
                     try {
@@ -237,6 +262,11 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity {
             changePasswordDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
             changePasswordDialog.setCancelable(false);
             changePasswordDialog.show();
+        } else if(id == R.id.changeUserType) {
+            ChangeUserTypeDialog changeUserTypeDialog = new ChangeUserTypeDialog(this, this);
+            changeUserTypeDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            changeUserTypeDialog.setCancelable(false);
+            changeUserTypeDialog.show();
         }
 
         switch (item.getItemId()) {

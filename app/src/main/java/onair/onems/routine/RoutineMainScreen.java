@@ -112,7 +112,7 @@ public class RoutineMainScreen extends SideNavigationMenuParentActivity {
         viewPager = (ViewPager) findViewById(R.id.pager);
         tabLayout = (TabLayout) findViewById(R.id.tabLayout);
 
-        if(UserTypeID!=1 && UserTypeID!=2&& UserTypeID!=4){
+        if(UserTypeID!=1 && UserTypeID!=2 && UserTypeID!=4){
             setupViewPager(viewPager);
             tabLayout.setupWithViewPager(viewPager);
         }

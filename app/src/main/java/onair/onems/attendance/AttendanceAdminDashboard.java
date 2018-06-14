@@ -97,7 +97,7 @@ public class AttendanceAdminDashboard extends SideNavigationMenuParentActivity {
         if(StaticHelperClass.isNetworkAvailable(this)) {
 
             String teacherUrl = getString(R.string.baseUrl)+"/api/onEms/getTotalTeacherAndTotalAttendence/"+today+"/"+
-                    InstituteID+"/"+UserTypeID;
+                    InstituteID+"/"+"4";
 
             mTeacherDialog = new ProgressDialog(this);
             mTeacherDialog.setTitle("Loading...");
@@ -138,8 +138,8 @@ public class AttendanceAdminDashboard extends SideNavigationMenuParentActivity {
     private void studentAttendanceDataGetRequest() {
         if(StaticHelperClass.isNetworkAvailable(this)) {
 
-            String studentUrl = getString(R.string.baseUrl)+"/api/onEms/getTotalStudentAndTotalAttendence/"+today+"/"+
-                    InstituteID+"/"+UserTypeID;
+            String studentUrl = getString(R.string.baseUrl)+"/api/onEms/getTotalStudentAndTotalAttendenceDashBoard/"+today+"/"+
+                    InstituteID+"/"+3;
 
             mStudentDialog = new ProgressDialog(this);
             mStudentDialog.setTitle("Loading...");

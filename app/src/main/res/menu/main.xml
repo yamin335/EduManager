@@ -9,12 +9,17 @@
     </item>
     <item
         android:id="@+id/action_logout"
-        android:orderInCategory="100"
+        android:orderInCategory="0"
         android:title="Log Out"
         app:showAsAction="never" />
     <item
         android:id="@+id/changePassword"
-        android:orderInCategory="100"
+        android:orderInCategory="1"
         android:title="Change Password"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/changeUserType"
+        android:orderInCategory="2"
+        android:title="Change User Type"
         app:showAsAction="never" />
 </menu>

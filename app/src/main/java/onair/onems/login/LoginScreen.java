@@ -39,7 +39,7 @@ public class LoginScreen extends AppCompatActivity {
     private EditText takePassword;
     private TextView errorView;
     private String loginUrl = "";
-    private ProgressDialog dialog, mStudentDialog;
+    private ProgressDialog dialog, mStudentDialog, mUserTypeDialog;
     public static final String MyPREFERENCES = "LogInKey";
     public static SharedPreferences sharedPreferences;
 
@@ -150,6 +150,7 @@ public class LoginScreen extends AppCompatActivity {
                 dialog.dismiss();
             } else {
                 String UserID = jsonArray.getJSONObject(0).getString("UserID");
+                getUserTypes(UserID);
                 String UserName = jsonArray.getJSONObject(0).getString("UserName");
                 String Password = jsonArray.getJSONObject(0).getString("Password");
                 String UserTypeIDTemp = jsonArray.getJSONObject(0).getString("UserTypeID");
@@ -451,5 +452,61 @@ public class LoginScreen extends AppCompatActivity {
         }
     }
 
+    private void getUserTypes(String UserID) {
+
+        if (StaticHelperClass.isNetworkAvailable(this)) {
+            String studentUrl = getString(R.string.baseUrl)+"/api/onEms/getDashBoardCmnUserType/"+UserID;
+
+            mUserTypeDialog = new ProgressDialog(this);
+            mUserTypeDialog.setTitle("Loading user types...");
+            mUserTypeDialog.setMessage("Please Wait...");
+            mUserTypeDialog.setCancelable(false);
+            mUserTypeDialog.setIcon(R.drawable.onair);
+            mUserTypeDialog.show();
+            //Preparing Shift data from server
+            StringRequest stringStudentRequest = new StringRequest(Request.Method.GET, studentUrl,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+
+                            parseUserTypeData(response);
+
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    mUserTypeDialog.dismiss();
+                    Toast.makeText(LoginScreen.this,"User type data not found!!! ",
+                            Toast.LENGTH_LONG).show();
+                }
+            })
+            {
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    Map<String, String>  params = new HashMap<>();
+                    params.put("Authorization", "Request_From_onEMS_Android_app");
+                    return params;
+                }
+            };
+            MySingleton.getInstance(this).addToRequestQueue(stringStudentRequest);
+        } else {
+            Toast.makeText(LoginScreen.this,"Please check your internet connection and select again!!! ",
+                    Toast.LENGTH_LONG).show();
+        }
+
+    }
+
+    private void parseUserTypeData(String string) {
+        if(!string.equalsIgnoreCase("[]")) {
+            getSharedPreferences("USER_TYPES", Context.MODE_PRIVATE)
+                    .edit()
+                    .putString("userTypesList", string)
+                    .apply();
+        } else {
+            Toast.makeText(this,"User type data not found!!! ",
+                    Toast.LENGTH_LONG).show();
+        }
+        mUserTypeDialog.dismiss();
+    }
 
 }

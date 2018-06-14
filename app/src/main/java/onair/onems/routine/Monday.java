@@ -65,7 +65,11 @@ public class Monday extends Fragment {
         UserID = prefs.getString("UserID","0");
 
         if(UserTypeID==1||UserTypeID==2||UserTypeID==4) {
-            String routineData = getArguments().getString("mondayJsonArray");
+            Bundle bundle = getArguments();
+            String routineData = "";
+            if(bundle != null) {
+                routineData = bundle.getString("mondayJsonArray");
+            }
             mAdapter = new RoutineAdapter(getActivity(), routineData, UserTypeID);
             RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity());
             recyclerView.setLayoutManager(mLayoutManager);
