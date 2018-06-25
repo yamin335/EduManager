@@ -1094,6 +1094,7 @@ public class ResultMainScreen extends SideNavigationMenuParentActivity{
                     params.put("InstituteID", Long.toString(InstituteID));
                     params.put("LoggedUserID", LoggedUserID);
                     params.put("UserID", "0");
+                    params.put("ExamID", String.valueOf(selectedExam.getExamID()));
                     params.put("ClassID", Long.toString(selectedClass.getClassID()));
                     params.put("SectionID", Long.toString(selectedSection.getSectionID()));
                     params.put("DepartmentID", Long.toString(selectedDepartment.getDepartmentID()));

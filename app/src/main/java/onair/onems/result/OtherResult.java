@@ -40,7 +40,9 @@ import onair.onems.models.SessionModel;
 import onair.onems.models.ShiftModel;
 import onair.onems.network.MySingleton;
 
-public class OtherResult extends Fragment {
+public class OtherResult extends Fragment
+
+{
 
     private Spinner spinnerClass, spinnerShift, spinnerSection,
             spinnerMedium, spinnerDepartment, spinnerStudent,
@@ -995,6 +997,7 @@ public class OtherResult extends Fragment {
                     params.put("IsPaging", "0");
                     params.put("InstituteID", Long.toString(InstituteID));
                     params.put("LoggedUserID", LoggedUserID);
+                    params.put("ExamID", String.valueOf(selectedExam.getExamID()));
                     params.put("UserID", "0");
                     params.put("ClassID", Long.toString(selectedClass.getClassID()));
                     params.put("SectionID", Long.toString(selectedSection.getSectionID()));

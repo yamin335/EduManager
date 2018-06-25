@@ -316,23 +316,7 @@ public class SelfResult extends Fragment implements View.OnTouchListener,
                 totalGradePoint = new BigDecimal(totalGradePoint).setScale(2, RoundingMode.HALF_UP).doubleValue();
             }
 
-//            if((totalGradePoint>5.0)||(totalGradePoint==5.0)) {
-//                totalGrade = "A+";
-//            } else if((totalGradePoint>=4.0)&&(totalGradePoint<5.0)) {
-//                totalGrade = "A";
-//            }else if((totalGradePoint>=3.5)&&(totalGradePoint<4.0)) {
-//                totalGrade = "A-";
-//            }else if((totalGradePoint>=3.0)&&(totalGradePoint<3.5)) {
-//                totalGrade = "B";
-//            }else if((totalGradePoint>=2.0)&&(totalGradePoint<3.0)) {
-//                totalGrade = "C";
-//            }else if((totalGradePoint>=1.0)&&(totalGradePoint<2.0)) {
-//                totalGrade = "D";
-//            }else if(isFail){
-//                totalGrade = "F";
-//            } else {
-//                totalGrade = "F";
-//            }
+
 
             if(isFail) {
                 totalGrade = "F";
@@ -341,12 +325,24 @@ public class SelfResult extends Fragment implements View.OnTouchListener,
             }
 
             JSONObject totalResult = new JSONObject();
-            totalResult.put("SubjectName", "Total");
-            totalResult.put("Total",Double.toString(totalMarks));
-            totalResult.put("Grade", totalGrade);
-            totalResult.put("GradePoint", totalGradePoint);
-            subjectWiseResultList.add(totalResult);
-            mAdapter.notifyDataSetChanged();
+            if(resultJsonArray.length()>0) {
+                totalResult.put("SubjectName", "Total");
+                totalResult.put("Total", Double.toString(totalMarks));
+                totalResult.put("Grade", totalGrade);
+                totalResult.put("GradePoint", totalGradePoint);
+                subjectWiseResultList.add(totalResult);
+                mAdapter.notifyDataSetChanged();
+            }
+            else
+            {
+                totalResult.put("SubjectName", "");
+                totalResult.put("Total", "");
+                totalResult.put("Grade", "");
+                totalResult.put("GradePoint", "");
+                subjectWiseResultList.add(totalResult);
+                mAdapter.notifyDataSetChanged();
+            }
+
         } catch (JSONException e) {
             e.printStackTrace();
         }
