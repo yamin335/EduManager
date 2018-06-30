@@ -105,8 +105,7 @@ public class StudentSubjectWiseAttendance extends CommonToolbarParentActivity {
     }
 
     public boolean onOptionsItemSelected(MenuItem item) {
-        Intent myIntent = new Intent(getApplicationContext(), StudentAttendanceAllDays.class);
-        startActivityForResult(myIntent, 0);
+        onBackPressed();
         finish();
         return true;
 

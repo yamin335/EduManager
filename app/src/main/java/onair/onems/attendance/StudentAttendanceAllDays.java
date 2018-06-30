@@ -101,12 +101,17 @@ public class StudentAttendanceAllDays extends CommonToolbarParentActivity
         UserID = intent.getStringExtra("UserID");
         String ImageUrl = intent.getStringExtra("ImageUrl");
 
+      try {
+          GlideApp.with(this)
+                  .load(getString(R.string.baseUrl) + "/" + ImageUrl.replace("\\", "/")).apply(RequestOptions.circleCropTransform())
+                  .diskCacheStrategy(DiskCacheStrategy.NONE)
+                  .skipMemoryCache(true)
+                  .into(studentImage);
+      }
+      catch (Exception e)
+      {
 
-        GlideApp.with(this)
-                .load(getString(R.string.baseUrl)+"/"+ImageUrl.replace("\\","/")).apply(RequestOptions.circleCropTransform())
-                .diskCacheStrategy(DiskCacheStrategy.NONE)
-                .skipMemoryCache(true)
-                .into(studentImage);
+      }
 
         // get Internal Data using SharedPreferences end
         name.setText(""+UserFullName);
@@ -179,8 +184,9 @@ public class StudentAttendanceAllDays extends CommonToolbarParentActivity
     }
     // Back parent Page code
     public boolean onOptionsItemSelected(MenuItem item){
-        Intent myIntent = new Intent(getApplicationContext(), StudentAttendanceShow.class);
-        startActivityForResult(myIntent, 0);
+//        Intent myIntent = new Intent(getApplicationContext(), StudentAttendanceShow.class);
+//        startActivityForResult(myIntent, 0);
+        onBackPressed();
         finish();
         return true;
 

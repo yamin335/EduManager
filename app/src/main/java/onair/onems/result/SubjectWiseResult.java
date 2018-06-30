@@ -172,22 +172,6 @@ public class SubjectWiseResult extends CommonToolbarParentActivity implements Su
                 totalGradePoint = new BigDecimal(totalGradePoint).setScale(2, RoundingMode.HALF_UP).doubleValue();
             }
 
-//            if((totalGradePoint>5.0)||(totalGradePoint==5.0)) {
-//                totalGrade = "A+";
-//            } else if((totalGradePoint>=4.0)&&(totalGradePoint<5.0)) {
-//                totalGrade = "A";
-//            }else if((totalGradePoint>=3.5)&&(totalGradePoint<4.0)) {
-//                totalGrade = "A-";
-//            }else if((totalGradePoint>=3.0)&&(totalGradePoint<3.5)) {
-//                totalGrade = "B";
-//            }else if((totalGradePoint>=2.0)&&(totalGradePoint<3.0)) {
-//                totalGrade = "C";
-//            }else if((totalGradePoint>=1.0)&&(totalGradePoint<2.0)) {
-//                totalGrade = "D";
-//            }else {
-//                totalGrade = "F";
-//            }
-
             if(isFail) {
                 totalGrade = "F";
             } else {

@@ -1,6 +1,7 @@
 package onair.onems.routine;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -120,17 +121,23 @@ public class RoutineClassAdapter extends RecyclerView.Adapter<RoutineClassAdapte
             }
         } else if(UserTypeID == 3) {
             holder.className.setVisibility(View.GONE);
+            holder.teacherName.setVisibility(View.GONE);
             try {
                 holder.subjectName.setText(object.getString("SubjectName").replace(",", ",\n"));
                 holder.classTime.setText(object.getString("StartTime")+" - "+object.getString("EndTime"));
                 if(!object.getString("TeacherName").equalsIgnoreCase("")) {
-                    holder.teacherName.setText("Teacher: "+object.getString("TeacherName").replace("_", ",\n"));
+                   // holder.teacherName.setText("Teacher: "+object.getString("TeacherName").replace("_", ",\n"));
                 }
-//                if(!object.getBoolean("IsBreak")) {
-//
-//                } else {
-//                    holder.teacherName.setText("Break");
-//                }
+
+                if(object.getString("SubjectName").equals("")&&object.getString("TeacherName").equals(""))
+                {
+                  //  holder.subjectName.setText("Break");
+                    holder.subjectName.setText("Break");
+                    holder.subjectName.setTextSize(16);
+                    holder.subjectName.setTextColor(Color.BLACK);
+
+                }
+
             } catch (JSONException e) {
                 e.printStackTrace();
             }

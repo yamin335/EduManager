@@ -32,6 +32,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 import de.codecrafters.tableview.TableView;
@@ -189,16 +190,14 @@ public class SelfAttendanceReport extends Fragment {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
-                if(position != 0) {
+
                     try {
-                        selectedMonth = allMonthArrayList.get(position-1);
+                        selectedMonth = allMonthArrayList.get(position);
                         MonthlyAttendanceDataGetRequest(selectedMonth.getMonthID());
                     } catch (IndexOutOfBoundsException e) {
                         Toast.makeText(getActivity(),"No section found !!!",Toast.LENGTH_LONG).show();
                     }
-                } else {
-                    selectedMonth = new MonthModel();
-                }
+
             }
 
             @Override
@@ -216,7 +215,7 @@ public class SelfAttendanceReport extends Fragment {
             allMonthArrayList = new ArrayList<>();
             JSONArray MonthJsonArray = new JSONArray(jsonString);
             ArrayList<String> monthArrayList = new ArrayList<>();
-            monthArrayList.add("Select Month");
+            //monthArrayList.add("Select Month");
             for(int i = 0; i < MonthJsonArray.length(); ++i)
             {
                 JSONObject monthJsonObject = MonthJsonArray.getJSONObject(i);
@@ -225,17 +224,14 @@ public class SelfAttendanceReport extends Fragment {
                 monthArrayList.add(monthModel.getMonthName());
             }
 
-            if(allMonthArrayList.size() >= 1){
-                selectedMonth = allMonthArrayList.get(0);
-                MonthlyAttendanceDataGetRequest(selectedMonth.getMonthID());
-            }
-
             try {
                 String[] strings = new String[monthArrayList.size()];
                 strings = monthArrayList.toArray(strings);
                 ArrayAdapter<String> month_spinner_adapter = new ArrayAdapter<>(getActivity(),R.layout.spinner_item, strings);
                 month_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinnerMonth.setAdapter(month_spinner_adapter);
+                Calendar c = Calendar.getInstance();
+                spinnerMonth.setSelection(c.get(Calendar.MONTH));
                 dialog.dismiss();
             }
             catch (IndexOutOfBoundsException e)

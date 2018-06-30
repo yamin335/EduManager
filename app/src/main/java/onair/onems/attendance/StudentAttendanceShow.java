@@ -10,6 +10,7 @@ import android.preference.PreferenceManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -178,5 +179,11 @@ public class StudentAttendanceShow extends CommonToolbarParentActivity {
             Toast.makeText(StudentAttendanceShow.this,"Please check your internet connection and select again!!! ",
                     Toast.LENGTH_LONG).show();
         }
+    }
+    public boolean onOptionsItemSelected(MenuItem item) {
+        onBackPressed();
+        finish();
+        return true;
+
     }
 }
