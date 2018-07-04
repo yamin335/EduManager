@@ -555,7 +555,7 @@ public class StudentiCardNewEntry extends SideNavigationMenuParentActivity {
                                 parentName = editparent.getText().toString();
                                 parentNumber = editparentnumber.getText().toString();
                                 address = editaddress.getText().toString();
-                                studentInformationEntry = new StudentInformationEntry();
+//                                studentInformationEntry = new StudentInformationEntry();
                                 studentInformationEntry.setUserName(name);
                                 studentInformationEntry.setRollNo(roll);
                                 studentInformationEntry.setGuardian(parentName);

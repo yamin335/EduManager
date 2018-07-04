@@ -1,8 +1,7 @@
-package onair.onems.exam;
+package onair.onems.routine;
 
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
@@ -32,7 +31,6 @@ import onair.onems.Services.StaticHelperClass;
 import onair.onems.customised.MyDividerItemDecoration;
 import onair.onems.mainactivities.CommonToolbarParentActivity;
 import onair.onems.network.MySingleton;
-import onair.onems.result.SubjectWiseResult;
 
 public class SubjectWiseExamRoutine extends CommonToolbarParentActivity {
 

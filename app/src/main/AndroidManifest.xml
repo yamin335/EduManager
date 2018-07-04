@@ -231,15 +231,15 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".exam.ExamRoutineMainScreen"
+            android:name=".routine.ExamRoutineMainScreen"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".exam.ExamDetails"
+            android:name=".routine.ExamDetails"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".exam.SubjectWiseExamRoutine"
+            android:name=".routine.SubjectWiseExamRoutine"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
@@ -250,22 +250,29 @@
         <activity
             android:name=".mainactivities.CommonToolbarParentActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar">
-
-        </activity>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".homework.HomeworkMainScreen"
             android:label="Homework"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar">
-
-        </activity>
-        <activity android:name=".lesson_plan.LessonPlanMainScreen"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".lesson_plan.LessonPlanMainScreen"
             android:label="Lesson Plan"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar">
-
-        </activity>
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".exam.SubjectWiseMarksEntryMain"
+            android:label="Marks Entry"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar"/>
+        <activity android:name=".exam.SubjectWiseMarksEntryStudentList"
+            android:label="Select Student"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar"/>
+        <activity android:name=".exam.SubjectWiseMarksEntryInputs"
+            android:label="Input Marks"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar"/>
     </application>
 
 </manifest>

@@ -44,7 +44,7 @@ import onair.onems.Services.StaticHelperClass;
 
 public class TakeAttendance extends SideNavigationMenuParentActivity {
 
-    private Spinner spinnerClass, spinnerShift,spinnerSection,spinnerMedium, spinnerDepartment, spinnerSubject;
+    private Spinner spinnerClass, spinnerShift, spinnerSection, spinnerMedium, spinnerDepartment, spinnerSubject;
     private ProgressDialog mShiftDialog, mMediumDialog, mClassDialog, mDepartmentDialog, mSectionDialog, mSubjectDialog;
     private Button datePicker;
 
@@ -70,7 +70,6 @@ public class TakeAttendance extends SideNavigationMenuParentActivity {
     private DepartmentModel selectedDepartment = null;
     private boolean hasDepartment = false;
     private String selectedDate = "";
-    private long InstituteID;
     private DatePickerDialog datePickerDialog;
     private int firstClass = 0, firstShift = 0, firstSection = 0, firstMedium = 0, firstDepartment = 0;
     @Override
@@ -83,9 +82,6 @@ public class TakeAttendance extends SideNavigationMenuParentActivity {
         final View childActivityLayout = inflater.inflate(R.layout.attendance_taking_activity, null);
         LinearLayout parentActivityLayout = (LinearLayout) findViewById(R.id.contentMain);
         parentActivityLayout.addView(childActivityLayout, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
-
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        InstituteID = prefs.getLong("InstituteID",0);
 
         selectedClass = new ClassModel();
         selectedShift = new ShiftModel();

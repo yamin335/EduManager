@@ -71,7 +71,7 @@ public class ResultGradeStructure extends SideNavigationMenuParentActivity
     private FloatingActionButton floatingMenu, menuItemMedium, menuItemClass;
     private ConstraintLayout constraintLayout;
     private CardView cardMedium, cardClass;
-    private Animation fab_open,fab_close,rotate_forward,rotate_backward;
+    private Animation fab_open, fab_close, rotate_forward, rotate_backward;
     private Boolean isFabOpen = false;
     private ResultStructureAdapter mAdapter;
     private List<JSONObject> ResultGradeSheet;

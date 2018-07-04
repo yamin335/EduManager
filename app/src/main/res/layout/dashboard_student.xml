@@ -174,7 +174,7 @@
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"
                 android:background="@drawable/menu_item_exam"
-                android:drawableTop="@drawable/routine"
+                android:drawableTop="@drawable/homework"
                 android:elevation="100dp"
                 android:fontFamily="sans-serif-condensed"
                 android:padding="10dp"
@@ -254,4 +254,166 @@
         </LinearLayout>
     </LinearLayout>
 </LinearLayout>
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/draggableFloatingMenu"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:elevation="5dp">
+
+        <android.support.v7.widget.CardView
+            android:id="@+id/card_log_out"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:clickable="false"
+            android:padding="3dp"
+            android:visibility="gone"
+            app:cardBackgroundColor="@color/white"
+            app:cardCornerRadius="5dp"
+            app:cardElevation="6dp"
+            app:layout_constraintBottom_toBottomOf="@+id/log_out"
+            app:layout_constraintEnd_toStartOf="@+id/log_out"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/log_out">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="5dp"
+                android:text="Logout"
+                android:textColor="#3D4852" />
+
+        </android.support.v7.widget.CardView>
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/log_out"
+            android:layout_width="46dp"
+            android:layout_height="46dp"
+            android:layout_marginBottom="8dp"
+            android:clickable="false"
+            android:scaleType="center"
+            android:visibility="gone"
+            app:layout_constraintBottom_toTopOf="@+id/change_password"
+            app:layout_constraintEnd_toEndOf="@+id/change_password"
+            app:layout_constraintStart_toStartOf="@+id/change_password"
+            app:srcCompat="@drawable/ic_logout" />
+
+        <android.support.v7.widget.CardView
+            android:id="@+id/card_change_password"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:clickable="false"
+            android:padding="3dp"
+            android:visibility="gone"
+            app:cardBackgroundColor="@color/white"
+            app:cardCornerRadius="5dp"
+            app:cardElevation="6dp"
+            app:layout_constraintBottom_toBottomOf="@+id/change_password"
+            app:layout_constraintEnd_toStartOf="@+id/change_password"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/change_password">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="5dp"
+                android:text="Change Password"
+                android:textColor="#3D4852" />
+
+        </android.support.v7.widget.CardView>
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/change_password"
+            android:layout_width="46dp"
+            android:layout_height="46dp"
+            android:layout_marginBottom="8dp"
+            android:clickable="false"
+            android:scaleType="center"
+            android:visibility="gone"
+            app:layout_constraintBottom_toTopOf="@+id/change_user_type"
+            app:layout_constraintEnd_toEndOf="@+id/change_user_type"
+            app:layout_constraintStart_toStartOf="@+id/change_user_type"
+            app:srcCompat="@drawable/ic_change_password" />
+
+        <android.support.v7.widget.CardView
+            android:id="@+id/card_change_user_type"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginTop="8dp"
+            android:clickable="false"
+            android:padding="3dp"
+            android:visibility="gone"
+            app:cardBackgroundColor="@color/white"
+            app:cardCornerRadius="5dp"
+            app:cardElevation="6dp"
+            app:layout_constraintBottom_toBottomOf="@+id/change_user_type"
+            app:layout_constraintEnd_toStartOf="@+id/change_user_type"
+            app:layout_constraintTop_toTopOf="@+id/change_user_type">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="5dp"
+                android:text="Change User Type"
+                android:textColor="#3D4852" />
+
+        </android.support.v7.widget.CardView>
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/change_user_type"
+            android:layout_width="46dp"
+            android:layout_height="46dp"
+            android:layout_marginBottom="8dp"
+            android:clickable="false"
+            android:scaleType="center"
+            android:visibility="gone"
+            app:layout_constraintBottom_toTopOf="@+id/floatingMenu"
+            app:layout_constraintEnd_toEndOf="@+id/floatingMenu"
+            app:layout_constraintStart_toStartOf="@+id/floatingMenu"
+            app:srcCompat="@drawable/ic_change_usertype"
+            android:tint="@color/white"/>
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/floatingMenu"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginLeft="4dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="0dp"
+            android:scaleType="center"
+            android:tint="@color/white"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="1.0"
+            app:srcCompat="@drawable/ic_arrow_up" />
+    </android.support.constraint.ConstraintLayout>
+    <View
+        android:id="@+id/dim"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:alpha="0.5"
+        android:background="@android:color/black"
+        android:visibility="gone"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"/>
 </RelativeLayout>

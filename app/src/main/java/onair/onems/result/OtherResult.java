@@ -40,9 +40,7 @@ import onair.onems.models.SessionModel;
 import onair.onems.models.ShiftModel;
 import onair.onems.network.MySingleton;
 
-public class OtherResult extends Fragment
-
-{
+public class OtherResult extends Fragment {
 
     private Spinner spinnerClass, spinnerShift, spinnerSection,
             spinnerMedium, spinnerDepartment, spinnerStudent,
