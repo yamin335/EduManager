@@ -348,6 +348,9 @@ public class TeacherMainScreen extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
+        if(isFabOpen){
+            animateFAB();
+        } else {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle(R.string.app_name);
             builder.setIcon(R.drawable.onair);
@@ -365,5 +368,6 @@ public class TeacherMainScreen extends AppCompatActivity {
                     });
             AlertDialog alert = builder.create();
             alert.show();
+        }
     }
 }

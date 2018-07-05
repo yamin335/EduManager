@@ -104,7 +104,25 @@ public class SubjectWiseMarksEntryMain extends SideNavigationMenuParentActivity 
         entryMarks.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                if(selectedClass.getClassID()==0||selectedClass.getClassID()==-2) {
+                    Toast.makeText(SubjectWiseMarksEntryMain.this,"Select a class !!!",Toast.LENGTH_LONG).show();
+                } else if(selectedSubject == null) {
+                    Toast.makeText(SubjectWiseMarksEntryMain.this,"Select a subject !!!",Toast.LENGTH_LONG).show();
+                }else if(selectedExam == null){
+                    Toast.makeText(SubjectWiseMarksEntryMain.this,"Select an exam !!!",Toast.LENGTH_LONG).show();
+                } else {
+                    CheckSelectedData();
+                    Intent intent = new Intent(SubjectWiseMarksEntryMain.this, SubjectWiseMarksEntryStudentList.class);
+                    intent.putExtra("InstituteID", InstituteID);
+                    intent.putExtra("ClassID", selectedClass.getClassID());
+                    intent.putExtra("SectionID", selectedSection.getSectionID());
+                    intent.putExtra("DepartmentID", selectedDepartment.getDepartmentID());
+                    intent.putExtra("MediumID", selectedMedium.getMediumID());
+                    intent.putExtra("ShiftID", selectedShift.getShiftID());
+                    intent.putExtra("SubjectID", selectedSubject.getSubjectID());
+                    intent.putExtra("ExamID", selectedExam.getExamID());
+                    startActivity(intent);
+                }
             }
         });
 
