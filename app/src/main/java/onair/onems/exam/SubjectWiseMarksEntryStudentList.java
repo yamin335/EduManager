@@ -37,6 +37,7 @@ import onair.onems.network.MySingleton;
 public class SubjectWiseMarksEntryStudentList extends CommonToolbarParentActivity implements StudentListAdapter.StudentListAdapterListener {
 
     private ProgressDialog mStudentDialog;
+    private long SubjectID;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,6 +48,7 @@ public class SubjectWiseMarksEntryStudentList extends CommonToolbarParentActivit
         parentActivityLayout.addView(childActivityLayout, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
 
         Intent intent = getIntent();
+        SubjectID = intent.getLongExtra("SubjectID", 0);
         String url = getString(R.string.baseUrl)+"/api/onEms/getSubjectWiseMarks/"+0+"/"+
                 intent.getLongExtra("InstituteID", 0)+"/"+intent.getLongExtra("ClassID", 0)+"/"
                 +intent.getLongExtra("SectionID", 0)+"/"+intent.getLongExtra("DepartmentID", 0)+"/"
@@ -119,6 +121,7 @@ public class SubjectWiseMarksEntryStudentList extends CommonToolbarParentActivit
     public void onStudentSelected(JSONObject result) {
         Intent intent = new Intent(SubjectWiseMarksEntryStudentList.this, SubjectWiseMarksEntryInputs.class);
         intent.putExtra("student", result.toString());
+        intent.putExtra("SubjectID", SubjectID);
         startActivity(intent);
     }
 }
