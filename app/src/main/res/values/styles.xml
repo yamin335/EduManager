@@ -16,6 +16,7 @@
         <item name="colorAccent">#FF0A2EF5</item>
         <item name="android:windowFullscreen">true</item>
         <item name="android:windowContentOverlay">@null</item>
+
     </style>
 
     <style name="AppTheme.NoActionBar">

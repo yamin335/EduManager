@@ -7,9 +7,6 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.CALL_PHONE" />
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
@@ -261,18 +258,30 @@
             android:label="Lesson Plan"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".exam.SubjectWiseMarksEntryMain"
+        <activity
+            android:name=".exam.SubjectWiseMarksEntryMain"
             android:label="Marks Entry"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar"/>
-        <activity android:name=".exam.SubjectWiseMarksEntryStudentList"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".exam.SubjectWiseMarksEntryStudentList"
             android:label="Select Student"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar"/>
-        <activity android:name=".exam.SubjectWiseMarksEntryInputs"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".exam.SubjectWiseMarksEntryInputs"
             android:label="Input Marks"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar"/>
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".fees_report.FeeCollectionReportMain"
+            android:label="Fees Collection Report"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".fees_report.FeeCollectionReportList"
+            android:label="Fees Collection Report"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>

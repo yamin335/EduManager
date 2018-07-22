@@ -255,10 +255,10 @@ public class SubjectWiseMarksEntryInputs extends CommonToolbarParentActivity {
 
         String postUrl = getString(R.string.baseUrl)+"/api/onEms/setMarks";
 
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest (Request.Method.POST, postUrl, jsonObject,
-                new Response.Listener<JSONObject>() {
+        CustomRequest customRequest = new CustomRequest (Request.Method.POST, postUrl, jsonObject,
+                new Response.Listener<JSONArray>() {
                     @Override
-                    public void onResponse(JSONObject response) {
+                    public void onResponse(JSONArray response) {
                         dialog.dismiss();
                         try {
                             Toast.makeText(SubjectWiseMarksEntryInputs.this,"Successful",Toast.LENGTH_LONG).show();
@@ -283,6 +283,6 @@ public class SubjectWiseMarksEntryInputs extends CommonToolbarParentActivity {
                 return params;
             }
         };
-        MySingleton.getInstance(this).addToRequestQueue(jsonObjectRequest);
+        MySingleton.getInstance(this).addToRequestQueue(customRequest);
     }
 }

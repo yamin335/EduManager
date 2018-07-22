@@ -14,6 +14,7 @@ public class CommonToolbarParentActivity extends AppCompatActivity {
         setContentView(R.layout.onems_common_toolbar_activity);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setNavigationIcon(R.drawable.ic_keyboard_arrow_left);
         setSupportActionBar(toolbar);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);

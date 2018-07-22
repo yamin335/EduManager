@@ -38,6 +38,14 @@ public class SubjectWiseMarksEntryStudentList extends CommonToolbarParentActivit
 
     private ProgressDialog mStudentDialog;
     private long SubjectID;
+    private String url = "";
+
+    @Override
+    protected void onRestart() {
+        StudentDataGetRequest(url);
+        super.onRestart();
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,7 +57,7 @@ public class SubjectWiseMarksEntryStudentList extends CommonToolbarParentActivit
 
         Intent intent = getIntent();
         SubjectID = intent.getLongExtra("SubjectID", 0);
-        String url = getString(R.string.baseUrl)+"/api/onEms/getSubjectWiseMarks/"+0+"/"+
+        url = getString(R.string.baseUrl)+"/api/onEms/getSubjectWiseMarks/"+0+"/"+
                 intent.getLongExtra("InstituteID", 0)+"/"+intent.getLongExtra("ClassID", 0)+"/"
                 +intent.getLongExtra("SectionID", 0)+"/"+intent.getLongExtra("DepartmentID", 0)+"/"
                 +intent.getLongExtra("MediumID", 0)+"/"+intent.getLongExtra("ShiftID", 0)+"/"

@@ -104,7 +104,10 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
                 case 7:
                     indicator.setVisibility(View.VISIBLE);
                     break;
-                case 8:
+                case 9:
+                    indicator.setVisibility(View.VISIBLE);
+                    break;
+                case 11:
                     indicator.setVisibility(View.VISIBLE);
                     break;
                 default:
@@ -127,7 +130,10 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
                 case 7:
                     indicator.setVisibility(View.VISIBLE);
                     break;
-                case 8:
+                case 9:
+                    indicator.setVisibility(View.VISIBLE);
+                    break;
+                case 11:
                     indicator.setVisibility(View.VISIBLE);
                     break;
                 default:
@@ -167,7 +173,10 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
                 case 7:
                     indicator.setVisibility(View.VISIBLE);
                     break;
-                case 8:
+                case 9:
+                    indicator.setVisibility(View.VISIBLE);
+                    break;
+                case 11:
                     indicator.setVisibility(View.VISIBLE);
                     break;
                 default:

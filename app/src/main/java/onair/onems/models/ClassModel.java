@@ -9,33 +9,24 @@ public class ClassModel {
     private long ClassID = -2;
     private String ClassName = "";
 
-    public ClassModel()
-    {
+    public ClassModel() {
         this.ClassID = -2;
         this.ClassName = "";
     }
 
-    public ClassModel(String ClassID, String ClassName)
-    {
-        if(ClassID.equals("null"))
-        {
+    public ClassModel(String ClassID, String ClassName) {
+        if(ClassID.equals("null")) {
             this.ClassID = -2;
-        }
-        else
-        {
+        } else {
             this.ClassID = Long.parseLong(ClassID);
         }
         this.ClassName = ClassName;
     }
 
-    public void setClassID(String ClassID)
-    {
-        if(ClassID.equals("null"))
-        {
+    public void setClassID(String ClassID) {
+        if(ClassID.equals("null")) {
             this.ClassID = -2;
-        }
-        else
-        {
+        } else {
             this.ClassID = Long.parseLong(ClassID);
         }
     }

@@ -19,6 +19,8 @@ import android.view.View;
 import android.widget.ExpandableListView;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 
@@ -32,6 +34,7 @@ import onair.onems.R;
 import onair.onems.attendance.AttendanceAdminDashboard;
 import onair.onems.customised.GuardianStudentSelectionDialog;
 import onair.onems.exam.SubjectWiseMarksEntryMain;
+import onair.onems.fees_report.FeeCollectionReportMain;
 import onair.onems.routine.ExamRoutineMainScreen;
 import onair.onems.fee.FeeMainScreen;
 import onair.onems.fee.FeesHistory;
@@ -235,11 +238,16 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity {
                     String string = getSharedPreferences("GUARDIAN_STUDENTS", Context.MODE_PRIVATE)
                             .getString("guardianStudentList", "[]");
                     try {
-                        JSONArray studentList = new JSONArray(string);
-                        GuardianStudentSelectionDialog selectStudent = new GuardianStudentSelectionDialog(this, studentList, this);
-                        selectStudent.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-                        selectStudent.setCancelable(false);
-                        selectStudent.show();
+                        if(!string.equalsIgnoreCase("")&&!string.equalsIgnoreCase("[]")) {
+                            JSONArray studentList = new JSONArray(string);
+                            GuardianStudentSelectionDialog selectStudent = new GuardianStudentSelectionDialog(this, studentList, this);
+                            selectStudent.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                            selectStudent.setCancelable(false);
+                            selectStudent.show();
+                        } else {
+                            Toast.makeText(this,"No student found!!! ",
+                                    Toast.LENGTH_LONG).show();
+                        }
                         return true;
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -340,6 +348,11 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity {
         menuStudentList.setIconImg(R.drawable.ic_action_users);
         listDataHeader.add(menuStudentList);
 
+        ExpandedMenuModel menuReport = new ExpandedMenuModel();
+        menuReport.setIconName("Reports");
+        menuReport.setIconImg(R.drawable.nav_fee);
+        listDataHeader.add(menuReport);
+
         // Adding child data
         List<String> headingDashboard = new ArrayList<>();
         List<String> headingNotice = new ArrayList<>();
@@ -361,7 +374,6 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity {
 
         List<String> headingExam = new ArrayList<>();
         headingExam.add("Subject Wise Marks Entry");
-        headingExam.add("Student Wise Marks Entry");
 
         List<String> headingResult = new ArrayList<>();
         headingResult.add("Show Result");
@@ -375,6 +387,10 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity {
 
         List<String> headingStudentList = new ArrayList<>();
 
+        List<String> headingReport = new ArrayList<>();
+        headingReport.add("Fees Collection Report");
+        headingReport.add("Fees Summary Report");
+
         // Header, Child data
         listDataChild.put(listDataHeader.get(0), headingDashboard);
         listDataChild.put(listDataHeader.get(1), headingNotice);
@@ -387,6 +403,7 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity {
         listDataChild.put(listDataHeader.get(8), headingContact);
         listDataChild.put(listDataHeader.get(9), headingiCard);
         listDataChild.put(listDataHeader.get(10), headingStudentList);
+        listDataChild.put(listDataHeader.get(11), headingReport);
 
         mMenuAdapter = new ExpandableListAdapter(this, listDataHeader, listDataChild, UserTypeID);
         expandableList.setAdapter(mMenuAdapter);
@@ -599,6 +616,34 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity {
                         }
                     } else {
                         Intent intent = new Intent(getApplicationContext(), StudentiCardNewEntry.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                }
+
+                if((i == 11) && (i1 == 0) && (l == 0)) {
+                    if(activityName.equals(FeeCollectionReportMain.class.getName())){
+                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                        if (drawer.isDrawerOpen(GravityCompat.START)) {
+                            drawer.closeDrawer(GravityCompat.START);
+                        }
+                    } else {
+                        Intent intent = new Intent(getApplicationContext(), FeeCollectionReportMain.class);
+                        intent.putExtra("Report Type", 1);
+                        startActivity(intent);
+                        finish();
+                    }
+                }
+
+                if((i == 11) && (i1 == 1) && (l == 1)) {
+                    if(activityName.equals(FeeCollectionReportMain.class.getName())){
+                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                        if (drawer.isDrawerOpen(GravityCompat.START)) {
+                            drawer.closeDrawer(GravityCompat.START);
+                        }
+                    } else {
+                        Intent intent = new Intent(getApplicationContext(), FeeCollectionReportMain.class);
+                        intent.putExtra("Report Type", 2);
                         startActivity(intent);
                         finish();
                     }
@@ -670,6 +715,11 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity {
         menuStudentList.setIconImg(R.drawable.ic_action_users);
         listDataHeader.add(menuStudentList);
 
+        ExpandedMenuModel menuReport = new ExpandedMenuModel();
+        menuReport.setIconName("Reports");
+        menuReport.setIconImg(R.drawable.nav_fee);
+        listDataHeader.add(menuReport);
+
         // Adding child data
         List<String> headingDashboard = new ArrayList<>();
         List<String> headingNotice = new ArrayList<>();
@@ -690,7 +740,6 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity {
 
         List<String> headingExam = new ArrayList<>();
         headingExam.add("Subject Wise Marks Entry");
-        headingExam.add("Student Wise Marks Entry");
 
         List<String> headingResult = new ArrayList<>();
         headingResult.add("Show Result");
@@ -704,6 +753,10 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity {
 
         List<String> headingStudentList = new ArrayList<>();
 
+        List<String> headingReport = new ArrayList<>();
+        headingReport.add("Fees Collection Report");
+        headingReport.add("Fees Summary Report");
+
         // Header, Child data
         listDataChild.put(listDataHeader.get(0), headingDashboard);
         listDataChild.put(listDataHeader.get(1), headingNotice);
@@ -716,6 +769,7 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity {
         listDataChild.put(listDataHeader.get(8), headingContact);
         listDataChild.put(listDataHeader.get(9), headingiCard);
         listDataChild.put(listDataHeader.get(10), headingStudentList);
+        listDataChild.put(listDataHeader.get(11), headingReport);
 
         mMenuAdapter = new ExpandableListAdapter(this, listDataHeader, listDataChild, UserTypeID);
         expandableList.setAdapter(mMenuAdapter);
@@ -933,6 +987,42 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity {
                     }
                 }
 
+                if((i == 11) && (i1 == 0) && (l == 0)) {
+                    if(activityName.equals(FeeCollectionReportMain.class.getName())){
+                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                        if (drawer.isDrawerOpen(GravityCompat.START)) {
+                            drawer.closeDrawer(GravityCompat.START);
+                            Intent intent = new Intent(getApplicationContext(), FeeCollectionReportMain.class);
+                            intent.putExtra("Report Type", 1);
+                            startActivity(intent);
+                            finish();
+                        }
+                    } else {
+                        Intent intent = new Intent(getApplicationContext(), FeeCollectionReportMain.class);
+                        intent.putExtra("Report Type", 1);
+                        startActivity(intent);
+                        finish();
+                    }
+                }
+
+                if((i == 11) && (i1 == 1) && (l == 1)) {
+                    if(activityName.equals(FeeCollectionReportMain.class.getName())){
+                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                        if (drawer.isDrawerOpen(GravityCompat.START)) {
+                            drawer.closeDrawer(GravityCompat.START);
+                            Intent intent = new Intent(getApplicationContext(), FeeCollectionReportMain.class);
+                            intent.putExtra("Report Type", 2);
+                            startActivity(intent);
+                            finish();
+                        }
+                    } else {
+                        Intent intent = new Intent(getApplicationContext(), FeeCollectionReportMain.class);
+                        intent.putExtra("Report Type", 2);
+                        startActivity(intent);
+                        finish();
+                    }
+                }
+
                 return false;
             }
         });
@@ -999,6 +1089,11 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity {
         menuStudentList.setIconImg(R.drawable.ic_action_users);
         listDataHeader.add(menuStudentList);
 
+        ExpandedMenuModel menuReport = new ExpandedMenuModel();
+        menuReport.setIconName("Reports");
+        menuReport.setIconImg(R.drawable.nav_fee);
+        listDataHeader.add(menuReport);
+
         // Adding child data
         List<String> headingDashboard = new ArrayList<>();
         List<String> headingNotice = new ArrayList<>();
@@ -1018,7 +1113,6 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity {
 
         List<String> headingExam = new ArrayList<>();
         headingExam.add("Subject Wise Marks Entry");
-        headingExam.add("Student Wise Marks Entry");
 
         List<String> headingResult = new ArrayList<>();
         headingResult.add("Show Result");
@@ -1032,6 +1126,10 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity {
 
         List<String> headingStudentList = new ArrayList<>();
 
+        List<String> headingReport = new ArrayList<>();
+        headingReport.add("Fees Collection Report");
+        headingReport.add("Fees Summary Report");
+
         // Header, Child data
         listDataChild.put(listDataHeader.get(0), headingDashboard);
         listDataChild.put(listDataHeader.get(1), headingNotice);
@@ -1044,6 +1142,7 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity {
         listDataChild.put(listDataHeader.get(8), headingContact);
         listDataChild.put(listDataHeader.get(9), headingiCard);
         listDataChild.put(listDataHeader.get(10), headingStudentList);
+        listDataChild.put(listDataHeader.get(11), headingReport);
 
         mMenuAdapter = new ExpandableListAdapter(this, listDataHeader, listDataChild, UserTypeID);
         expandableList.setAdapter(mMenuAdapter);
@@ -1243,6 +1342,34 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity {
                         }
                     } else {
                         Intent intent = new Intent(getApplicationContext(), StudentiCardNewEntry.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                }
+
+                if((i == 11) && (i1 == 0) && (l == 0)) {
+                    if(activityName.equals(FeeCollectionReportMain.class.getName())){
+                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                        if (drawer.isDrawerOpen(GravityCompat.START)) {
+                            drawer.closeDrawer(GravityCompat.START);
+                        }
+                    } else {
+                        Intent intent = new Intent(getApplicationContext(), FeeCollectionReportMain.class);
+                        intent.putExtra("Report Type", 1);
+                        startActivity(intent);
+                        finish();
+                    }
+                }
+
+                if((i == 11) && (i1 == 1) && (l == 1)) {
+                    if(activityName.equals(FeeCollectionReportMain.class.getName())){
+                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                        if (drawer.isDrawerOpen(GravityCompat.START)) {
+                            drawer.closeDrawer(GravityCompat.START);
+                        }
+                    } else {
+                        Intent intent = new Intent(getApplicationContext(), FeeCollectionReportMain.class);
+                        intent.putExtra("Report Type", 2);
                         startActivity(intent);
                         finish();
                     }

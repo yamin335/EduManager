@@ -436,20 +436,27 @@ public class LoginScreen extends AppCompatActivity {
 
     private void parseStudentJsonData(String string) {
         try {
-            JSONArray students = new JSONArray(string);
-            getSharedPreferences("GUARDIAN_STUDENTS", Context.MODE_PRIVATE)
-                    .edit()
-                    .putString("guardianStudentList", students.toString())
-                    .apply();
-            GuardianStudentSelectionDialog selectStudent = new GuardianStudentSelectionDialog(this, students, this);
-            selectStudent.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-            selectStudent.setCancelable(false);
-            selectStudent.show();
-            mStudentDialog.dismiss();
+            if(!string.equalsIgnoreCase("")&&!string.equalsIgnoreCase("[]")) {
+                JSONArray students = new JSONArray(string);
+                getSharedPreferences("GUARDIAN_STUDENTS", Context.MODE_PRIVATE)
+                        .edit()
+                        .putString("guardianStudentList", students.toString())
+                        .apply();
+                GuardianStudentSelectionDialog selectStudent = new GuardianStudentSelectionDialog(this, students, this);
+                selectStudent.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                selectStudent.setCancelable(false);
+                selectStudent.show();
+            } else {
+                Toast.makeText(LoginScreen.this,"No student found!!! ",
+                        Toast.LENGTH_LONG).show();
+                Intent mainIntent = new Intent(this, StudentMainScreen.class);
+                startActivity(mainIntent);
+                finish();
+            }
         } catch (JSONException e) {
-            mStudentDialog.dismiss();
             e.printStackTrace();
         }
+        mStudentDialog.dismiss();
     }
 
     private void getUserTypes(String UserID) {

@@ -28,6 +28,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -231,7 +232,9 @@ public class RoutineMainScreen extends SideNavigationMenuParentActivity {
             adapter.addFragment(new Friday(), "Fri");
         }
         viewPager.setAdapter(adapter);
-
+        Calendar c = Calendar.getInstance();
+        int currentDay = c.get(Calendar.DAY_OF_WEEK);
+        viewPager.setCurrentItem(currentDay);
     }
 
     private void parseReturnData(String routine) {

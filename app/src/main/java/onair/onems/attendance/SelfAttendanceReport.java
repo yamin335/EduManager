@@ -63,7 +63,7 @@ public class SelfAttendanceReport extends Fragment {
     private DailyAttendanceModel selectedDay;
     private int UserTypeID;
     private TextView totalClass, totalPresent;
-    private String UserFullName, RollNo, RFID, ImageUrl;
+    private String UserFullName, RollNo, RFID, ImageUrl = "";
     public SelfAttendanceReport()
     {
 
@@ -90,36 +90,58 @@ public class SelfAttendanceReport extends Fragment {
 
         SharedPreferences sharedPre = PreferenceManager.getDefaultSharedPreferences(getActivity());
         UserTypeID = sharedPre.getInt("UserTypeID",0);
-        ShiftID=sharedPre.getLong("ShiftID",0);
-        MediumID=sharedPre.getLong("MediumID",0);
-        ClassID=sharedPre.getLong("ClassID",0);
-        SectionID=sharedPre.getLong("SectionID",0);
+        InstituteID=sharedPre.getLong("InstituteID",0);
         if(UserTypeID == 3) {
             DepartmentID=sharedPre.getLong("SDepartmentID",0);
-        } else {
-            DepartmentID=sharedPre.getLong("DepartmentID",0);
-        }
-        InstituteID=sharedPre.getLong("InstituteID",0);
-        UserID = sharedPre.getString("UserID","");
-        UserFullName = sharedPre.getString("UserFullName","");
-        RollNo = sharedPre.getString("RollNo","");
-        RFID = sharedPre.getString("RFID","");
-        ImageUrl = sharedPre.getString("ImageUrl","");
-
-        if(UserTypeID == 5){
+            ShiftID=sharedPre.getLong("ShiftID",0);
+            MediumID=sharedPre.getLong("MediumID",0);
+            ClassID=sharedPre.getLong("ClassID",0);
+            SectionID=sharedPre.getLong("SectionID",0);
+            UserFullName = sharedPre.getString("UserFullName","");
+            RollNo = sharedPre.getString("RollNo","");
+            RFID = sharedPre.getString("RFID","");
+            ImageUrl = sharedPre.getString("ImageUrl","");
+            name.setText(UserFullName);
+            roll.setText("Roll: "+RollNo);
+            id.setText("ID: "+RFID);
+        } else if(UserTypeID == 5) {
+//            DepartmentID=sharedPre.getLong("DepartmentID",0);
             try {
                 JSONObject selectedStudent = new JSONObject(getActivity().getSharedPreferences("CURRENT_STUDENT", Context.MODE_PRIVATE)
                         .getString("guardianSelectedStudent", "{}"));
-                ShiftID = selectedStudent.getLong("ShiftID");
-                MediumID = selectedStudent.getLong("MediumID");
-                ClassID = selectedStudent.getLong("ClassID");
-                SectionID = selectedStudent.getLong("SectionID");
-                DepartmentID = selectedStudent.getLong("DepartmentID");
+                if(selectedStudent.getString("ShiftID").equalsIgnoreCase("null")||selectedStudent.getString("ShiftID").equalsIgnoreCase("")) {
+                    ShiftID = 0;
+                } else {
+                    ShiftID = Long.parseLong(selectedStudent.getString("ShiftID"));
+                }
+                if(selectedStudent.getString("MediumID").equalsIgnoreCase("null")||selectedStudent.getString("MediumID").equalsIgnoreCase("")) {
+                    MediumID = 0;
+                } else {
+                    MediumID = Long.parseLong(selectedStudent.getString("MediumID"));
+                }
+                if(selectedStudent.getString("ClassID").equalsIgnoreCase("null")||selectedStudent.getString("ClassID").equalsIgnoreCase("")) {
+                    ClassID = 0;
+                } else {
+                    ClassID = Long.parseLong(selectedStudent.getString("ClassID"));
+                }
+                if(selectedStudent.getString("SectionID").equalsIgnoreCase("null")||selectedStudent.getString("SectionID").equalsIgnoreCase("")) {
+                    SectionID = 0;
+                } else {
+                    SectionID = Long.parseLong(selectedStudent.getString("SectionID"));
+                }
+                if(selectedStudent.getString("DepartmentID").equalsIgnoreCase("null")||selectedStudent.getString("DepartmentID").equalsIgnoreCase("")) {
+                    DepartmentID = 0;
+                } else {
+                    DepartmentID = Long.parseLong(selectedStudent.getString("DepartmentID"));
+                }
                 UserID = selectedStudent.getString("UserID");
                 UserFullName = selectedStudent.getString("UserFullName");
                 RollNo = selectedStudent.getString("RollNo");
                 RFID = selectedStudent.getString("RFID");
                 ImageUrl = selectedStudent.getString("ImageUrl");
+                name.setText(UserFullName);
+                roll.setText("Roll: "+RollNo);
+                id.setText("ID: "+RFID);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -130,10 +152,6 @@ public class SelfAttendanceReport extends Fragment {
                 .diskCacheStrategy(DiskCacheStrategy.NONE)
                 .skipMemoryCache(true)
                 .into(studentImage);
-
-        name.setText(UserFullName);
-        roll.setText("Roll: "+RollNo);
-        id.setText("ID: "+RFID);
 
         selectedMonth = new MonthModel();
 
@@ -190,14 +208,12 @@ public class SelfAttendanceReport extends Fragment {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
-
-                    try {
-                        selectedMonth = allMonthArrayList.get(position);
-                        MonthlyAttendanceDataGetRequest(selectedMonth.getMonthID());
-                    } catch (IndexOutOfBoundsException e) {
-                        Toast.makeText(getActivity(),"No section found !!!",Toast.LENGTH_LONG).show();
-                    }
-
+                try {
+                    selectedMonth = allMonthArrayList.get(position);
+                    MonthlyAttendanceDataGetRequest(selectedMonth.getMonthID());
+                } catch (Exception e) {
+                    Toast.makeText(getActivity(),"No section found !!!",Toast.LENGTH_LONG).show();
+                }
             }
 
             @Override

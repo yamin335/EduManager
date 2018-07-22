@@ -6,16 +6,19 @@
     android:orientation="vertical">
 
     <TextView
-        android:layout_width="110dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:layout_gravity="center"
         android:text="Details Marks"
         android:textColor="#074d72"
         android:textSize="18sp"
-        android:textStyle="bold"/>
+        android:textStyle="bold"
+        android:gravity="center"/>
     <View
-        android:layout_width="110dp"
+        android:layout_width="match_parent"
+        android:layout_marginStart="80dp"
+        android:layout_marginEnd="80dp"
         android:layout_height="2dp"
         android:background="#074d72"
         android:layout_gravity="center"
