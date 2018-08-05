@@ -1,28 +1,43 @@
 package onair.onems.mainactivities;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
+import android.support.constraint.ConstraintLayout;
+import android.support.design.internal.BottomNavigationItemView;
+import android.support.design.internal.BottomNavigationMenuView;
+import android.support.design.internal.BottomNavigationPresenter;
+import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.NavigationView;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ExpandableListView;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -31,10 +46,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import onair.onems.R;
+import onair.onems.app.Config;
 import onair.onems.attendance.AttendanceAdminDashboard;
+import onair.onems.contacts.ContactsMainScreen;
 import onair.onems.customised.GuardianStudentSelectionDialog;
 import onair.onems.exam.SubjectWiseMarksEntryMain;
 import onair.onems.fees_report.FeeCollectionReportMain;
+import onair.onems.notification.NotificationMainScreen;
 import onair.onems.routine.ExamRoutineMainScreen;
 import onair.onems.fee.FeeMainScreen;
 import onair.onems.fee.FeesHistory;
@@ -55,6 +73,8 @@ import onair.onems.icard.StudentiCardNewEntry;
 import onair.onems.models.ExpandedMenuModel;
 import onair.onems.studentlist.ReportAllStudentMain;
 import onair.onems.syllabus.SyllabusMainScreen;
+import onair.onems.user.Profile;
+import onair.onems.utils.NotificationUtils;
 
 public class SideNavigationMenuParentActivity extends AppCompatActivity {
     private DrawerLayout mDrawerLayout;
@@ -68,6 +88,40 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity {
             LoggedUserDepartmentID, LoggedUserSectionID, LoggedUserSessionID;
     public String activityName = "", LoggedUserID, UserName;
     public static final int MENU_ITEM_CHANGE_STUDENT = 4;
+    private BroadcastReceiver mRegistrationBroadcastReceiver;
+    private ConstraintLayout dashboard, profile, notification, contacts;
+    private TextView textDashboard, textProfile, textNotification, textContacts, notificationCounter;
+    private ImageView iconDashboard, iconProfile, iconNotification, iconContacts;
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+//        MenuItem item = bottomNavigationView.getMenu().findItem(selectedBottomNavItem);
+//        item.setChecked(true);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        // register GCM registration complete receiver
+        LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
+                new IntentFilter(Config.REGISTRATION_COMPLETE));
+
+        // register new push message receiver
+        // by doing this, the activity will be notified each time a new message arrives
+        LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
+                new IntentFilter(Config.PUSH_NOTIFICATION));
+
+        // clear the notification area when the app is opened
+        NotificationUtils.clearNotifications(getApplicationContext());
+    }
+
+    @Override
+    protected void onPause() {
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mRegistrationBroadcastReceiver);
+        super.onPause();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,6 +149,190 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity {
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        notificationCounter = findViewById(R.id.notificationCounter);
+        dashboard = findViewById(R.id.dashboard);
+        profile = findViewById(R.id.profile);
+        notification = findViewById(R.id.notification);
+        contacts = findViewById(R.id.contacts);
+        iconDashboard = findViewById(R.id.iconDashboard);
+        iconProfile = findViewById(R.id.iconProfile);
+        iconNotification = findViewById(R.id.iconNotification);
+        iconContacts = findViewById(R.id.iconContact);
+        textDashboard = findViewById(R.id.textDashboard);
+        textProfile = findViewById(R.id.textProfile);
+        textNotification = findViewById(R.id.textNotification);
+        textContacts = findViewById(R.id.textContact);
+
+        if(activityName.equalsIgnoreCase(Profile.class.getName())){
+            profile.setBackgroundColor(Color.parseColor("#f9f7f7"));
+            iconProfile.setColorFilter(Color.parseColor("#0550b7"));
+            textProfile.setTextColor(Color.parseColor("#0550b7"));
+        }
+
+        if(activityName.equalsIgnoreCase(NotificationMainScreen.class.getName())){
+            notification.setBackgroundColor(Color.parseColor("#f9f7f7"));
+            iconNotification.setColorFilter(Color.parseColor("#0550b7"));
+            textNotification.setTextColor(Color.parseColor("#0550b7"));
+        }
+
+        if(activityName.equalsIgnoreCase(ContactsMainScreen.class.getName())){
+            contacts.setBackgroundColor(Color.parseColor("#f9f7f7"));
+            iconContacts.setColorFilter(Color.parseColor("#0550b7"));
+            textContacts.setTextColor(Color.parseColor("#0550b7"));
+        }
+
+        dashboard.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                refreshBottomNavBar();
+                dashboard.setBackgroundColor(Color.parseColor("#f9f7f7"));
+                iconDashboard.setColorFilter(Color.parseColor("#0550b7"));
+                textDashboard.setTextColor(Color.parseColor("#0550b7"));
+
+                if(UserTypeID == 1) {
+                    Intent mainIntent = new Intent(getApplicationContext(),TeacherMainScreen.class);
+                    startActivity(mainIntent);
+                    finish();
+                } else if(UserTypeID == 2) {
+                    Intent mainIntent = new Intent(getApplicationContext(),TeacherMainScreen.class);
+                    startActivity(mainIntent);
+                    finish();
+                } else if(UserTypeID == 3) {
+                    Intent mainIntent = new Intent(getApplicationContext(),StudentMainScreen.class);
+                    startActivity(mainIntent);
+                    finish();
+                } else if(UserTypeID == 4) {
+                    Intent mainIntent = new Intent(getApplicationContext(),TeacherMainScreen.class);
+                    startActivity(mainIntent);
+                    finish();
+                } else if(UserTypeID == 5) {
+                    Intent mainIntent = new Intent(getApplicationContext(),StudentMainScreen.class);
+                    startActivity(mainIntent);
+                    finish();
+                }
+            }
+        });
+
+        profile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                refreshBottomNavBar();
+                profile.setBackgroundColor(Color.parseColor("#f9f7f7"));
+                iconProfile.setColorFilter(Color.parseColor("#0550b7"));
+                textProfile.setTextColor(Color.parseColor("#0550b7"));
+                if(!activityName.equalsIgnoreCase(Profile.class.getName())){
+                    Intent mainIntent = new Intent(getApplicationContext(), Profile.class);
+                    startActivity(mainIntent);
+                    finish();
+                }
+            }
+        });
+
+        notification.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                refreshBottomNavBar();
+                notification.setBackgroundColor(Color.parseColor("#f9f7f7"));
+                iconNotification.setColorFilter(Color.parseColor("#0550b7"));
+                textNotification.setTextColor(Color.parseColor("#0550b7"));
+                notificationCounter.setVisibility(View.INVISIBLE);
+                if(!activityName.equalsIgnoreCase(NotificationMainScreen.class.getName())){
+                    Intent mainIntent = new Intent(getApplicationContext(), NotificationMainScreen.class);
+                    startActivity(mainIntent);
+                    finish();
+                }
+            }
+        });
+
+        contacts.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                refreshBottomNavBar();
+                contacts.setBackgroundColor(Color.parseColor("#f9f7f7"));
+                iconContacts.setColorFilter(Color.parseColor("#0550b7"));
+                textContacts.setTextColor(Color.parseColor("#0550b7"));
+                if(!activityName.equalsIgnoreCase(ContactsMainScreen.class.getName())){
+                    Intent mainIntent = new Intent(getApplicationContext(), ContactsMainScreen.class);
+                    startActivity(mainIntent);
+                    finish();
+                }
+            }
+        });
+
+//        bottomNavigationView = findViewById(R.id.navigation);
+//        bottomNavigationView.getMenu().getItem(0).setCheckable(false);
+//        bottomNavigationView.getMenu().getItem(1).setCheckable(false);
+//        bottomNavigationView.getMenu().getItem(2).setCheckable(false);
+//        bottomNavigationView.getMenu().getItem(3).setCheckable(false);
+//        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+//            @Override
+//            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+//                item.setCheckable(true);
+//                bottomNavigationView.postDelayed(() -> {
+//                    int itemId = item.getItemId();
+//                    if (itemId == R.id.navigation_dashboard) {
+//                        switch (UserTypeID) {
+//                            case 1: startActivity(new Intent(SideNavigationMenuParentActivity.this, TeacherMainScreen.class));
+//                                break;
+//                            case 2: startActivity(new Intent(SideNavigationMenuParentActivity.this, TeacherMainScreen.class));
+//                                break;
+//                            case 3: startActivity(new Intent(SideNavigationMenuParentActivity.this, StudentMainScreen.class));
+//                                break;
+//                            case 4: startActivity(new Intent(SideNavigationMenuParentActivity.this, TeacherMainScreen.class));
+//                                break;
+//                            case 5: startActivity(new Intent(SideNavigationMenuParentActivity.this, StudentMainScreen.class));
+//                                break;
+//                        }
+//                    } else if (itemId == R.id.navigation_profile) {
+//
+//                    } else if (itemId == R.id.navigation_notification) {
+////                        startActivity(new Intent(this, NotificationsActivity.class));
+//                    } else if(itemId == R.id.navigation_contact) {
+//
+//                    }
+////                    finish();
+//                }, 300);
+//                return true;
+//            }
+//        });
+//        BottomNavigationMenuView bottomNavigationMenuView = (BottomNavigationMenuView) bottomNavigationView.getChildAt(0);
+//        View v = bottomNavigationMenuView.getChildAt(2);
+//        BottomNavigationItemView itemView = (BottomNavigationItemView) v;
+//        View badge = LayoutInflater.from(this).inflate(R.layout.notification_badge_container, bottomNavigationMenuView, false);
+//        itemView.addView(badge);
+//
+//        TextView textView = itemView.findViewById(R.id.notificationCounter);
+//        textView.setText("20");
+
+        //
+//        notificationMenuItem = menu.findItem(R.id.notificationCounterMenuId);
+//        View actionView = notificationMenuItem.getActionView();
+//        if(actionView!=null){
+//            notificationBell = actionView.findViewById(R.id.notificationBell);
+//            notificationCounter = actionView.findViewById(R.id.notificationCounter);
+//            notificationBell.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(SideNavigationMenuParentActivity.this);
+//                    SharedPreferences.Editor editor = prefs.edit();
+//                    editor.putInt("Notification", 0);
+//                    editor.apply();
+//                    notificationCounter.setText("");
+//                    notificationCounter.setVisibility(View.INVISIBLE);
+//                }
+//            });
+//
+//            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+//            SharedPreferences.Editor editor = prefs.edit();
+//            int number = prefs.getInt("Notification",0);
+//            if(number>0){
+//                notificationCounter.setVisibility(View.VISIBLE);
+//                notificationCounter.setText(Integer.toString(number));
+//            } else {
+//                notificationCounter.setVisibility(View.INVISIBLE);
+//            }
+//        }
 
 //        final ActionBar actionBar = getSupportActionBar();
 //        actionBar.setHomeAsUpIndicator(android.R.drawable.ic_menu_add);
@@ -153,6 +391,67 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity {
             case 5: prepareGuardianSideMenu();
             break;
         }
+
+        mRegistrationBroadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+
+                // checking for type intent filter
+                if (intent.getAction().equals(Config.REGISTRATION_COMPLETE)) {
+                    // gcm successfully registered
+                    // now subscribe to `global` topic to receive app wide notifications
+                    FirebaseMessaging.getInstance().subscribeToTopic(Config.TOPIC_GLOBAL);
+                    displayFirebaseRegId();
+
+                } else if (intent.getAction().equals(Config.PUSH_NOTIFICATION)) {
+                    // new push notification is received
+                    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(SideNavigationMenuParentActivity.this);
+                    SharedPreferences.Editor editor = prefs.edit();
+                    int number = prefs.getInt("Notification",0);
+//                    notificationCounter.setVisibility(View.VISIBLE);
+//                    notificationCounter.setText(Integer.toString(++number));
+                    editor.putInt("Notification", number);
+                    editor.apply();
+                    String message = intent.getStringExtra("message");
+
+                    Toast.makeText(getApplicationContext(), "Push notification: "
+                            + message, Toast.LENGTH_LONG).show();
+                }
+            }
+        };
+    }
+
+    private void refreshBottomNavBar(){
+        dashboard.setBackgroundColor(Color.WHITE);
+        iconDashboard.setColorFilter(Color.parseColor("#757575"));
+        textDashboard.setTextColor(Color.parseColor("#757575"));
+
+        profile.setBackgroundColor(Color.WHITE);
+        iconProfile.setColorFilter(Color.parseColor("#757575"));
+        textProfile.setTextColor(Color.parseColor("#757575"));
+
+        notification.setBackgroundColor(Color.WHITE);
+        iconNotification.setColorFilter(Color.parseColor("#757575"));
+        textNotification.setTextColor(Color.parseColor("#757575"));
+
+        contacts.setBackgroundColor(Color.WHITE);
+        iconContacts.setColorFilter(Color.parseColor("#757575"));
+        textContacts.setTextColor(Color.parseColor("#757575"));
+
+    }
+
+    // Fetches reg id from shared preferences
+    // and displays on the screen
+    private void displayFirebaseRegId() {
+        SharedPreferences pref = getApplicationContext().getSharedPreferences(Config.SHARED_PREF, 0);
+        String regId = pref.getString("regId", null);
+
+        Log.e(SideNavigationMenuParentActivity.class.getSimpleName(), "Firebase reg id: " + regId);
+
+        if (!TextUtils.isEmpty(regId))
+            Toast.makeText(getApplicationContext(), "Firebase Reg Id: " + regId, Toast.LENGTH_LONG).show();
+        else
+        Toast.makeText(getApplicationContext(), "Firebase Reg Id is not received yet!", Toast.LENGTH_LONG).show();
     }
 
     private void setupDrawerContent(NavigationView navigationView) {
@@ -189,6 +488,34 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity {
                         .setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
                 break;
         }
+//
+//        notificationMenuItem = menu.findItem(R.id.notificationCounterMenuId);
+//        View actionView = notificationMenuItem.getActionView();
+//        if(actionView!=null){
+//            notificationBell = actionView.findViewById(R.id.notificationBell);
+//            notificationCounter = actionView.findViewById(R.id.notificationCounter);
+//            notificationBell.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(SideNavigationMenuParentActivity.this);
+//                    SharedPreferences.Editor editor = prefs.edit();
+//                    editor.putInt("Notification", 0);
+//                    editor.apply();
+//                    notificationCounter.setText("");
+//                    notificationCounter.setVisibility(View.INVISIBLE);
+//                }
+//            });
+//
+//            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+//            SharedPreferences.Editor editor = prefs.edit();
+//            int number = prefs.getInt("Notification",0);
+//            if(number>0){
+//                notificationCounter.setVisibility(View.VISIBLE);
+//                notificationCounter.setText(Integer.toString(number));
+//            } else {
+//                notificationCounter.setVisibility(View.INVISIBLE);
+//            }
+//        }
         return true;
     }
 

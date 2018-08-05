@@ -10,6 +10,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
+import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
@@ -17,17 +18,21 @@ import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import onair.onems.R;
 import onair.onems.attendance.AttendanceAdminDashboard;
+import onair.onems.contacts.ContactsMainScreen;
 import onair.onems.homework.HomeworkMainScreen;
 import onair.onems.login.LoginScreen;
 import onair.onems.notice.NoticeMainScreen;
+import onair.onems.notification.NotificationMainScreen;
 import onair.onems.result.ResultMainScreen;
 import onair.onems.routine.RoutineMainScreen;
 import onair.onems.attendance.TakeAttendance;
 import onair.onems.icard.StudentiCardMain;
 import onair.onems.syllabus.SyllabusMainScreen;
+import onair.onems.user.Profile;
 
 import static onair.onems.login.LoginScreen.MyPREFERENCES;
 
@@ -40,6 +45,9 @@ public class TeacherMainScreen extends AppCompatActivity {
     private long InstituteID;
     private String UserName, LoggedUserID;
     private View dimView;
+    private ConstraintLayout dashboard, profile, notification, contacts;
+    private TextView textDashboard, textProfile, textNotification, textContacts, notificationCounter;
+    private ImageView iconDashboard, iconProfile, iconNotification, iconContacts;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -144,16 +152,16 @@ public class TeacherMainScreen extends AppCompatActivity {
             }
         });
 
-        Button attendance = (Button)findViewById(R.id.attendance);
-        Button iCard = (Button)findViewById(R.id.iCard);
-        Button notice = (Button)findViewById(R.id.notice);
+        CardView attendance = findViewById(R.id.attendance);
+        CardView iCard = findViewById(R.id.iCard);
+        CardView notice = findViewById(R.id.notice);
         TextView InstituteName = (TextView) findViewById(R.id.InstituteName);
         TextView userType = (TextView) findViewById(R.id.userType);
-        Button result = (Button)findViewById(R.id.result);
-        Button contact = (Button)findViewById(R.id.contact);
-        Button routine = (Button)findViewById(R.id.routine);
-        Button homework = (Button)findViewById(R.id.homework);
-        Button syllabus = findViewById(R.id.syllabus);
+        CardView result = findViewById(R.id.result);
+        CardView exam = findViewById(R.id.exam);
+        CardView routine = findViewById(R.id.routine);
+        CardView homework = findViewById(R.id.homework);
+        CardView syllabus = findViewById(R.id.syllabus);
 
         SharedPreferences sharedPre = PreferenceManager.getDefaultSharedPreferences(this);
         String InstituteNameString = sharedPre.getString("InstituteName","");
@@ -233,7 +241,7 @@ public class TeacherMainScreen extends AppCompatActivity {
         });
 
         // Contact module start point
-        contact.setOnClickListener(new View.OnClickListener() {
+        exam.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 //                Intent mainIntent = new Intent(TeacherMainScreen.this, SyllabusMainScreen.class);
@@ -253,6 +261,89 @@ public class TeacherMainScreen extends AppCompatActivity {
                 finish();
             }
         });
+
+        notificationCounter = findViewById(R.id.notificationCounter);
+        dashboard = findViewById(R.id.dashboard);
+        profile = findViewById(R.id.profile);
+        notification = findViewById(R.id.notification);
+        contacts = findViewById(R.id.contacts);
+        iconDashboard = findViewById(R.id.iconDashboard);
+        iconProfile = findViewById(R.id.iconProfile);
+        iconNotification = findViewById(R.id.iconNotification);
+        iconContacts = findViewById(R.id.iconContact);
+        textDashboard = findViewById(R.id.textDashboard);
+        textProfile = findViewById(R.id.textProfile);
+        textNotification = findViewById(R.id.textNotification);
+        textContacts = findViewById(R.id.textContact);
+
+        dashboard.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                refreshBottomNavBar();
+                dashboard.setBackgroundColor(Color.parseColor("#f9f7f7"));
+                iconDashboard.setColorFilter(Color.parseColor("#0550b7"));
+                textDashboard.setTextColor(Color.parseColor("#0550b7"));
+            }
+        });
+
+        profile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                refreshBottomNavBar();
+                profile.setBackgroundColor(Color.parseColor("#f9f7f7"));
+                iconProfile.setColorFilter(Color.parseColor("#0550b7"));
+                textProfile.setTextColor(Color.parseColor("#0550b7"));
+                Intent mainIntent = new Intent(TeacherMainScreen.this,Profile.class);
+                startActivity(mainIntent);
+                finish();
+            }
+        });
+
+        notification.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                refreshBottomNavBar();
+                notification.setBackgroundColor(Color.parseColor("#f9f7f7"));
+                iconNotification.setColorFilter(Color.parseColor("#0550b7"));
+                textNotification.setTextColor(Color.parseColor("#0550b7"));
+                notificationCounter.setVisibility(View.INVISIBLE);
+                Intent mainIntent = new Intent(TeacherMainScreen.this,NotificationMainScreen.class);
+                startActivity(mainIntent);
+                finish();
+            }
+        });
+
+        contacts.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                refreshBottomNavBar();
+                contacts.setBackgroundColor(Color.parseColor("#f9f7f7"));
+                iconContacts.setColorFilter(Color.parseColor("#0550b7"));
+                textContacts.setTextColor(Color.parseColor("#0550b7"));
+                Intent mainIntent = new Intent(TeacherMainScreen.this,ContactsMainScreen.class);
+                startActivity(mainIntent);
+                finish();
+            }
+        });
+
+    }
+
+    private void refreshBottomNavBar(){
+        dashboard.setBackgroundColor(Color.WHITE);
+        iconDashboard.setColorFilter(Color.parseColor("#757575"));
+        textDashboard.setTextColor(Color.parseColor("#757575"));
+
+        profile.setBackgroundColor(Color.WHITE);
+        iconProfile.setColorFilter(Color.parseColor("#757575"));
+        textProfile.setTextColor(Color.parseColor("#757575"));
+
+        notification.setBackgroundColor(Color.WHITE);
+        iconNotification.setColorFilter(Color.parseColor("#757575"));
+        textNotification.setTextColor(Color.parseColor("#757575"));
+
+        contacts.setBackgroundColor(Color.WHITE);
+        iconContacts.setColorFilter(Color.parseColor("#757575"));
+        textContacts.setTextColor(Color.parseColor("#757575"));
 
     }
 

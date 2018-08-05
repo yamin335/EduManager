@@ -50,9 +50,10 @@ public class ContactsMainScreen extends SideNavigationMenuParentActivity impleme
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
 
         activityName = ContactsMainScreen.class.getName();
+
+        super.onCreate(savedInstanceState);
 
         LayoutInflater inflater = (LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         final View childActivityLayout = inflater.inflate(R.layout.contacts_content_main, null);
@@ -73,7 +74,7 @@ public class ContactsMainScreen extends SideNavigationMenuParentActivity impleme
         mAdapter = new ContactsAdapter(this, contactList, this);
 
         // white background notification bar
-        whiteNotificationBar(recyclerView);
+//        whiteNotificationBar(recyclerView);
 
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(mLayoutManager);
@@ -176,14 +177,14 @@ public class ContactsMainScreen extends SideNavigationMenuParentActivity impleme
         }
     }
 
-    private void whiteNotificationBar(View view) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            int flags = view.getSystemUiVisibility();
-            flags |= View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
-            view.setSystemUiVisibility(flags);
-            getWindow().setStatusBarColor(Color.WHITE);
-        }
-    }
+//    private void whiteNotificationBar(View view) {
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+//            int flags = view.getSystemUiVisibility();
+//            flags |= View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
+//            view.setSystemUiVisibility(flags);
+//            getWindow().setStatusBarColor(Color.WHITE);
+//        }
+//    }
 
     @Override
     public void onContactSelected(Contact contact) {

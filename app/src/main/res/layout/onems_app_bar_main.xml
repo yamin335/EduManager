@@ -22,12 +22,174 @@
     </android.support.design.widget.AppBarLayout>
 
     <LinearLayout
-        android:id="@+id/contentMain"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:background="#ffffff"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
-    </LinearLayout>
+        <LinearLayout
+            android:id="@+id/contentMain"
+            android:orientation="vertical"
+            android:background="#ffffff"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+        </LinearLayout>
+        <android.support.v7.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            app:cardElevation="16dp">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+                <android.support.constraint.ConstraintLayout
+                    android:id="@+id/dashboard"
+                    android:layout_weight="1"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent">
 
+                    <ImageView
+                        android:id="@+id/iconDashboard"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:tint="#757575"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintVertical_bias="0.40"
+                        app:srcCompat="@drawable/ic_dashboard_black_24dp" />
+
+                    <TextView
+                        android:id="@+id/textDashboard"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Dashboard"
+                        android:textAllCaps="false"
+                        android:textColor="#757575"
+                        android:textSize="10sp"
+                        android:textStyle="italic"
+                        app:layout_constraintEnd_toEndOf="@+id/iconDashboard"
+                        app:layout_constraintStart_toStartOf="@+id/iconDashboard"
+                        app:layout_constraintTop_toBottomOf="@+id/iconDashboard" />
+                </android.support.constraint.ConstraintLayout>
+
+                <android.support.constraint.ConstraintLayout
+                    android:id="@+id/profile"
+                    android:layout_weight="1"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent">
+
+                    <ImageView
+                        android:id="@+id/iconProfile"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:tint="#757575"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintVertical_bias="0.40"
+                        app:srcCompat="@drawable/ic_person_black_24dp" />
+
+                    <TextView
+                        android:id="@+id/textProfile"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Profile"
+                        android:textAllCaps="false"
+                        android:textColor="#757575"
+                        android:textSize="10sp"
+                        android:textStyle="italic"
+                        app:layout_constraintEnd_toEndOf="@+id/iconProfile"
+                        app:layout_constraintStart_toStartOf="@+id/iconProfile"
+                        app:layout_constraintTop_toBottomOf="@+id/iconProfile" />
+                </android.support.constraint.ConstraintLayout>
+
+                <android.support.constraint.ConstraintLayout
+                    android:id="@+id/notification"
+                    android:layout_weight="1"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent">
+
+                    <ImageView
+                        android:id="@+id/iconNotification"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:tint="#757575"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintVertical_bias="0.40"
+                        app:srcCompat="@drawable/ic_notifications_black_24dp" />
+
+                    <TextView
+                        android:id="@+id/textNotification"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Notification"
+                        android:textAllCaps="false"
+                        android:textColor="#757575"
+                        android:textSize="10sp"
+                        android:textStyle="italic"
+                        app:layout_constraintEnd_toEndOf="@+id/iconNotification"
+                        app:layout_constraintStart_toStartOf="@+id/iconNotification"
+                        app:layout_constraintTop_toBottomOf="@+id/iconNotification" />
+
+                    <TextView
+                        android:id="@+id/notificationCounter"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:background="@drawable/notification_badge"
+                        android:gravity="center"
+                        android:padding="3dp"
+                        android:text="0"
+                        android:textColor="#000000"
+                        android:textSize="11sp"
+                        app:layout_constraintBottom_toTopOf="@+id/iconNotification"
+                        app:layout_constraintEnd_toStartOf="@+id/iconNotification"
+                        app:layout_constraintHorizontal_bias="0.25"
+                        app:layout_constraintStart_toEndOf="@+id/iconNotification"
+                        app:layout_constraintTop_toBottomOf="@+id/iconNotification"
+                        app:layout_constraintVertical_bias="0.7" />
+                </android.support.constraint.ConstraintLayout>
+
+                <android.support.constraint.ConstraintLayout
+                    android:id="@+id/contacts"
+                    android:layout_weight="1"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent">
+
+                    <ImageView
+                        android:id="@+id/iconContact"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:tint="#757575"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintVertical_bias="0.40"
+                        app:srcCompat="@drawable/ic_group_black_24dp" />
+
+                    <TextView
+                        android:id="@+id/textContact"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Contacts"
+                        android:textAllCaps="false"
+                        android:textColor="#757575"
+                        android:textSize="10sp"
+                        android:textStyle="italic"
+                        app:layout_constraintEnd_toEndOf="@+id/iconContact"
+                        app:layout_constraintStart_toStartOf="@+id/iconContact"
+                        app:layout_constraintTop_toBottomOf="@+id/iconContact" />
+                </android.support.constraint.ConstraintLayout>
+
+            </LinearLayout>
+        </android.support.v7.widget.CardView>
+    </LinearLayout>
 </android.support.design.widget.CoordinatorLayout>
