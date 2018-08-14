@@ -174,7 +174,7 @@ public class StudentMainScreen extends AppCompatActivity {
         CardView homework = findViewById(R.id.homework);
         CardView result = findViewById(R.id.result);
         CardView Fees = findViewById(R.id.fee);
-        CardView contact = findViewById(R.id.contact);
+        CardView exam = findViewById(R.id.exam);
 
         // Notice module start point
         notice.setOnClickListener(new View.OnClickListener() {
@@ -256,12 +256,12 @@ public class StudentMainScreen extends AppCompatActivity {
         });
 
         // Contact module start point
-        contact.setOnClickListener(new View.OnClickListener() {
+        exam.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                Intent mainIntent = new Intent(StudentMainScreen.this, SyllabusMainScreen.class);
-//                StudentMainScreen.this.startActivity(mainIntent);
-//                finish();
+                Intent mainIntent = new Intent(StudentMainScreen.this, NotificationMainScreen.class);
+                startActivity(mainIntent);
+                finish();
             }
         });
 

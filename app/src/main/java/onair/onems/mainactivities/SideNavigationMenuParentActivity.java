@@ -114,7 +114,7 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity {
                 new IntentFilter(Config.PUSH_NOTIFICATION));
 
         // clear the notification area when the app is opened
-        NotificationUtils.clearNotifications(getApplicationContext());
+//        NotificationUtils.clearNotifications(getApplicationContext());
     }
 
     @Override
@@ -412,7 +412,7 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity {
 //                    notificationCounter.setText(Integer.toString(++number));
                     editor.putInt("Notification", number);
                     editor.apply();
-                    String message = intent.getStringExtra("message");
+                    String message = intent.getStringExtra("notification");
 
                     Toast.makeText(getApplicationContext(), "Push notification: "
                             + message, Toast.LENGTH_LONG).show();

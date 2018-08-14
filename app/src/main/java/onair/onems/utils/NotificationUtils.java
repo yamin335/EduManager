@@ -19,6 +19,7 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationManagerCompat;
 import android.text.Html;
 import android.text.TextUtils;
 import android.util.Patterns;
@@ -31,26 +32,25 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
 
 import onair.onems.R;
 import onair.onems.app.Config;
 
 
 public class NotificationUtils {
-    private static String TAG = NotificationUtils.class.getSimpleName();
-
     private Context mContext;
 
     public NotificationUtils(Context mContext) {
         this.mContext = mContext;
     }
 
-    public void showNotificationMessage(String title, String message, String timeStamp, Intent intent) {
+    public void showNotificationMessage(String title, String message, long timeStamp, Intent intent) {
         showNotificationMessage(title, message, timeStamp, intent, null);
     }
 
     public void showNotificationMessage(final String title, final String message,
-                                        final String timeStamp, Intent intent, String imageUrl) {
+                                        final long timeStamp, Intent intent, String imageUrl) {
         // Check for empty push message
         if (TextUtils.isEmpty(message))
             return;
@@ -58,18 +58,11 @@ public class NotificationUtils {
 
         // notification icon
         final int icon = R.drawable.onair;
+        int requestCode = new Random().nextInt(900000)+100000;
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        PendingIntent resultPendingIntent = PendingIntent.getActivity(mContext, requestCode, intent, PendingIntent.FLAG_IMMUTABLE);
 
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        final PendingIntent resultPendingIntent =
-                PendingIntent.getActivity(
-                        mContext,
-                        0,
-                        intent,
-                        PendingIntent.FLAG_CANCEL_CURRENT
-                );
-
-        final NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(
-                mContext);
+        final NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(mContext, Config.NOTIFICATION_CHANNEL);
 
         final Uri alarmSound = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE
                 + "://" + mContext.getPackageName() + "/raw/notification");
@@ -99,50 +92,51 @@ public class NotificationUtils {
 
 
     private void showSmallNotification(NotificationCompat.Builder mBuilder, int icon,
-                                       String title, String message, String timeStamp,
+                                       String title, String message, long timeStamp,
                                        PendingIntent resultPendingIntent, Uri alarmSound) {
 
         NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
 
         inboxStyle.addLine(message);
 
-        Notification notification;
-        notification = mBuilder.setSmallIcon(icon).setTicker(title).setWhen(0)
+        Notification notification = mBuilder.setSmallIcon(icon).setTicker(title)
                 .setAutoCancel(true)
                 .setContentTitle(title)
                 .setContentIntent(resultPendingIntent)
                 .setSound(alarmSound)
                 .setStyle(inboxStyle)
-                .setWhen(getTimeMilliSec(timeStamp))
+                .setWhen(timeStamp)
+//                .setWhen(getTimeMilliSec(timeStamp))
                 .setSmallIcon(R.drawable.onair)
-                .setLargeIcon(BitmapFactory.decodeResource(mContext.getResources(), icon))
+//                .setLargeIcon(BitmapFactory.decodeResource(mContext.getResources(), icon))
                 .setContentText(message)
+                .setPriority(NotificationCompat.PRIORITY_MAX)
                 .build();
-
-        NotificationManager notificationManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.notify(Config.NOTIFICATION_ID, notification);
+        int uniqueNotificationId = new Random().nextInt(900000)+100000;
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(mContext);
+        notificationManager.notify(uniqueNotificationId, notification);
     }
 
-    private void showBigNotification(Bitmap bitmap, NotificationCompat.Builder mBuilder, int icon, String title, String message, String timeStamp, PendingIntent resultPendingIntent, Uri alarmSound) {
+    private void showBigNotification(Bitmap bitmap, NotificationCompat.Builder mBuilder, int icon, String title, String message, long timeStamp, PendingIntent resultPendingIntent, Uri alarmSound) {
         NotificationCompat.BigPictureStyle bigPictureStyle = new NotificationCompat.BigPictureStyle();
-        bigPictureStyle.setBigContentTitle(title);
-        bigPictureStyle.setSummaryText(Html.fromHtml(message).toString());
-        bigPictureStyle.bigPicture(bitmap);
-        Notification notification;
-        notification = mBuilder.setSmallIcon(icon).setTicker(title).setWhen(0)
+        bigPictureStyle.setBigContentTitle(title)
+                .setSummaryText(Html.fromHtml(message).toString())
+                .bigPicture(bitmap);
+        Notification notification = mBuilder.setSmallIcon(icon).setTicker(title)
                 .setAutoCancel(true)
                 .setContentTitle(title)
                 .setContentIntent(resultPendingIntent)
                 .setSound(alarmSound)
                 .setStyle(bigPictureStyle)
-                .setWhen(getTimeMilliSec(timeStamp))
+                .setWhen(timeStamp)
+//                .setWhen(getTimeMilliSec(timeStamp))
                 .setSmallIcon(R.drawable.onair)
-                .setLargeIcon(BitmapFactory.decodeResource(mContext.getResources(), icon))
+//                .setLargeIcon(BitmapFactory.decodeResource(mContext.getResources(), icon))
                 .setContentText(message)
                 .build();
-
-        NotificationManager notificationManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.notify(Config.NOTIFICATION_ID_BIG_IMAGE, notification);
+        int uniqueNotificationId = new Random().nextInt(900000)+100000;
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(mContext);
+        notificationManager.notify(uniqueNotificationId, notification);
     }
 
     /**
@@ -205,10 +199,10 @@ public class NotificationUtils {
     }
 
     // Clears notification tray messages
-    public static void clearNotifications(Context context) {
-        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.cancelAll();
-    }
+//    public static void clearNotifications(Context context) {
+//        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+//        notificationManager.cancelAll();
+//    }
 
     public static long getTimeMilliSec(String timeStamp) {
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");

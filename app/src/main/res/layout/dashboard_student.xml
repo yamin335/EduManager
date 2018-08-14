@@ -346,7 +346,7 @@
                 android:layout_weight="1"
                 android:orientation="horizontal">
                 <android.support.v7.widget.CardView
-                    android:id="@+id/contact"
+                    android:id="@+id/exam"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
@@ -375,7 +375,7 @@
                             android:layout_marginTop="8dp"
                             android:orientation="vertical"
                             android:fontFamily="sans-serif-condensed"
-                            android:text="Contacts"
+                            android:text="Exam"
                             android:textAllCaps="false"
                             android:textColor="@color/white"
                             android:textSize="20sp"
@@ -385,7 +385,8 @@
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent"
-                            android:drawableTop="@drawable/contact"/>
+                            android:drawableTop="@drawable/exam"
+                            android:drawableTint="@color/white"/>
                     </android.support.constraint.ConstraintLayout>
                 </android.support.v7.widget.CardView>
                 <android.support.v7.widget.CardView

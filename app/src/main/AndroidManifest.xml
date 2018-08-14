@@ -337,16 +337,27 @@
             android:label="Fees Collection Report"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".notification.NotificationMainScreen"
+        <activity
+            android:name=".notification.NotificationMainScreen"
             android:label="Notifications"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar">
 
         </activity>
-        <activity android:name=".user.Profile"
+        <activity
+            android:name=".user.Profile"
             android:label="Profile"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar">
+
+        </activity>
+        <activity android:name=".notification.NotificationDetails"
+            android:label="Notification Details"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:launchMode="singleInstance"
+            android:taskAffinity=""
+            android:excludeFromRecents="true">
 
         </activity>
     </application>
