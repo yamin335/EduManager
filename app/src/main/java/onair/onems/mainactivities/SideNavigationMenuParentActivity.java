@@ -1,5 +1,7 @@
 package onair.onems.mainactivities;
 
+import android.app.Notification;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -15,6 +17,8 @@ import android.support.design.internal.BottomNavigationMenuView;
 import android.support.design.internal.BottomNavigationPresenter;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -41,10 +45,13 @@ import com.google.firebase.messaging.FirebaseMessaging;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
+
 import onair.onems.R;
 import onair.onems.app.Config;
 import onair.onems.attendance.AttendanceAdminDashboard;
@@ -52,6 +59,7 @@ import onair.onems.contacts.ContactsMainScreen;
 import onair.onems.customised.GuardianStudentSelectionDialog;
 import onair.onems.exam.SubjectWiseMarksEntryMain;
 import onair.onems.fees_report.FeeCollectionReportMain;
+import onair.onems.notification.NotificationDetails;
 import onair.onems.notification.NotificationMainScreen;
 import onair.onems.routine.ExamRoutineMainScreen;
 import onair.onems.fee.FeeMainScreen;
@@ -413,9 +421,34 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity {
                     editor.putInt("Notification", number);
                     editor.apply();
                     String message = intent.getStringExtra("notification");
-
-                    Toast.makeText(getApplicationContext(), "Push notification: "
-                            + message, Toast.LENGTH_LONG).show();
+                    try {
+                        JSONObject messageJSONObject = new JSONObject(message);
+                        //Show the notification when app is in foreground
+                        // notification icon
+                        final int icon = R.drawable.onair;
+                        Intent resultIntent = new Intent(getApplicationContext(), NotificationDetails.class);
+                        resultIntent.putExtra("notification", message);
+                        resultIntent.putExtra("from", "tray");
+                        int requestCode = new Random().nextInt(900000)+100000;
+                        resultIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        PendingIntent resultPendingIntent = PendingIntent.getActivity(getApplicationContext(), requestCode, resultIntent, PendingIntent.FLAG_IMMUTABLE);
+                        final NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(getApplicationContext(), Config.NOTIFICATION_CHANNEL);
+                        Notification notification = mBuilder.setSmallIcon(icon).setTicker(messageJSONObject.getString("title"))
+                                .setAutoCancel(true)
+                                .setContentTitle(messageJSONObject.getString("title"))
+                                .setContentIntent(resultPendingIntent)
+                                .setWhen(System.currentTimeMillis())
+                                .setStyle(new NotificationCompat.BigTextStyle()
+                                        .bigText(messageJSONObject.getString("body")))
+                                .setContentText(messageJSONObject.getString("body"))
+                                .setPriority(NotificationCompat.PRIORITY_MAX)
+                                .build();
+                        int uniqueNotificationId = new Random().nextInt(900000)+100000;
+                        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(getApplicationContext());
+                        notificationManager.notify(uniqueNotificationId, notification);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         };

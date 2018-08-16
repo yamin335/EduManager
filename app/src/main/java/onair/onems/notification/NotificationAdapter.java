@@ -15,6 +15,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -144,11 +145,36 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         // to perform recycler view delete animations
         // NOTE: don't call notifyDataSetChanged()
         notifyItemRemoved(position);
+
+        String string = context.getSharedPreferences("PUSH_NOTIFICATIONS", Context.MODE_PRIVATE)
+                .getString("notifications", "[]");
+        try {
+            JSONArray jsonArray = new JSONArray(string);
+            jsonArray.remove(position);
+            context.getSharedPreferences("PUSH_NOTIFICATIONS", Context.MODE_PRIVATE)
+                    .edit()
+                    .putString("notifications", jsonArray.toString())
+                    .apply();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     public void restoreItem(JSONObject jsonObject, int position) {
         notificationListFiltered.add(position, jsonObject);
         // notify item added by position
         notifyItemInserted(position);
+        try {
+            String string = context.getSharedPreferences("PUSH_NOTIFICATIONS", Context.MODE_PRIVATE)
+                    .getString("notifications", "[]");
+            JSONArray jsonArray = new JSONArray(string);
+            jsonArray.put(position, jsonObject);
+            context.getSharedPreferences("PUSH_NOTIFICATIONS", Context.MODE_PRIVATE)
+                    .edit()
+                    .putString("notifications", jsonArray.toString())
+                    .apply();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 }

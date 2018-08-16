@@ -1,9 +1,13 @@
 package onair.onems.mainactivities;
 
 import android.app.AlertDialog;
+import android.app.Notification;
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -12,6 +16,9 @@ import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationManagerCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.view.View;
@@ -20,7 +27,16 @@ import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.google.firebase.messaging.FirebaseMessaging;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.Random;
+
+import onair.onems.app.Config;
 import onair.onems.contacts.ContactsMainScreen;
 import onair.onems.fee.FeeMainScreen;
 import onair.onems.R;
@@ -28,6 +44,7 @@ import onair.onems.attendance.StudentAttendanceReport;
 import onair.onems.homework.HomeworkMainScreen;
 import onair.onems.login.LoginScreen;
 import onair.onems.notice.NoticeMainScreen;
+import onair.onems.notification.NotificationDetails;
 import onair.onems.notification.NotificationMainScreen;
 import onair.onems.result.ResultMainScreen;
 import onair.onems.routine.RoutineMainScreen;
@@ -49,6 +66,30 @@ public class StudentMainScreen extends AppCompatActivity {
     private ConstraintLayout dashboard, profile, notification, contacts;
     private TextView textDashboard, textProfile, textNotification, textContacts, notificationCounter;
     private ImageView iconDashboard, iconProfile, iconNotification, iconContacts;
+    private BroadcastReceiver mRegistrationBroadcastReceiver;
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        // register GCM registration complete receiver
+        LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
+                new IntentFilter(Config.REGISTRATION_COMPLETE));
+
+        // register new push message receiver
+        // by doing this, the activity will be notified each time a new message arrives
+        LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
+                new IntentFilter(Config.PUSH_NOTIFICATION));
+
+        // clear the notification area when the app is opened
+//        NotificationUtils.clearNotifications(getApplicationContext());
+    }
+
+    @Override
+    protected void onPause() {
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mRegistrationBroadcastReceiver);
+        super.onPause();
+    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -328,6 +369,59 @@ public class StudentMainScreen extends AppCompatActivity {
                 finish();
             }
         });
+
+        mRegistrationBroadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+
+                // checking for type intent filter
+                if (intent.getAction().equals(Config.REGISTRATION_COMPLETE)) {
+                    // gcm successfully registered
+                    // now subscribe to `global` topic to receive app wide notifications
+                    FirebaseMessaging.getInstance().subscribeToTopic(Config.TOPIC_GLOBAL);
+//                    displayFirebaseRegId();
+
+                } else if (intent.getAction().equals(Config.PUSH_NOTIFICATION)) {
+                    // new push notification is received
+                    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(StudentMainScreen.this);
+                    SharedPreferences.Editor editor = prefs.edit();
+                    int number = prefs.getInt("Notification",0);
+//                    notificationCounter.setVisibility(View.VISIBLE);
+//                    notificationCounter.setText(Integer.toString(++number));
+                    editor.putInt("Notification", number);
+                    editor.apply();
+                    String message = intent.getStringExtra("notification");
+                    try {
+                        JSONObject messageJSONObject = new JSONObject(message);
+                        //Show the notification when app is in foreground
+                        // notification icon
+                        final int icon = R.drawable.onair;
+                        Intent resultIntent = new Intent(getApplicationContext(), NotificationDetails.class);
+                        resultIntent.putExtra("notification", message);
+                        resultIntent.putExtra("from", "tray");
+                        int requestCode = new Random().nextInt(900000)+100000;
+                        resultIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        PendingIntent resultPendingIntent = PendingIntent.getActivity(getApplicationContext(), requestCode, resultIntent, PendingIntent.FLAG_IMMUTABLE);
+                        final NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(getApplicationContext(), Config.NOTIFICATION_CHANNEL);
+                        Notification notification = mBuilder.setSmallIcon(icon).setTicker(messageJSONObject.getString("title"))
+                                .setAutoCancel(true)
+                                .setContentTitle(messageJSONObject.getString("title"))
+                                .setContentIntent(resultPendingIntent)
+                                .setWhen(System.currentTimeMillis())
+                                .setStyle(new NotificationCompat.BigTextStyle()
+                                        .bigText(messageJSONObject.getString("body")))
+                                .setContentText(messageJSONObject.getString("body"))
+                                .setPriority(NotificationCompat.PRIORITY_MAX)
+                                .build();
+                        int uniqueNotificationId = new Random().nextInt(900000)+100000;
+                        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(getApplicationContext());
+                        notificationManager.notify(uniqueNotificationId, notification);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        };
 
     }
 

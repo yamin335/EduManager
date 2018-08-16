@@ -82,7 +82,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
             if (!NotificationUtils.isAppIsInBackground(getApplicationContext())) {
 
-                notification.put("seen", 0);
+                notification.put("seen", 1);
                 notification.put("id", notificationNo);
                 String string = getSharedPreferences("PUSH_NOTIFICATIONS", Context.MODE_PRIVATE)
                         .getString("notifications", "[]");
@@ -103,7 +103,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                 notificationUtils.playNotificationSound();
             } else {
 
-                notification.put("seen", 1);
+                notification.put("seen", 0);
                 notification.put("id", notificationNo);
                 String string = getSharedPreferences("PUSH_NOTIFICATIONS", Context.MODE_PRIVATE)
                         .getString("notifications", "[]");
@@ -117,7 +117,6 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                 // app is in background, show the notification in notification tray
                 Intent resultIntent = new Intent(getApplicationContext(), NotificationDetails.class);
                 resultIntent.putExtra("notification", notification.toString());
-                resultIntent.putExtra("id", notificationNo);
                 resultIntent.putExtra("from", "tray");
 
                 String imageUrl = "";
