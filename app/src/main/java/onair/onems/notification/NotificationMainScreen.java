@@ -32,11 +32,31 @@ import onair.onems.mainactivities.StudentMainScreen;
 import onair.onems.mainactivities.TeacherMainScreen;
 import onair.onems.user.Profile;
 
-public class NotificationMainScreen extends SideNavigationMenuParentActivity implements NotificationAdapter.NotificationAdapterListener, RecyclerItemTouchHelper.RecyclerItemTouchHelperListener{
+public class NotificationMainScreen extends SideNavigationMenuParentActivity implements NotificationAdapter.NotificationAdapterListener,
+        RecyclerItemTouchHelper.RecyclerItemTouchHelperListener, NotificationAdapter.NotificationSaverListener, SideNavigationMenuParentActivity.NotificationReceiverListener{
 
     private ArrayList<JSONObject> notificationList;
     private NotificationAdapter mAdapter;
     private CoordinatorLayout coordinatorLayout;
+    private int notificationCounter = 0;
+    private RecyclerView  recyclerView;
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mAdapter = new NotificationAdapter(this, notificationList, this, this, this, this);
+        recyclerView.setAdapter(mAdapter);
+        prepareNotifications();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mAdapter = new NotificationAdapter(this, notificationList, this, this, this, this);
+        recyclerView.setAdapter(mAdapter);
+        prepareNotifications();
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -50,9 +70,9 @@ public class NotificationMainScreen extends SideNavigationMenuParentActivity imp
         parentActivityLayout.addView(childActivityLayout, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
         coordinatorLayout = findViewById(R.id.coordinator_layout);
 
-        RecyclerView  recyclerView = findViewById(R.id.recycler);
+        recyclerView = findViewById(R.id.recycler);
         notificationList = new ArrayList<>();
-        mAdapter = new NotificationAdapter(this, notificationList, this);
+        mAdapter = new NotificationAdapter(this, notificationList, this, this, this, this);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -103,6 +123,7 @@ public class NotificationMainScreen extends SideNavigationMenuParentActivity imp
     }
 
     private void prepareNotifications() {
+        notificationList.clear();
         String string = getSharedPreferences("PUSH_NOTIFICATIONS", Context.MODE_PRIVATE)
                 .getString("notifications", "[]");
         try {
@@ -140,5 +161,35 @@ public class NotificationMainScreen extends SideNavigationMenuParentActivity imp
             snackbar.setActionTextColor(Color.YELLOW);
             snackbar.show();
         }
+    }
+
+    @Override
+    public void onNotificationChanged(ArrayList<JSONObject> notificationListFiltered, int counter) {
+        this.notificationList = notificationListFiltered;
+        notificationCounter = counter;
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        JSONArray jsonArray = new JSONArray();
+        for (int i = 0; i<notificationList.size(); i++) {
+            try {
+                jsonArray.put(i, notificationList.get(i));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        getSharedPreferences("PUSH_NOTIFICATIONS", Context.MODE_PRIVATE)
+                .edit()
+                .putString("notifications", jsonArray.toString())
+                .apply();
+    }
+
+    @Override
+    public void onNotificationReceived(JSONObject jsonObject) {
+        notificationList.add(jsonObject);
+        mAdapter.notifyItemInserted(notificationList.size()-1);
+        recyclerView.smoothScrollToPosition(notificationList.size()-1);
     }
 }

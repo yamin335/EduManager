@@ -341,8 +341,7 @@ public class StudentiCardDetailsEdit extends CommonToolbarParentActivity {
             }
         });
 
-        checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
-        {
+        checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
             {
@@ -425,13 +424,13 @@ public class StudentiCardDetailsEdit extends CommonToolbarParentActivity {
                     studentInformationEntry.setPreAddress(t_address.getText().toString());
                     studentInformationEntry.setRemarks(t_remarks.getText().toString());
 
+                    mStudentDataPostDialog = new ProgressDialog(StudentiCardDetailsEdit.this);
+                    mStudentDataPostDialog.setTitle("Loading...");
+                    mStudentDataPostDialog.setMessage("Please Wait...");
+                    mStudentDataPostDialog.setCancelable(false);
+                    mStudentDataPostDialog.setIcon(R.drawable.onair);
                     if(imageChanged) {
                         if(originalBitmap != null) {
-                            mStudentDataPostDialog = new ProgressDialog(StudentiCardDetailsEdit.this);
-                            mStudentDataPostDialog.setTitle("Loading...");
-                            mStudentDataPostDialog.setMessage("Please Wait...");
-                            mStudentDataPostDialog.setCancelable(false);
-                            mStudentDataPostDialog.setIcon(R.drawable.onair);
                             mStudentDataPostDialog.show();
                             if(checkBox.isChecked()) {
                                 tempBitmap = mCropImageView.getCroppedImage(500, 500);
@@ -446,11 +445,6 @@ public class StudentiCardDetailsEdit extends CommonToolbarParentActivity {
                             Toast.makeText(StudentiCardDetailsEdit.this,"Take or choose a photo to update!!!",Toast.LENGTH_LONG).show();
                         }
                     } else {
-                        mStudentDataPostDialog = new ProgressDialog(StudentiCardDetailsEdit.this);
-                        mStudentDataPostDialog.setTitle("Loading...");
-                        mStudentDataPostDialog.setMessage("Please Wait...");
-                        mStudentDataPostDialog.setCancelable(false);
-                        mStudentDataPostDialog.setIcon(R.drawable.onair);
                         mStudentDataPostDialog.show();
                         Gson gson = new Gson();
                         String json = gson.toJson(studentInformationEntry);
@@ -726,293 +720,50 @@ public class StudentiCardDetailsEdit extends CommonToolbarParentActivity {
         });
     }
 
-    void parseClassJsonData(String jsonString) {
-        try {
-            allClassArrayList = new ArrayList<>();
-            JSONArray classJsonArray = new JSONArray(jsonString);
-            ArrayList<String> classArrayList = new ArrayList<>();
-            classArrayList.add("Select Class");
-            for(int i = 0; i < classJsonArray.length(); ++i) {
-                JSONObject classJsonObject = classJsonArray.getJSONObject(i);
-                ClassModel classModel = new ClassModel(classJsonObject.getString("ClassID"), classJsonObject.getString("ClassName"));
-//                Toast.makeText(this,classJsonObject.getString("ClassID")+classJsonObject.getString("ClassName"),Toast.LENGTH_LONG).show();
-                allClassArrayList.add(classModel);
-                classArrayList.add(classModel.getClassName());
-            }
-            if(allClassArrayList.size() == 1){
-                selectedClass = allClassArrayList.get(0);
-                DepartmentDataGetRequest();
-            }
-            try {
-                String[] strings = new String[classArrayList.size()];
-                strings = classArrayList.toArray(strings);
-                ArrayAdapter<String> class_spinner_adapter = new ArrayAdapter<>(this,R.layout.spinner_item, strings);
-                class_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                spinnerClass.setAdapter(class_spinner_adapter);
-                mClassDialog.dismiss();
-            }
-            catch (IndexOutOfBoundsException e)
+    public void StudentDataGetRequest(){
+        if(isNetworkAvailable()) {
+
+            String studentDataGetUrl = getString(R.string.baseUrl)+"/api/onEms/getStudent"+"/"+InstituteID+"/"+
+                    selected_Class+"/"+selected_Section+"/"+
+                    selected_Department+"/"+selected_Medium+"/"+selected_Shift+"/"+UserID;
+            mStudentDataGetDialog = new ProgressDialog(this);
+            mStudentDataGetDialog.setTitle("Loading...");
+            mStudentDataGetDialog.setMessage("Please Wait...");
+            mStudentDataGetDialog.setCancelable(false);
+            mStudentDataGetDialog.setIcon(R.drawable.onair);
+            mStudentDataGetDialog.show();
+            //Preparing Student data from server
+            StringRequest stringStudentRequest = new StringRequest(Request.Method.GET, studentDataGetUrl,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+
+                            parseStudentJsonData(response);
+
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+
+                    mStudentDataGetDialog.dismiss();
+                }
+            })
             {
-                mClassDialog.dismiss();
-                Toast.makeText(this,"No class found !!!",Toast.LENGTH_LONG).show();
-            }
-            //spinner.setSelectedIndex(1);
-        } catch (JSONException e) {
-            mClassDialog.dismiss();
-            Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    Map<String, String>  params = new HashMap<String, String>();
+                    params.put("Authorization", "Request_From_onEMS_Android_app");
+                    return params;
+                }
+            };
+            MySingleton.getInstance(this).addToRequestQueue(stringStudentRequest);
+        } else {
+            Toast.makeText(StudentiCardDetailsEdit.this,"Please check your internet connection!!! ",
+                    Toast.LENGTH_LONG).show();
         }
     }
 
-    void parseShiftJsonData(String jsonString) {
-        try {
-            allShiftArrayList = new ArrayList<>();
-            JSONArray shiftJsonArray = new JSONArray(jsonString);
-            ArrayList<String> shiftArrayList = new ArrayList<>();
-            shiftArrayList.add("Select Shift");
-            for(int i = 0; i < shiftJsonArray.length(); ++i) {
-                JSONObject shiftJsonObject = shiftJsonArray.getJSONObject(i);
-                ShiftModel shiftModel = new ShiftModel(shiftJsonObject.getString("ShiftID"), shiftJsonObject.getString("ShiftName"));
-//                Toast.makeText(this,classJsonObject.getString("ClassID")+classJsonObject.getString("ClassName"),Toast.LENGTH_LONG).show();
-                allShiftArrayList.add(shiftModel);
-                shiftArrayList.add(shiftModel.getShiftName());
-            }
-            if(allShiftArrayList.size() == 1){
-                selectedShift = allShiftArrayList.get(0);
-            }
-            try {
-                String[] strings = new String[shiftArrayList.size()];
-                strings = shiftArrayList.toArray(strings);
-                ArrayAdapter<String> shift_spinner_adapter = new ArrayAdapter<>(this,R.layout.spinner_item, strings);
-                shift_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                spinnerShift.setAdapter(shift_spinner_adapter);
-                mShiftDialog.dismiss();
-            }
-            catch (IndexOutOfBoundsException e)
-            {
-                mShiftDialog.dismiss();
-                Toast.makeText(this,"No shift found !!!",Toast.LENGTH_LONG).show();
-            }
-            //spinner.setSelectedIndex(1);
-        } catch (JSONException e) {
-            mShiftDialog.dismiss();
-            Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
-        }
-    }
-
-    void parseSectionJsonData(String jsonString) {
-        try {
-            allSectionArrayList = new ArrayList<>();
-            JSONArray sectionJsonArray = new JSONArray(jsonString);
-            ArrayList<String> sectionArrayList = new ArrayList<>();
-            sectionArrayList.add("Select Section");
-            for(int i = 0; i < sectionJsonArray.length(); ++i) {
-                JSONObject sectionJsonObject = sectionJsonArray.getJSONObject(i);
-                SectionModel sectionModel = new SectionModel(sectionJsonObject.getString("SectionID"), sectionJsonObject.getString("SectionName"));
-//                Toast.makeText(this,classJsonObject.getString("ClassID")+classJsonObject.getString("ClassName"),Toast.LENGTH_LONG).show();
-                allSectionArrayList.add(sectionModel);
-                sectionArrayList.add(sectionModel.getSectionName());
-            }
-            if(allSectionArrayList.size() == 1){
-                selectedSection = allSectionArrayList.get(0);
-            }
-            try {
-                String[] strings = new String[sectionArrayList.size()];
-                strings = sectionArrayList.toArray(strings);
-                ArrayAdapter<String> section_spinner_adapter = new ArrayAdapter<>(this,R.layout.spinner_item, strings);
-                section_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                spinnerSection.setAdapter(section_spinner_adapter);
-                mSectionDialog.dismiss();
-            }
-            catch (IndexOutOfBoundsException e)
-            {
-                mSectionDialog.dismiss();
-                Toast.makeText(this,"No section found !!!",Toast.LENGTH_LONG).show();
-            }
-            //spinner.setSelectedIndex(1);
-        } catch (JSONException e) {
-            mSectionDialog.dismiss();
-            Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
-        }
-    }
-
-    void parseMediumJsonData(String jsonString) {
-        try {
-            allMediumArrayList = new ArrayList<>();
-            JSONArray mediumJsonArray = new JSONArray(jsonString);
-            ArrayList<String> mediumnArrayList = new ArrayList<>();
-            mediumnArrayList.add("Select Medium");
-            for(int i = 0; i < mediumJsonArray.length(); ++i) {
-                JSONObject mediumJsonObject = mediumJsonArray.getJSONObject(i);
-                MediumModel mediumModel = new MediumModel(mediumJsonObject.getString("MediumID"), mediumJsonObject.getString("MameName"),
-                        mediumJsonObject.getString("IsDefault"));
-//                Toast.makeText(this,classJsonObject.getString("ClassID")+classJsonObject.getString("ClassName"),Toast.LENGTH_LONG).show();
-                allMediumArrayList.add(mediumModel);
-                mediumnArrayList.add(mediumModel.getMameName());
-            }
-            if(allMediumArrayList.size() == 1){
-                selectedMedium = allMediumArrayList.get(0);
-                ClassDataGetRequest();
-            }
-            try {
-                String[] strings = new String[mediumnArrayList.size()];
-                strings = mediumnArrayList.toArray(strings);
-                ArrayAdapter<String> medium_spinner_adapter = new ArrayAdapter<>(this,R.layout.spinner_item, strings);
-                medium_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                spinnerMedium.setAdapter(medium_spinner_adapter);
-                mMediumDialog.dismiss();
-            }
-            catch (IndexOutOfBoundsException e)
-            {
-                mMediumDialog.dismiss();
-                Toast.makeText(this,"No medium found !!!",Toast.LENGTH_LONG).show();
-            }
-            //spinner.setSelectedIndex(1);
-        } catch (JSONException e) {
-            mMediumDialog.dismiss();
-            Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
-        }
-    }
-
-    void parseDepartmentJsonData(String jsonString) {
-        try {
-            allDepartmentArrayList = new ArrayList<>();
-            JSONArray departmentJsonArray = new JSONArray(jsonString);
-            ArrayList<String> departmentArrayList = new ArrayList<>();
-            departmentArrayList.add("Select Department");
-            for(int i = 0; i < departmentJsonArray.length(); ++i) {
-                JSONObject departmentJsonObject = departmentJsonArray.getJSONObject(i);
-                DepartmentModel departmentModel = new DepartmentModel(departmentJsonObject.getString("DepartmentID"), departmentJsonObject.getString("DepartmentName"));
-//                Toast.makeText(this,classJsonObject.getString("ClassID")+classJsonObject.getString("ClassName"),Toast.LENGTH_LONG).show();
-                allDepartmentArrayList.add(departmentModel);
-                departmentArrayList.add(departmentModel.getDepartmentName());
-            }
-            if(allDepartmentArrayList.size() == 1){
-                selectedDepartment = allDepartmentArrayList.get(0);
-                SectionDataGetRequest();
-            }
-            if(allDepartmentArrayList.size() == 0){
-                SectionDataGetRequest();
-            }
-            try {
-                String[] strings = new String[departmentArrayList.size()];
-                strings = departmentArrayList.toArray(strings);
-                ArrayAdapter<String> department_spinner_adapter = new ArrayAdapter<>(this,R.layout.spinner_item, strings);
-                department_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                spinnerDepartment.setAdapter(department_spinner_adapter);
-                mDepartmentDialog.dismiss();
-            }
-            catch (IndexOutOfBoundsException e)
-            {
-                mDepartmentDialog.dismiss();
-                Toast.makeText(this,"No department found !!!",Toast.LENGTH_LONG).show();
-            }
-            //spinner.setSelectedIndex(1);
-        } catch (JSONException e) {
-            mDepartmentDialog.dismiss();
-            Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
-        }
-    }
-
-    void parseGenderJsonData(String jsonString) {
-        try {
-            allGenderArrayList = new ArrayList<>();
-            JSONArray genderJsonArray = new JSONArray(jsonString);
-            ArrayList<String> genderArrayList = new ArrayList<>();
-            genderArrayList.add("Select Gender");
-            for(int i = 0; i < genderJsonArray.length(); ++i) {
-                JSONObject genderJsonObject = genderJsonArray.getJSONObject(i);
-                GenderModel genderModel = new GenderModel(genderJsonObject.getString("GenderID"), genderJsonObject.getString("GenderName"));
-//                Toast.makeText(this,classJsonObject.getString("ClassID")+classJsonObject.getString("ClassName"),Toast.LENGTH_LONG).show();
-                allGenderArrayList.add(genderModel);
-                genderArrayList.add(genderModel.getGenderName());
-            }
-            try {
-                String[] strings = new String[genderArrayList.size()];
-                strings = genderArrayList.toArray(strings);
-                ArrayAdapter<String> gender_spinner_adapter = new ArrayAdapter<>(this,R.layout.spinner_item, strings);
-                gender_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                spinnerGender.setAdapter(gender_spinner_adapter);
-                mGenderDialog.dismiss();
-            }
-            catch (IndexOutOfBoundsException e)
-            {
-                mGenderDialog.dismiss();
-                Toast.makeText(this,"No gender found !!!",Toast.LENGTH_LONG).show();
-            }
-            //spinner.setSelectedIndex(1);
-        } catch (JSONException e) {
-            mGenderDialog.dismiss();
-            Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
-        }
-    }
-
-    void parseReligionJsonData(String jsonString) {
-        try {
-            allReligionArrayList = new ArrayList<>();
-            JSONArray religionJsonArray = new JSONArray(jsonString);
-            ArrayList<String> religionArrayList = new ArrayList<>();
-            religionArrayList.add("Select Religion");
-            for(int i = 0; i < religionJsonArray.length(); ++i) {
-                JSONObject religionJsonObject = religionJsonArray.getJSONObject(i);
-                ReligionModel religionModel = new ReligionModel(religionJsonObject.getString("ReligionID"), religionJsonObject.getString("ReligionName"));
-//                Toast.makeText(this,classJsonObject.getString("ClassID")+classJsonObject.getString("ClassName"),Toast.LENGTH_LONG).show();
-                allReligionArrayList.add(religionModel);
-                religionArrayList.add(religionModel.getReligionName());
-            }
-            try {
-                String[] strings = new String[religionArrayList.size()];
-                strings = religionArrayList.toArray(strings);
-                ArrayAdapter<String> religion_spinner_adapter = new ArrayAdapter<>(this,R.layout.spinner_item, strings);
-                religion_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                spinnerReligion.setAdapter(religion_spinner_adapter);
-                mReligionDialog.dismiss();
-            }
-            catch (IndexOutOfBoundsException e)
-            {
-                mReligionDialog.dismiss();
-                Toast.makeText(this,"No religion found !!!",Toast.LENGTH_LONG).show();
-            }
-            //spinner.setSelectedIndex(1);
-        } catch (JSONException e) {
-            mReligionDialog.dismiss();
-            Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
-        }
-    }
-
-    void parseBloodGroupJsonData(String jsonString) {
-        try {
-            allBloodGroupArrayList = new ArrayList<>();
-            JSONArray bloodGroupJsonArray = new JSONArray(jsonString);
-            ArrayList<String> bloodGroupArrayList = new ArrayList<>();
-            bloodGroupArrayList.add("Select Blood Group");
-            for(int i = 0; i < bloodGroupJsonArray.length(); ++i) {
-                JSONObject bloodGroupJsonObject = bloodGroupJsonArray.getJSONObject(i);
-                BloodGroupModel bloodGroupModel = new BloodGroupModel(bloodGroupJsonObject.getString("BloodGroupID"), bloodGroupJsonObject.getString("BloodGroupName"));
-//                Toast.makeText(this,classJsonObject.getString("ClassID")+classJsonObject.getString("ClassName"),Toast.LENGTH_LONG).show();
-                allBloodGroupArrayList.add(bloodGroupModel);
-                bloodGroupArrayList.add(bloodGroupModel.getBloodGroupName());
-            }
-            try {
-                String[] strings = new String[bloodGroupArrayList.size()];
-                strings = bloodGroupArrayList.toArray(strings);
-                ArrayAdapter<String> bloodGroup_spinner_adapter = new ArrayAdapter<>(this,R.layout.spinner_item, strings);
-                bloodGroup_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                spinnerBloodGroup.setAdapter(bloodGroup_spinner_adapter);
-                mBloodGroupDialog.dismiss();
-            }
-            catch (IndexOutOfBoundsException e)
-            {
-                mBloodGroupDialog.dismiss();
-                Toast.makeText(this,"No blood group found !!!",Toast.LENGTH_LONG).show();
-            }
-            //spinner.setSelectedIndex(1);
-        } catch (JSONException e) {
-            mBloodGroupDialog.dismiss();
-            Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
-        }
-    }
-
-    void parseStudentJsonData(String jsonString) {
+    private void parseStudentJsonData(String jsonString) {
         try {
             JSONArray studentJsonArray = new JSONArray(jsonString);
             JSONObject studentJsonObject = studentJsonArray.getJSONObject(0);
@@ -1670,6 +1421,42 @@ public class StudentiCardDetailsEdit extends CommonToolbarParentActivity {
         }
     }
 
+    void parseShiftJsonData(String jsonString) {
+        try {
+            allShiftArrayList = new ArrayList<>();
+            JSONArray shiftJsonArray = new JSONArray(jsonString);
+            ArrayList<String> shiftArrayList = new ArrayList<>();
+            shiftArrayList.add("Select Shift");
+            for(int i = 0; i < shiftJsonArray.length(); ++i) {
+                JSONObject shiftJsonObject = shiftJsonArray.getJSONObject(i);
+                ShiftModel shiftModel = new ShiftModel(shiftJsonObject.getString("ShiftID"), shiftJsonObject.getString("ShiftName"));
+//                Toast.makeText(this,classJsonObject.getString("ClassID")+classJsonObject.getString("ClassName"),Toast.LENGTH_LONG).show();
+                allShiftArrayList.add(shiftModel);
+                shiftArrayList.add(shiftModel.getShiftName());
+            }
+            if(allShiftArrayList.size() == 1){
+                selectedShift = allShiftArrayList.get(0);
+            }
+            try {
+                String[] strings = new String[shiftArrayList.size()];
+                strings = shiftArrayList.toArray(strings);
+                ArrayAdapter<String> shift_spinner_adapter = new ArrayAdapter<>(this,R.layout.spinner_item, strings);
+                shift_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                spinnerShift.setAdapter(shift_spinner_adapter);
+                mShiftDialog.dismiss();
+            }
+            catch (IndexOutOfBoundsException e)
+            {
+                mShiftDialog.dismiss();
+                Toast.makeText(this,"No shift found !!!",Toast.LENGTH_LONG).show();
+            }
+            //spinner.setSelectedIndex(1);
+        } catch (JSONException e) {
+            mShiftDialog.dismiss();
+            Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
+        }
+    }
+
     private void MediumDataGetRequest() {
         if(isNetworkAvailable()) {
             String mediumUrl = getString(R.string.baseUrl)+"/api/onEms/getInstituteMediumDdl/"+InstituteID;
@@ -1707,6 +1494,44 @@ public class StudentiCardDetailsEdit extends CommonToolbarParentActivity {
         } else {
             Toast.makeText(StudentiCardDetailsEdit.this,"Please check your internet connection and select again!!! ",
                     Toast.LENGTH_LONG).show();
+        }
+    }
+
+    void parseMediumJsonData(String jsonString) {
+        try {
+            allMediumArrayList = new ArrayList<>();
+            JSONArray mediumJsonArray = new JSONArray(jsonString);
+            ArrayList<String> mediumnArrayList = new ArrayList<>();
+            mediumnArrayList.add("Select Medium");
+            for(int i = 0; i < mediumJsonArray.length(); ++i) {
+                JSONObject mediumJsonObject = mediumJsonArray.getJSONObject(i);
+                MediumModel mediumModel = new MediumModel(mediumJsonObject.getString("MediumID"), mediumJsonObject.getString("MameName"),
+                        mediumJsonObject.getString("IsDefault"));
+//                Toast.makeText(this,classJsonObject.getString("ClassID")+classJsonObject.getString("ClassName"),Toast.LENGTH_LONG).show();
+                allMediumArrayList.add(mediumModel);
+                mediumnArrayList.add(mediumModel.getMameName());
+            }
+            if(allMediumArrayList.size() == 1){
+                selectedMedium = allMediumArrayList.get(0);
+                ClassDataGetRequest();
+            }
+            try {
+                String[] strings = new String[mediumnArrayList.size()];
+                strings = mediumnArrayList.toArray(strings);
+                ArrayAdapter<String> medium_spinner_adapter = new ArrayAdapter<>(this,R.layout.spinner_item, strings);
+                medium_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                spinnerMedium.setAdapter(medium_spinner_adapter);
+                mMediumDialog.dismiss();
+            }
+            catch (IndexOutOfBoundsException e)
+            {
+                mMediumDialog.dismiss();
+                Toast.makeText(this,"No medium found !!!",Toast.LENGTH_LONG).show();
+            }
+            //spinner.setSelectedIndex(1);
+        } catch (JSONException e) {
+            mMediumDialog.dismiss();
+            Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
         }
     }
 
@@ -1750,6 +1575,43 @@ public class StudentiCardDetailsEdit extends CommonToolbarParentActivity {
         } else {
             Toast.makeText(StudentiCardDetailsEdit.this,"Please check your internet connection and select again!!! ",
                     Toast.LENGTH_LONG).show();
+        }
+    }
+
+    void parseClassJsonData(String jsonString) {
+        try {
+            allClassArrayList = new ArrayList<>();
+            JSONArray classJsonArray = new JSONArray(jsonString);
+            ArrayList<String> classArrayList = new ArrayList<>();
+            classArrayList.add("Select Class");
+            for(int i = 0; i < classJsonArray.length(); ++i) {
+                JSONObject classJsonObject = classJsonArray.getJSONObject(i);
+                ClassModel classModel = new ClassModel(classJsonObject.getString("ClassID"), classJsonObject.getString("ClassName"));
+//                Toast.makeText(this,classJsonObject.getString("ClassID")+classJsonObject.getString("ClassName"),Toast.LENGTH_LONG).show();
+                allClassArrayList.add(classModel);
+                classArrayList.add(classModel.getClassName());
+            }
+            if(allClassArrayList.size() == 1){
+                selectedClass = allClassArrayList.get(0);
+                DepartmentDataGetRequest();
+            }
+            try {
+                String[] strings = new String[classArrayList.size()];
+                strings = classArrayList.toArray(strings);
+                ArrayAdapter<String> class_spinner_adapter = new ArrayAdapter<>(this,R.layout.spinner_item, strings);
+                class_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                spinnerClass.setAdapter(class_spinner_adapter);
+                mClassDialog.dismiss();
+            }
+            catch (IndexOutOfBoundsException e)
+            {
+                mClassDialog.dismiss();
+                Toast.makeText(this,"No class found !!!",Toast.LENGTH_LONG).show();
+            }
+            //spinner.setSelectedIndex(1);
+        } catch (JSONException e) {
+            mClassDialog.dismiss();
+            Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
         }
     }
 
@@ -1797,6 +1659,46 @@ public class StudentiCardDetailsEdit extends CommonToolbarParentActivity {
         }
     }
 
+    void parseDepartmentJsonData(String jsonString) {
+        try {
+            allDepartmentArrayList = new ArrayList<>();
+            JSONArray departmentJsonArray = new JSONArray(jsonString);
+            ArrayList<String> departmentArrayList = new ArrayList<>();
+            departmentArrayList.add("Select Department");
+            for(int i = 0; i < departmentJsonArray.length(); ++i) {
+                JSONObject departmentJsonObject = departmentJsonArray.getJSONObject(i);
+                DepartmentModel departmentModel = new DepartmentModel(departmentJsonObject.getString("DepartmentID"), departmentJsonObject.getString("DepartmentName"));
+//                Toast.makeText(this,classJsonObject.getString("ClassID")+classJsonObject.getString("ClassName"),Toast.LENGTH_LONG).show();
+                allDepartmentArrayList.add(departmentModel);
+                departmentArrayList.add(departmentModel.getDepartmentName());
+            }
+            if(allDepartmentArrayList.size() == 1){
+                selectedDepartment = allDepartmentArrayList.get(0);
+                SectionDataGetRequest();
+            }
+            if(allDepartmentArrayList.size() == 0){
+                SectionDataGetRequest();
+            }
+            try {
+                String[] strings = new String[departmentArrayList.size()];
+                strings = departmentArrayList.toArray(strings);
+                ArrayAdapter<String> department_spinner_adapter = new ArrayAdapter<>(this,R.layout.spinner_item, strings);
+                department_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                spinnerDepartment.setAdapter(department_spinner_adapter);
+                mDepartmentDialog.dismiss();
+            }
+            catch (IndexOutOfBoundsException e)
+            {
+                mDepartmentDialog.dismiss();
+                Toast.makeText(this,"No department found !!!",Toast.LENGTH_LONG).show();
+            }
+            //spinner.setSelectedIndex(1);
+        } catch (JSONException e) {
+            mDepartmentDialog.dismiss();
+            Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
+        }
+    }
+
     private void SectionDataGetRequest() {
         if(isNetworkAvailable()) {
 
@@ -1841,48 +1743,42 @@ public class StudentiCardDetailsEdit extends CommonToolbarParentActivity {
         }
     }
 
-    public void StudentDataGetRequest(){
-        if(isNetworkAvailable()) {
-
-            String studentDataGetUrl = getString(R.string.baseUrl)+"/api/onEms/getStudent"+"/"+InstituteID+"/"+
-                    selected_Class+"/"+selected_Section+"/"+
-                    selected_Department+"/"+selected_Medium+"/"+selected_Shift+"/"+UserID;
-            mStudentDataGetDialog = new ProgressDialog(this);
-            mStudentDataGetDialog.setTitle("Loading...");
-            mStudentDataGetDialog.setMessage("Please Wait...");
-            mStudentDataGetDialog.setCancelable(false);
-            mStudentDataGetDialog.setIcon(R.drawable.onair);
-            mStudentDataGetDialog.show();
-            //Preparing Student data from server
-            StringRequest stringStudentRequest = new StringRequest(Request.Method.GET, studentDataGetUrl,
-                    new Response.Listener<String>() {
-                        @Override
-                        public void onResponse(String response) {
-
-                            parseStudentJsonData(response);
-
-                        }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-
-                    mStudentDataGetDialog.dismiss();
-                }
-            })
+    void parseSectionJsonData(String jsonString) {
+        try {
+            allSectionArrayList = new ArrayList<>();
+            JSONArray sectionJsonArray = new JSONArray(jsonString);
+            ArrayList<String> sectionArrayList = new ArrayList<>();
+            sectionArrayList.add("Select Section");
+            for(int i = 0; i < sectionJsonArray.length(); ++i) {
+                JSONObject sectionJsonObject = sectionJsonArray.getJSONObject(i);
+                SectionModel sectionModel = new SectionModel(sectionJsonObject.getString("SectionID"), sectionJsonObject.getString("SectionName"));
+//                Toast.makeText(this,classJsonObject.getString("ClassID")+classJsonObject.getString("ClassName"),Toast.LENGTH_LONG).show();
+                allSectionArrayList.add(sectionModel);
+                sectionArrayList.add(sectionModel.getSectionName());
+            }
+            if(allSectionArrayList.size() == 1){
+                selectedSection = allSectionArrayList.get(0);
+            }
+            try {
+                String[] strings = new String[sectionArrayList.size()];
+                strings = sectionArrayList.toArray(strings);
+                ArrayAdapter<String> section_spinner_adapter = new ArrayAdapter<>(this,R.layout.spinner_item, strings);
+                section_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                spinnerSection.setAdapter(section_spinner_adapter);
+                mSectionDialog.dismiss();
+            }
+            catch (IndexOutOfBoundsException e)
             {
-                @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
-                    Map<String, String>  params = new HashMap<String, String>();
-                    params.put("Authorization", "Request_From_onEMS_Android_app");
-                    return params;
-                }
-            };
-            MySingleton.getInstance(this).addToRequestQueue(stringStudentRequest);
-        } else {
-            Toast.makeText(StudentiCardDetailsEdit.this,"Please check your internet connection!!! ",
-                    Toast.LENGTH_LONG).show();
+                mSectionDialog.dismiss();
+                Toast.makeText(this,"No section found !!!",Toast.LENGTH_LONG).show();
+            }
+            //spinner.setSelectedIndex(1);
+        } catch (JSONException e) {
+            mSectionDialog.dismiss();
+            Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
         }
     }
+
 
     public void GenderDataGetRequest(){
         if(isNetworkAvailable()) {
@@ -1922,6 +1818,39 @@ public class StudentiCardDetailsEdit extends CommonToolbarParentActivity {
         } else {
             Toast.makeText(StudentiCardDetailsEdit.this,"Please check your internet connection!!! ",
                     Toast.LENGTH_LONG).show();
+        }
+    }
+
+    void parseGenderJsonData(String jsonString) {
+        try {
+            allGenderArrayList = new ArrayList<>();
+            JSONArray genderJsonArray = new JSONArray(jsonString);
+            ArrayList<String> genderArrayList = new ArrayList<>();
+            genderArrayList.add("Select Gender");
+            for(int i = 0; i < genderJsonArray.length(); ++i) {
+                JSONObject genderJsonObject = genderJsonArray.getJSONObject(i);
+                GenderModel genderModel = new GenderModel(genderJsonObject.getString("GenderID"), genderJsonObject.getString("GenderName"));
+//                Toast.makeText(this,classJsonObject.getString("ClassID")+classJsonObject.getString("ClassName"),Toast.LENGTH_LONG).show();
+                allGenderArrayList.add(genderModel);
+                genderArrayList.add(genderModel.getGenderName());
+            }
+            try {
+                String[] strings = new String[genderArrayList.size()];
+                strings = genderArrayList.toArray(strings);
+                ArrayAdapter<String> gender_spinner_adapter = new ArrayAdapter<>(this,R.layout.spinner_item, strings);
+                gender_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                spinnerGender.setAdapter(gender_spinner_adapter);
+                mGenderDialog.dismiss();
+            }
+            catch (IndexOutOfBoundsException e)
+            {
+                mGenderDialog.dismiss();
+                Toast.makeText(this,"No gender found !!!",Toast.LENGTH_LONG).show();
+            }
+            //spinner.setSelectedIndex(1);
+        } catch (JSONException e) {
+            mGenderDialog.dismiss();
+            Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
         }
     }
 
@@ -1966,6 +1895,40 @@ public class StudentiCardDetailsEdit extends CommonToolbarParentActivity {
         }
     }
 
+    void parseReligionJsonData(String jsonString) {
+        try {
+            allReligionArrayList = new ArrayList<>();
+            JSONArray religionJsonArray = new JSONArray(jsonString);
+            ArrayList<String> religionArrayList = new ArrayList<>();
+            religionArrayList.add("Select Religion");
+            for(int i = 0; i < religionJsonArray.length(); ++i) {
+                JSONObject religionJsonObject = religionJsonArray.getJSONObject(i);
+                ReligionModel religionModel = new ReligionModel(religionJsonObject.getString("ReligionID"), religionJsonObject.getString("ReligionName"));
+//                Toast.makeText(this,classJsonObject.getString("ClassID")+classJsonObject.getString("ClassName"),Toast.LENGTH_LONG).show();
+                allReligionArrayList.add(religionModel);
+                religionArrayList.add(religionModel.getReligionName());
+            }
+            try {
+                String[] strings = new String[religionArrayList.size()];
+                strings = religionArrayList.toArray(strings);
+                ArrayAdapter<String> religion_spinner_adapter = new ArrayAdapter<>(this,R.layout.spinner_item, strings);
+                religion_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                spinnerReligion.setAdapter(religion_spinner_adapter);
+                mReligionDialog.dismiss();
+            }
+            catch (IndexOutOfBoundsException e)
+            {
+                mReligionDialog.dismiss();
+                Toast.makeText(this,"No religion found !!!",Toast.LENGTH_LONG).show();
+            }
+            //spinner.setSelectedIndex(1);
+        } catch (JSONException e) {
+            mReligionDialog.dismiss();
+            Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
+        }
+    }
+
+
     public void BloodGroupDataGetRequest(){
         if(isNetworkAvailable()) {
 
@@ -2004,6 +1967,39 @@ public class StudentiCardDetailsEdit extends CommonToolbarParentActivity {
         } else {
             Toast.makeText(StudentiCardDetailsEdit.this,"Please check your internet connection!!! ",
                     Toast.LENGTH_LONG).show();
+        }
+    }
+
+    void parseBloodGroupJsonData(String jsonString) {
+        try {
+            allBloodGroupArrayList = new ArrayList<>();
+            JSONArray bloodGroupJsonArray = new JSONArray(jsonString);
+            ArrayList<String> bloodGroupArrayList = new ArrayList<>();
+            bloodGroupArrayList.add("Select Blood Group");
+            for(int i = 0; i < bloodGroupJsonArray.length(); ++i) {
+                JSONObject bloodGroupJsonObject = bloodGroupJsonArray.getJSONObject(i);
+                BloodGroupModel bloodGroupModel = new BloodGroupModel(bloodGroupJsonObject.getString("BloodGroupID"), bloodGroupJsonObject.getString("BloodGroupName"));
+//                Toast.makeText(this,classJsonObject.getString("ClassID")+classJsonObject.getString("ClassName"),Toast.LENGTH_LONG).show();
+                allBloodGroupArrayList.add(bloodGroupModel);
+                bloodGroupArrayList.add(bloodGroupModel.getBloodGroupName());
+            }
+            try {
+                String[] strings = new String[bloodGroupArrayList.size()];
+                strings = bloodGroupArrayList.toArray(strings);
+                ArrayAdapter<String> bloodGroup_spinner_adapter = new ArrayAdapter<>(this,R.layout.spinner_item, strings);
+                bloodGroup_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                spinnerBloodGroup.setAdapter(bloodGroup_spinner_adapter);
+                mBloodGroupDialog.dismiss();
+            }
+            catch (IndexOutOfBoundsException e)
+            {
+                mBloodGroupDialog.dismiss();
+                Toast.makeText(this,"No blood group found !!!",Toast.LENGTH_LONG).show();
+            }
+            //spinner.setSelectedIndex(1);
+        } catch (JSONException e) {
+            mBloodGroupDialog.dismiss();
+            Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
         }
     }
 

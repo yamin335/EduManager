@@ -1,6 +1,8 @@
 package onair.onems.notification;
 
 import android.content.Context;
+import android.graphics.Typeface;
+import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -23,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import onair.onems.R;
+import onair.onems.mainactivities.SideNavigationMenuParentActivity;
 import onair.onems.models.Contact;
 
 /**
@@ -32,9 +35,13 @@ import onair.onems.models.Contact;
 public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapter.MyViewHolder>
         implements Filterable {
     private Context context;
+    private int notificationCounter;
     private ArrayList<JSONObject> notificationList;
     private ArrayList<JSONObject> notificationListFiltered;
     private NotificationAdapterListener listener;
+    private DecreaseCounterListener decreaseCounterListener;
+    private IncreaseCounterListener increaseCounterListener;
+    private NotificationSaverListener notificationSaverListener;
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
         public TextView title, detail, icon;
@@ -60,11 +67,18 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
     }
 
 
-    public NotificationAdapter(Context context, ArrayList<JSONObject> notificationList, NotificationAdapterListener listener) {
+    public NotificationAdapter(Context context, ArrayList<JSONObject> notificationList, NotificationAdapterListener listener,
+                               DecreaseCounterListener decreaseCounterListener, IncreaseCounterListener increaseCounterListener,
+                               NotificationSaverListener notificationSaverListener) {
         this.context = context;
         this.listener = listener;
+        this.notificationCounter = context.getSharedPreferences("UNSEEN_NOTIFICATIONS", Context.MODE_PRIVATE)
+                .getInt("unseen", 0);
         this.notificationList = notificationList;
         this.notificationListFiltered = notificationList;
+        this.decreaseCounterListener = decreaseCounterListener;
+        this.increaseCounterListener = increaseCounterListener;
+        this.notificationSaverListener = notificationSaverListener;
     }
 
     @Override
@@ -81,6 +95,11 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         try {
             holder.title.setText(jsonObject.getString("title"));
             holder.detail.setText(jsonObject.getString("body"));
+            if(jsonObject.getInt("seen") == 0) {
+                holder.title.setTypeface(Typeface.DEFAULT_BOLD);
+            } else {
+                holder.title.setTypeface(Typeface.DEFAULT);
+            }
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -139,42 +158,58 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         void onNotificationSelected(JSONObject jsonObject);
     }
 
-    public void removeItem(int position) {
-        notificationListFiltered.remove(position);
-        // notify the item removed by position
-        // to perform recycler view delete animations
-        // NOTE: don't call notifyDataSetChanged()
-        notifyItemRemoved(position);
+    public interface NotificationSaverListener {
+        void onNotificationChanged(ArrayList<JSONObject> notificationListFiltered, int counter);
+    }
 
-        String string = context.getSharedPreferences("PUSH_NOTIFICATIONS", Context.MODE_PRIVATE)
-                .getString("notifications", "[]");
+    public void removeItem(int position) {
         try {
-            JSONArray jsonArray = new JSONArray(string);
-            jsonArray.remove(position);
-            context.getSharedPreferences("PUSH_NOTIFICATIONS", Context.MODE_PRIVATE)
-                    .edit()
-                    .putString("notifications", jsonArray.toString())
-                    .apply();
+            if(notificationListFiltered.get(position).getInt("seen") == 0) {
+                if(notificationCounter>0){
+                    notificationCounter--;
+                }
+                decreaseCounterListener.onNotificationDeleted(notificationCounter);
+                context.getSharedPreferences("UNSEEN_NOTIFICATIONS", Context.MODE_PRIVATE)
+                        .edit()
+                        .putInt("unseen", notificationCounter)
+                        .apply();
+            }
+            notificationListFiltered.remove(position);
+            // notify the item removed by position
+            // to perform recycler view delete animations
+            // NOTE: don't call notifyDataSetChanged()
+            notifyItemRemoved(position);
+            notificationSaverListener.onNotificationChanged(notificationListFiltered, notificationCounter);
         } catch (JSONException e) {
             e.printStackTrace();
         }
     }
 
     public void restoreItem(JSONObject jsonObject, int position) {
-        notificationListFiltered.add(position, jsonObject);
-        // notify item added by position
-        notifyItemInserted(position);
         try {
-            String string = context.getSharedPreferences("PUSH_NOTIFICATIONS", Context.MODE_PRIVATE)
-                    .getString("notifications", "[]");
-            JSONArray jsonArray = new JSONArray(string);
-            jsonArray.put(position, jsonObject);
-            context.getSharedPreferences("PUSH_NOTIFICATIONS", Context.MODE_PRIVATE)
-                    .edit()
-                    .putString("notifications", jsonArray.toString())
-                    .apply();
+            if(jsonObject.getInt("seen") == 0) {
+                notificationCounter++;
+                increaseCounterListener.onNotificationUndo(notificationCounter);
+                context.getSharedPreferences("UNSEEN_NOTIFICATIONS", Context.MODE_PRIVATE)
+                        .edit()
+                        .putInt("unseen", notificationCounter)
+                        .apply();
+            }
+            notificationListFiltered.add(position, jsonObject);
+            // notify item added by position
+            notifyItemInserted(position);
+            notificationSaverListener.onNotificationChanged(notificationListFiltered, notificationCounter);
         } catch (JSONException e) {
             e.printStackTrace();
         }
     }
+
+    public interface DecreaseCounterListener {
+        void onNotificationDeleted(int i);
+    }
+
+    public interface IncreaseCounterListener {
+        void onNotificationUndo(int i);
+    }
+    
 }

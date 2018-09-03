@@ -69,6 +69,21 @@ public class TeacherMainScreen extends AppCompatActivity {
     private BroadcastReceiver mRegistrationBroadcastReceiver;
 
     @Override
+    protected void onStart() {
+        super.onStart();
+//        MenuItem item = bottomNavigationView.getMenu().findItem(selectedBottomNavItem);
+//        item.setChecked(true);
+        int i = getSharedPreferences("UNSEEN_NOTIFICATIONS", Context.MODE_PRIVATE)
+                .getInt("unseen", 0);
+        if(i != 0) {
+            notificationCounter.setVisibility(View.VISIBLE);
+            notificationCounter.setText(Integer.toString(i));
+        } else {
+            notificationCounter.setVisibility(View.INVISIBLE);
+        }
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
 
@@ -83,6 +98,14 @@ public class TeacherMainScreen extends AppCompatActivity {
 
         // clear the notification area when the app is opened
 //        NotificationUtils.clearNotifications(getApplicationContext());
+        int i = getSharedPreferences("UNSEEN_NOTIFICATIONS", Context.MODE_PRIVATE)
+                .getInt("unseen", 0);
+        if(i != 0) {
+            notificationCounter.setVisibility(View.VISIBLE);
+            notificationCounter.setText(Integer.toString(i));
+        } else {
+            notificationCounter.setVisibility(View.INVISIBLE);
+        }
     }
 
     @Override
@@ -305,6 +328,13 @@ public class TeacherMainScreen extends AppCompatActivity {
         });
 
         notificationCounter = findViewById(R.id.notificationCounter);
+        int i = getSharedPreferences("UNSEEN_NOTIFICATIONS", Context.MODE_PRIVATE)
+                .getInt("unseen", 0);
+        if(i != 0) {
+            notificationCounter.setText(Integer.toString(i));
+        } else {
+            notificationCounter.setVisibility(View.INVISIBLE);
+        }
         dashboard = findViewById(R.id.dashboard);
         profile = findViewById(R.id.profile);
         notification = findViewById(R.id.notification);
@@ -348,7 +378,6 @@ public class TeacherMainScreen extends AppCompatActivity {
                 notification.setBackgroundColor(Color.parseColor("#f9f7f7"));
                 iconNotification.setColorFilter(Color.parseColor("#0550b7"));
                 textNotification.setTextColor(Color.parseColor("#0550b7"));
-                notificationCounter.setVisibility(View.INVISIBLE);
                 Intent mainIntent = new Intent(TeacherMainScreen.this,NotificationMainScreen.class);
                 startActivity(mainIntent);
                 finish();
@@ -396,7 +425,6 @@ public class TeacherMainScreen extends AppCompatActivity {
                         final int icon = R.drawable.onair;
                         Intent resultIntent = new Intent(getApplicationContext(), NotificationDetails.class);
                         resultIntent.putExtra("notification", message);
-                        resultIntent.putExtra("from", "tray");
                         int requestCode = new Random().nextInt(900000)+100000;
                         resultIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                         PendingIntent resultPendingIntent = PendingIntent.getActivity(getApplicationContext(), requestCode, resultIntent, PendingIntent.FLAG_IMMUTABLE);
@@ -416,6 +444,14 @@ public class TeacherMainScreen extends AppCompatActivity {
                         notificationManager.notify(uniqueNotificationId, notification);
                     } catch (JSONException e) {
                         e.printStackTrace();
+                    }
+                    int i = TeacherMainScreen.this.getSharedPreferences("UNSEEN_NOTIFICATIONS", Context.MODE_PRIVATE)
+                            .getInt("unseen", 0);
+                    if(i != 0) {
+                        notificationCounter.setVisibility(View.VISIBLE);
+                        notificationCounter.setText(Integer.toString(i));
+                    } else {
+                        notificationCounter.setVisibility(View.INVISIBLE);
                     }
                 }
             }

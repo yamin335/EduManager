@@ -59,6 +59,7 @@ import onair.onems.contacts.ContactsMainScreen;
 import onair.onems.customised.GuardianStudentSelectionDialog;
 import onair.onems.exam.SubjectWiseMarksEntryMain;
 import onair.onems.fees_report.FeeCollectionReportMain;
+import onair.onems.notification.NotificationAdapter;
 import onair.onems.notification.NotificationDetails;
 import onair.onems.notification.NotificationMainScreen;
 import onair.onems.routine.ExamRoutineMainScreen;
@@ -84,7 +85,8 @@ import onair.onems.syllabus.SyllabusMainScreen;
 import onair.onems.user.Profile;
 import onair.onems.utils.NotificationUtils;
 
-public class SideNavigationMenuParentActivity extends AppCompatActivity {
+public class SideNavigationMenuParentActivity extends AppCompatActivity implements NotificationAdapter.DecreaseCounterListener,
+        NotificationAdapter.IncreaseCounterListener {
     private DrawerLayout mDrawerLayout;
     private List<ExpandedMenuModel> listDataHeader;
     private HashMap<ExpandedMenuModel, List<String>> listDataChild;
@@ -100,12 +102,21 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity {
     private ConstraintLayout dashboard, profile, notification, contacts;
     private TextView textDashboard, textProfile, textNotification, textContacts, notificationCounter;
     private ImageView iconDashboard, iconProfile, iconNotification, iconContacts;
+    private NotificationReceiverListener notificationReceiverListener;
 
     @Override
     protected void onStart() {
         super.onStart();
 //        MenuItem item = bottomNavigationView.getMenu().findItem(selectedBottomNavItem);
 //        item.setChecked(true);
+        int i = getSharedPreferences("UNSEEN_NOTIFICATIONS", Context.MODE_PRIVATE)
+                .getInt("unseen", 0);
+        if(i != 0) {
+            notificationCounter.setVisibility(View.VISIBLE);
+            notificationCounter.setText(Integer.toString(i));
+        } else {
+            notificationCounter.setVisibility(View.INVISIBLE);
+        }
     }
 
     @Override
@@ -123,6 +134,15 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity {
 
         // clear the notification area when the app is opened
 //        NotificationUtils.clearNotifications(getApplicationContext());
+
+        int i = getSharedPreferences("UNSEEN_NOTIFICATIONS", Context.MODE_PRIVATE)
+                .getInt("unseen", 0);
+        if(i != 0) {
+            notificationCounter.setVisibility(View.VISIBLE);
+            notificationCounter.setText(Integer.toString(i));
+        } else {
+            notificationCounter.setVisibility(View.INVISIBLE);
+        }
     }
 
     @Override
@@ -159,6 +179,14 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         notificationCounter = findViewById(R.id.notificationCounter);
+        int i = getSharedPreferences("UNSEEN_NOTIFICATIONS", Context.MODE_PRIVATE)
+                .getInt("unseen", 0);
+        if(i != 0) {
+            notificationCounter.setVisibility(View.VISIBLE);
+            notificationCounter.setText(Integer.toString(i));
+        } else {
+            notificationCounter.setVisibility(View.INVISIBLE);
+        }
         dashboard = findViewById(R.id.dashboard);
         profile = findViewById(R.id.profile);
         notification = findViewById(R.id.notification);
@@ -244,7 +272,6 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity {
                 notification.setBackgroundColor(Color.parseColor("#f9f7f7"));
                 iconNotification.setColorFilter(Color.parseColor("#0550b7"));
                 textNotification.setTextColor(Color.parseColor("#0550b7"));
-                notificationCounter.setVisibility(View.INVISIBLE);
                 if(!activityName.equalsIgnoreCase(NotificationMainScreen.class.getName())){
                     Intent mainIntent = new Intent(getApplicationContext(), NotificationMainScreen.class);
                     startActivity(mainIntent);
@@ -423,12 +450,15 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity {
                     String message = intent.getStringExtra("notification");
                     try {
                         JSONObject messageJSONObject = new JSONObject(message);
+                        if (activityName.contains("NotificationMainScreen")) {
+                            notificationReceiverListener = (NotificationMainScreen)SideNavigationMenuParentActivity.this;
+                            notificationReceiverListener.onNotificationReceived(messageJSONObject);
+                        }
                         //Show the notification when app is in foreground
                         // notification icon
                         final int icon = R.drawable.onair;
                         Intent resultIntent = new Intent(getApplicationContext(), NotificationDetails.class);
                         resultIntent.putExtra("notification", message);
-                        resultIntent.putExtra("from", "tray");
                         int requestCode = new Random().nextInt(900000)+100000;
                         resultIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                         PendingIntent resultPendingIntent = PendingIntent.getActivity(getApplicationContext(), requestCode, resultIntent, PendingIntent.FLAG_IMMUTABLE);
@@ -448,6 +478,14 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity {
                         notificationManager.notify(uniqueNotificationId, notification);
                     } catch (JSONException e) {
                         e.printStackTrace();
+                    }
+                    int i = getSharedPreferences("UNSEEN_NOTIFICATIONS", Context.MODE_PRIVATE)
+                            .getInt("unseen", 0);
+                    if(i != 0) {
+                        notificationCounter.setVisibility(View.VISIBLE);
+                        notificationCounter.setText(Integer.toString(i));
+                    } else {
+                        notificationCounter.setVisibility(View.INVISIBLE);
                     }
                 }
             }
@@ -2252,4 +2290,27 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    public void onNotificationDeleted(int i) {
+        if(i != 0) {
+            notificationCounter.setVisibility(View.VISIBLE);
+            notificationCounter.setText(Integer.toString(i));
+        } else {
+            notificationCounter.setVisibility(View.INVISIBLE);
+        }
+    }
+
+    @Override
+    public void onNotificationUndo(int i) {
+        if(i != 0) {
+            notificationCounter.setVisibility(View.VISIBLE);
+            notificationCounter.setText(Integer.toString(i));
+        } else {
+            notificationCounter.setVisibility(View.INVISIBLE);
+        }
+    }
+
+    public interface NotificationReceiverListener {
+        void onNotificationReceived(JSONObject jsonObject);
+    }
 }

@@ -183,7 +183,9 @@ public class SubjectWiseResult extends CommonToolbarParentActivity implements Su
             totalResult.put("Total",Integer.toString(totalMarks));
             totalResult.put("Grade", totalGrade);
             totalResult.put("GradePoint", totalGradePoint);
-            subjectWiseResultList.add(totalResult);
+            if(resultJsonArray.length()!=0){
+                subjectWiseResultList.add(totalResult);
+            }
             mAdapter.notifyDataSetChanged();
         } catch (JSONException e) {
             e.printStackTrace();

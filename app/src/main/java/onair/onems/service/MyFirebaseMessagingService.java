@@ -79,20 +79,27 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     private void handleDataMessage(JSONObject jsonObject, long timestamp) {
         try {
             JSONObject notification = jsonObject.getJSONObject("notification");
-
+            notification.put("seen", 0);
+            notification.put("id", notificationNo);
+            String string = getSharedPreferences("PUSH_NOTIFICATIONS", Context.MODE_PRIVATE)
+                    .getString("notifications", "[]");
+            JSONArray jsonArray = new JSONArray(string);
+            jsonArray.put(notification);
+            getSharedPreferences("PUSH_NOTIFICATIONS", Context.MODE_PRIVATE)
+                    .edit()
+                    .putString("notifications", jsonArray.toString())
+                    .apply();
+            int unseen = 0;
+            for(int i = 0; i<jsonArray.length(); i++) {
+                if (jsonArray.getJSONObject(i).getInt("seen") == 0) {
+                    unseen++;
+                }
+            }
+            getSharedPreferences("UNSEEN_NOTIFICATIONS", Context.MODE_PRIVATE)
+                    .edit()
+                    .putInt("unseen", unseen)
+                    .apply();
             if (!NotificationUtils.isAppIsInBackground(getApplicationContext())) {
-
-                notification.put("seen", 1);
-                notification.put("id", notificationNo);
-                String string = getSharedPreferences("PUSH_NOTIFICATIONS", Context.MODE_PRIVATE)
-                        .getString("notifications", "[]");
-                JSONArray jsonArray = new JSONArray(string);
-                jsonArray.put(notification);
-                getSharedPreferences("PUSH_NOTIFICATIONS", Context.MODE_PRIVATE)
-                        .edit()
-                        .putString("notifications", jsonArray.toString())
-                        .apply();
-
                 // app is in foreground, broadcast the push message
                 Intent pushNotification = new Intent(Config.PUSH_NOTIFICATION);
                 pushNotification.putExtra("notification", notification.toString());
@@ -102,22 +109,9 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                 NotificationUtils notificationUtils = new NotificationUtils(getApplicationContext());
                 notificationUtils.playNotificationSound();
             } else {
-
-                notification.put("seen", 0);
-                notification.put("id", notificationNo);
-                String string = getSharedPreferences("PUSH_NOTIFICATIONS", Context.MODE_PRIVATE)
-                        .getString("notifications", "[]");
-                JSONArray jsonArray = new JSONArray(string);
-                jsonArray.put(notification);
-                getSharedPreferences("PUSH_NOTIFICATIONS", Context.MODE_PRIVATE)
-                        .edit()
-                        .putString("notifications", jsonArray.toString())
-                        .apply();
-
                 // app is in background, show the notification in notification tray
                 Intent resultIntent = new Intent(getApplicationContext(), NotificationDetails.class);
                 resultIntent.putExtra("notification", notification.toString());
-                resultIntent.putExtra("from", "tray");
 
                 String imageUrl = "";
                 // check for image attachment

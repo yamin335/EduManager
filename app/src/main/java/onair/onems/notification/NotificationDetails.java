@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -34,6 +35,29 @@ public class NotificationDetails extends CommonToolbarParentActivity {
             JSONObject jsonObject = new JSONObject(getIntent().getStringExtra("notification"));
             notificationTitle.setText(jsonObject.getString("title"));
             notificationDetails.setText(jsonObject.getString("body"));
+            int id = jsonObject.getInt("id");
+            int unseen = 0;
+            String string = getSharedPreferences("PUSH_NOTIFICATIONS", Context.MODE_PRIVATE)
+                    .getString("notifications", "[]");
+            JSONArray jsonArray = new JSONArray(string);
+            for(int i = 0; i<jsonArray.length(); i++) {
+                if (jsonArray.getJSONObject(i).getInt("id") == id) {
+                    jsonArray.getJSONObject(i).put("seen", 1);
+                }
+
+                if (jsonArray.getJSONObject(i).getInt("seen") == 0) {
+                    unseen++;
+                }
+            }
+            getSharedPreferences("UNSEEN_NOTIFICATIONS", Context.MODE_PRIVATE)
+                    .edit()
+                    .putInt("unseen", unseen)
+                    .apply();
+
+            getSharedPreferences("PUSH_NOTIFICATIONS", Context.MODE_PRIVATE)
+                    .edit()
+                    .putString("notifications", jsonArray.toString())
+                    .apply();
         } catch (JSONException e) {
             e.printStackTrace();
         }

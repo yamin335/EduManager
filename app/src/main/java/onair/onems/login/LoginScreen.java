@@ -1,5 +1,6 @@
 package onair.onems.login;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -8,13 +9,17 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.telephony.TelephonyManager;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -26,17 +31,26 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.FirebaseInstanceIdService;
+
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
+
 import onair.onems.R;
 import onair.onems.Services.StaticHelperClass;
 import onair.onems.app.Config;
+import onair.onems.customised.CustomRequest;
 import onair.onems.customised.GuardianStudentSelectionDialog;
 import onair.onems.mainactivities.StudentMainScreen;
 import onair.onems.mainactivities.TeacherMainScreen;
 import onair.onems.network.MySingleton;
+import onair.onems.service.MyFirebaseInstanceIDService;
 
 public class LoginScreen extends AppCompatActivity {
     private EditText takeId;
@@ -46,6 +60,12 @@ public class LoginScreen extends AppCompatActivity {
     private ProgressDialog dialog, mStudentDialog, mUserTypeDialog;
     public static final String MyPREFERENCES = "LogInKey";
     public static SharedPreferences sharedPreferences;
+    private String returnValue = "[]";
+    private String LoggedUserID = "";
+    private String uuid = "";
+    private long ID = 0;
+    private String previousToken = "";
+    private JSONObject tokenJsonObject;
 
     @Override
     public void onResume() {
@@ -62,16 +82,42 @@ public class LoginScreen extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+//        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+//        if (!prefs.getBoolean("firstTime", false)) {
+//            // <---- run your one time code here
+//            createNotificationChannel();
+//            sharedPreferences  = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
+//            SharedPreferences.Editor editor = sharedPreferences.edit();
+//            editor.putBoolean("LogInState", false);
+//            editor.apply();
+//
+//            //Device unique installation ID
+//            this.getSharedPreferences("UNIQUE_ID", Context.MODE_PRIVATE)
+//                    .edit()
+//                    .putString("uuid", UUID.randomUUID().toString())
+//                    .apply();
+//
+//            // mark first time has run.
+//            SharedPreferences.Editor defaultEditor = prefs.edit();
+//            defaultEditor.putBoolean("firstTime", true);
+//            defaultEditor.apply();
+//        }
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         if (!prefs.getBoolean("firstTime", false)) {
             // <---- run your one time code here
             createNotificationChannel();
-            sharedPreferences  = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
+            sharedPreferences = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putBoolean("LogInState", false);
             editor.apply();
 
-            // mark first time has runned.
+            uuid = UUID.randomUUID().toString();
+            this.getSharedPreferences("UNIQUE_ID", Context.MODE_PRIVATE)
+                    .edit()
+                    .putString("uuid", uuid)
+                    .apply();
+
+            // mark first time has run.
             SharedPreferences.Editor defaultEditor = prefs.edit();
             defaultEditor.putBoolean("firstTime", true);
             defaultEditor.apply();
@@ -301,38 +347,37 @@ public class LoginScreen extends AppCompatActivity {
                     Intent mainIntent = new Intent(LoginScreen.this, TeacherMainScreen.class);
                     startActivity(mainIntent);
                     finish();
-                    dialog.dismiss();
+                    saveRegistrationToken();
                 } else if((UserID.length()>0) && (UserTypeID == 2)) {
                     Intent mainIntent = new Intent(LoginScreen.this, TeacherMainScreen.class);
                     startActivity(mainIntent);
                     finish();
-                    dialog.dismiss();
+                    saveRegistrationToken();
                 } else if((UserID.length()>0) && (UserTypeID == 3)) {
                     Intent mainIntent = new Intent(LoginScreen.this, StudentMainScreen.class);
                     startActivity(mainIntent);
                     finish();
-                    dialog.dismiss();
+                    saveRegistrationToken();
                 } else if((UserID.length()>0) && (UserTypeID == 4)) {
                     Intent mainIntent = new Intent(LoginScreen.this,TeacherMainScreen.class);
                     startActivity(mainIntent);
                     finish();
-                    dialog.dismiss();
+                    saveRegistrationToken();
                 } else if((UserID.length()>0) && (UserTypeID == 5)) {
-                    dialog.dismiss();
+                    saveRegistrationToken();
                     getStudents(UserID, InstituteID);
                 } else {
                     errorView.setText("Invalid Login ID or Password !!!");
                     takeId.setText("");
                     takePassword.setText("");
                     takeId.requestFocus();
-                    dialog.dismiss();
                 }
             }
 
         } catch (JSONException e) {
             Toast.makeText(this,"Json : "+e,Toast.LENGTH_LONG).show();
         }
-       dialog.dismiss();
+        dialog.dismiss();
     }
 
     @Override
@@ -521,6 +566,104 @@ public class LoginScreen extends AppCompatActivity {
         mUserTypeDialog.dismiss();
     }
 
+    private void saveRegistrationToken() {
+        LoggedUserID = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString("UserID", "0");
+        uuid = getApplicationContext().getSharedPreferences("UNIQUE_ID", Context.MODE_PRIVATE)
+                .getString("uuid", "");
+        previousToken = getApplicationContext().getSharedPreferences(Config.SHARED_PREF, Context.MODE_PRIVATE)
+                .getString("regId", "");
+        if(!LoggedUserID.equals("0")&&!previousToken.equals("")&&!uuid.equals("")){
+            // sending reg id to your server
+            sendRegistrationToServer(previousToken);
+        }
+    }
+
+    private void sendRegistrationToServer(final String token) {
+        if(StaticHelperClass.isNetworkAvailable(this)) {
+            String url = getString(R.string.baseUrl)+"/api/onEms/getFcmTokenByUserID/"+LoggedUserID;
+            //Preparing Medium data from server
+            StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+                            returnValue = response;
+                            if (returnValue.equals("[]")) {
+                                ID = 0;
+                            } else {
+                                try {
+                                    JSONArray jsonArray = new JSONArray(returnValue);
+                                    for (int i = 0; i<jsonArray.length(); i++) {
+                                        JSONObject jsonObject = jsonArray.getJSONObject(i);
+                                        if (jsonObject.getString("UserID").equals(LoggedUserID)
+                                                &&jsonObject.getString("Browser").equals("android")
+                                                &&jsonObject.getString("Token").equals(previousToken)
+                                                &&jsonObject.getString("DeviceID").equals(uuid)) {
+                                            ID = jsonObject.getLong("ID");
+                                        }
+                                    }
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+
+                            try {
+                                tokenJsonObject = new JSONObject();
+                                tokenJsonObject.put("ID", ID);
+                                tokenJsonObject.put("UserID", LoggedUserID);
+                                tokenJsonObject.put("Browser", "android");
+                                tokenJsonObject.put("Token", token);
+                                tokenJsonObject.put("DeviceID", uuid);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                            // sending fcm token to server
+                            tokenPostRequest(tokenJsonObject);
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                }
+            })
+            {
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    Map<String, String>  params = new HashMap<>();
+                    params.put("Authorization", "Request_From_onEMS_Android_app");
+                    return params;
+                }
+            };
+            MySingleton.getInstance(this).addToRequestQueue(stringRequest);
+        } else {
+            Toast.makeText(getApplicationContext(),"Please check your internet connection and select again!!! ",
+                    Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private void tokenPostRequest(JSONObject postDataJsonObject) {
+        String url = getString(R.string.baseUrl)+"/api/onEms/setFcmToken";
+        CustomRequest customRequest = new CustomRequest (Request.Method.POST, url, postDataJsonObject,
+                new Response.Listener<JSONArray>() {
+                    @Override
+                    public void onResponse(JSONArray response) {
+                        Toast.makeText(getApplicationContext(),"Successfully posted token",Toast.LENGTH_LONG).show();
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(getApplicationContext(),"ERROR posting token",Toast.LENGTH_LONG).show();
+            }
+        })
+        {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String>  params = new HashMap<>();
+                params.put("Authorization", "Request_From_onEMS_Android_app");
+                return params;
+            }
+        };
+        MySingleton.getInstance(this).addToRequestQueue(customRequest);
+    }
+
     private void createNotificationChannel() {
         // Create the NotificationChannel, but only on API 26+ because
         // the NotificationChannel class is new and not in the support library
@@ -538,4 +681,5 @@ public class LoginScreen extends AppCompatActivity {
             }
         }
     }
+
 }

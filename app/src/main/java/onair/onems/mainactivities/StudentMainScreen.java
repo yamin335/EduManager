@@ -12,6 +12,7 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
@@ -69,6 +70,21 @@ public class StudentMainScreen extends AppCompatActivity {
     private BroadcastReceiver mRegistrationBroadcastReceiver;
 
     @Override
+    protected void onStart() {
+        super.onStart();
+//        MenuItem item = bottomNavigationView.getMenu().findItem(selectedBottomNavItem);
+//        item.setChecked(true);
+        int i = getSharedPreferences("UNSEEN_NOTIFICATIONS", Context.MODE_PRIVATE)
+                .getInt("unseen", 0);
+        if(i != 0) {
+            notificationCounter.setVisibility(View.VISIBLE);
+            notificationCounter.setText(Integer.toString(i));
+        } else {
+            notificationCounter.setVisibility(View.INVISIBLE);
+        }
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
 
@@ -83,6 +99,14 @@ public class StudentMainScreen extends AppCompatActivity {
 
         // clear the notification area when the app is opened
 //        NotificationUtils.clearNotifications(getApplicationContext());
+        int i = getSharedPreferences("UNSEEN_NOTIFICATIONS", Context.MODE_PRIVATE)
+                .getInt("unseen", 0);
+        if(i != 0) {
+            notificationCounter.setVisibility(View.VISIBLE);
+            notificationCounter.setText(Integer.toString(i));
+        } else {
+            notificationCounter.setVisibility(View.INVISIBLE);
+        }
     }
 
     @Override
@@ -307,6 +331,13 @@ public class StudentMainScreen extends AppCompatActivity {
         });
 
         notificationCounter = findViewById(R.id.notificationCounter);
+        int i = getSharedPreferences("UNSEEN_NOTIFICATIONS", Context.MODE_PRIVATE)
+                .getInt("unseen", 0);
+        if(i != 0) {
+            notificationCounter.setText(Integer.toString(i));
+        } else {
+            notificationCounter.setVisibility(View.INVISIBLE);
+        }
         dashboard = findViewById(R.id.dashboard);
         profile = findViewById(R.id.profile);
         notification = findViewById(R.id.notification);
@@ -350,7 +381,6 @@ public class StudentMainScreen extends AppCompatActivity {
                 notification.setBackgroundColor(Color.parseColor("#f9f7f7"));
                 iconNotification.setColorFilter(Color.parseColor("#0550b7"));
                 textNotification.setTextColor(Color.parseColor("#0550b7"));
-                notificationCounter.setVisibility(View.INVISIBLE);
                 Intent mainIntent = new Intent(StudentMainScreen.this,NotificationMainScreen.class);
                 startActivity(mainIntent);
                 finish();
@@ -383,13 +413,13 @@ public class StudentMainScreen extends AppCompatActivity {
 
                 } else if (intent.getAction().equals(Config.PUSH_NOTIFICATION)) {
                     // new push notification is received
-                    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(StudentMainScreen.this);
-                    SharedPreferences.Editor editor = prefs.edit();
-                    int number = prefs.getInt("Notification",0);
+//                    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(StudentMainScreen.this);
+//                    SharedPreferences.Editor editor = prefs.edit();
+//                    int number = prefs.getInt("Notification",0);
 //                    notificationCounter.setVisibility(View.VISIBLE);
 //                    notificationCounter.setText(Integer.toString(++number));
-                    editor.putInt("Notification", number);
-                    editor.apply();
+//                    editor.putInt("Notification", number);
+//                    editor.apply();
                     String message = intent.getStringExtra("notification");
                     try {
                         JSONObject messageJSONObject = new JSONObject(message);
@@ -398,7 +428,6 @@ public class StudentMainScreen extends AppCompatActivity {
                         final int icon = R.drawable.onair;
                         Intent resultIntent = new Intent(getApplicationContext(), NotificationDetails.class);
                         resultIntent.putExtra("notification", message);
-                        resultIntent.putExtra("from", "tray");
                         int requestCode = new Random().nextInt(900000)+100000;
                         resultIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                         PendingIntent resultPendingIntent = PendingIntent.getActivity(getApplicationContext(), requestCode, resultIntent, PendingIntent.FLAG_IMMUTABLE);
@@ -418,6 +447,14 @@ public class StudentMainScreen extends AppCompatActivity {
                         notificationManager.notify(uniqueNotificationId, notification);
                     } catch (JSONException e) {
                         e.printStackTrace();
+                    }
+                    int i = StudentMainScreen.this.getSharedPreferences("UNSEEN_NOTIFICATIONS", Context.MODE_PRIVATE)
+                            .getInt("unseen", 0);
+                    if(i != 0) {
+                        notificationCounter.setVisibility(View.VISIBLE);
+                        notificationCounter.setText(Integer.toString(i));
+                    } else {
+                        notificationCounter.setVisibility(View.INVISIBLE);
                     }
                 }
             }

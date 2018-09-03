@@ -288,7 +288,6 @@ public class StudentiCardDetails extends CommonToolbarParentActivity {
                             fileFromBitmap.execute();
                         }
                     } else {
-                        mStudentDataPostDialog.dismiss();
                         Toast.makeText(StudentiCardDetails.this,"Take or choose a photo to update!!!",Toast.LENGTH_LONG).show();
                     }
                 } else {
