@@ -279,6 +279,11 @@
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="stateHidden|adjustPan" />
         <activity
+            android:name=".routine.ExamRoutineDetailsScreen"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden|adjustPan" />
+        <activity
             android:name=".routine.ExamDetails"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"

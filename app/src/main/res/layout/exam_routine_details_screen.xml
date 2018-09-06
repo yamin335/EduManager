@@ -10,8 +10,9 @@
         android:layout_height="wrap_content"
         android:background="#123456"
         android:textColor="@color/white"
-        android:textSize="15sp"
-        android:gravity="center"/>
+        android:textSize="18sp"
+        android:gravity="center"
+        android:padding="5dp"/>
     <android.support.v7.widget.RecyclerView
         android:id="@+id/routineClasses"
         android:layout_width="match_parent"

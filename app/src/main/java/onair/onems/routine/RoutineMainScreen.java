@@ -4,7 +4,11 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.preference.PreferenceManager;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -15,6 +19,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
@@ -26,6 +31,7 @@ import com.android.volley.toolbox.StringRequest;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -38,14 +44,19 @@ import onair.onems.Services.StaticHelperClass;
 import onair.onems.mainactivities.SideNavigationMenuParentActivity;
 import onair.onems.mainactivities.StudentMainScreen;
 import onair.onems.mainactivities.TeacherMainScreen;
+import onair.onems.models.ShiftModel;
 import onair.onems.network.MySingleton;
+import onair.onems.result.ResultMainScreen;
+import onair.onems.syllabus.ExamSelectionDialog;
 
-public class RoutineMainScreen extends SideNavigationMenuParentActivity {
+public class RoutineMainScreen extends SideNavigationMenuParentActivity implements ShiftSelectionAdapter.ShiftSelectionListener{
 
     private ProgressDialog dialog;
     private JSONArray saturdayJsonArray, sundayJsonArray, mondayJsonArray, tuesdayJsonArray, wednesdayJsonArray, thursdayJsonArray, fridayJsonArray;
     private ViewPager viewPager;
     private TabLayout tabLayout;
+    private FloatingActionButton fabShift;
+    private ProgressDialog mShiftDialog;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,49 +76,25 @@ public class RoutineMainScreen extends SideNavigationMenuParentActivity {
         thursdayJsonArray = new JSONArray();
         fridayJsonArray = new JSONArray();
 
-        if(UserTypeID == 1||UserTypeID == 2||UserTypeID == 4){
-            if(StaticHelperClass.isNetworkAvailable(this)) {
-                dialog = new ProgressDialog(this);
-                dialog.setTitle("Loading Routine...");
-                dialog.setMessage("Please Wait...");
-                dialog.setCancelable(false);
-                dialog.setIcon(R.drawable.onair);
-                dialog.show();
-
-                String routineUrl = "";
-
-                if(UserTypeID == 1||UserTypeID == 2) {
-                    routineUrl = getString(R.string.baseUrl)+"/api/onEms/spGetCommonClassRoutine/"
-                            +InstituteID+"/"+"0";
-                } else if(UserTypeID == 4) {
-                    routineUrl = getString(R.string.baseUrl)+"/api/onEms/spGetTeacherStudentMyClassRoutine/"
-                            +InstituteID+"/"+LoggedUserClassID+"/"+LoggedUserID;
-                }
-
-                StringRequest request = new StringRequest(Request.Method.GET, routineUrl,
-                        new Response.Listener<String>() {
-                            @Override
-                            public void onResponse(String response) {
-                                parseReturnData(response);
-                            }
-                        }, new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        dialog.dismiss();
-                    }
-                })
-                {
-                    @Override
-                    public Map<String, String> getHeaders() throws AuthFailureError {
-                        Map<String, String>  params = new HashMap<>();
-                        params.put("Authorization", "Request_From_onEMS_Android_app");
-                        return params;
-                    }
-                };
-                MySingleton.getInstance(this).addToRequestQueue(request);
-            } else {
-                Toast.makeText(this,"Please check your INTERNET connection !!!",Toast.LENGTH_LONG).show();
+        fabShift = findViewById(R.id.fabShift);
+        fabShift.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#9C077EF5")));
+        fabShift.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ShiftDataGetRequest();
             }
+        });
+
+        if(UserTypeID==3 || UserTypeID==4 || UserTypeID==5){
+            fabShift.setVisibility(View.GONE);
+        }
+
+        if (UserTypeID == 1 || UserTypeID == 2) {
+            ShiftDataGetRequest();
+        }
+
+        if(UserTypeID == 4){
+            RoutineDataGetRequest(0);
         }
 
         viewPager = (ViewPager) findViewById(R.id.pager);
@@ -116,6 +103,15 @@ public class RoutineMainScreen extends SideNavigationMenuParentActivity {
         if(UserTypeID!=1 && UserTypeID!=2 && UserTypeID!=4){
             setupViewPager(viewPager);
             tabLayout.setupWithViewPager(viewPager);
+        }
+    }
+
+    @Override
+    public void onShiftSelected(JSONObject shift) {
+        try {
+            RoutineDataGetRequest(shift.getLong("ShiftID"));
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
     }
 
@@ -237,6 +233,51 @@ public class RoutineMainScreen extends SideNavigationMenuParentActivity {
         viewPager.setCurrentItem(currentDay);
     }
 
+    private void RoutineDataGetRequest(long ShiftID) {
+        if(StaticHelperClass.isNetworkAvailable(this)) {
+            dialog = new ProgressDialog(this);
+            dialog.setTitle("Loading Routine...");
+            dialog.setMessage("Please Wait...");
+            dialog.setCancelable(false);
+            dialog.setIcon(R.drawable.onair);
+            dialog.show();
+
+            String routineUrl = "";
+
+            if(UserTypeID == 1||UserTypeID == 2) {
+                routineUrl = getString(R.string.baseUrl)+"/api/onEms/spGetCommonClassRoutine/"
+                        +InstituteID+"/"+ShiftID;
+            } else if(UserTypeID == 4) {
+                routineUrl = getString(R.string.baseUrl)+"/api/onEms/spGetTeacherStudentMyClassRoutine/"
+                        +InstituteID+"/"+LoggedUserClassID+"/"+LoggedUserID;
+            }
+
+            StringRequest request = new StringRequest(Request.Method.GET, routineUrl,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+                            parseReturnData(response);
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    dialog.dismiss();
+                }
+            })
+            {
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    Map<String, String>  params = new HashMap<>();
+                    params.put("Authorization", "Request_From_onEMS_Android_app");
+                    return params;
+                }
+            };
+            MySingleton.getInstance(this).addToRequestQueue(request);
+        } else {
+            Toast.makeText(this,"Please check your INTERNET connection !!!",Toast.LENGTH_LONG).show();
+        }
+    }
+
     private void parseReturnData(String routine) {
         try {
             JSONArray routineJsonArray = new JSONArray(routine);
@@ -279,5 +320,60 @@ public class RoutineMainScreen extends SideNavigationMenuParentActivity {
             e.printStackTrace();
         }
         dialog.dismiss();
+    }
+
+    private void ShiftDataGetRequest() {
+        if (StaticHelperClass.isNetworkAvailable(this)) {
+            String shiftUrl = getString(R.string.baseUrl)+"/api/onEms/getInsShift/"+InstituteID;
+
+            mShiftDialog = new ProgressDialog(this);
+            mShiftDialog.setTitle("Loading shift...");
+            mShiftDialog.setMessage("Please Wait...");
+            mShiftDialog.setCancelable(true);
+            mShiftDialog.setIcon(R.drawable.onair);
+            mShiftDialog.show();
+            //Preparing Shift data from server
+            StringRequest stringShiftRequest = new StringRequest(Request.Method.GET, shiftUrl,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+
+                            parseShiftJsonData(response);
+
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    mShiftDialog.dismiss();
+                    Toast.makeText(RoutineMainScreen.this,"Shift not found!!! ",
+                            Toast.LENGTH_LONG).show();
+                }
+            })
+            {
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    Map<String, String>  params = new HashMap<>();
+                    params.put("Authorization", "Request_From_onEMS_Android_app");
+                    return params;
+                }
+            };
+            MySingleton.getInstance(this).addToRequestQueue(stringShiftRequest);
+        } else {
+            Toast.makeText(RoutineMainScreen.this,"Please check your internet connection and select again!!! ",
+                    Toast.LENGTH_LONG).show();
+        }
+    }
+
+    void parseShiftJsonData(String jsonString) {
+        if (jsonString.equals("")) {
+            Toast.makeText(RoutineMainScreen.this,"Shift not found!!! ",
+                    Toast.LENGTH_LONG).show();
+        } else {
+            ShiftSelectionDialog shiftSelectionDialog = new ShiftSelectionDialog(this, jsonString, this);
+            shiftSelectionDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            shiftSelectionDialog.setCancelable(false);
+            shiftSelectionDialog.show();
+        }
+        mShiftDialog.dismiss();
     }
 }

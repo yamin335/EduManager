@@ -12,7 +12,7 @@ public class ExamModel {
     }
 
     public ExamModel(String ExamID, String ExamName, String InsExamID, String Sequence, String IsActive) {
-        if(ExamID.equals("null")) {
+        if(ExamID.equals("null")||ExamID.equals("")) {
             this.ExamID = 0;
         } else {
             this.ExamID = Long.parseLong(ExamID);
@@ -20,19 +20,19 @@ public class ExamModel {
 
         this.ExamName = ExamName;
 
-        if(InsExamID.equals("null")) {
+        if(InsExamID.equals("null")||InsExamID.equals("")) {
             this.InsExamID = 0;
         } else {
             this.InsExamID = Long.parseLong(InsExamID);
         }
 
-        if(Sequence.equals("null")) {
+        if(Sequence.equals("null")||Sequence.equals("")) {
             this.Sequence = 0;
         } else {
             this.Sequence = Integer.parseInt(Sequence);
         }
 
-        if(IsActive.equals("null")) {
+        if(IsActive.equals("null")||IsActive.equals("")) {
             this.IsActive = 0;
         } else {
             this.IsActive = Integer.parseInt(IsActive);
@@ -40,7 +40,7 @@ public class ExamModel {
     }
 
     public void setExamID(String ExamID) {
-        if(ExamID.equals("null")) {
+        if(ExamID.equals("null")||ExamID.equals("")) {
             this.ExamID = 0;
         } else {
             this.ExamID = Long.parseLong(ExamID);
@@ -60,7 +60,7 @@ public class ExamModel {
     }
 
     public void setInsExamID(String InsExamID) {
-        if(InsExamID.equals("null")) {
+        if(InsExamID.equals("null")||InsExamID.equals("")) {
             this.InsExamID = 0;
         } else {
             this.InsExamID = Long.parseLong(InsExamID);
@@ -72,7 +72,7 @@ public class ExamModel {
     }
 
     public void setSequence(String Sequence) {
-        if(Sequence.equals("null")) {
+        if(Sequence.equals("null")||Sequence.equals("")) {
             this.Sequence = 0;
         } else {
             this.Sequence = Integer.parseInt(Sequence);
@@ -84,7 +84,7 @@ public class ExamModel {
     }
 
     public void setIsActive(String IsActive) {
-        if(IsActive.equals("null")) {
+        if(IsActive.equals("null")||IsActive.equals("")) {
             this.IsActive = 0;
         } else {
             this.IsActive = Integer.parseInt(IsActive);

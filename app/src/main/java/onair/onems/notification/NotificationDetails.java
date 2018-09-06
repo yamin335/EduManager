@@ -62,17 +62,4 @@ public class NotificationDetails extends CommonToolbarParentActivity {
             e.printStackTrace();
         }
     }
-
-//    @Override
-//    public void onBackPressed() {
-//        if(from.equals("tray")) {
-//            super.onBackPressed();
-//            Intent intent = new Intent(getApplicationContext(), NotificationMainScreen.class);
-//            startActivity(intent);
-//            finish();
-//            moveTaskToBack(true);
-//        } else if(from.equals("activity")) {
-//            super.onBackPressed();
-//        }
-//    }
 }
