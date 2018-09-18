@@ -76,6 +76,7 @@ public class HomeworkMainScreen extends SideNavigationMenuParentActivity impleme
     private Button datePicker;
     private DigitalContentAdapter mDigitalAdapter;
     private ArrayList<Long> refIdList = new ArrayList<>();
+    private String selectedDate = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,7 +100,30 @@ public class HomeworkMainScreen extends SideNavigationMenuParentActivity impleme
 
         Date date = Calendar.getInstance().getTime();
         SimpleDateFormat df = new SimpleDateFormat("MM-dd-yyyy");
-        String today = df.format(date);
+        selectedDate = df.format(date);
+
+        if (UserTypeID == 1 || UserTypeID == 2 || UserTypeID == 4) {
+            Intent intent = getIntent();
+            selectedDate = intent.getStringExtra("Date");
+            LoggedUserMediumID = intent.getLongExtra("MediumID", 0);
+            LoggedUserShiftID= intent.getLongExtra("ShiftID", 0);
+            LoggedUserClassID = intent.getLongExtra("ClassID", 0);
+            LoggedUserDepartmentID = intent.getLongExtra("DepartmentID", 0);
+            LoggedUserSectionID = intent.getLongExtra("SectionID", 0);
+
+        } else if (UserTypeID == 5) {
+            try {
+                JSONObject selectedStudent = new JSONObject(getSharedPreferences("CURRENT_STUDENT", Context.MODE_PRIVATE)
+                        .getString("guardianSelectedStudent", "{}"));
+                LoggedUserMediumID = selectedStudent.getLong("MediumID");
+                LoggedUserShiftID = selectedStudent.getLong("ShiftID");
+                LoggedUserClassID = selectedStudent.getLong("ClassID");
+                LoggedUserDepartmentID = selectedStudent.getLong("DepartmentID");
+                LoggedUserSectionID = selectedStudent.getLong("SectionID");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
 
         mAdapter = new HomeworkAdapter(this, homeworkList, this);
         RecyclerView recyclerView = findViewById(R.id.homeworkRecycler);
@@ -144,7 +168,7 @@ public class HomeworkMainScreen extends SideNavigationMenuParentActivity impleme
             }
         });
         registerReceiver(onComplete, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
-        homeworkGetRequest(today);
+        homeworkGetRequest(selectedDate);
     }
 
     @Override
@@ -153,11 +177,11 @@ public class HomeworkMainScreen extends SideNavigationMenuParentActivity impleme
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else if(UserTypeID == 1) {
-            Intent mainIntent = new Intent(HomeworkMainScreen.this, TeacherMainScreen.class);
+            Intent mainIntent = new Intent(HomeworkMainScreen.this, HomeworkMainScreenForAdmin.class);
             startActivity(mainIntent);
             finish();
         } else if(UserTypeID == 2) {
-            Intent mainIntent = new Intent(HomeworkMainScreen.this, TeacherMainScreen.class);
+            Intent mainIntent = new Intent(HomeworkMainScreen.this, HomeworkMainScreenForAdmin.class);
             startActivity(mainIntent);
             finish();
         } else if(UserTypeID == 3) {
@@ -165,7 +189,7 @@ public class HomeworkMainScreen extends SideNavigationMenuParentActivity impleme
             startActivity(mainIntent);
             finish();
         } else if(UserTypeID == 4) {
-            Intent mainIntent = new Intent(HomeworkMainScreen.this, TeacherMainScreen.class);
+            Intent mainIntent = new Intent(HomeworkMainScreen.this, HomeworkMainScreenForAdmin.class);
             startActivity(mainIntent);
             finish();
         } else if(UserTypeID == 5) {
@@ -189,23 +213,9 @@ public class HomeworkMainScreen extends SideNavigationMenuParentActivity impleme
     private void homeworkGetRequest(String date) {
         if (StaticHelperClass.isNetworkAvailable(this)) {
 
-            String homeworkUrl = "";
-            if(UserTypeID == 3) {
-                homeworkUrl = getString(R.string.baseUrl)+"/api/onEms/getMyInsHomeWork/"+InstituteID+
-                        "/"+LoggedUserMediumID+"/"+LoggedUserClassID+"/"+LoggedUserDepartmentID+"/"+
-                        LoggedUserSectionID+"/"+LoggedUserShiftID+"/"+date;
-            } else if(UserTypeID == 5) {
-                try {
-                    JSONObject selectedStudent = new JSONObject(getSharedPreferences("CURRENT_STUDENT", Context.MODE_PRIVATE)
-                            .getString("guardianSelectedStudent", "{}"));
-                    homeworkUrl = getString(R.string.baseUrl)+"/api/onEms/getMyInsHomeWork/"+InstituteID+
-                            "/"+selectedStudent.getString("MediumID")+"/"+selectedStudent.getString("ClassID")
-                            +"/"+selectedStudent.getString("DepartmentID")+"/"+selectedStudent.getString("SectionID")
-                            +"/"+selectedStudent.getString("ShiftID")+"/"+date;
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
+            String homeworkUrl = getString(R.string.baseUrl)+"/api/onEms/getMyInsHomeWork/"+InstituteID+
+                    "/"+LoggedUserMediumID+"/"+LoggedUserClassID+"/"+LoggedUserDepartmentID+"/"+
+                    LoggedUserSectionID+"/"+LoggedUserShiftID+"/"+date;
 
             mHomeworkDialog = new ProgressDialog(this);
             mHomeworkDialog.setTitle("Loading homework...");
@@ -223,7 +233,16 @@ public class HomeworkMainScreen extends SideNavigationMenuParentActivity impleme
                         }
                     }, new Response.ErrorListener() {
                 @Override
-                public void onErrorResponse(VolleyError error) {
+                public void onErrorResponse(VolleyError e) {
+                    homeworkList.clear();
+                    mAdapter.notifyDataSetChanged();
+                    error.setVisibility(View.VISIBLE);
+                    homeworkDate.setText("");
+                    details.setText("");
+                    topic.setText("");
+                    errorDigital.setVisibility(View.VISIBLE);
+                    digitalContentList.clear();
+                    mDigitalAdapter.notifyDataSetChanged();
                     mHomeworkDialog.dismiss();
                     Toast.makeText(HomeworkMainScreen.this,"Homework data not found!!! ",
                             Toast.LENGTH_LONG).show();
@@ -261,6 +280,12 @@ public class HomeworkMainScreen extends SideNavigationMenuParentActivity impleme
             homeworkList.clear();
             mAdapter.notifyDataSetChanged();
             error.setVisibility(View.VISIBLE);
+            homeworkDate.setText("");
+            details.setText("");
+            topic.setText("");
+            errorDigital.setVisibility(View.VISIBLE);
+            digitalContentList.clear();
+            mDigitalAdapter.notifyDataSetChanged();
             Toast.makeText(this,"Homework not found!!! ",
                     Toast.LENGTH_LONG).show();
         }
@@ -289,6 +314,9 @@ public class HomeworkMainScreen extends SideNavigationMenuParentActivity impleme
                     }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
+                    errorDigital.setVisibility(View.VISIBLE);
+                    digitalContentList.clear();
+                    mDigitalAdapter.notifyDataSetChanged();
                     mHomeworkDialog.dismiss();
                     Toast.makeText(HomeworkMainScreen.this,"Digital content not found!!! ",
                             Toast.LENGTH_LONG).show();

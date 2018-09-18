@@ -93,7 +93,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
     public void onBindViewHolder(MyViewHolder holder, final int position) {
         final JSONObject jsonObject = notificationListFiltered.get(position);
         try {
-            holder.title.setText(jsonObject.getString("title"));
+            holder.title.setText(jsonObject.getString("title").toUpperCase());
             holder.detail.setText(jsonObject.getString("body"));
             if(jsonObject.getInt("seen") == 0) {
                 holder.title.setTypeface(Typeface.DEFAULT_BOLD);

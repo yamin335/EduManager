@@ -2,6 +2,7 @@ package onair.onems.mainactivities;
 
 import android.app.Notification;
 import android.app.PendingIntent;
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -39,6 +40,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.google.firebase.messaging.FirebaseMessaging;
@@ -50,15 +56,21 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import onair.onems.R;
+import onair.onems.Services.StaticHelperClass;
 import onair.onems.app.Config;
 import onair.onems.attendance.AttendanceAdminDashboard;
 import onair.onems.contacts.ContactsMainScreen;
+import onair.onems.crm.NewClientEntry;
 import onair.onems.customised.GuardianStudentSelectionDialog;
 import onair.onems.exam.SubjectWiseMarksEntryMain;
 import onair.onems.fees_report.FeeCollectionReportMain;
+import onair.onems.homework.HomeworkMainScreenForAdmin;
+import onair.onems.lesson_plan.LessonPlanMainScreenForAdmin;
+import onair.onems.network.MySingleton;
 import onair.onems.notification.NotificationAdapter;
 import onair.onems.notification.NotificationDetails;
 import onair.onems.notification.NotificationMainScreen;
@@ -82,6 +94,7 @@ import onair.onems.icard.StudentiCardNewEntry;
 import onair.onems.models.ExpandedMenuModel;
 import onair.onems.studentlist.ReportAllStudentMain;
 import onair.onems.syllabus.SyllabusMainScreen;
+import onair.onems.syllabus.SyllabusMainScreenForAdmin;
 import onair.onems.user.Profile;
 import onair.onems.utils.NotificationUtils;
 
@@ -103,6 +116,8 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
     private TextView textDashboard, textProfile, textNotification, textContacts, notificationCounter;
     private ImageView iconDashboard, iconProfile, iconNotification, iconContacts;
     private NotificationReceiverListener notificationReceiverListener;
+    private ProgressDialog dialog;
+    private boolean returnValue = false;
 
     @Override
     protected void onStart() {
@@ -399,7 +414,7 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
         } else if(UserTypeID == 3) {
             userType.setText("Student");
         } else if(UserTypeID == 4) {
-            userType.setText("Teacher");
+            userType.setText("Staff");
         } else if(UserTypeID == 5) {
             userType.setText("Guardian");
         }
@@ -656,14 +671,7 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_logout) {
-            SharedPreferences sharedPreferences  = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
-            SharedPreferences.Editor editor = sharedPreferences.edit();
-            editor.putBoolean("LogInState", false);
-            editor.apply();
-            Intent intent = new Intent(getApplicationContext(), LoginScreen.class);
-            startActivity(intent);
-            finish();
-            return true;
+            return logOut();
         } else if(id == R.id.changePassword) {
             ChangePasswordDialog changePasswordDialog = new ChangePasswordDialog(this, this, LoggedUserID, UserName, InstituteID);
             changePasswordDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
@@ -683,6 +691,78 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private boolean logOut() {
+        if (StaticHelperClass.isNetworkAvailable(this)) {
+
+            String logOutUrl = getString(R.string.baseUrl)+"/api/onEms/deleteFcmToken/"+LoggedUserID+"/"+"android"+"/"+getSharedPreferences("UNIQUE_ID", Context.MODE_PRIVATE)
+                    .getString("uuid", "");
+
+            dialog = new ProgressDialog(this);
+            dialog.setTitle("Logging Out...");
+            dialog.setMessage("Please Wait...");
+            dialog.setCancelable(false);
+            dialog.setIcon(R.drawable.onair);
+            dialog.show();
+            //Preparing Shift data from server
+            StringRequest loginRequest = new StringRequest(Request.Method.DELETE, logOutUrl,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+
+                            doLogOut(response);
+
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    returnValue = false;
+                    dialog.dismiss();
+                    Toast.makeText(SideNavigationMenuParentActivity.this,"Server error while logging out!!! ",
+                            Toast.LENGTH_LONG).show();
+                }
+            })
+            {
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    Map<String, String>  params = new HashMap<>();
+                    params.put("Authorization", "Request_From_onEMS_Android_app");
+                    return params;
+                }
+            };
+            MySingleton.getInstance(this).addToRequestQueue(loginRequest);
+        } else {
+            Toast.makeText(SideNavigationMenuParentActivity.this,"Please check your internet connection and select again!!! ",
+                    Toast.LENGTH_LONG).show();
+        }
+        return returnValue;
+    }
+
+    private void doLogOut(String returnValueFromServer) {
+        try {
+            if (new JSONArray(returnValueFromServer).getJSONObject(0).getInt("ReturnValue") == 1) {
+                SharedPreferences sharedPreferences  = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putBoolean("LogInState", false);
+                editor.apply();
+
+                getSharedPreferences("PUSH_NOTIFICATIONS", Context.MODE_PRIVATE)
+                        .edit()
+                        .putString("notifications", "[]")
+                        .apply();
+
+                returnValue = true;
+                Intent intent = new Intent(getApplicationContext(), LoginScreen.class);
+                startActivity(intent);
+                finish();
+            } else {
+                returnValue = false;
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     private void prepareSuperAdminSideMenu() {
@@ -751,6 +831,11 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
         menuReport.setIconImg(R.drawable.nav_fee);
         listDataHeader.add(menuReport);
 
+        ExpandedMenuModel menuCrm = new ExpandedMenuModel();
+        menuCrm.setIconName("CRM");
+        menuCrm.setIconImg(R.drawable.ic_person_add);
+        listDataHeader.add(menuCrm);
+
         // Adding child data
         List<String> headingDashboard = new ArrayList<>();
         List<String> headingNotice = new ArrayList<>();
@@ -789,6 +874,8 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
         headingReport.add("Fees Collection Report");
         headingReport.add("Fees Summary Report");
 
+        List<String> headingCRM = new ArrayList<>();
+
         // Header, Child data
         listDataChild.put(listDataHeader.get(0), headingDashboard);
         listDataChild.put(listDataHeader.get(1), headingNotice);
@@ -802,6 +889,7 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
         listDataChild.put(listDataHeader.get(9), headingiCard);
         listDataChild.put(listDataHeader.get(10), headingStudentList);
         listDataChild.put(listDataHeader.get(11), headingReport);
+        listDataChild.put(listDataHeader.get(12), headingCRM);
 
         mMenuAdapter = new ExpandableListAdapter(this, listDataHeader, listDataChild, UserTypeID);
         expandableList.setAdapter(mMenuAdapter);
@@ -831,13 +919,13 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
                 }
 
                 if((i == 4) && (l == 4)) {
-                    if(activityName.equals(SyllabusMainScreen.class.getName())){
+                    if(activityName.equals(SyllabusMainScreenForAdmin.class.getName())){
                         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
                         if (drawer.isDrawerOpen(GravityCompat.START)) {
                             drawer.closeDrawer(GravityCompat.START);
                         }
                     } else {
-                        Intent intent = new Intent(getApplicationContext(), SyllabusMainScreen.class);
+                        Intent intent = new Intent(getApplicationContext(), SyllabusMainScreenForAdmin.class);
                         startActivity(intent);
                         finish();
                     }
@@ -851,6 +939,19 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
                         }
                     } else {
                         Intent intent = new Intent(getApplicationContext(), ReportAllStudentMain.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                }
+
+                if((i == 12) && (l == 12)) {
+                    if(activityName.equals(NewClientEntry.class.getName())){
+                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                        if (drawer.isDrawerOpen(GravityCompat.START)) {
+                            drawer.closeDrawer(GravityCompat.START);
+                        }
+                    } else {
+                        Intent intent = new Intent(getApplicationContext(), NewClientEntry.class);
                         startActivity(intent);
                         finish();
                     }
@@ -929,26 +1030,26 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
                 }
 
                 if((i == 5) && (i1 == 0) && (l == 0)) {
-                    if(activityName.equals(HomeworkMainScreen.class.getName())){
+                    if(activityName.equals(HomeworkMainScreenForAdmin.class.getName())){
                         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
                         if (drawer.isDrawerOpen(GravityCompat.START)) {
                             drawer.closeDrawer(GravityCompat.START);
                         }
                     } else {
-                        Intent intent = new Intent(getApplicationContext(), HomeworkMainScreen.class);
+                        Intent intent = new Intent(getApplicationContext(), HomeworkMainScreenForAdmin.class);
                         startActivity(intent);
                         finish();
                     }
                 }
 
                 if((i == 5) && (i1 == 1) && (l == 1)) {
-                    if(activityName.equals(LessonPlanMainScreen.class.getName())){
+                    if(activityName.equals(LessonPlanMainScreenForAdmin.class.getName())){
                         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
                         if (drawer.isDrawerOpen(GravityCompat.START)) {
                             drawer.closeDrawer(GravityCompat.START);
                         }
                     } else {
-                        Intent intent = new Intent(getApplicationContext(), LessonPlanMainScreen.class);
+                        Intent intent = new Intent(getApplicationContext(), LessonPlanMainScreenForAdmin.class);
                         startActivity(intent);
                         finish();
                     }
@@ -1118,6 +1219,11 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
         menuReport.setIconImg(R.drawable.nav_fee);
         listDataHeader.add(menuReport);
 
+        ExpandedMenuModel menuCrm = new ExpandedMenuModel();
+        menuCrm.setIconName("CRM");
+        menuCrm.setIconImg(R.drawable.ic_person_add);
+        listDataHeader.add(menuCrm);
+
         // Adding child data
         List<String> headingDashboard = new ArrayList<>();
         List<String> headingNotice = new ArrayList<>();
@@ -1155,6 +1261,8 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
         headingReport.add("Fees Collection Report");
         headingReport.add("Fees Summary Report");
 
+        List<String> headingCRM = new ArrayList<>();
+
         // Header, Child data
         listDataChild.put(listDataHeader.get(0), headingDashboard);
         listDataChild.put(listDataHeader.get(1), headingNotice);
@@ -1168,6 +1276,7 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
         listDataChild.put(listDataHeader.get(9), headingiCard);
         listDataChild.put(listDataHeader.get(10), headingStudentList);
         listDataChild.put(listDataHeader.get(11), headingReport);
+        listDataChild.put(listDataHeader.get(12), headingCRM);
 
         mMenuAdapter = new ExpandableListAdapter(this, listDataHeader, listDataChild, UserTypeID);
         expandableList.setAdapter(mMenuAdapter);
@@ -1197,13 +1306,13 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
                 }
 
                 if((i == 4) && (l == 4)) {
-                    if(activityName.equals(SyllabusMainScreen.class.getName())){
+                    if(activityName.equals(SyllabusMainScreenForAdmin.class.getName())){
                         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
                         if (drawer.isDrawerOpen(GravityCompat.START)) {
                             drawer.closeDrawer(GravityCompat.START);
                         }
                     } else {
-                        Intent intent = new Intent(getApplicationContext(), SyllabusMainScreen.class);
+                        Intent intent = new Intent(getApplicationContext(), SyllabusMainScreenForAdmin.class);
                         startActivity(intent);
                         finish();
                     }
@@ -1217,6 +1326,19 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
                         }
                     } else {
                         Intent intent = new Intent(getApplicationContext(), ReportAllStudentMain.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                }
+
+                if((i == 12) && (l == 12)) {
+                    if(activityName.equals(NewClientEntry.class.getName())){
+                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                        if (drawer.isDrawerOpen(GravityCompat.START)) {
+                            drawer.closeDrawer(GravityCompat.START);
+                        }
+                    } else {
+                        Intent intent = new Intent(getApplicationContext(), NewClientEntry.class);
                         startActivity(intent);
                         finish();
                     }
@@ -1295,26 +1417,26 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
                 }
 
                 if((i == 5) && (i1 == 0) && (l == 0)) {
-                    if(activityName.equals(HomeworkMainScreen.class.getName())){
+                    if(activityName.equals(HomeworkMainScreenForAdmin.class.getName())){
                         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
                         if (drawer.isDrawerOpen(GravityCompat.START)) {
                             drawer.closeDrawer(GravityCompat.START);
                         }
                     } else {
-                        Intent intent = new Intent(getApplicationContext(), HomeworkMainScreen.class);
+                        Intent intent = new Intent(getApplicationContext(), HomeworkMainScreenForAdmin.class);
                         startActivity(intent);
                         finish();
                     }
                 }
 
                 if((i == 5) && (i1 == 1) && (l == 1)) {
-                    if(activityName.equals(LessonPlanMainScreen.class.getName())){
+                    if(activityName.equals(LessonPlanMainScreenForAdmin.class.getName())){
                         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
                         if (drawer.isDrawerOpen(GravityCompat.START)) {
                             drawer.closeDrawer(GravityCompat.START);
                         }
                     } else {
-                        Intent intent = new Intent(getApplicationContext(), LessonPlanMainScreen.class);
+                        Intent intent = new Intent(getApplicationContext(), LessonPlanMainScreenForAdmin.class);
                         startActivity(intent);
                         finish();
                     }
@@ -1570,13 +1692,13 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
                 }
 
                 if((i == 4) && (l == 4)) {
-                    if(activityName.equals(SyllabusMainScreen.class.getName())){
+                    if(activityName.equals(SyllabusMainScreenForAdmin.class.getName())){
                         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
                         if (drawer.isDrawerOpen(GravityCompat.START)) {
                             drawer.closeDrawer(GravityCompat.START);
                         }
                     } else {
-                        Intent intent = new Intent(getApplicationContext(), SyllabusMainScreen.class);
+                        Intent intent = new Intent(getApplicationContext(), SyllabusMainScreenForAdmin.class);
                         startActivity(intent);
                         finish();
                     }
@@ -1655,26 +1777,26 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
                 }
 
                 if((i == 5) && (i1 == 0) && (l == 0)) {
-                    if(activityName.equals(HomeworkMainScreen.class.getName())){
+                    if(activityName.equals(HomeworkMainScreenForAdmin.class.getName())){
                         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
                         if (drawer.isDrawerOpen(GravityCompat.START)) {
                             drawer.closeDrawer(GravityCompat.START);
                         }
                     } else {
-                        Intent intent = new Intent(getApplicationContext(), HomeworkMainScreen.class);
+                        Intent intent = new Intent(getApplicationContext(), HomeworkMainScreenForAdmin.class);
                         startActivity(intent);
                         finish();
                     }
                 }
 
                 if((i == 5) && (i1 == 1) && (l == 1)) {
-                    if(activityName.equals(LessonPlanMainScreen.class.getName())){
+                    if(activityName.equals(LessonPlanMainScreenForAdmin.class.getName())){
                         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
                         if (drawer.isDrawerOpen(GravityCompat.START)) {
                             drawer.closeDrawer(GravityCompat.START);
                         }
                     } else {
-                        Intent intent = new Intent(getApplicationContext(), LessonPlanMainScreen.class);
+                        Intent intent = new Intent(getApplicationContext(), LessonPlanMainScreenForAdmin.class);
                         startActivity(intent);
                         finish();
                     }

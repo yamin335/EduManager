@@ -73,7 +73,8 @@ public class LessonPlanMainScreen extends SideNavigationMenuParentActivity imple
     private DigitalContentAdapter mDigitalAdapter, mLessonPlanDigitalAdapter;
     private LessonPlanAdapter mAdapter;
     private DatePickerDialog datePickerDialog;
-    private ProgressDialog mDigitalDialog, mLessonDialog, mLessonDigitalDialog;
+    private ProgressDialog mDigitalDialog, mLessonDialog;
+    private String selectedDate = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,7 +107,7 @@ public class LessonPlanMainScreen extends SideNavigationMenuParentActivity imple
 
         Date date = Calendar.getInstance().getTime();
         SimpleDateFormat df = new SimpleDateFormat("MM-dd-yyyy");
-        String today = df.format(date);
+        selectedDate = df.format(date);
 
         mAdapter = new LessonPlanAdapter(this, lessonPlanList, this);
         lessonPlanRecycler = findViewById(R.id.lessonRecycler);
@@ -157,30 +158,36 @@ public class LessonPlanMainScreen extends SideNavigationMenuParentActivity imple
             }
         });
 
+        if (UserTypeID == 1 || UserTypeID == 2 || UserTypeID == 4){
+            Intent intent = getIntent();
+            LoggedUserMediumID = intent.getLongExtra("MediumID", 0);
+            LoggedUserClassID = intent.getLongExtra("ClassID", 0);
+            LoggedUserDepartmentID = intent.getLongExtra("DepartmentID", 0);
+            LoggedUserSectionID = intent.getLongExtra("SectionID", 0);
+            selectedDate = intent.getStringExtra("Date");
+        } else if(UserTypeID == 5) {
+            try {
+                JSONObject selectedStudent = new JSONObject(getSharedPreferences("CURRENT_STUDENT", Context.MODE_PRIVATE)
+                        .getString("guardianSelectedStudent", "{}"));
+                LoggedUserMediumID = selectedStudent.getLong("MediumID");
+                LoggedUserClassID = selectedStudent.getLong("ClassID");
+                LoggedUserDepartmentID = selectedStudent.getLong("DepartmentID");
+                LoggedUserSectionID = selectedStudent.getLong("SectionID");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
         registerReceiver(onComplete, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
-        lessonPlanGetRequest(today);
+        lessonPlanGetRequest(selectedDate);
     }
 
     private void lessonPlanGetRequest(String date) {
         if (StaticHelperClass.isNetworkAvailable(this)) {
 
-            String lessonPlanUrl = "";
-            if(UserTypeID == 3) {
-                lessonPlanUrl = getString(R.string.baseUrl)+"/api/onEms/getDateWiseLessonPlan/"+InstituteID+
-                        "/"+LoggedUserMediumID+"/"+LoggedUserClassID+"/"+LoggedUserDepartmentID+"/"+
-                        LoggedUserSectionID+"/"+date;
-            } else if(UserTypeID == 5) {
-                try {
-                    JSONObject selectedStudent = new JSONObject(getSharedPreferences("CURRENT_STUDENT", Context.MODE_PRIVATE)
-                            .getString("guardianSelectedStudent", "{}"));
-                    lessonPlanUrl = getString(R.string.baseUrl)+"/api/onEms/getMyInsHomeWork/"+InstituteID+
-                            "/"+selectedStudent.getString("MediumID")+"/"+selectedStudent.getString("ClassID")
-                            +"/"+selectedStudent.getString("DepartmentID")+"/"+selectedStudent.getString("SectionID")
-                            +"/"+date;
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
+            String lessonPlanUrl = getString(R.string.baseUrl)+"/api/onEms/getDateWiseLessonPlan/"+InstituteID+
+                    "/"+LoggedUserMediumID+"/"+LoggedUserClassID+"/"+LoggedUserDepartmentID+"/"+
+                    LoggedUserSectionID+"/"+date;
 
             mLessonDialog = new ProgressDialog(this);
             mLessonDialog.setTitle("Loading lesson plan...");
@@ -199,6 +206,22 @@ public class LessonPlanMainScreen extends SideNavigationMenuParentActivity imple
                     }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
+                    digitalContentList.clear();
+                    mDigitalAdapter.notifyDataSetChanged();
+                    digitalContentEmpty.setVisibility(View.VISIBLE);
+
+                    lessonPlanList.clear();
+                    mAdapter.notifyDataSetChanged();
+                    lessonPlanEmpty.setVisibility(View.VISIBLE);
+
+                    homeworkDate.setText("");
+                    topicTitle.setText("");
+                    topicDetails.setText("");
+
+                    lessonPlanDigitalContentList.clear();
+                    mLessonPlanDigitalAdapter.notifyDataSetChanged();
+                    lessonDigitalEmpty.setVisibility(View.VISIBLE);
+
                     mLessonDialog.dismiss();
                     Toast.makeText(LessonPlanMainScreen.this,"Lesson plan not found!!! ",
                             Toast.LENGTH_LONG).show();
@@ -235,12 +258,21 @@ public class LessonPlanMainScreen extends SideNavigationMenuParentActivity imple
                 e.printStackTrace();
             }
         } else {
-            lessonPlanList.clear();
-            mAdapter.notifyDataSetChanged();
-            lessonPlanEmpty.setVisibility(View.VISIBLE);
             digitalContentList.clear();
             mDigitalAdapter.notifyDataSetChanged();
             digitalContentEmpty.setVisibility(View.VISIBLE);
+
+            lessonPlanList.clear();
+            mAdapter.notifyDataSetChanged();
+            lessonPlanEmpty.setVisibility(View.VISIBLE);
+
+            homeworkDate.setText("");
+            topicTitle.setText("");
+            topicDetails.setText("");
+
+            lessonPlanDigitalContentList.clear();
+            mLessonPlanDigitalAdapter.notifyDataSetChanged();
+            lessonDigitalEmpty.setVisibility(View.VISIBLE);
             Toast.makeText(this,"Lesson plan not found!!! ",
                     Toast.LENGTH_LONG).show();
         }
@@ -275,6 +307,9 @@ public class LessonPlanMainScreen extends SideNavigationMenuParentActivity imple
                     }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
+                    digitalContentList.clear();
+                    mDigitalAdapter.notifyDataSetChanged();
+                    digitalContentEmpty.setVisibility(View.VISIBLE);
                     mDigitalDialog.dismiss();
                     Toast.makeText(LessonPlanMainScreen.this,"Digital content not found!!! ",
                             Toast.LENGTH_LONG).show();
@@ -307,14 +342,13 @@ public class LessonPlanMainScreen extends SideNavigationMenuParentActivity imple
             } catch (JSONException e) {
                 e.printStackTrace();
             }
+        } else {
+            digitalContentList.clear();
+            mDigitalAdapter.notifyDataSetChanged();
+            digitalContentEmpty.setVisibility(View.VISIBLE);
+            Toast.makeText(this,"Digital content not found!!! ",
+                    Toast.LENGTH_LONG).show();
         }
-//        else {
-//            digitalContentList.clear();
-//            mDigitalAdapter.notifyDataSetChanged();
-//            digitalContentEmpty.setVisibility(View.VISIBLE);
-//            Toast.makeText(this,"Digital content not found!!! ",
-//                    Toast.LENGTH_LONG).show();
-//        }
         mDigitalDialog.dismiss();
     }
 
@@ -335,6 +369,9 @@ public class LessonPlanMainScreen extends SideNavigationMenuParentActivity imple
                     }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
+                    lessonPlanDigitalContentList.clear();
+                    mLessonPlanDigitalAdapter.notifyDataSetChanged();
+                    lessonDigitalEmpty.setVisibility(View.VISIBLE);
                     mDigitalDialog.dismiss();
                     Toast.makeText(LessonPlanMainScreen.this,"Digital content not found!!! ",
                             Toast.LENGTH_LONG).show();
@@ -384,11 +421,11 @@ public class LessonPlanMainScreen extends SideNavigationMenuParentActivity imple
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else if(UserTypeID == 1) {
-            Intent mainIntent = new Intent(LessonPlanMainScreen.this, TeacherMainScreen.class);
+            Intent mainIntent = new Intent(LessonPlanMainScreen.this, LessonPlanMainScreenForAdmin.class);
             startActivity(mainIntent);
             finish();
         } else if(UserTypeID == 2) {
-            Intent mainIntent = new Intent(LessonPlanMainScreen.this, TeacherMainScreen.class);
+            Intent mainIntent = new Intent(LessonPlanMainScreen.this, LessonPlanMainScreenForAdmin.class);
             startActivity(mainIntent);
             finish();
         } else if(UserTypeID == 3) {
@@ -396,7 +433,7 @@ public class LessonPlanMainScreen extends SideNavigationMenuParentActivity imple
             startActivity(mainIntent);
             finish();
         } else if(UserTypeID == 4) {
-            Intent mainIntent = new Intent(LessonPlanMainScreen.this, TeacherMainScreen.class);
+            Intent mainIntent = new Intent(LessonPlanMainScreen.this, LessonPlanMainScreenForAdmin.class);
             startActivity(mainIntent);
             finish();
         } else if(UserTypeID == 5) {

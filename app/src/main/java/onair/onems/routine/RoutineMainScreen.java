@@ -13,12 +13,14 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -68,6 +70,9 @@ public class RoutineMainScreen extends SideNavigationMenuParentActivity implemen
         LinearLayout parentActivityLayout = (LinearLayout) findViewById(R.id.contentMain);
         parentActivityLayout.addView(childActivityLayout, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
 
+        viewPager = (ViewPager) findViewById(R.id.pager);
+        tabLayout = (TabLayout) findViewById(R.id.tabLayout);
+
         saturdayJsonArray = new JSONArray();
         sundayJsonArray = new JSONArray();
         mondayJsonArray = new JSONArray();
@@ -97,9 +102,6 @@ public class RoutineMainScreen extends SideNavigationMenuParentActivity implemen
             RoutineDataGetRequest(0);
         }
 
-        viewPager = (ViewPager) findViewById(R.id.pager);
-        tabLayout = (TabLayout) findViewById(R.id.tabLayout);
-
         if(UserTypeID!=1 && UserTypeID!=2 && UserTypeID!=4){
             setupViewPager(viewPager);
             tabLayout.setupWithViewPager(viewPager);
@@ -115,9 +117,9 @@ public class RoutineMainScreen extends SideNavigationMenuParentActivity implemen
         }
     }
 
-    class ViewPagerAdapter extends FragmentPagerAdapter {
-        private final List<Fragment> mFragmentList = new ArrayList<>();
-        private final List<String> mFragmentTitleList = new ArrayList<>();
+    class ViewPagerAdapter extends FragmentStatePagerAdapter {
+        private List<Fragment> mFragmentList = new ArrayList<>();
+        private List<String> mFragmentTitleList = new ArrayList<>();
 
         ViewPagerAdapter(FragmentManager manager) {
             super(manager);
@@ -141,6 +143,11 @@ public class RoutineMainScreen extends SideNavigationMenuParentActivity implemen
         @Override
         public CharSequence getPageTitle(int position) {
             return mFragmentTitleList.get(position);
+        }
+
+        @Override
+        public Object instantiateItem(ViewGroup container, int position) {
+            return super.instantiateItem(container, position);
         }
     }
 
@@ -228,6 +235,7 @@ public class RoutineMainScreen extends SideNavigationMenuParentActivity implemen
             adapter.addFragment(new Friday(), "Fri");
         }
         viewPager.setAdapter(adapter);
+        adapter.notifyDataSetChanged();
         Calendar c = Calendar.getInstance();
         int currentDay = c.get(Calendar.DAY_OF_WEEK);
         viewPager.setCurrentItem(currentDay);

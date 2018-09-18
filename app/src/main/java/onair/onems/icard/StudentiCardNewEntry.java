@@ -997,8 +997,7 @@ public class StudentiCardNewEntry extends SideNavigationMenuParentActivity {
         return false;
     }
 
-    private String encodeImage(Bitmap bm)
-    {
+    private String encodeImage(Bitmap bm) {
         bm = getResizedBitmap(bm, 500);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         bm.compress(Bitmap.CompressFormat.JPEG,100,baos);

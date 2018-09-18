@@ -9,10 +9,9 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
     <LinearLayout
-        android:id="@+id/shiftLayout"
+        android:id="@+id/mediumLayout"
         android:layout_width="match_parent"
         android:layout_height="40dp"
-        android:layout_alignParentTop="true"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
@@ -28,37 +27,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0">
-
-        <Spinner
-            android:id="@+id/spinnerShift"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:backgroundTint="#000000"
-            android:popupBackground="@drawable/drop_down_menu"
-            android:spinnerMode="dropdown" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/mediumLayout"
-        android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:layout_below="@+id/shiftLayout"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:background="@drawable/spinner_background"
-        android:elevation="5dp"
-        android:orientation="vertical"
-        android:paddingEnd="10dp"
-        android:paddingLeft="20dp"
-        android:paddingRight="10dp"
-        android:paddingStart="20dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/shiftLayout"
         app:layout_constraintVertical_bias="0.0">
 
         <Spinner
@@ -163,42 +131,12 @@
             android:spinnerMode="dropdown" />
     </LinearLayout>
 
-    <LinearLayout
-        android:id="@+id/subjectLayout"
-        android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:layout_below="@id/sectionLayout"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:background="@drawable/spinner_background"
-        android:elevation="5dp"
-        android:paddingEnd="10dp"
-        android:paddingLeft="20dp"
-        android:paddingRight="10dp"
-        android:paddingStart="20dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/sectionLayout"
-        app:layout_constraintVertical_bias="0.0">
-
-        <Spinner
-            android:id="@+id/spinnerSubject"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:backgroundTint="#000000"
-            android:popupBackground="@drawable/drop_down_menu"
-            android:spinnerMode="dropdown" />
-    </LinearLayout>
 
     <Button
         android:id="@+id/pickDate"
         android:layout_width="wrap_content"
         android:layout_height="30dp"
         android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
         android:layout_below="@id/subjectLayout"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
@@ -214,14 +152,15 @@
         android:text="Pick Date"
         android:textAllCaps="false"
         android:textColor="@android:color/white"
-        app:layout_constraintBottom_toTopOf="@+id/takeAttendance"
+        app:layout_constraintBottom_toTopOf="@+id/showSyllabus"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/subjectLayout" />
+        app:layout_constraintTop_toBottomOf="@+id/sectionLayout"
+        app:layout_constraintVertical_bias="0.06999999" />
 
     <Button
-        android:id="@+id/takeAttendance"
+        android:id="@+id/showSyllabus"
         android:layout_width="match_parent"
         android:layout_height="35dp"
         android:layout_alignParentBottom="true"
@@ -230,7 +169,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:background="@drawable/button"
-        android:text="Take Attendance"
+        android:text="Show Syllabus"
         android:textAllCaps="false"
         android:textColor="@android:color/white"
         android:textSize="18sp"

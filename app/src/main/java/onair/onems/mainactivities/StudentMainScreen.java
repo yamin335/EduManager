@@ -3,6 +3,7 @@ package onair.onems.mainactivities;
 import android.app.AlertDialog;
 import android.app.Notification;
 import android.app.PendingIntent;
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -30,13 +31,22 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
 import com.google.firebase.messaging.FirebaseMessaging;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
+import onair.onems.Services.StaticHelperClass;
 import onair.onems.app.Config;
 import onair.onems.contacts.ContactsMainScreen;
 import onair.onems.fee.FeeMainScreen;
@@ -44,6 +54,7 @@ import onair.onems.R;
 import onair.onems.attendance.StudentAttendanceReport;
 import onair.onems.homework.HomeworkMainScreen;
 import onair.onems.login.LoginScreen;
+import onair.onems.network.MySingleton;
 import onair.onems.notice.NoticeMainScreen;
 import onair.onems.notification.NotificationDetails;
 import onair.onems.notification.NotificationMainScreen;
@@ -68,6 +79,8 @@ public class StudentMainScreen extends AppCompatActivity {
     private TextView textDashboard, textProfile, textNotification, textContacts, notificationCounter;
     private ImageView iconDashboard, iconProfile, iconNotification, iconContacts;
     private BroadcastReceiver mRegistrationBroadcastReceiver;
+    private ProgressDialog dialog;
+    private boolean returnValue = false;
 
     @Override
     protected void onStart() {
@@ -120,12 +133,19 @@ public class StudentMainScreen extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.dashboard_student);
 
-
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         InstituteID = prefs.getLong("InstituteID",0);
         LoggedUserID = prefs.getString("UserID", "0");
         UserName = prefs.getString("UserName", "0");
         dimView = findViewById(R.id.dim);
+        dimView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(isFabOpen){
+                    animateFAB();
+                }
+            }
+        });
         initializeFabAnimations();
         fabMenu = findViewById(R.id.floatingMenu);
 //        fabMenu.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#5f27cd")));
@@ -143,13 +163,7 @@ public class StudentMainScreen extends AppCompatActivity {
         fabLogout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                SharedPreferences sharedPreferences  = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
-                SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.putBoolean("LogInState", false);
-                editor.apply();
-                Intent intent = new Intent(getApplicationContext(), LoginScreen.class);
-                startActivity(intent);
-                finish();
+                logOut();
             }
         });
 
@@ -487,6 +501,7 @@ public class StudentMainScreen extends AppCompatActivity {
             @Override
             public void onAnimationStart(Animation animation) {
                 dimView.setVisibility(View.VISIBLE);
+                dimView.setClickable(true);
                 fabChangeUserType.setVisibility(View.VISIBLE);
                 cardChangeUserType.setVisibility(View.VISIBLE);
                 fabChangePassword.setVisibility(View.VISIBLE);
@@ -522,6 +537,7 @@ public class StudentMainScreen extends AppCompatActivity {
                 cardChangeUserType.setVisibility(View.GONE);
                 fabChangeUserType.setVisibility(View.GONE);
                 dimView.setVisibility(View.GONE);
+                dimView.setClickable(false);
             }
 
             @Override
@@ -592,6 +608,79 @@ public class StudentMainScreen extends AppCompatActivity {
                     });
             AlertDialog alert = builder.create();
             alert.show();
+        }
+    }
+
+
+    private boolean logOut() {
+        if (StaticHelperClass.isNetworkAvailable(this)) {
+
+            String logOutUrl = getString(R.string.baseUrl)+"/api/onEms/deleteFcmToken/"+LoggedUserID+"/"+"android"+"/"+getSharedPreferences("UNIQUE_ID", Context.MODE_PRIVATE)
+                    .getString("uuid", "");
+
+            dialog = new ProgressDialog(this);
+            dialog.setTitle("Logging Out...");
+            dialog.setMessage("Please Wait...");
+            dialog.setCancelable(false);
+            dialog.setIcon(R.drawable.onair);
+            dialog.show();
+            //Preparing Shift data from server
+            StringRequest loginRequest = new StringRequest(Request.Method.DELETE, logOutUrl,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+
+                            doLogOut(response);
+
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    returnValue = false;
+                    dialog.dismiss();
+                    Toast.makeText(StudentMainScreen.this,"Server error while logging out!!! ",
+                            Toast.LENGTH_LONG).show();
+                }
+            })
+            {
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    Map<String, String>  params = new HashMap<>();
+                    params.put("Authorization", "Request_From_onEMS_Android_app");
+                    return params;
+                }
+            };
+            MySingleton.getInstance(this).addToRequestQueue(loginRequest);
+        } else {
+            Toast.makeText(StudentMainScreen.this,"Please check your internet connection and select again!!! ",
+                    Toast.LENGTH_LONG).show();
+        }
+        return returnValue;
+    }
+
+    private void doLogOut(String returnValueFromServer) {
+        try {
+            if (new JSONArray(returnValueFromServer).getJSONObject(0).getInt("ReturnValue") == 1) {
+                SharedPreferences sharedPreferences  = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putBoolean("LogInState", false);
+                editor.apply();
+
+                getSharedPreferences("PUSH_NOTIFICATIONS", Context.MODE_PRIVATE)
+                        .edit()
+                        .putString("notifications", "[]")
+                        .apply();
+
+                returnValue = true;
+                Intent intent = new Intent(getApplicationContext(), LoginScreen.class);
+                startActivity(intent);
+                finish();
+            } else {
+                returnValue = false;
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
     }
 }

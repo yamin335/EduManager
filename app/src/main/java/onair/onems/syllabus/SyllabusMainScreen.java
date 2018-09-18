@@ -68,7 +68,7 @@ public class SyllabusMainScreen extends SideNavigationMenuParentActivity impleme
         FloatingMenuDialog.FloatingMenuListener, DigitalContentAdapter.AddFileToDownloader{
 
     private ProgressDialog mExamDialog, mSyllabusDialog, mSubjectDialog, mContentDialog, mLessonContentDialog;
-    private String selectedSubjectID = null, selectedExamID = null;
+    private String selectedSubjectID = "", selectedExamID = "", selectedDate = "";
     private TextView error, lessonError, topicValue, detailValue, syllabusTime;
     private View shadow;
     private FloatingActionButton floatingMenu;
@@ -77,6 +77,7 @@ public class SyllabusMainScreen extends SideNavigationMenuParentActivity impleme
     private DigitalContentAdapter mAdapter;
     private DigitalContentAdapter mLessonAdapter;
     private ArrayList<JSONObject> lessonDigitalContentUrls;
+    private Intent intent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,6 +89,8 @@ public class SyllabusMainScreen extends SideNavigationMenuParentActivity impleme
         final View rowView = inflater.inflate(R.layout.syllabus_main_screen, null);
         LinearLayout parent = (LinearLayout) findViewById(R.id.contentMain);
         parent.addView(rowView, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
+
+        intent = getIntent();
 
         error = findViewById(R.id.empty);
         lessonError = findViewById(R.id.lessonEmpty);
@@ -119,6 +122,12 @@ public class SyllabusMainScreen extends SideNavigationMenuParentActivity impleme
         floatingMenu.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#FF5722")));
         floatingMenu.setRippleColor(Color.parseColor("#e50b00"));
 
+//        if (UserTypeID == 1 || UserTypeID == 2 || UserTypeID == 4) {
+//
+//            floatingMenu.setVisibility(View.GONE);
+//            floatingMenu.setClickable(false);
+//        }
+
         floatingMenu.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -143,9 +152,19 @@ public class SyllabusMainScreen extends SideNavigationMenuParentActivity impleme
             }
         });
 
+        Date date = Calendar.getInstance().getTime();
+        SimpleDateFormat df = new SimpleDateFormat("MM-dd-yyyy");
+        selectedDate = df.format(date);
 
-
-        if(UserTypeID == 5) {
+        if (UserTypeID == 1 || UserTypeID == 2 || UserTypeID == 4){
+            LoggedUserMediumID = intent.getLongExtra("MediumID", 0);
+            LoggedUserClassID = intent.getLongExtra("ClassID", 0);
+            LoggedUserDepartmentID = intent.getLongExtra("DepartmentID", 0);
+            LoggedUserSectionID = intent.getLongExtra("SectionID", 0);
+            selectedSubjectID = Long.toString(intent.getLongExtra("SubjectID", 0));
+            selectedExamID = Long.toString(intent.getLongExtra("ExamID", 0));
+            selectedDate = intent.getStringExtra("Date");
+        } else if(UserTypeID == 5) {
             try {
                 JSONObject selectedStudent = new JSONObject(getSharedPreferences("CURRENT_STUDENT", Context.MODE_PRIVATE)
                         .getString("guardianSelectedStudent", "{}"));
@@ -157,7 +176,12 @@ public class SyllabusMainScreen extends SideNavigationMenuParentActivity impleme
                 e.printStackTrace();
             }
         }
-        examDataGetRequest();
+
+        if (UserTypeID != 1 && UserTypeID != 2 && UserTypeID != 4) {
+            examDataGetRequest();
+        } else {
+            syllabusDataGetRequest(intent.getStringExtra("Date"));
+        }
         registerReceiver(onComplete, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
     }
 
@@ -346,11 +370,8 @@ public class SyllabusMainScreen extends SideNavigationMenuParentActivity impleme
     public void onSubjectSelected(JSONObject subject) {
         try {
             selectedSubjectID = subject.getString("SubjectID");
-            Date date = Calendar.getInstance().getTime();
-            SimpleDateFormat df = new SimpleDateFormat("MM-dd-yyyy");
-            String today = df.format(date);
             if(selectedExamID!=null && selectedSubjectID!=null) {
-                syllabusDataGetRequest(today);
+                syllabusDataGetRequest(selectedDate);
             } else {
                 Toast.makeText(SyllabusMainScreen.this,"Select exam and subject!!! ",
                         Toast.LENGTH_LONG).show();
@@ -362,7 +383,6 @@ public class SyllabusMainScreen extends SideNavigationMenuParentActivity impleme
 
     private void syllabusDataGetRequest(String date) {
         if (StaticHelperClass.isNetworkAvailable(this)) {
-
             String syllabusUrl = getString(R.string.baseUrl)+"/api/onEms/getAcademicClassDayForMySyllabus/"+
                     InstituteID+"/"+LoggedUserMediumID+"/"+LoggedUserClassID+"/"+LoggedUserDepartmentID+"/"+
                     LoggedUserSectionID+"/"+selectedSubjectID+"/"+selectedExamID+"/"+date+"/"+date;
@@ -509,7 +529,7 @@ public class SyllabusMainScreen extends SideNavigationMenuParentActivity impleme
             mLessonContentDialog.setMessage("Please Wait...");
             mLessonContentDialog.setCancelable(false);
             mLessonContentDialog.setIcon(R.drawable.onair);
-            mLessonContentDialog.show();
+//            mLessonContentDialog.show();
 
             //Preparing digital content
             StringRequest request = new StringRequest(Request.Method.GET, url,
@@ -572,11 +592,11 @@ public class SyllabusMainScreen extends SideNavigationMenuParentActivity impleme
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else if(UserTypeID == 1) {
-            Intent mainIntent = new Intent(SyllabusMainScreen.this, TeacherMainScreen.class);
+            Intent mainIntent = new Intent(SyllabusMainScreen.this, SyllabusMainScreenForAdmin.class);
             startActivity(mainIntent);
             finish();
         } else if(UserTypeID == 2) {
-            Intent mainIntent = new Intent(SyllabusMainScreen.this, TeacherMainScreen.class);
+            Intent mainIntent = new Intent(SyllabusMainScreen.this, SyllabusMainScreenForAdmin.class);
             startActivity(mainIntent);
             finish();
         } else if(UserTypeID == 3) {
@@ -584,7 +604,7 @@ public class SyllabusMainScreen extends SideNavigationMenuParentActivity impleme
             startActivity(mainIntent);
             finish();
         } else if(UserTypeID == 4) {
-            Intent mainIntent = new Intent(SyllabusMainScreen.this, TeacherMainScreen.class);
+            Intent mainIntent = new Intent(SyllabusMainScreen.this, SyllabusMainScreenForAdmin.class);
             startActivity(mainIntent);
             finish();
         } else if(UserTypeID == 5) {
@@ -599,7 +619,8 @@ public class SyllabusMainScreen extends SideNavigationMenuParentActivity impleme
         if(menuId == R.id.selectExam) {
             examDataGetRequest();
         } else if(menuId == R.id.selectDate) {
-            syllabusDataGetRequest(date);
+            selectedDate = date;
+            syllabusDataGetRequest(selectedDate);
         }
     }
 

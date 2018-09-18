@@ -301,8 +301,8 @@ public class TakeAttendance extends SideNavigationMenuParentActivity {
                         SectionDataGetRequest();
                         if(hasDepartment){
                             SubjectDataGetRequest();
+                            selectedSubject = null;
                         }
-                        selectedSubject = null;
                     } catch (IndexOutOfBoundsException e) {
                         Toast.makeText(TakeAttendance.this,"No department found !!!",Toast.LENGTH_LONG).show();
                     }
@@ -310,7 +310,9 @@ public class TakeAttendance extends SideNavigationMenuParentActivity {
                     if(firstDepartment++>1) {
                         selectedDepartment = new DepartmentModel();
                         selectedSection = new SectionModel();
-                        selectedSubject = null;
+                        if(hasDepartment){
+                            selectedSubject = null;
+                        }
                     }
                 }
             }
@@ -543,6 +545,7 @@ public class TakeAttendance extends SideNavigationMenuParentActivity {
             if(allDepartmentArrayList.size() == 0){
                 SectionDataGetRequest();
             }
+            hasDepartment = allDepartmentArrayList.size() > 0;
             try {
                 String[] strings = new String[departmentArrayList.size()];
                 strings = departmentArrayList.toArray(strings);

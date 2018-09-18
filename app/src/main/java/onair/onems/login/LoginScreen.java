@@ -82,26 +82,6 @@ public class LoginScreen extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-//        if (!prefs.getBoolean("firstTime", false)) {
-//            // <---- run your one time code here
-//            createNotificationChannel();
-//            sharedPreferences  = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
-//            SharedPreferences.Editor editor = sharedPreferences.edit();
-//            editor.putBoolean("LogInState", false);
-//            editor.apply();
-//
-//            //Device unique installation ID
-//            this.getSharedPreferences("UNIQUE_ID", Context.MODE_PRIVATE)
-//                    .edit()
-//                    .putString("uuid", UUID.randomUUID().toString())
-//                    .apply();
-//
-//            // mark first time has run.
-//            SharedPreferences.Editor defaultEditor = prefs.edit();
-//            defaultEditor.putBoolean("firstTime", true);
-//            defaultEditor.apply();
-//        }
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         if (!prefs.getBoolean("firstTime", false)) {
             // <---- run your one time code here

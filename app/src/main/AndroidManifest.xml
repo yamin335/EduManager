@@ -14,7 +14,7 @@
         android:allowBackup="true"
         android:icon="@drawable/onair"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@drawable/onair"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <provider
@@ -348,25 +348,40 @@
             android:name=".notification.NotificationMainScreen"
             android:label="Notifications"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar">
-
-        </activity>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".user.Profile"
             android:label="Profile"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar">
-
-        </activity>
-        <activity android:name=".notification.NotificationDetails"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".notification.NotificationDetails"
+            android:excludeFromRecents="true"
             android:label="Notification Details"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar"
             android:launchMode="singleInstance"
+            android:screenOrientation="portrait"
             android:taskAffinity=""
-            android:excludeFromRecents="true">
-
-        </activity>
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".syllabus.SyllabusMainScreenForAdmin"
+            android:label="Syllabus"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".homework.HomeworkMainScreenForAdmin"
+            android:label="Homework"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".lesson_plan.LessonPlanMainScreenForAdmin"
+            android:label="Lesson Plan"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".crm.NewClientEntry"
+            android:label="New client entry"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden|adjustPan"></activity>
+        <activity android:name=".crm.ClientCommunicationDetail"
+            android:label="Communication details"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden|adjustPan"></activity>
     </application>
 
 </manifest>
