@@ -119,13 +119,13 @@
             app:layout_constraintVertical_bias="0.0">
 
             <android.support.v7.widget.RecyclerView
-                android:id="@+id/recyclerVCard"
+                android:id="@+id/recycler"
                 android:layout_width="match_parent"
                 android:layout_height="100dp"
                 android:scrollbars="horizontal" />
 
             <ImageView
-                android:id="@+id/addVCard"
+                android:id="@+id/addFile"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"
