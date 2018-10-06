@@ -4,10 +4,13 @@
     android:layout_height="match_parent"
     android:layout_width="match_parent"
     android:nestedScrollingEnabled="true"
+    android:background="#ffffff"
     xmlns:android="http://schemas.android.com/apk/res/android">
-    <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <android.support.constraint.ConstraintLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/mainContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -34,9 +37,9 @@
                 android:layout_weight="1"
                 android:background="@drawable/spinner_background"
                 android:elevation="5dp"
-                android:gravity="center_vertical"
-                android:paddingEnd="10dp"
-                android:paddingStart="20dp">
+                android:paddingEnd="0dp"
+                android:paddingStart="5dp"
+                android:gravity="center_vertical">
 
                 <Spinner
                     android:id="@+id/spinnerInstitute"
@@ -57,8 +60,8 @@
                 android:background="@drawable/spinner_background"
                 android:elevation="5dp"
                 android:gravity="center_vertical"
-                android:paddingEnd="10dp"
-                android:paddingStart="20dp">
+                android:paddingEnd="0dp"
+                android:paddingStart="5dp">
 
                 <Spinner
                     android:id="@+id/spinnerPriority"
@@ -109,6 +112,25 @@
             app:layout_constraintTop_toBottomOf="@+id/InstituteName"
             app:layout_constraintVertical_bias="0.0" />
 
+        <EditText
+            android:id="@+id/contactNumber"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/client_edittext"
+            android:ems="10"
+            android:hint="Institute contact No."
+            android:inputType="number"
+            android:padding="5dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/headMasterName"
+            app:layout_constraintVertical_bias="0.0" />
+
         <LinearLayout
             android:id="@+id/linearCombined"
             android:layout_width="match_parent"
@@ -121,32 +143,32 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/headMasterName"
+            app:layout_constraintTop_toBottomOf="@+id/contactNumber"
             app:layout_constraintVertical_bias="0.0">
 
             <EditText
                 android:id="@+id/studentNo"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginEnd="3dp"
                 android:layout_weight="1"
                 android:background="@drawable/client_edittext"
                 android:ems="10"
                 android:hint="No. of students"
-                android:inputType="numberDecimal"
-                android:padding="5dp"
-                android:layout_marginEnd="3dp" />
+                android:inputType="number"
+                android:padding="5dp" />
 
             <EditText
                 android:id="@+id/teacherNo"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="3dp"
                 android:layout_weight="1"
                 android:background="@drawable/client_edittext"
                 android:ems="10"
                 android:hint="No. of teachers"
-                android:inputType="numberDecimal"
-                android:padding="5dp"
-                android:layout_marginStart="3dp" />
+                android:inputType="number"
+                android:padding="5dp" />
         </LinearLayout>
 
         <EditText
@@ -306,5 +328,27 @@
             app:layout_constraintTop_toBottomOf="@+id/linearPhoto"
             app:layout_constraintVertical_bias="1.0" />
 
+        <View
+            android:id="@+id/whiteBackground"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="#ffffff"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            style="@style/MyProgressBarRectangle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.39999998" />
+
     </android.support.constraint.ConstraintLayout>
 </ScrollView>
+

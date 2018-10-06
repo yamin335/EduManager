@@ -2,6 +2,7 @@ package onair.onems.crm;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -11,6 +12,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
@@ -20,17 +22,42 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import onair.onems.R;
+import onair.onems.Services.StaticHelperClass;
+import onair.onems.attendance.TakeAttendanceDetails;
+import onair.onems.customised.CustomRequest;
+import onair.onems.models.InstituteTypeModel;
+import onair.onems.models.MediumModel;
+import onair.onems.models.PriorityModel;
+import onair.onems.models.SessionModel;
+import onair.onems.network.MySingleton;
+import onair.onems.routine.ExamRoutineMainScreen;
 import onair.onems.utils.ImageUtils;
 import onair.onems.mainactivities.SideNavigationMenuParentActivity;
 import onair.onems.mainactivities.StudentMainScreen;
@@ -39,8 +66,12 @@ import onair.onems.mainactivities.TeacherMainScreen;
 public class NewClientEntry extends SideNavigationMenuParentActivity implements ImageAdapter.DeleteImage, ImageAdapter.ViewImage{
 
     private Spinner spinnerInsType, spinnerPriorityType;
-    private String[] tempInsType = {"Institute Type", "University", "College", "School"};
-    private String[] tempPriorityType = {"Priority", "High", "Medium", "Low"};
+    private ArrayList<InstituteTypeModel> allInstituteType;
+    private ArrayList<PriorityModel> allPriority;
+    private InstituteTypeModel selectedInstituteType;
+    private PriorityModel selectedPriority;
+    private String[] tempInsType = {"Institute Type"};
+    private String[] tempPriorityType = {"Priority"};
     private RecyclerView recyclerCard, recyclerPhoto;
     private ArrayList<Bitmap> vCardBitmapArray;
     private ArrayList<Bitmap> photoBitmapArray;
@@ -54,7 +85,10 @@ public class NewClientEntry extends SideNavigationMenuParentActivity implements 
     private static final int VCARD = 1;
     private static final int PHOTO = 2;
     private CoordinatorLayout coordinatorLayout;
-
+    private JSONObject newClient;
+    private ProgressBar progressBar;
+    private View whiteBackground;
+    private TextView instituteName, contactPerson, contactNumber, noOfStudent, noOfTeacher, instituteAddress, comment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,7 +101,50 @@ public class NewClientEntry extends SideNavigationMenuParentActivity implements 
         LinearLayout parentActivityLayout = (LinearLayout) findViewById(R.id.contentMain);
         parentActivityLayout.addView(childActivityLayout, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
 
+        instituteName = findViewById(R.id.InstituteName);
+        contactPerson = findViewById(R.id.headMasterName);
+        contactNumber = findViewById(R.id.contactNumber);
+        noOfStudent = findViewById(R.id.studentNo);
+        noOfTeacher = findViewById(R.id.teacherNo);
+        instituteAddress = findViewById(R.id.address);
+        comment = findViewById(R.id.comments);
+
+        newClient = new JSONObject();
+        try {
+            newClient.put("NewClientID", 0);
+            newClient.put("InstituteTypeID", 0);
+            newClient.put("PriorityID", 0);
+            newClient.put("InsName", "");
+            newClient.put("ContactPerson", "");
+            newClient.put("ContactNumber", "");
+            newClient.put("NoOfStudent", 0);
+            newClient.put("NoOfTeacher", 0);
+            newClient.put("InstituteAddress", "");
+            newClient.put("Comments", "");
+            newClient.put("CreateBy", 0);
+            newClient.put("CreateOn", null);
+            newClient.put("CreatePc", null);
+            newClient.put("UpdateBy", null);
+            newClient.put("UpdateOn", null);
+            newClient.put("UpdatePc", null);
+            newClient.put("IsDeleted", 0);
+            newClient.put("DeleteBy", null);
+            newClient.put("DeleteOn", null);
+            newClient.put("DeletePc", null);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
         coordinatorLayout = findViewById(R.id.coordinator_layout);
+        whiteBackground = findViewById(R.id.whiteBackground);
+        progressBar = findViewById(R.id.progressBar);
+        progressBar.setVisibility(View.INVISIBLE);
+        whiteBackground.setVisibility(View.INVISIBLE);
+
+        allInstituteType= new ArrayList<>();
+        allPriority = new ArrayList<>();
+        selectedInstituteType = new InstituteTypeModel();
+        selectedPriority = new PriorityModel();
 
         vCardBitmapArray = new ArrayList<>();
         photoBitmapArray = new ArrayList<>();
@@ -119,16 +196,105 @@ public class NewClientEntry extends SideNavigationMenuParentActivity implements 
         PriorityTypeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerPriorityType.setAdapter(PriorityTypeAdapter);
 
+        spinnerInsType.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                if(position != 0) {
+                    try {
+                        selectedInstituteType = allInstituteType.get(position-1);
+                    } catch (IndexOutOfBoundsException e) {
+                        Toast.makeText(NewClientEntry.this,"No shift found !!!",Toast.LENGTH_LONG).show();
+                    }
+                } else {
+                    selectedInstituteType = new InstituteTypeModel();
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+        spinnerPriorityType.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                if(position != 0) {
+                    try {
+                        selectedPriority = allPriority.get(position-1);
+                    } catch (IndexOutOfBoundsException e) {
+                        Toast.makeText(NewClientEntry.this,"No shift found !!!",Toast.LENGTH_LONG).show();
+                    }
+                } else {
+                    selectedPriority = new PriorityModel();
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+
         Button proceed = findViewById(R.id.proceed);
 
         proceed.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(NewClientEntry.this,ClientCommunicationDetail.class);
-                startActivity(intent);
-                finish();
+                if (selectedInstituteType.getInstituteTypeID() == 0) {
+                    Toast.makeText(NewClientEntry.this,"Select Institute Type",
+                            Toast.LENGTH_LONG).show();
+                } else if (selectedPriority.getPriorityID() == 0) {
+                    Toast.makeText(NewClientEntry.this,"Select Priority",
+                            Toast.LENGTH_LONG).show();
+                } else if (instituteName.getText().toString().equals("")) {
+                    instituteName.setError("This is required!");
+                    instituteName.requestFocus();
+                } else if (contactPerson.getText().toString().equals("")) {
+                    contactPerson.setError("This is required!");
+                    contactPerson.requestFocus();
+                } else if (contactNumber.getText().toString().equals("")) {
+                    contactNumber.setError("This is required!");
+                    contactNumber.requestFocus();
+                } else if (noOfStudent.getText().toString().equals("")) {
+                    noOfStudent.setError("This is required!");
+                    noOfStudent.requestFocus();
+                } else if (noOfTeacher.getText().toString().equals("")) {
+                    noOfTeacher.setError("This is required!");
+                    noOfTeacher.requestFocus();
+                } else if (instituteAddress.getText().toString().equals("")) {
+                    instituteAddress.setError("This is required!");
+                    instituteAddress.requestFocus();
+                } else if (comment.getText().toString().equals("")) {
+                    comment.setError("This is required!");
+                    comment.requestFocus();
+                } else {
+                    try {
+                        newClient.put("InstituteTypeID", selectedInstituteType.getInstituteTypeID());
+                        newClient.put("PriorityID", selectedPriority.getPriorityID());
+                        newClient.put("InsName", instituteName.getText().toString());
+                        newClient.put("ContactPerson", contactPerson.getText().toString());
+                        newClient.put("ContactNumber", contactNumber.getText().toString());
+                        newClient.put("NoOfStudent", !noOfStudent.getText().toString().equals("")? Integer.parseInt(noOfStudent.getText().toString()):0);
+                        newClient.put("NoOfTeacher", !noOfTeacher.getText().toString().equals("")? Integer.parseInt(noOfTeacher.getText().toString()):0);
+                        newClient.put("InstituteAddress", instituteAddress.getText().toString());
+                        newClient.put("Comments", comment.getText().toString());
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+                // , , , ,
+//                Intent intent = new Intent(NewClientEntry.this,ClientCommunicationDetail.class);
+//                startActivity(intent);
+//                finish();
             }
         });
+
+        InstituteTypeGetRequest();
+        PriorityDataGetRequest();
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -263,5 +429,171 @@ public class NewClientEntry extends SideNavigationMenuParentActivity implements 
         } else if (type == PHOTO) {
 
         }
+    }
+
+    private void InstituteTypeGetRequest() {
+        if(StaticHelperClass.isNetworkAvailable(this)) {
+            progressBar.setVisibility(View.VISIBLE);
+            whiteBackground.setVisibility(View.VISIBLE);
+            String url = getString(R.string.baseUrl)+"/api/onEms/getInstituteType";
+
+            StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+
+                            parseInstituteTypeData(response);
+
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    progressBar.setVisibility(View.INVISIBLE);
+                    whiteBackground.setVisibility(View.INVISIBLE);
+                    Toast.makeText(NewClientEntry.this,"Error: "+error,
+                            Toast.LENGTH_LONG).show();
+                }
+            })
+            {
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    Map<String, String>  params = new HashMap<>();
+                    params.put("Authorization", "Request_From_onEMS_Android_app");
+                    return params;
+                }
+            };
+            MySingleton.getInstance(this).addToRequestQueue(stringRequest);
+        } else {
+            Toast.makeText(NewClientEntry.this,"Please check your internet connection and select again!!! ",
+                    Toast.LENGTH_LONG).show();
+        }
+    }
+
+    void parseInstituteTypeData(String jsonString) {
+        try {
+            allInstituteType = new ArrayList<>();
+            JSONArray jsonArray = new JSONArray(jsonString);
+            ArrayList<String> arrayList = new ArrayList<>();
+            arrayList.add("Institute Type");
+            for(int i = 0; i < jsonArray.length(); ++i) {
+                JSONObject jsonObject = jsonArray.getJSONObject(i);
+                InstituteTypeModel instituteTypeModel = new InstituteTypeModel(jsonObject.getString("InstituteTypeID"),
+                        jsonObject.getString("InstituteTypeName"));
+                allInstituteType.add(instituteTypeModel);
+                arrayList.add(instituteTypeModel.getInstituteTypeName());
+            }
+            try {
+                String[] strings = new String[arrayList.size()];
+                strings = arrayList.toArray(strings);
+                ArrayAdapter<String> spinner_adapter = new ArrayAdapter<>(this,R.layout.spinner_item, strings);
+                spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                spinnerInsType.setAdapter(spinner_adapter);
+            } catch (IndexOutOfBoundsException e) {
+                Toast.makeText(this,"No Institute Type found !!!",Toast.LENGTH_LONG).show();
+            }
+        } catch (JSONException e) {
+            Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
+        }
+        progressBar.setVisibility(View.INVISIBLE);
+        whiteBackground.setVisibility(View.INVISIBLE);
+    }
+
+    private void PriorityDataGetRequest() {
+        if(StaticHelperClass.isNetworkAvailable(this)) {
+            String url = getString(R.string.baseUrl)+"/api/onEms/spGetCRMPriority";
+            progressBar.setVisibility(View.VISIBLE);
+            whiteBackground.setVisibility(View.VISIBLE);
+            //Preparing Medium data from server
+            StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+
+                            parsePriorityData(response);
+
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    progressBar.setVisibility(View.INVISIBLE);
+                    whiteBackground.setVisibility(View.INVISIBLE);
+                    Toast.makeText(NewClientEntry.this,"Error: "+error,
+                            Toast.LENGTH_LONG).show();
+                }
+            })
+            {
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    Map<String, String>  params = new HashMap<>();
+                    params.put("Authorization", "Request_From_onEMS_Android_app");
+                    return params;
+                }
+            };
+            MySingleton.getInstance(this).addToRequestQueue(stringRequest);
+        } else {
+            Toast.makeText(NewClientEntry.this,"Please check your internet connection and select again!!! ",
+                    Toast.LENGTH_LONG).show();
+        }
+    }
+
+    void parsePriorityData(String jsonString) {
+        try {
+            allPriority = new ArrayList<>();
+            JSONArray jsonArray = new JSONArray(jsonString);
+            ArrayList<String> arrayList = new ArrayList<>();
+            arrayList.add("Priority");
+            for(int i = 0; i < jsonArray.length(); ++i) {
+                JSONObject jsonObject = jsonArray.getJSONObject(i);
+                PriorityModel priorityModel = new PriorityModel(jsonObject.getString("PriorityID"),
+                        jsonObject.getString("Priority"));
+                allPriority.add(priorityModel);
+                arrayList.add(priorityModel.getPriority());
+            }
+            try {
+                String[] strings = new String[arrayList.size()];
+                strings = arrayList.toArray(strings);
+                ArrayAdapter<String> spinner_adapter = new ArrayAdapter<>(this,R.layout.spinner_item, strings);
+                spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                spinnerPriorityType.setAdapter(spinner_adapter);
+            } catch (IndexOutOfBoundsException e) {
+                Toast.makeText(this,"No Priority found !!!",Toast.LENGTH_LONG).show();
+            }
+        } catch (JSONException e) {
+            Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
+        }
+        progressBar.setVisibility(View.INVISIBLE);
+        whiteBackground.setVisibility(View.INVISIBLE);
+    }
+
+    public void entryNewClient() {
+        progressBar.setVisibility(View.VISIBLE);
+        String url = getString(R.string.baseUrl)+"/api/onEms/spSetCRMNewClientEntry";
+        CustomRequest customRequest = new CustomRequest (Request.Method.POST, url, newClient,
+                new Response.Listener<JSONArray>() {
+                    @Override
+                    public void onResponse(JSONArray response) {
+                        try {
+                            if (response.getJSONObject(0).getInt("ReturnValue") == 1) {
+                                Toast.makeText(NewClientEntry.this,"Successfully done",Toast.LENGTH_LONG).show();
+                            }
+                        } catch (JSONException e) {
+                            Toast.makeText(NewClientEntry.this,"Error: "+e,Toast.LENGTH_LONG).show();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(NewClientEntry.this,"Not Successful "+error.toString(),Toast.LENGTH_LONG).show();
+            }
+        })
+        {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String>  params = new HashMap<>();
+                params.put("Authorization", "Request_From_onEMS_Android_app");
+                return params;
+            }
+        };
+        MySingleton.getInstance(this).addToRequestQueue(customRequest);
     }
 }

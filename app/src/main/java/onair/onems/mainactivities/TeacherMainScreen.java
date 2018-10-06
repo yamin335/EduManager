@@ -47,6 +47,7 @@ import java.util.Random;
 
 import onair.onems.R;
 import onair.onems.Services.StaticHelperClass;
+import onair.onems.Test;
 import onair.onems.app.Config;
 import onair.onems.attendance.AttendanceAdminDashboard;
 import onair.onems.contacts.ContactsMainScreen;
@@ -330,6 +331,10 @@ public class TeacherMainScreen extends AppCompatActivity {
                 Intent mainIntent = new Intent(TeacherMainScreen.this, SubjectWiseMarksEntryMain.class);
                 startActivity(mainIntent);
                 finish();
+
+//                Intent mainIntent = new Intent(TeacherMainScreen.this, Test.class);
+//                startActivity(mainIntent);
+//                finish();
             }
         });
 

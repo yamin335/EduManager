@@ -374,14 +374,17 @@
             android:name=".lesson_plan.LessonPlanMainScreenForAdmin"
             android:label="Lesson Plan"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".crm.NewClientEntry"
+        <activity
+            android:name=".crm.NewClientEntry"
             android:label="New client entry"
             android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="stateHidden|adjustPan"></activity>
-        <activity android:name=".crm.ClientCommunicationDetail"
+            android:windowSoftInputMode="stateHidden|adjustPan" />
+        <activity
+            android:name=".crm.ClientCommunicationDetail"
             android:label="Communication details"
             android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="stateHidden|adjustPan"></activity>
+            android:windowSoftInputMode="stateHidden|adjustPan" />
+        <activity android:name=".Test"></activity>
     </application>
 
 </manifest>

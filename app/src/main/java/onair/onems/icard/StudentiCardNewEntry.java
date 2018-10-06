@@ -20,6 +20,7 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -60,7 +61,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
 import onair.onems.R;
+import onair.onems.Services.FileUploadService;
 import onair.onems.Services.StaticHelperClass;
 import onair.onems.customised.CustomRequest;
 import onair.onems.mainactivities.SideNavigationMenuParentActivity;
@@ -72,6 +79,11 @@ import onair.onems.models.SectionModel;
 import onair.onems.models.ShiftModel;
 import onair.onems.models.StudentInformationEntry;
 import onair.onems.network.MySingleton;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 public class StudentiCardNewEntry extends SideNavigationMenuParentActivity {
 
@@ -538,43 +550,91 @@ public class StudentiCardNewEntry extends SideNavigationMenuParentActivity {
             // back to main thread after finishing doInBackground
             // update your UI or take action after
             // exp; make progressbar gone
-            Ion.with(getApplicationContext())
-                    .load(getString(R.string.baseUrl)+"/api/onEms/Mobile/uploads")
-                    .progressDialog(mStudentDataPostDialog)
-                    .setMultipartParameter("name", "source")
-                    .setMultipartFile("file", "image/jpeg", file)
-                    .asString()
-                    .setCallback(new FutureCallback<String>() {
-                        @Override
-                        public void onCompleted(Exception e, String result) {
-                            //do stuff with result
-                            try {
-                                JSONObject jsonObject = new JSONObject(result);
-                                name = editname.getText().toString();
-                                roll = editroll.getText().toString();
-                                parentName = editparent.getText().toString();
-                                parentNumber = editparentnumber.getText().toString();
-                                address = editaddress.getText().toString();
-//                                studentInformationEntry = new StudentInformationEntry();
-                                studentInformationEntry.setUserName(name);
-                                studentInformationEntry.setRollNo(roll);
-                                studentInformationEntry.setGuardian(parentName);
-                                studentInformationEntry.setGuardianPhone(parentNumber);
-                                studentInformationEntry.setPreAddress(address);
-                                studentInformationEntry.setInstituteID(Long.toString(InstituteID));
-                                studentInformationEntry.setImageUrl(jsonObject.getString("path"));
-                                studentInformationEntry.setIsImageCaptured(IsImageCaptured);
-                                Gson gson = new Gson();
-                                String json = gson.toJson(studentInformationEntry);
-                                postUsingVolley(json);
-                                Log.d( "ImageUrl", jsonObject.getString("path"));
-                            } catch (JSONException e1) {
-                                mStudentDataPostDialog.dismiss();
-                                e1.printStackTrace();
-                            }
-                        }
-                    });
+            uploadImageWithRetrofit2(file);
+        }
+    }
 
+    private void uploadImageWithIon(File file) {
+        Ion.with(getApplicationContext())
+                .load(getString(R.string.baseUrl)+"/api/onEms/Mobile/uploads")
+                .progressDialog(mStudentDataPostDialog)
+                .setMultipartParameter("name", "source")
+                .setMultipartFile("file", "image/jpeg", file)
+                .asString()
+                .setCallback(new FutureCallback<String>() {
+                    @Override
+                    public void onCompleted(Exception e, String result) {
+                        //do stuff with result
+                        postStudentData(result);
+                    }
+                });
+    }
+
+    private void uploadImageWithRetrofit2(File file) {
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(getString(R.string.baseUrl))
+                .addConverterFactory(ScalarsConverterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        // create upload service client
+        FileUploadService service = retrofit.create(FileUploadService.class);
+
+        // create RequestBody instance from file
+        RequestBody requestFile = RequestBody.create(
+                MediaType.parse("image/jpeg"),
+                        file
+                );
+
+        // MultipartBody.Part is used to send also the actual file name
+        MultipartBody.Part body = MultipartBody.Part.createFormData("file", file.getName(), requestFile);
+
+        // add another part within the multipart request
+//        String descriptionString = "hello, this is description speaking";
+//        RequestBody description =
+//                RequestBody.create(
+//                        okhttp3.MultipartBody.FORM, descriptionString);
+
+        // finally, execute the request
+        Call<String> call = service.upload(body);
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(@NonNull Call<String> call, @NonNull retrofit2.Response<String> response) {
+                String responseData = response.body();
+                postStudentData(responseData);
+                Log.v("Upload", "success");
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<String> call, @NonNull Throwable t) {
+                Log.e("Upload error:", t.getMessage());
+            }
+        });
+    }
+
+    private void postStudentData(String result) {
+        try {
+            JSONObject jsonObject = new JSONObject(result);
+            name = editname.getText().toString();
+            roll = editroll.getText().toString();
+            parentName = editparent.getText().toString();
+            parentNumber = editparentnumber.getText().toString();
+            address = editaddress.getText().toString();
+//                                studentInformationEntry = new StudentInformationEntry();
+            studentInformationEntry.setUserName(name);
+            studentInformationEntry.setRollNo(roll);
+            studentInformationEntry.setGuardian(parentName);
+            studentInformationEntry.setGuardianPhone(parentNumber);
+            studentInformationEntry.setPreAddress(address);
+            studentInformationEntry.setInstituteID(Long.toString(InstituteID));
+            studentInformationEntry.setImageUrl(jsonObject.getString("path"));
+            studentInformationEntry.setIsImageCaptured(IsImageCaptured);
+            Gson gson = new Gson();
+            String json = gson.toJson(studentInformationEntry);
+            postUsingVolley(json);
+            Log.d( "ImageUrl", jsonObject.getString("path"));
+        } catch (JSONException e1) {
+            mStudentDataPostDialog.dismiss();
+            e1.printStackTrace();
         }
     }
 
