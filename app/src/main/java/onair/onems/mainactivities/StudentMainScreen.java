@@ -338,9 +338,9 @@ public class StudentMainScreen extends AppCompatActivity {
         exam.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent mainIntent = new Intent(StudentMainScreen.this, NotificationMainScreen.class);
-                startActivity(mainIntent);
-                finish();
+//                Intent mainIntent = new Intent(StudentMainScreen.this, NotificationMainScreen.class);
+//                startActivity(mainIntent);
+//                finish();
             }
         });
 
