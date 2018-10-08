@@ -28,6 +28,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -52,6 +53,8 @@ public class ClientCommunicationDetail extends SideNavigationMenuParentActivity 
     private ArrayList<Uri> fileUriArray;
     private Uri backupFileUri;
     private CoordinatorLayout coordinatorLayout;
+    private ProgressBar progressBar;
+    private View whiteBackground;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +68,10 @@ public class ClientCommunicationDetail extends SideNavigationMenuParentActivity 
         parentActivityLayout.addView(childActivityLayout, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
 
         coordinatorLayout = findViewById(R.id.coordinator_layout);
+        whiteBackground = findViewById(R.id.whiteBackground);
+        progressBar = findViewById(R.id.progressBar);
+        progressBar.setVisibility(View.INVISIBLE);
+        whiteBackground.setVisibility(View.INVISIBLE);
 
         fileRecycler = findViewById(R.id.recycler);
         fileUriArray = new ArrayList<>();

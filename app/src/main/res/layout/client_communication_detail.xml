@@ -21,7 +21,7 @@
             android:layout_marginTop="12dp"
             android:layout_weight="1"
             android:background="@drawable/spinner_background"
-            android:elevation="5dp"
+            android:elevation="2dp"
             android:paddingEnd="10dp"
             android:paddingStart="20dp"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -49,7 +49,7 @@
             android:layout_marginTop="12dp"
             android:layout_weight="1"
             android:background="@drawable/spinner_background"
-            android:elevation="5dp"
+            android:elevation="2dp"
             android:paddingEnd="10dp"
             android:paddingStart="20dp"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -311,6 +311,29 @@
                 </android.support.v7.widget.CardView>
             </LinearLayout>
         </LinearLayout>
+
+        <View
+            android:id="@+id/whiteBackground"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="#ffffff"
+            android:elevation="3dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            style="@style/MyProgressBarRectangle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:elevation="4dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.39999998" />
 
     </android.support.constraint.ConstraintLayout>
 </ScrollView>
