@@ -384,7 +384,16 @@
             android:label="Communication details"
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="stateHidden|adjustPan" />
-        <activity android:name=".Test"></activity>
+        <activity android:name=".Test" />
+        <activity
+            android:name=".PrivacyPolicy"
+            android:label="Privacy Policy"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden|adjustPan" />
+        <activity android:name=".crm.ClientList"
+            android:label="Client List"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden|adjustPan"></activity>
     </application>
 
 </manifest>

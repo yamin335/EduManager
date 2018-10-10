@@ -25,6 +25,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -32,19 +33,40 @@ import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import onair.onems.R;
+import onair.onems.Services.StaticHelperClass;
 import onair.onems.mainactivities.SideNavigationMenuParentActivity;
 import onair.onems.mainactivities.StudentMainScreen;
 import onair.onems.mainactivities.TeacherMainScreen;
+import onair.onems.models.CommunicationTypeModel;
+import onair.onems.models.InstituteTypeModel;
+import onair.onems.models.PriorityModel;
+import onair.onems.network.MySingleton;
 import onair.onems.utils.FileUtils;
 
 public class ClientCommunicationDetail extends SideNavigationMenuParentActivity implements FileAdapter.DeleteUri {
 
     private Spinner spinnerCommunicationType, spinnerPriorityType;
-    private String[] tempCommunicationType = {"Communication Type", "Phone call", "Visit", "Mail", "SMS"};
-    private String[] tempPriorityType = {"Priority", "High", "Medium", "Low"};
+    private String[] tempCommunicationType = {"Communication Type"};
+    private String[] tempPriorityType = {"Priority"};
+    private ArrayList<CommunicationTypeModel> allCommunicationType;
+    private ArrayList<PriorityModel> allPriority;
+    private CommunicationTypeModel selectedCommunicationType;
+    private PriorityModel selectedPriority;
     private static final String TAG = "ClientComDetail:";
     private static final int REQUEST_CODE = 3359;
     private static final int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 3369;
@@ -92,17 +114,58 @@ public class ClientCommunicationDetail extends SideNavigationMenuParentActivity 
         PriorityTypeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerPriorityType.setAdapter(PriorityTypeAdapter);
 
-        ImageView addFile = findViewById(R.id.addFile);
-        addFile.setOnClickListener(new View.OnClickListener() {
+        spinnerCommunicationType.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
-            public void onClick(View v) {
-                if (checkPermissionREAD_EXTERNAL_STORAGE(ClientCommunicationDetail.this)) {
-                    // do your stuff..
-                    // Display the file chooser dialog
-                    showChooser();
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                if(position != 0) {
+                    try {
+                        selectedCommunicationType = allCommunicationType.get(position-1);
+                    } catch (IndexOutOfBoundsException e) {
+                        Toast.makeText(ClientCommunicationDetail.this,"No communication type found !!!",Toast.LENGTH_LONG).show();
+                    }
+                } else {
+                    selectedCommunicationType = new CommunicationTypeModel();
                 }
             }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
         });
+
+        spinnerPriorityType.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                if(position != 0) {
+                    try {
+                        selectedPriority = allPriority.get(position-1);
+                    } catch (IndexOutOfBoundsException e) {
+                        Toast.makeText(ClientCommunicationDetail.this,"No priority found !!!",Toast.LENGTH_LONG).show();
+                    }
+                } else {
+                    selectedPriority = new PriorityModel();
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+        ImageView addFile = findViewById(R.id.addFile);
+        addFile.setOnClickListener((view)-> {
+            if (checkPermissionREAD_EXTERNAL_STORAGE(ClientCommunicationDetail.this)) {
+                // do your stuff..
+                // Display the file chooser dialog
+                showChooser();
+            }
+        });
+        CommunicationTypeGetRequest();
+        PriorityDataGetRequest();
     }
 
     private void showChooser() {
@@ -259,5 +322,139 @@ public class ClientCommunicationDetail extends SideNavigationMenuParentActivity 
                 });
         AlertDialog alert = alertBuilder.create();
         alert.show();
+    }
+
+    private void CommunicationTypeGetRequest() {
+        if(StaticHelperClass.isNetworkAvailable(this)) {
+            progressBar.setVisibility(View.VISIBLE);
+            whiteBackground.setVisibility(View.VISIBLE);
+            String url = getString(R.string.baseUrl)+"/api/onEms/spGetCRMCommunicationType";
+
+            StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+
+                            parseCommunicationTypeData(response);
+
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    progressBar.setVisibility(View.INVISIBLE);
+                    whiteBackground.setVisibility(View.INVISIBLE);
+                    Toast.makeText(ClientCommunicationDetail.this,"Error: "+error,
+                            Toast.LENGTH_LONG).show();
+                }
+            })
+            {
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    Map<String, String>  params = new HashMap<>();
+                    params.put("Authorization", "Request_From_onEMS_Android_app");
+                    return params;
+                }
+            };
+            MySingleton.getInstance(this).addToRequestQueue(stringRequest);
+        } else {
+            Toast.makeText(ClientCommunicationDetail.this,"Please check your internet connection and select again!!! ",
+                    Toast.LENGTH_LONG).show();
+        }
+    }
+
+    void parseCommunicationTypeData(String jsonString) {
+        try {
+            allCommunicationType= new ArrayList<>();
+            JSONArray jsonArray = new JSONArray(jsonString);
+            ArrayList<String> arrayList = new ArrayList<>();
+            arrayList.add("Communication Type");
+            for(int i = 0; i < jsonArray.length(); ++i) {
+                JSONObject jsonObject = jsonArray.getJSONObject(i);
+                CommunicationTypeModel communicationTypeModel = new CommunicationTypeModel(jsonObject.getString("CommunicationTypeID"),
+                        jsonObject.getString("CommunicationType"));
+                allCommunicationType.add(communicationTypeModel);
+                arrayList.add(communicationTypeModel.getCommunicationType());
+            }
+            try {
+                String[] strings = new String[arrayList.size()];
+                strings = arrayList.toArray(strings);
+                ArrayAdapter<String> spinner_adapter = new ArrayAdapter<>(this,R.layout.spinner_item, strings);
+                spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                spinnerCommunicationType.setAdapter(spinner_adapter);
+            } catch (IndexOutOfBoundsException e) {
+                Toast.makeText(this,"No Communication Type found !!!",Toast.LENGTH_LONG).show();
+            }
+        } catch (JSONException e) {
+            Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
+        }
+        progressBar.setVisibility(View.INVISIBLE);
+        whiteBackground.setVisibility(View.INVISIBLE);
+    }
+
+    private void PriorityDataGetRequest() {
+        if(StaticHelperClass.isNetworkAvailable(this)) {
+            String url = getString(R.string.baseUrl)+"/api/onEms/spGetCRMPriority";
+            progressBar.setVisibility(View.VISIBLE);
+            whiteBackground.setVisibility(View.VISIBLE);
+            //Preparing Medium data from server
+            StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+
+                            parsePriorityData(response);
+
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    progressBar.setVisibility(View.INVISIBLE);
+                    whiteBackground.setVisibility(View.INVISIBLE);
+                    Toast.makeText(ClientCommunicationDetail.this,"Error: "+error,
+                            Toast.LENGTH_LONG).show();
+                }
+            })
+            {
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    Map<String, String>  params = new HashMap<>();
+                    params.put("Authorization", "Request_From_onEMS_Android_app");
+                    return params;
+                }
+            };
+            MySingleton.getInstance(this).addToRequestQueue(stringRequest);
+        } else {
+            Toast.makeText(ClientCommunicationDetail.this,"Please check your internet connection and select again!!! ",
+                    Toast.LENGTH_LONG).show();
+        }
+    }
+
+    void parsePriorityData(String jsonString) {
+        try {
+            allPriority = new ArrayList<>();
+            JSONArray jsonArray = new JSONArray(jsonString);
+            ArrayList<String> arrayList = new ArrayList<>();
+            arrayList.add("Priority");
+            for(int i = 0; i < jsonArray.length(); ++i) {
+                JSONObject jsonObject = jsonArray.getJSONObject(i);
+                PriorityModel priorityModel = new PriorityModel(jsonObject.getString("PriorityID"),
+                        jsonObject.getString("Priority"));
+                allPriority.add(priorityModel);
+                arrayList.add(priorityModel.getPriority());
+            }
+            try {
+                String[] strings = new String[arrayList.size()];
+                strings = arrayList.toArray(strings);
+                ArrayAdapter<String> spinner_adapter = new ArrayAdapter<>(this,R.layout.spinner_item, strings);
+                spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                spinnerPriorityType.setAdapter(spinner_adapter);
+            } catch (IndexOutOfBoundsException e) {
+                Toast.makeText(this,"No Priority found !!!",Toast.LENGTH_LONG).show();
+            }
+        } catch (JSONException e) {
+            Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
+        }
+        progressBar.setVisibility(View.INVISIBLE);
+        whiteBackground.setVisibility(View.INVISIBLE);
     }
 }

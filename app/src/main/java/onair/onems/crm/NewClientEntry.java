@@ -112,6 +112,7 @@ public class NewClientEntry extends SideNavigationMenuParentActivity implements 
         newClient = new JSONObject();
         try {
             newClient.put("NewClientID", 0);
+            newClient.put("AgentID", Integer.parseInt(LoggedUserID));
             newClient.put("InstituteTypeID", 0);
             newClient.put("PriorityID", 0);
             newClient.put("InsName", "");
@@ -122,15 +123,17 @@ public class NewClientEntry extends SideNavigationMenuParentActivity implements 
             newClient.put("InstituteAddress", "");
             newClient.put("Comments", "");
             newClient.put("CreateBy", 0);
-            newClient.put("CreateOn", null);
-            newClient.put("CreatePc", null);
-            newClient.put("UpdateBy", null);
-            newClient.put("UpdateOn", null);
-            newClient.put("UpdatePc", null);
+            newClient.put("CreateOn", "");
+            newClient.put("CreatePc", "");
+            newClient.put("UpdateBy", 0);
+            newClient.put("UpdateOn", "");
+            newClient.put("UpdatePc", "");
             newClient.put("IsDeleted", 0);
-            newClient.put("DeleteBy", null);
-            newClient.put("DeleteOn", null);
-            newClient.put("DeletePc", null);
+            newClient.put("DeleteBy", 0);
+            newClient.put("DeleteOn", "");
+            newClient.put("DeletePc", "");
+            newClient.put("VCard", new JSONArray());
+            newClient.put("Photo", new JSONArray());
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -285,11 +288,8 @@ public class NewClientEntry extends SideNavigationMenuParentActivity implements 
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
+                    entryNewClient();
                 }
-                // , , , ,
-//                Intent intent = new Intent(NewClientEntry.this,ClientCommunicationDetail.class);
-//                startActivity(intent);
-//                finish();
             }
         });
 
@@ -567,24 +567,17 @@ public class NewClientEntry extends SideNavigationMenuParentActivity implements 
 
     public void entryNewClient() {
         progressBar.setVisibility(View.VISIBLE);
+        whiteBackground.setVisibility(View.VISIBLE);
         String url = getString(R.string.baseUrl)+"/api/onEms/spSetCRMNewClientEntry";
         CustomRequest customRequest = new CustomRequest (Request.Method.POST, url, newClient,
-                new Response.Listener<JSONArray>() {
-                    @Override
-                    public void onResponse(JSONArray response) {
-                        try {
-                            if (response.getJSONObject(0).getInt("ReturnValue") == 1) {
-                                Toast.makeText(NewClientEntry.this,"Successfully done",Toast.LENGTH_LONG).show();
-                            }
-                        } catch (JSONException e) {
-                            Toast.makeText(NewClientEntry.this,"Error: "+e,Toast.LENGTH_LONG).show();
-                        }
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Toast.makeText(NewClientEntry.this,"Not Successful "+error.toString(),Toast.LENGTH_LONG).show();
-            }
+                (JSONArray response)-> {
+                    progressBar.setVisibility(View.INVISIBLE);
+                    whiteBackground.setVisibility(View.INVISIBLE);
+                    Toast.makeText(NewClientEntry.this,"Entry completed!!!",Toast.LENGTH_LONG).show();
+                }, (VolleyError error)-> {
+            progressBar.setVisibility(View.INVISIBLE);
+            whiteBackground.setVisibility(View.INVISIBLE);
+            Toast.makeText(NewClientEntry.this,"Not complete! "+error.toString(),Toast.LENGTH_LONG).show();
         })
         {
             @Override

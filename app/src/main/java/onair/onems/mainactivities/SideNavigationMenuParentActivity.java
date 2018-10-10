@@ -59,11 +59,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import onair.onems.PrivacyPolicy;
 import onair.onems.R;
 import onair.onems.Services.StaticHelperClass;
 import onair.onems.app.Config;
 import onair.onems.attendance.AttendanceAdminDashboard;
 import onair.onems.contacts.ContactsMainScreen;
+import onair.onems.crm.ClientList;
 import onair.onems.crm.NewClientEntry;
 import onair.onems.customised.GuardianStudentSelectionDialog;
 import onair.onems.exam.SubjectWiseMarksEntryMain;
@@ -682,6 +684,10 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
             changeUserTypeDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
             changeUserTypeDialog.setCancelable(false);
             changeUserTypeDialog.show();
+        } else if (id == R.id.privacyPolicy && !activityName.equals(PrivacyPolicy.class.getName())) {
+            Intent intent = new Intent(getApplicationContext(), PrivacyPolicy.class);
+            startActivity(intent);
+            finish();
         }
 
         switch (item.getItemId()) {
@@ -836,6 +842,11 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
         menuCrm.setIconImg(R.drawable.ic_person_add);
         listDataHeader.add(menuCrm);
 
+        ExpandedMenuModel menuPrivacy = new ExpandedMenuModel();
+        menuPrivacy.setIconName("Privacy Policy");
+        menuPrivacy.setIconImg(R.drawable.privacy_icon);
+        listDataHeader.add(menuPrivacy);
+
         // Adding child data
         List<String> headingDashboard = new ArrayList<>();
         List<String> headingNotice = new ArrayList<>();
@@ -875,6 +886,10 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
         headingReport.add("Fees Summary Report");
 
         List<String> headingCRM = new ArrayList<>();
+        headingCRM.add("New Client Entry");
+        headingCRM.add("Client List");
+
+        List<String> headingPrivacy = new ArrayList<>();
 
         // Header, Child data
         listDataChild.put(listDataHeader.get(0), headingDashboard);
@@ -890,6 +905,7 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
         listDataChild.put(listDataHeader.get(10), headingStudentList);
         listDataChild.put(listDataHeader.get(11), headingReport);
         listDataChild.put(listDataHeader.get(12), headingCRM);
+        listDataChild.put(listDataHeader.get(13), headingPrivacy);
 
         mMenuAdapter = new ExpandableListAdapter(this, listDataHeader, listDataChild, UserTypeID);
         expandableList.setAdapter(mMenuAdapter);
@@ -944,14 +960,14 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
                     }
                 }
 
-                if((i == 12) && (l == 12)) {
-                    if(activityName.equals(NewClientEntry.class.getName())){
+                if((i == 13) && (l == 13)) {
+                    if(activityName.equals(PrivacyPolicy.class.getName())){
                         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
                         if (drawer.isDrawerOpen(GravityCompat.START)) {
                             drawer.closeDrawer(GravityCompat.START);
                         }
                     } else {
-                        Intent intent = new Intent(getApplicationContext(), NewClientEntry.class);
+                        Intent intent = new Intent(getApplicationContext(), PrivacyPolicy.class);
                         startActivity(intent);
                         finish();
                     }
@@ -1148,6 +1164,32 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
                     }
                 }
 
+                if((i == 12) && (i1 == 0) && (l == 0)) {
+                    if(activityName.equals(NewClientEntry.class.getName())){
+                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                        if (drawer.isDrawerOpen(GravityCompat.START)) {
+                            drawer.closeDrawer(GravityCompat.START);
+                        }
+                    } else {
+                        Intent intent = new Intent(getApplicationContext(), NewClientEntry.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                }
+
+                if((i == 12) && (i1 == 1) && (l == 1)) {
+                    if(activityName.equals(ClientList.class.getName())){
+                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                        if (drawer.isDrawerOpen(GravityCompat.START)) {
+                            drawer.closeDrawer(GravityCompat.START);
+                        }
+                    } else {
+                        Intent intent = new Intent(getApplicationContext(), ClientList.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                }
+
                 return false;
             }
         });
@@ -1224,6 +1266,12 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
         menuCrm.setIconImg(R.drawable.ic_person_add);
         listDataHeader.add(menuCrm);
 
+
+        ExpandedMenuModel menuPrivacy = new ExpandedMenuModel();
+        menuPrivacy.setIconName("Privacy Policy");
+        menuPrivacy.setIconImg(R.drawable.privacy_icon);
+        listDataHeader.add(menuPrivacy);
+
         // Adding child data
         List<String> headingDashboard = new ArrayList<>();
         List<String> headingNotice = new ArrayList<>();
@@ -1262,6 +1310,10 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
         headingReport.add("Fees Summary Report");
 
         List<String> headingCRM = new ArrayList<>();
+        headingCRM.add("New Client Entry");
+        headingCRM.add("Client List");
+
+        List<String> headingPrivacy = new ArrayList<>();
 
         // Header, Child data
         listDataChild.put(listDataHeader.get(0), headingDashboard);
@@ -1277,6 +1329,7 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
         listDataChild.put(listDataHeader.get(10), headingStudentList);
         listDataChild.put(listDataHeader.get(11), headingReport);
         listDataChild.put(listDataHeader.get(12), headingCRM);
+        listDataChild.put(listDataHeader.get(13), headingPrivacy);
 
         mMenuAdapter = new ExpandableListAdapter(this, listDataHeader, listDataChild, UserTypeID);
         expandableList.setAdapter(mMenuAdapter);
@@ -1331,14 +1384,14 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
                     }
                 }
 
-                if((i == 12) && (l == 12)) {
-                    if(activityName.equals(NewClientEntry.class.getName())){
+                if((i == 13) && (l == 13)) {
+                    if(activityName.equals(PrivacyPolicy.class.getName())){
                         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
                         if (drawer.isDrawerOpen(GravityCompat.START)) {
                             drawer.closeDrawer(GravityCompat.START);
                         }
                     } else {
-                        Intent intent = new Intent(getApplicationContext(), NewClientEntry.class);
+                        Intent intent = new Intent(getApplicationContext(), PrivacyPolicy.class);
                         startActivity(intent);
                         finish();
                     }
@@ -1543,6 +1596,32 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
                     }
                 }
 
+                if((i == 12) && (i1 == 0) && (l == 0)) {
+                    if(activityName.equals(NewClientEntry.class.getName())){
+                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                        if (drawer.isDrawerOpen(GravityCompat.START)) {
+                            drawer.closeDrawer(GravityCompat.START);
+                        }
+                    } else {
+                        Intent intent = new Intent(getApplicationContext(), NewClientEntry.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                }
+
+                if((i == 12) && (i1 == 1) && (l == 1)) {
+                    if(activityName.equals(ClientList.class.getName())){
+                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                        if (drawer.isDrawerOpen(GravityCompat.START)) {
+                            drawer.closeDrawer(GravityCompat.START);
+                        }
+                    } else {
+                        Intent intent = new Intent(getApplicationContext(), ClientList.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                }
+
                 return false;
             }
         });
@@ -1614,6 +1693,16 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
         menuReport.setIconImg(R.drawable.nav_fee);
         listDataHeader.add(menuReport);
 
+        ExpandedMenuModel menuCrm = new ExpandedMenuModel();
+        menuCrm.setIconName("CRM");
+        menuCrm.setIconImg(R.drawable.ic_person_add);
+        listDataHeader.add(menuCrm);
+
+        ExpandedMenuModel menuPrivacy = new ExpandedMenuModel();
+        menuPrivacy.setIconName("Privacy Policy");
+        menuPrivacy.setIconImg(R.drawable.privacy_icon);
+        listDataHeader.add(menuPrivacy);
+
         // Adding child data
         List<String> headingDashboard = new ArrayList<>();
         List<String> headingNotice = new ArrayList<>();
@@ -1650,6 +1739,12 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
         headingReport.add("Fees Collection Report");
         headingReport.add("Fees Summary Report");
 
+        List<String> headingCRM = new ArrayList<>();
+        headingCRM.add("New Client Entry");
+        headingCRM.add("Client List");
+
+        List<String> headingPrivacy = new ArrayList<>();
+
         // Header, Child data
         listDataChild.put(listDataHeader.get(0), headingDashboard);
         listDataChild.put(listDataHeader.get(1), headingNotice);
@@ -1663,6 +1758,8 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
         listDataChild.put(listDataHeader.get(9), headingiCard);
         listDataChild.put(listDataHeader.get(10), headingStudentList);
         listDataChild.put(listDataHeader.get(11), headingReport);
+        listDataChild.put(listDataHeader.get(12), headingCRM);
+        listDataChild.put(listDataHeader.get(13), headingPrivacy);
 
         mMenuAdapter = new ExpandableListAdapter(this, listDataHeader, listDataChild, UserTypeID);
         expandableList.setAdapter(mMenuAdapter);
@@ -1712,6 +1809,19 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
                         }
                     } else {
                         Intent intent = new Intent(getApplicationContext(), ReportAllStudentMain.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                }
+
+                if((i == 13) && (l == 13)) {
+                    if(activityName.equals(PrivacyPolicy.class.getName())){
+                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                        if (drawer.isDrawerOpen(GravityCompat.START)) {
+                            drawer.closeDrawer(GravityCompat.START);
+                        }
+                    } else {
+                        Intent intent = new Intent(getApplicationContext(), PrivacyPolicy.class);
                         startActivity(intent);
                         finish();
                     }
@@ -1895,6 +2005,32 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
                     }
                 }
 
+                if((i == 12) && (i1 == 0) && (l == 0)) {
+                    if(activityName.equals(NewClientEntry.class.getName())){
+                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                        if (drawer.isDrawerOpen(GravityCompat.START)) {
+                            drawer.closeDrawer(GravityCompat.START);
+                        }
+                    } else {
+                        Intent intent = new Intent(getApplicationContext(), NewClientEntry.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                }
+
+                if((i == 12) && (i1 == 1) && (l == 1)) {
+                    if(activityName.equals(ClientList.class.getName())){
+                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                        if (drawer.isDrawerOpen(GravityCompat.START)) {
+                            drawer.closeDrawer(GravityCompat.START);
+                        }
+                    } else {
+                        Intent intent = new Intent(getApplicationContext(), ClientList.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                }
+
                 return false;
             }
         });
@@ -1952,6 +2088,11 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
         menuContact.setIconImg(R.drawable.nav_contact);
         listDataHeader.add(menuContact);
 
+        ExpandedMenuModel menuPrivacy = new ExpandedMenuModel();
+        menuPrivacy.setIconName("Privacy Policy");
+        menuPrivacy.setIconImg(R.drawable.privacy_icon);
+        listDataHeader.add(menuPrivacy);
+
         // Adding child data
         List<String> headingDashboard = new ArrayList<>();
         List<String> headingNotice = new ArrayList<>();
@@ -1976,6 +2117,8 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
 
         List<String> headingContact = new ArrayList<>();
 
+        List<String> headingPrivacy = new ArrayList<>();
+
         // Header, Child data
         listDataChild.put(listDataHeader.get(0), headingDashboard);
         listDataChild.put(listDataHeader.get(1), headingNotice);
@@ -1986,6 +2129,7 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
         listDataChild.put(listDataHeader.get(6), headingResult);
         listDataChild.put(listDataHeader.get(7), headingFee);
         listDataChild.put(listDataHeader.get(8), headingContact);
+        listDataChild.put(listDataHeader.get(9), headingPrivacy);
 
         mMenuAdapter = new ExpandableListAdapter(this, listDataHeader, listDataChild, UserTypeID);
         expandableList.setAdapter(mMenuAdapter);
@@ -2035,6 +2179,19 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
                         }
                     } else {
                         Intent intent = new Intent(getApplicationContext(), SyllabusMainScreen.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                }
+
+                if((i == 9) && (l == 9)) {
+                    if(activityName.equals(PrivacyPolicy.class.getName())){
+                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                        if (drawer.isDrawerOpen(GravityCompat.START)) {
+                            drawer.closeDrawer(GravityCompat.START);
+                        }
+                    } else {
+                        Intent intent = new Intent(getApplicationContext(), PrivacyPolicy.class);
                         startActivity(intent);
                         finish();
                     }
@@ -2208,6 +2365,11 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
         menuContact.setIconImg(R.drawable.nav_contact);
         listDataHeader.add(menuContact);
 
+        ExpandedMenuModel menuPrivacy = new ExpandedMenuModel();
+        menuPrivacy.setIconName("Privacy Policy");
+        menuPrivacy.setIconImg(R.drawable.privacy_icon);
+        listDataHeader.add(menuPrivacy);
+
         // Adding child data
         List<String> headingDashboard = new ArrayList<>();
         List<String> headingNotice = new ArrayList<>();
@@ -2232,6 +2394,8 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
 
         List<String> headingContact = new ArrayList<>();
 
+        List<String> headingPrivacy = new ArrayList<>();
+
         // Header, Child data
         listDataChild.put(listDataHeader.get(0), headingDashboard);
         listDataChild.put(listDataHeader.get(1), headingNotice);
@@ -2242,6 +2406,7 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
         listDataChild.put(listDataHeader.get(6), headingResult);
         listDataChild.put(listDataHeader.get(7), headingFee);
         listDataChild.put(listDataHeader.get(8), headingContact);
+        listDataChild.put(listDataHeader.get(9), headingPrivacy);
 
         mMenuAdapter = new ExpandableListAdapter(this, listDataHeader, listDataChild, UserTypeID);
         expandableList.setAdapter(mMenuAdapter);
@@ -2291,6 +2456,19 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
                         }
                     } else {
                         Intent intent = new Intent(getApplicationContext(), SyllabusMainScreen.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                }
+
+                if((i == 9) && (l == 9)) {
+                    if(activityName.equals(PrivacyPolicy.class.getName())){
+                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                        if (drawer.isDrawerOpen(GravityCompat.START)) {
+                            drawer.closeDrawer(GravityCompat.START);
+                        }
+                    } else {
+                        Intent intent = new Intent(getApplicationContext(), PrivacyPolicy.class);
                         startActivity(intent);
                         finish();
                     }

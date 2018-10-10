@@ -45,6 +45,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
+import onair.onems.PrivacyPolicy;
 import onair.onems.R;
 import onair.onems.Services.StaticHelperClass;
 import onair.onems.Test;
@@ -331,8 +332,8 @@ public class TeacherMainScreen extends AppCompatActivity {
                 Intent mainIntent = new Intent(TeacherMainScreen.this, SubjectWiseMarksEntryMain.class);
                 startActivity(mainIntent);
                 finish();
-
-//                Intent mainIntent = new Intent(TeacherMainScreen.this, Test.class);
+//
+//                Intent mainIntent = new Intent(TeacherMainScreen.this, PrivacyPolicy.class);
 //                startActivity(mainIntent);
 //                finish();
             }
