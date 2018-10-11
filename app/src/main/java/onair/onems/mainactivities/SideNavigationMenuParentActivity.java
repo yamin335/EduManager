@@ -111,7 +111,7 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
     public int UserTypeID;
     public long InstituteID, LoggedUserShiftID, LoggedUserMediumID, LoggedUserClassID,
             LoggedUserDepartmentID, LoggedUserSectionID, LoggedUserSessionID;
-    public String activityName = "", LoggedUserID, UserName;
+    public String activityName = "", LoggedUserID, UserName, UserFullName, ImageUrl;
     public static final int MENU_ITEM_CHANGE_STUDENT = 4;
     private BroadcastReceiver mRegistrationBroadcastReceiver;
     private ConstraintLayout dashboard, profile, notification, contacts;
@@ -178,6 +178,8 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
         InstituteID = prefs.getLong("InstituteID",0);
         LoggedUserID = prefs.getString("UserID", "0");
         UserName = prefs.getString("UserName", "0");
+        UserFullName = prefs.getString("UserFullName", "0");
+        ImageUrl = prefs.getString("ImageUrl", "0");
         LoggedUserShiftID = prefs.getLong("ShiftID",0);
         LoggedUserMediumID = prefs.getLong("MediumID",0);
         LoggedUserClassID = prefs.getLong("ClassID",0);
@@ -405,9 +407,7 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
         ImageView profilePicture = (ImageView)view.findViewById(R.id.profilePicture);
         TextView userType = (TextView)view.findViewById(R.id.userType);
         TextView userName = (TextView)view.findViewById(R.id.userName);
-        String imageUrl = prefs.getString("ImageUrl","");
-        String name = prefs.getString("UserFullName","");
-        userName.setText(name);
+        userName.setText(UserFullName);
 
         if(UserTypeID == 1) {
             userType.setText("Super Admin");
@@ -422,7 +422,7 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
         }
 
         GlideApp.with(this)
-                .load(getString(R.string.baseUrl)+"/"+imageUrl.replace("\\","/")).apply(RequestOptions.circleCropTransform())
+                .load(getString(R.string.baseUrl)+"/"+ImageUrl.replace("\\","/")).apply(RequestOptions.circleCropTransform())
                 .diskCacheStrategy(DiskCacheStrategy.NONE)
                 .skipMemoryCache(true)
                 .into(profilePicture);
@@ -833,7 +833,7 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
         listDataHeader.add(menuStudentList);
 
         ExpandedMenuModel menuReport = new ExpandedMenuModel();
-        menuReport.setIconName("Reports");
+        menuReport.setIconName("Fees Reports");
         menuReport.setIconImg(R.drawable.nav_fee);
         listDataHeader.add(menuReport);
 
@@ -1257,7 +1257,7 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
         listDataHeader.add(menuStudentList);
 
         ExpandedMenuModel menuReport = new ExpandedMenuModel();
-        menuReport.setIconName("Reports");
+        menuReport.setIconName("Fees Reports");
         menuReport.setIconImg(R.drawable.nav_fee);
         listDataHeader.add(menuReport);
 
@@ -1689,7 +1689,7 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
         listDataHeader.add(menuStudentList);
 
         ExpandedMenuModel menuReport = new ExpandedMenuModel();
-        menuReport.setIconName("Reports");
+        menuReport.setIconName("Fees Reports");
         menuReport.setIconImg(R.drawable.nav_fee);
         listDataHeader.add(menuReport);
 

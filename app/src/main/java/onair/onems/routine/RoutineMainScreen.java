@@ -59,6 +59,7 @@ public class RoutineMainScreen extends SideNavigationMenuParentActivity implemen
     private TabLayout tabLayout;
     private FloatingActionButton fabShift;
     private ProgressDialog mShiftDialog;
+    private boolean hasShift = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -373,9 +374,12 @@ public class RoutineMainScreen extends SideNavigationMenuParentActivity implemen
     }
 
     void parseShiftJsonData(String jsonString) {
-        if (jsonString.equals("")) {
+        if (jsonString.equals("")||jsonString.equals("[]")) {
             Toast.makeText(RoutineMainScreen.this,"Shift not found!!! ",
                     Toast.LENGTH_LONG).show();
+            hasShift = false;
+            fabShift.setVisibility(View.GONE);
+            RoutineDataGetRequest(0);
         } else {
             ShiftSelectionDialog shiftSelectionDialog = new ShiftSelectionDialog(this, jsonString, this);
             shiftSelectionDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));

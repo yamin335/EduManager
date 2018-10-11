@@ -462,7 +462,7 @@ public class SyllabusMainScreen extends SideNavigationMenuParentActivity impleme
             mContentDialog.setMessage("Please Wait...");
             mContentDialog.setCancelable(false);
             mContentDialog.setIcon(R.drawable.onair);
-            mContentDialog.show();
+//            mContentDialog.show();
 
             //Preparing digital content
             StringRequest request = new StringRequest(Request.Method.GET, url,
