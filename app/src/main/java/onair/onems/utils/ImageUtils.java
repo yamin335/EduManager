@@ -155,7 +155,7 @@ public final class ImageUtils {
 
     public static File getFileFromBitmap(Bitmap bitmap, Context context) {
         //create a file to write bitmap data
-        File file = new File(context.getCacheDir(), "temporaryName");
+        File file = new File(context.getCacheDir(), "Image"+System.currentTimeMillis());
         try {
             file.createNewFile();
             //Convert bitmap to byte array

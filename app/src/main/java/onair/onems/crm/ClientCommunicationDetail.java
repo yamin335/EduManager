@@ -3,6 +3,7 @@ package onair.onems.crm;
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.DatePickerDialog;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -11,13 +12,11 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
+import android.support.annotation.NonNull;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -25,12 +24,18 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
@@ -43,22 +48,29 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 import onair.onems.R;
+import onair.onems.Services.RetrofitNetworkService;
 import onair.onems.Services.StaticHelperClass;
-import onair.onems.mainactivities.SideNavigationMenuParentActivity;
-import onair.onems.mainactivities.StudentMainScreen;
-import onair.onems.mainactivities.TeacherMainScreen;
+import onair.onems.mainactivities.CommonToolbarParentActivity;
+import onair.onems.models.CommunicationDetailModel;
 import onair.onems.models.CommunicationTypeModel;
-import onair.onems.models.InstituteTypeModel;
 import onair.onems.models.PriorityModel;
 import onair.onems.network.MySingleton;
 import onair.onems.utils.FileUtils;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.converter.scalars.ScalarsConverterFactory;
 
-public class ClientCommunicationDetail extends SideNavigationMenuParentActivity implements FileAdapter.DeleteUri {
+public class ClientCommunicationDetail extends CommonToolbarParentActivity implements FileAdapter.DeleteUri {
 
     private Spinner spinnerCommunicationType, spinnerPriorityType;
     private String[] tempCommunicationType = {"Communication Type"};
@@ -77,17 +89,120 @@ public class ClientCommunicationDetail extends SideNavigationMenuParentActivity 
     private CoordinatorLayout coordinatorLayout;
     private ProgressBar progressBar;
     private View whiteBackground;
-
+    private String clientData = "", selectedDate = "", selectedNextMeetingDate = "";
+    private CommunicationDetailModel communicationDetailModel;
+    private Button proceed;
+    private LinearLayout nextMeetingDate;
+    private DatePickerDialog datePickerDialog;
+    private boolean forUpdate = false;
+    private int updatedCommunicationType = -1, updatedPriority = -1;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        activityName = ClientCommunicationDetail.class.getName();
-
         LayoutInflater inflater = (LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         final View childActivityLayout = inflater.inflate(R.layout.client_communication_detail, null);
-        LinearLayout parentActivityLayout = (LinearLayout) findViewById(R.id.contentMain);
+        LinearLayout parentActivityLayout = findViewById(R.id.contentMain);
         parentActivityLayout.addView(childActivityLayout, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
+
+        TextView comDate = findViewById(R.id.comDate);
+        ImageView dateIcon = findViewById(R.id.dateIcon);
+        CheckBox yes = findViewById(R.id.yes);
+        TextView nextComDate = findViewById(R.id.comDate1);
+        ImageView nextDateIcon = findViewById(R.id.dateIcon1);
+        EditText details = findViewById(R.id.details);
+        proceed = findViewById(R.id.proceed);
+        nextMeetingDate = findViewById(R.id.nextMeetingDate);
+
+        Date date = Calendar.getInstance().getTime();
+        SimpleDateFormat df = new SimpleDateFormat("MM-dd-yyyy");
+        selectedDate = df.format(date);
+        comDate.setText(selectedDate);
+
+        yes.setOnCheckedChangeListener((buttonView, isChecked)-> {
+            if (isChecked) {
+                showNextMeetingDate();
+            } else {
+                showNextMeetingDate();
+            }
+        });
+
+        communicationDetailModel = new CommunicationDetailModel();
+        Intent extraIntent = getIntent();
+        if (extraIntent.hasExtra("clientData")) {
+            clientData = extraIntent.getStringExtra("clientData");
+            try {
+                JSONObject jsonObject = new JSONObject(clientData);
+                communicationDetailModel.setNewClientID(Integer.toString(jsonObject.getInt("NewClientID")));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        } else if (extraIntent.hasExtra("forUpdate")) {
+            forUpdate = true;
+            try {
+                JSONObject jsonObject = new JSONObject(extraIntent.getStringExtra("forUpdate"));
+                communicationDetailModel.setComDetailID(jsonObject.getString("ComDetailID"));
+                communicationDetailModel.setNewClientID(jsonObject.getString("NewClientID"));
+                communicationDetailModel.setCommunicationType(jsonObject.getString("CommunicationType"));
+                communicationDetailModel.setCommunicationTypeID(jsonObject.getString("CommunicationTypeID"));
+                updatedCommunicationType = jsonObject.getInt("CommunicationTypeID");
+                communicationDetailModel.setPriority(jsonObject.getString("Priority"));
+                communicationDetailModel.setPriorityID(jsonObject.getString("PriorityID"));
+                updatedPriority = jsonObject.getInt("PriorityID");
+                communicationDetailModel.setCommunicationDate(jsonObject.getString("CommunicationDate"));
+                comDate.setText(jsonObject.getString("CommunicationDate"));
+                String nextMeeting = jsonObject.getString("NextMeetingDate");
+                if (!nextMeeting.equalsIgnoreCase("")&&!nextMeeting.equalsIgnoreCase("null")) {
+                    communicationDetailModel.setNextMeetingDate(nextMeeting);
+                    yes.setChecked(true);
+                    nextComDate.setText(nextMeeting);
+                }
+                communicationDetailModel.setCommunicationDetails(jsonObject.getString("CommunicationDetails"));
+                details.setText(jsonObject.getString("CommunicationDetails"));
+                proceed.setText("Update");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
+        dateIcon.setOnClickListener(v -> {
+            // calender class's instance and get current date , month and year from calender
+            final Calendar c = Calendar.getInstance();
+            int mYear = c.get(Calendar.YEAR); // current year
+            int mMonth = c.get(Calendar.MONTH); // current month
+            int mDay = c.get(Calendar.DAY_OF_MONTH); // current day
+            // date picker dialog
+            datePickerDialog = new DatePickerDialog(ClientCommunicationDetail.this,
+                    (view, year, monthOfYear, dayOfMonth) -> {
+                        // set day of month , month and year value in the edit text
+//                                selectedDate = dayOfMonth + "/" + (monthOfYear + 1) + "/" + year;
+//                                selectedDate = year + "-" + (monthOfYear + 1) + "-" + dayOfMonth;
+                        selectedDate = (monthOfYear + 1)+"-"+dayOfMonth+"-"+year;
+                        comDate.setText(selectedDate);
+
+                    }, mYear, mMonth, mDay);
+            datePickerDialog.show();
+        });
+
+        nextDateIcon.setOnClickListener(v -> {
+            // calender class's instance and get current date , month and year from calender
+            final Calendar c = Calendar.getInstance();
+            int mYear = c.get(Calendar.YEAR); // current year
+            int mMonth = c.get(Calendar.MONTH); // current month
+            int mDay = c.get(Calendar.DAY_OF_MONTH); // current day
+            // date picker dialog
+            datePickerDialog = new DatePickerDialog(ClientCommunicationDetail.this,
+                    (view, year, monthOfYear, dayOfMonth) -> {
+                        // set day of month , month and year value in the edit text
+//                                selectedDate = dayOfMonth + "/" + (monthOfYear + 1) + "/" + year;
+//                                selectedDate = year + "-" + (monthOfYear + 1) + "-" + dayOfMonth;
+                        selectedNextMeetingDate = (monthOfYear + 1)+"-"+dayOfMonth+"-"+year;
+                        nextComDate.setText(selectedNextMeetingDate);
+
+                    }, mYear, mMonth, mDay);
+            datePickerDialog.show();
+        });
+
 
         coordinatorLayout = findViewById(R.id.coordinator_layout);
         whiteBackground = findViewById(R.id.whiteBackground);
@@ -156,6 +271,31 @@ public class ClientCommunicationDetail extends SideNavigationMenuParentActivity 
             }
         });
 
+        proceed.setOnClickListener(view-> {
+            if (selectedCommunicationType.getCommunicationTypeID() == 0) {
+                Toast.makeText(ClientCommunicationDetail.this,"Select communication type !!!",Toast.LENGTH_LONG).show();
+            } else if (selectedPriority.getPriorityID() == 0) {
+                Toast.makeText(ClientCommunicationDetail.this,"Select priority !!!",Toast.LENGTH_LONG).show();
+            } else if (selectedDate.equals("")) {
+                Toast.makeText(ClientCommunicationDetail.this,"Select communication date !!!",Toast.LENGTH_LONG).show();
+            } else if (yes.isChecked() && selectedNextMeetingDate.equals("")) {
+                Toast.makeText(ClientCommunicationDetail.this,"Select meeting date !!!",Toast.LENGTH_LONG).show();
+            } else if (details.getText().toString().equals("")){
+                details.setError("Add details");
+                details.requestFocus();
+            } else {
+                communicationDetailModel.setCommunicationType(selectedCommunicationType.getCommunicationType());
+                communicationDetailModel.setCommunicationTypeID(Integer.toString(selectedCommunicationType.getCommunicationTypeID()));
+                communicationDetailModel.setPriority(selectedPriority.getPriority());
+                communicationDetailModel.setPriorityID(Integer.toString(selectedPriority.getPriorityID()));
+                communicationDetailModel.setCommunicationDate(selectedDate);
+                communicationDetailModel.setNextMeetingDate(selectedNextMeetingDate);
+                communicationDetailModel.setCommunicationDetails(details.getText().toString());
+                postToServer(communicationDetailModel);
+            }
+
+        });
+
         ImageView addFile = findViewById(R.id.addFile);
         addFile.setOnClickListener((view)-> {
             if (checkPermissionREAD_EXTERNAL_STORAGE(ClientCommunicationDetail.this)) {
@@ -166,6 +306,86 @@ public class ClientCommunicationDetail extends SideNavigationMenuParentActivity 
         });
         CommunicationTypeGetRequest();
         PriorityDataGetRequest();
+    }
+
+    private void postToServer(CommunicationDetailModel communicationDetailModel) {
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(getString(R.string.baseUrl))
+                .addConverterFactory(ScalarsConverterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        RetrofitNetworkService retrofitNetworkService = retrofit.create(RetrofitNetworkService.class);
+
+        // finally, execute the request
+        Call<String> networkCall = retrofitNetworkService.postCommunicationDetail(communicationDetailModel);
+        networkCall.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(@NonNull Call<String> call, @NonNull retrofit2.Response<String> response) {
+                String responseData = "";
+                responseData = response.body();
+                if (responseData!= null) {
+                    if (!responseData.equals("")&&!responseData.equals("[]")) {
+//                        try {
+//                            JSONArray jsonArray = new JSONArray(responseData);
+//                            for (int i = 0; i<jsonArray.length(); i++) {
+//                                clientList.add(i, jsonArray.getJSONObject(i));
+//                            }
+//                            mAdapter.notifyDataSetChanged();
+//                        } catch (JSONException e) {
+//                            e.printStackTrace();
+//                        }
+                        Toast.makeText(ClientCommunicationDetail.this,"Successful with return value: "+responseData,Toast.LENGTH_LONG).show();
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<String> call, @NonNull Throwable t) {
+                Log.e("Request error:", t.getMessage());
+                Toast.makeText(ClientCommunicationDetail.this,"Not Successful !!!",Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    private void showNextMeetingDate() {
+        if(nextMeetingDate.isShown()){
+            Animation slideUp = AnimationUtils.loadAnimation(this, R.anim.slide_up);
+            slideUp.setAnimationListener(new Animation.AnimationListener() {
+                @Override
+                public void onAnimationStart(Animation animation) {
+
+                }
+
+                @Override
+                public void onAnimationEnd(Animation animation) {
+                    nextMeetingDate.setVisibility(View.GONE);
+                }
+
+                @Override
+                public void onAnimationRepeat(Animation animation) {
+
+                }
+            });
+            if(slideUp != null){
+                slideUp.reset();
+                if(nextMeetingDate != null){
+                    nextMeetingDate.clearAnimation();
+                    nextMeetingDate.startAnimation(slideUp);
+                }
+            }
+        } else {
+            Animation slideDown = AnimationUtils.loadAnimation(this, R.anim.slide_down);
+            if(slideDown != null){
+                slideDown.reset();
+                if(nextMeetingDate != null){
+                    nextMeetingDate.clearAnimation();
+                    nextMeetingDate.startAnimation(slideDown);
+                }
+            }
+            nextMeetingDate.setVisibility(View.VISIBLE);
+            nextMeetingDate.requestFocus();
+        }
     }
 
     private void showChooser() {
@@ -210,30 +430,7 @@ public class ClientCommunicationDetail extends SideNavigationMenuParentActivity 
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else if(UserTypeID == 1) {
-            Intent mainIntent = new Intent(ClientCommunicationDetail.this,NewClientEntry.class);
-            startActivity(mainIntent);
-            finish();
-        } else if(UserTypeID == 2) {
-            Intent mainIntent = new Intent(ClientCommunicationDetail.this,NewClientEntry.class);
-            startActivity(mainIntent);
-            finish();
-        } else if(UserTypeID == 3) {
-            Intent mainIntent = new Intent(ClientCommunicationDetail.this,NewClientEntry.class);
-            startActivity(mainIntent);
-            finish();
-        } else if(UserTypeID == 4) {
-            Intent mainIntent = new Intent(ClientCommunicationDetail.this,NewClientEntry.class);
-            startActivity(mainIntent);
-            finish();
-        } else if(UserTypeID == 5) {
-            Intent mainIntent = new Intent(ClientCommunicationDetail.this,NewClientEntry.class);
-            startActivity(mainIntent);
-            finish();
-        }
+        super.onBackPressed();
     }
 
     @Override
@@ -363,6 +560,7 @@ public class ClientCommunicationDetail extends SideNavigationMenuParentActivity 
     }
 
     void parseCommunicationTypeData(String jsonString) {
+        int communicationTypeIndex = -1234;
         try {
             allCommunicationType= new ArrayList<>();
             JSONArray jsonArray = new JSONArray(jsonString);
@@ -374,6 +572,9 @@ public class ClientCommunicationDetail extends SideNavigationMenuParentActivity 
                         jsonObject.getString("CommunicationType"));
                 allCommunicationType.add(communicationTypeModel);
                 arrayList.add(communicationTypeModel.getCommunicationType());
+                if(updatedCommunicationType != -1 && jsonObject.getInt("CommunicationTypeID") == updatedCommunicationType) {
+                    communicationTypeIndex = i;
+                }
             }
             try {
                 String[] strings = new String[arrayList.size()];
@@ -389,6 +590,10 @@ public class ClientCommunicationDetail extends SideNavigationMenuParentActivity 
         }
         progressBar.setVisibility(View.INVISIBLE);
         whiteBackground.setVisibility(View.INVISIBLE);
+        if (communicationTypeIndex != -1234) {
+            spinnerCommunicationType.setSelection(communicationTypeIndex+1);
+            selectedCommunicationType = allCommunicationType.get(communicationTypeIndex);
+        }
     }
 
     private void PriorityDataGetRequest() {
@@ -430,6 +635,7 @@ public class ClientCommunicationDetail extends SideNavigationMenuParentActivity 
     }
 
     void parsePriorityData(String jsonString) {
+        int priority = -12345;
         try {
             allPriority = new ArrayList<>();
             JSONArray jsonArray = new JSONArray(jsonString);
@@ -441,6 +647,9 @@ public class ClientCommunicationDetail extends SideNavigationMenuParentActivity 
                         jsonObject.getString("Priority"));
                 allPriority.add(priorityModel);
                 arrayList.add(priorityModel.getPriority());
+                if(updatedPriority != -1 && jsonObject.getInt("PriorityID") == updatedPriority) {
+                    priority = i;
+                }
             }
             try {
                 String[] strings = new String[arrayList.size()];
@@ -456,5 +665,9 @@ public class ClientCommunicationDetail extends SideNavigationMenuParentActivity 
         }
         progressBar.setVisibility(View.INVISIBLE);
         whiteBackground.setVisibility(View.INVISIBLE);
+        if (priority != -12345) {
+            spinnerPriorityType.setSelection(priority+1);
+            selectedPriority = allPriority.get(priority);
+        }
     }
 }

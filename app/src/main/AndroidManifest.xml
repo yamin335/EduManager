@@ -275,11 +275,13 @@
             android:windowSoftInputMode="stateHidden|adjustPan" />
         <activity
             android:name=".routine.ExamRoutineMainScreen"
+            android:label="Exam Routine"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="stateHidden|adjustPan" />
         <activity
             android:name=".routine.ExamRoutineDetailsScreen"
+            android:label="Exam Routine"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="stateHidden|adjustPan" />
@@ -390,14 +392,22 @@
             android:label="Privacy Policy"
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="stateHidden|adjustPan" />
-        <activity android:name=".crm.ClientList"
+        <activity
+            android:name=".crm.ClientList"
             android:label="Client List"
             android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="stateHidden|adjustPan"></activity>
+            android:windowSoftInputMode="stateHidden|adjustPan" />
 
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
+
+        <activity android:name=".crm.ClientCommunicationDetailList"
+            android:label="Details List"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden|adjustPan">
+
+        </activity>
     </application>
 
 </manifest>

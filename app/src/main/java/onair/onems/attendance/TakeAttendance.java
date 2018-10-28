@@ -124,65 +124,54 @@ public class TakeAttendance extends SideNavigationMenuParentActivity {
         subject_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerSubject.setAdapter(subject_spinner_adapter);
 
-        datePicker.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // calender class's instance and get current date , month and year from calender
-                final Calendar c = Calendar.getInstance();
-                int mYear = c.get(Calendar.YEAR); // current year
-                int mMonth = c.get(Calendar.MONTH); // current month
-                int mDay = c.get(Calendar.DAY_OF_MONTH); // current day
-                // date picker dialog
-                datePickerDialog = new DatePickerDialog(TakeAttendance.this,
-                        new DatePickerDialog.OnDateSetListener() {
-
-                            @Override
-                            public void onDateSet(DatePicker view, int year,
-                                                  int monthOfYear, int dayOfMonth) {
-                                // set day of month , month and year value in the edit text
+        datePicker.setOnClickListener(v -> {
+            // calender class's instance and get current date , month and year from calender
+            final Calendar c = Calendar.getInstance();
+            int mYear = c.get(Calendar.YEAR); // current year
+            int mMonth = c.get(Calendar.MONTH); // current month
+            int mDay = c.get(Calendar.DAY_OF_MONTH); // current day
+            // date picker dialog
+            datePickerDialog = new DatePickerDialog(TakeAttendance.this,
+                    (view, year, monthOfYear, dayOfMonth) -> {
+                        // set day of month , month and year value in the edit text
 //                                selectedDate = dayOfMonth + "/" + (monthOfYear + 1) + "/" + year;
 //                                selectedDate = year + "-" + (monthOfYear + 1) + "-" + dayOfMonth;
-                                selectedDate = (monthOfYear + 1)+"-"+dayOfMonth+"-"+year;
-                                datePicker.setText(selectedDate);
+                        selectedDate = (monthOfYear + 1)+"-"+dayOfMonth+"-"+year;
+                        datePicker.setText(selectedDate);
 
-                            }
-                        }, mYear, mMonth, mDay);
-                datePickerDialog.show();
-            }
+                    }, mYear, mMonth, mDay);
+            datePickerDialog.show();
         });
 
         ShiftDataGetRequest();
         MediumDataGetRequest();
 
-        takeAttendance.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(StaticHelperClass.isNetworkAvailable(TakeAttendance.this)) {
-                    if((selectedClass.getClassID() != -2)&&(!selectedDate.isEmpty())&&(selectedSubject != null)) {
-                        CheckSelectedData();
-                        Bundle bundle = new Bundle();
-                        bundle.putLong("InstituteID", InstituteID);
-                        bundle.putLong("MediumID",selectedMedium.getMediumID());
-                        bundle.putLong("ShiftID",selectedShift.getShiftID());
-                        bundle.putLong("ClassID",selectedClass.getClassID());
-                        bundle.putLong("SectionID",selectedSection.getSectionID());
-                        bundle.putLong("SubjectID",selectedSubject.getSubjectID());
-                        bundle.putLong("DepertmentID",selectedDepartment.getDepartmentID());
-                        bundle.putString("Date",selectedDate);
+        takeAttendance.setOnClickListener(v -> {
+            if(StaticHelperClass.isNetworkAvailable(TakeAttendance.this)) {
+                if((selectedClass.getClassID() != -2)&&(!selectedDate.isEmpty())&&(selectedSubject != null)) {
+                    CheckSelectedData();
+                    Bundle bundle = new Bundle();
+                    bundle.putLong("InstituteID", InstituteID);
+                    bundle.putLong("MediumID",selectedMedium.getMediumID());
+                    bundle.putLong("ShiftID",selectedShift.getShiftID());
+                    bundle.putLong("ClassID",selectedClass.getClassID());
+                    bundle.putLong("SectionID",selectedSection.getSectionID());
+                    bundle.putLong("SubjectID",selectedSubject.getSubjectID());
+                    bundle.putLong("DepertmentID",selectedDepartment.getDepartmentID());
+                    bundle.putString("Date",selectedDate);
 
-                        Intent intent = new Intent(TakeAttendance.this, TakeAttendanceDetails.class);
-                        intent.putExtras(bundle);
-                        startActivity(intent);
-                    } else if(selectedClass.getClassID() == -2) {
-                        Toast.makeText(TakeAttendance.this,"Please select a class !!! ",Toast.LENGTH_LONG).show();
-                    } else if(selectedDate.isEmpty()) {
-                        Toast.makeText(TakeAttendance.this,"Please select a date !!! ",Toast.LENGTH_LONG).show();
-                    } else if(selectedSubject == null) {
-                        Toast.makeText(TakeAttendance.this,"Please select a subject !!! ",Toast.LENGTH_LONG).show();
-                    }
-                } else {
-                    Toast.makeText(TakeAttendance.this,"Please check your internet connection!!!",Toast.LENGTH_LONG).show();
+                    Intent intent = new Intent(TakeAttendance.this, TakeAttendanceDetails.class);
+                    intent.putExtras(bundle);
+                    startActivity(intent);
+                } else if(selectedClass.getClassID() == -2) {
+                    Toast.makeText(TakeAttendance.this,"Please select a class !!! ",Toast.LENGTH_LONG).show();
+                } else if(selectedDate.isEmpty()) {
+                    Toast.makeText(TakeAttendance.this,"Please select a date !!! ",Toast.LENGTH_LONG).show();
+                } else if(selectedSubject == null) {
+                    Toast.makeText(TakeAttendance.this,"Please select a subject !!! ",Toast.LENGTH_LONG).show();
                 }
+            } else {
+                Toast.makeText(TakeAttendance.this,"Please check your internet connection!!!",Toast.LENGTH_LONG).show();
             }
         });
 
@@ -652,19 +641,7 @@ public class TakeAttendance extends SideNavigationMenuParentActivity {
             mShiftDialog.show();
             //Preparing Shift data from server
             StringRequest stringShiftRequest = new StringRequest(Request.Method.GET, shiftUrl,
-                    new Response.Listener<String>() {
-                        @Override
-                        public void onResponse(String response) {
-
-                            parseShiftJsonData(response);
-
-                        }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    mShiftDialog.dismiss();
-                }
-            })
+                    this::parseShiftJsonData, error -> mShiftDialog.dismiss())
             {
                 @Override
                 public Map<String, String> getHeaders() throws AuthFailureError {
@@ -692,19 +669,7 @@ public class TakeAttendance extends SideNavigationMenuParentActivity {
             mMediumDialog.show();
             //Preparing Medium data from server
             StringRequest stringMediumRequest = new StringRequest(Request.Method.GET, mediumUrl,
-                    new Response.Listener<String>() {
-                        @Override
-                        public void onResponse(String response) {
-
-                            parseMediumJsonData(response);
-
-                        }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    mMediumDialog.dismiss();
-                }
-            })
+                    this::parseMediumJsonData, error -> mMediumDialog.dismiss())
             {
                 @Override
                 public Map<String, String> getHeaders() throws AuthFailureError {
@@ -735,19 +700,7 @@ public class TakeAttendance extends SideNavigationMenuParentActivity {
             mClassDialog.show();
             //Preparing claas data from server
             StringRequest stringClassRequest = new StringRequest(Request.Method.GET, classUrl,
-                    new Response.Listener<String>() {
-                        @Override
-                        public void onResponse(String response) {
-
-                            parseClassJsonData(response);
-
-                        }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    mClassDialog.dismiss();
-                }
-            })
+                    this::parseClassJsonData, error -> mClassDialog.dismiss())
             {
                 @Override
                 public Map<String, String> getHeaders() throws AuthFailureError {
@@ -779,19 +732,7 @@ public class TakeAttendance extends SideNavigationMenuParentActivity {
             mDepartmentDialog.show();
             //Preparing Department data from server
             StringRequest stringDepartmentRequest = new StringRequest(Request.Method.GET, departmentUrl,
-                    new Response.Listener<String>() {
-                        @Override
-                        public void onResponse(String response) {
-
-                            parseDepartmentJsonData(response);
-
-                        }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    mDepartmentDialog.dismiss();
-                }
-            })
+                    this::parseDepartmentJsonData, error -> mDepartmentDialog.dismiss())
             {
                 @Override
                 public Map<String, String> getHeaders() throws AuthFailureError {
@@ -823,19 +764,7 @@ public class TakeAttendance extends SideNavigationMenuParentActivity {
             mSectionDialog.show();
             //Preparing section data from server
             StringRequest stringSectionRequest = new StringRequest(Request.Method.GET, sectionUrl,
-                    new Response.Listener<String>() {
-                        @Override
-                        public void onResponse(String response) {
-
-                            parseSectionJsonData(response);
-
-                        }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    mSectionDialog.dismiss();
-                }
-            })
+                    this::parseSectionJsonData, error -> mSectionDialog.dismiss())
             {
                 @Override
                 public Map<String, String> getHeaders() throws AuthFailureError {
@@ -864,20 +793,7 @@ public class TakeAttendance extends SideNavigationMenuParentActivity {
             mSubjectDialog.show();
             //Preparing subject data from server
             StringRequest stringSubjectRequest = new StringRequest(Request.Method.GET, subjectUrl,
-                    new Response.Listener<String>() {
-                        @Override
-                        public void onResponse(String response) {
-
-                            parseSubjectJsonData(response);
-
-                        }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-
-                    mSubjectDialog.dismiss();
-                }
-            })
+                    this::parseSubjectJsonData, error -> mSubjectDialog.dismiss())
             {
                 @Override
                 public Map<String, String> getHeaders() throws AuthFailureError {

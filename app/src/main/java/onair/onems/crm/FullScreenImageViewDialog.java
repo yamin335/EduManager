@@ -35,7 +35,7 @@ public class FullScreenImageViewDialog extends Dialog implements View.OnClickLis
         setContentView(R.layout.image_view);
         imageView = findViewById(R.id.image);
         imageView.setImageBitmap(bitmap);
-        Button back = findViewById(R.id.back);
+        ImageView back = findViewById(R.id.back);
         back.setOnClickListener(this);
     }
 

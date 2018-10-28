@@ -2,78 +2,100 @@ package onair.onems.crm;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
-import android.support.annotation.NonNull;
-import android.support.v4.view.GravityCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
-import android.widget.Toast;
+import android.widget.TextView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.reactivestreams.Subscriber;
-import org.reactivestreams.Subscription;
 
 import java.util.ArrayList;
 
-import io.reactivex.Observable;
-import io.reactivex.Observer;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.schedulers.Schedulers;
-import onair.onems.PrivacyPolicy;
 import onair.onems.R;
 import onair.onems.Services.RetrofitNetworkService;
-import onair.onems.customised.GuardianStudentSelectionDialog;
 import onair.onems.customised.MyDividerItemDecoration;
-import onair.onems.mainactivities.ChangePasswordDialog;
-import onair.onems.mainactivities.ChangeUserTypeDialog;
 import onair.onems.mainactivities.SideNavigationMenuParentActivity;
+import onair.onems.mainactivities.StudentMainScreen;
+import onair.onems.mainactivities.TeacherMainScreen;
 import retrofit2.Call;
 import retrofit2.Callback;
-import retrofit2.HttpException;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.converter.scalars.ScalarsConverterFactory;
 
-public class ClientList extends SideNavigationMenuParentActivity implements ClientListAdapter.ClientListAdapterListener {
+public class ClientCommunicationDetailList extends SideNavigationMenuParentActivity implements DetailListAdapter.DetailListAdapterListener {
 
-    private ArrayList<JSONObject> clientList;
-    private ClientListAdapter mAdapter;
+    private FloatingActionButton addDetails;
+    private String clientData = "";
+    private RecyclerView recyclerView;
+    private TextView empty;
+    private DetailListAdapter mAdapter;
+    private ArrayList<JSONObject> detailList;
+    private int NewClientID = 0;
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        getDetailListData(NewClientID);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-        activityName = ClientList.class.getName();
+        activityName = ClientCommunicationDetailList.class.getName();
 
         super.onCreate(savedInstanceState);
 
+        Intent extraIntent = getIntent();
+        if (extraIntent.hasExtra("clientData")) {
+            clientData = extraIntent.getStringExtra("clientData");
+        }
+
         LayoutInflater inflater = (LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        final View childActivityLayout = inflater.inflate(R.layout.client_list, null);
+        final View childActivityLayout = inflater.inflate(R.layout.client_communication_detail_list, null);
         LinearLayout parentActivityLayout = (LinearLayout) findViewById(R.id.contentMain);
         parentActivityLayout.addView(childActivityLayout, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
 
-        clientList = new ArrayList<>();
-        RecyclerView recyclerView = findViewById(R.id.recycler);
-        mAdapter = new ClientListAdapter(this, clientList, this);
+        detailList = new ArrayList<>();
+        recyclerView = findViewById(R.id.recyclerView);
+        mAdapter = new DetailListAdapter(this, detailList, this);
+        empty = findViewById(R.id.empty);
 
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
-        recyclerView.addItemDecoration(new MyDividerItemDecoration(this, DividerItemDecoration.VERTICAL, 10));
+        recyclerView.addItemDecoration(new MyDividerItemDecoration(this, DividerItemDecoration.VERTICAL, 8));
         recyclerView.setAdapter(mAdapter);
 
+        addDetails = findViewById(R.id.addDetails);
+        addDetails.setOnClickListener(view->{
+            Intent intent = new Intent(ClientCommunicationDetailList.this, ClientCommunicationDetail.class);
+            intent.putExtra("clientData", clientData);
+            startActivity(intent);
+        });
+
+        try {
+            NewClientID = new JSONObject(clientData).getInt("NewClientID");
+            getDetailListData(NewClientID);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private void getDetailListData(int NewClientID) {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(getString(R.string.baseUrl))
                 .addConverterFactory(ScalarsConverterFactory.create())
@@ -83,7 +105,7 @@ public class ClientList extends SideNavigationMenuParentActivity implements Clie
         RetrofitNetworkService retrofitNetworkService = retrofit.create(RetrofitNetworkService.class);
 
         // finally, execute the request
-        Call<String> networkCall = retrofitNetworkService.getClientList(LoggedUserID);
+        Call<String> networkCall = retrofitNetworkService.getDetailList(NewClientID);
         networkCall.enqueue(new Callback<String>() {
             @Override
             public void onResponse(@NonNull Call<String> call, @NonNull retrofit2.Response<String> response) {
@@ -91,10 +113,12 @@ public class ClientList extends SideNavigationMenuParentActivity implements Clie
                 responseData = response.body();
                 if (responseData!= null) {
                     if (!responseData.equals("")&&!responseData.equals("[]")) {
+                        empty.setVisibility(View.GONE);
+                        detailList.clear();
                         try {
                             JSONArray jsonArray = new JSONArray(responseData);
                             for (int i = 0; i<jsonArray.length(); i++) {
-                                clientList.add(i, jsonArray.getJSONObject(i));
+                                detailList.add(i, jsonArray.getJSONObject(i));
                             }
                             mAdapter.notifyDataSetChanged();
                         } catch (JSONException e) {
@@ -109,14 +133,25 @@ public class ClientList extends SideNavigationMenuParentActivity implements Clie
                 Log.e("Request error:", t.getMessage());
             }
         });
-
     }
 
     @Override
-    public void onClientSelected(JSONObject client) {
-        Intent mainIntent = new Intent(ClientList.this, NewClientEntry.class);
-        mainIntent.putExtra("clientData", client.toString());
+    public void onBackPressed() {
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else if(UserTypeID == 1) {
+            Intent intent = new Intent(ClientCommunicationDetailList.this, NewClientEntry.class);
+            intent.putExtra("clientData", clientData);
+            startActivity(intent);
+            finish();
+        }
+    }
+
+    @Override
+    public void onDetailSelected(JSONObject detail) {
+        Intent mainIntent = new Intent(ClientCommunicationDetailList.this, ClientCommunicationDetail.class);
+        mainIntent.putExtra("forUpdate", detail.toString());
         startActivity(mainIntent);
-        finish();
     }
 }

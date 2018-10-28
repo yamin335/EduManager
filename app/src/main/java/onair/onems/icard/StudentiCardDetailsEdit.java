@@ -157,13 +157,13 @@ public class StudentiCardDetailsEdit extends CommonToolbarParentActivity {
 
     @Override
     public void onResume() {
-        this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+//        this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
         super.onResume();
     }
 
     @Override
     public void onStart() {
-        this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+//        this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
         super.onStart();
     }
 
@@ -187,7 +187,7 @@ public class StudentiCardDetailsEdit extends CommonToolbarParentActivity {
         selectedGender = new GenderModel();
         selectedReligion = new ReligionModel();
         selectedBloodGroup = new BloodGroupModel();
-        this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+//        this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
         Intent intent = getIntent();
         Bundle bundle = intent.getExtras();
@@ -2025,6 +2025,4 @@ public class StudentiCardDetailsEdit extends CommonToolbarParentActivity {
             selectedDepartment.setDepartmentID("0");
         }
     }
-
-
 }

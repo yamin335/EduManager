@@ -120,6 +120,7 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
     private NotificationReceiverListener notificationReceiverListener;
     private ProgressDialog dialog;
     private boolean returnValue = false;
+    public Toolbar toolbar;
 
     @Override
     protected void onStart() {
@@ -194,7 +195,7 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
         expandableList = (ExpandableListView) findViewById(R.id.navigationmenu);
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         notificationCounter = findViewById(R.id.notificationCounter);

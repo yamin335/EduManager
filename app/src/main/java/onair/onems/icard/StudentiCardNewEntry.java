@@ -65,13 +65,11 @@ import java.util.Map;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
-import okhttp3.ResponseBody;
 import onair.onems.R;
-import onair.onems.Services.FileUploadService;
+import onair.onems.Services.RetrofitNetworkService;
 import onair.onems.Services.StaticHelperClass;
 import onair.onems.customised.CustomRequest;
 import onair.onems.mainactivities.SideNavigationMenuParentActivity;
-import onair.onems.mainactivities.TeacherMainScreen;
 import onair.onems.models.ClassModel;
 import onair.onems.models.DepartmentModel;
 import onair.onems.models.MediumModel;
@@ -134,13 +132,13 @@ public class StudentiCardNewEntry extends SideNavigationMenuParentActivity {
 
     @Override
     public void onResume() {
-        this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+//        this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
         super.onResume();
     }
 
     @Override
     public void onStart() {
-        this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+//        this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
         super.onStart();
     }
 
@@ -165,7 +163,7 @@ public class StudentiCardNewEntry extends SideNavigationMenuParentActivity {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         InstituteID = prefs.getLong("InstituteID",0);
 
-        this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+//        this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
         rotateLeft = (Button)findViewById(R.id.rotateLeft);
         rotateRight = (Button)findViewById(R.id.rotateRight);
@@ -577,7 +575,7 @@ public class StudentiCardNewEntry extends SideNavigationMenuParentActivity {
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         // create upload service client
-        FileUploadService service = retrofit.create(FileUploadService.class);
+        RetrofitNetworkService service = retrofit.create(RetrofitNetworkService.class);
 
         // create RequestBody instance from file
         RequestBody requestFile = RequestBody.create(

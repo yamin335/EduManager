@@ -17,12 +17,14 @@
         app:layout_constraintTop_toTopOf="parent"
         android:adjustViewBounds="true"/>
 
-    <Button
+    <ImageView
         android:id="@+id/back"
         android:layout_width="30dp"
         android:layout_height="30dp"
-        android:background="?android:attr/selectableItemBackground"
-        android:drawableStart="@drawable/ic_keyboard_arrow_left"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/image_view_back_icon_background"
+        android:src="@drawable/ic_keyboard_arrow_left"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
