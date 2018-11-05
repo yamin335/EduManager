@@ -1028,6 +1028,8 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
                         }
                     } else {
                         Intent intent = new Intent(getApplicationContext(), TakeAttendance.class);
+                        intent.putExtra("fromDashBoard", false);
+                        intent.putExtra("fromSideMenu", true);
                         startActivity(intent);
                         finish();
                     }
@@ -1452,6 +1454,8 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
                         }
                     } else {
                         Intent intent = new Intent(getApplicationContext(), TakeAttendance.class);
+                        intent.putExtra("fromDashBoard", false);
+                        intent.putExtra("fromSideMenu", true);
                         startActivity(intent);
                         finish();
                     }

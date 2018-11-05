@@ -72,9 +72,20 @@ public class TakeAttendance extends SideNavigationMenuParentActivity {
     private String selectedDate = "";
     private DatePickerDialog datePickerDialog;
     private int firstClass = 0, firstShift = 0, firstSection = 0, firstMedium = 0, firstDepartment = 0;
+    private boolean fromDashBoard = false, fromSideMenu = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Intent intent = getIntent();
+        if (intent.hasExtra("fromDashBoard")) {
+            fromDashBoard = intent.getBooleanExtra("fromDashBoard", false);
+        }
+
+        if (intent.hasExtra("fromSideMenu")) {
+            fromSideMenu = intent.getBooleanExtra("fromSideMenu", false);
+        }
 
         activityName = TakeAttendance.class.getName();
 
@@ -160,9 +171,9 @@ public class TakeAttendance extends SideNavigationMenuParentActivity {
                     bundle.putLong("DepertmentID",selectedDepartment.getDepartmentID());
                     bundle.putString("Date",selectedDate);
 
-                    Intent intent = new Intent(TakeAttendance.this, TakeAttendanceDetails.class);
-                    intent.putExtras(bundle);
-                    startActivity(intent);
+                    Intent tempIntent = new Intent(TakeAttendance.this, TakeAttendanceDetails.class);
+                    tempIntent.putExtras(bundle);
+                    startActivity(tempIntent);
                 } else if(selectedClass.getClassID() == -2) {
                     Toast.makeText(TakeAttendance.this,"Please select a class !!! ",Toast.LENGTH_LONG).show();
                 } else if(selectedDate.isEmpty()) {
@@ -623,9 +634,16 @@ public class TakeAttendance extends SideNavigationMenuParentActivity {
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            Intent mainIntent = new Intent(TakeAttendance.this, TeacherMainScreen.class);
-            startActivity(mainIntent);
-            finish();
+            if (fromSideMenu) {
+                Intent mainIntent = new Intent(TakeAttendance.this, TeacherMainScreen.class);
+                startActivity(mainIntent);
+                finish();
+            } else if (fromDashBoard) {
+                Intent mainIntent = new Intent(TakeAttendance.this, AttendanceAdminDashboard.class);
+                startActivity(mainIntent);
+                finish();
+            }
+
         }
     }
 

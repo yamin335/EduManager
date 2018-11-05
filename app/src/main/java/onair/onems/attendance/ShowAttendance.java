@@ -309,19 +309,18 @@ public class ShowAttendance extends SideNavigationMenuParentActivity {
 
     @Override
     public void onBackPressed() {
-
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
             switch (UserTypeID) {
                 case 1:
-                    Intent superAdminIntent = new Intent(ShowAttendance.this, TeacherMainScreen.class);
+                    Intent superAdminIntent = new Intent(ShowAttendance.this, AttendanceAdminDashboard.class);
                     startActivity(superAdminIntent);
                     finish();
                     break;
                 case 2:
-                    Intent instituteAdminIntent = new Intent(ShowAttendance.this, TeacherMainScreen.class);
+                    Intent instituteAdminIntent = new Intent(ShowAttendance.this, AttendanceAdminDashboard.class);
                     startActivity(instituteAdminIntent);
                     finish();
                     break;

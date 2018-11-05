@@ -275,12 +275,49 @@ public class NewClientEntry extends SideNavigationMenuParentActivity implements 
         recyclerPhoto.setItemAnimator(new DefaultItemAnimator());
         recyclerPhoto.setAdapter(photoAdapter);
 
+        if (forUpdate) {
+            try {
+                JSONObject jsonObject = new JSONObject(clientData);
+                JSONArray vCardJsonArray = jsonObject.getJSONArray("VCard");
+                ArrayList<JSONObject> vCardUrls = new ArrayList<>();
+                for (int i = 0; i<vCardJsonArray.length(); i++) {
+                    vCardUrls.add(vCardJsonArray.getJSONObject(i));
+                }
+                vCardAdapter = new ImageAdapter(this, vCardUrls,VCARD, forUpdate, this);
+                RecyclerView.LayoutManager vCardManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
+                recyclerCard.setLayoutManager(vCardManager);
+                recyclerCard.setItemAnimator(new DefaultItemAnimator());
+                recyclerCard.setAdapter(vCardAdapter);
+
+                JSONArray photoJsonArray = jsonObject.getJSONArray("Photo");
+                ArrayList<JSONObject> photoUrls = new ArrayList<>();
+                for (int i = 0; i<photoJsonArray.length(); i++) {
+                    photoUrls.add(photoJsonArray.getJSONObject(i));
+                }
+
+                photoAdapter = new ImageAdapter(this, photoUrls, PHOTO, forUpdate, this);
+                RecyclerView.LayoutManager photoManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
+                recyclerPhoto.setLayoutManager(photoManager);
+                recyclerPhoto.setItemAnimator(new DefaultItemAnimator());
+                recyclerPhoto.setAdapter(photoAdapter);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
         ImageView addVisitingCard = findViewById(R.id.addVCard);
         addVisitingCard.setOnClickListener(v -> startActivityForResult(ImageUtils.getPickImageChooserIntent(NewClientEntry.this), REQUEST_VCARD));
 
         ImageView addPhoto = findViewById(R.id.addPhoto);
         addPhoto.setOnClickListener(v -> startActivityForResult(ImageUtils.getPickImageChooserIntent(NewClientEntry.this), REQUEST_PHOTO));
 
+        if (forUpdate) {
+            addVisitingCard.setVisibility(View.GONE);
+            addVisitingCard.setClickable(false);
+
+            addPhoto.setVisibility(View.GONE);
+            addPhoto.setClickable(false);
+        }
         spinnerInsType =(Spinner)findViewById(R.id.spinnerInstitute);
         spinnerPriorityType = (Spinner)findViewById(R.id.spinnerPriority);
 
@@ -404,8 +441,8 @@ public class NewClientEntry extends SideNavigationMenuParentActivity implements 
     }
 
     private void postNewClientToServer() {
-        progressBar.setVisibility(View.VISIBLE);
-        whiteBackground.setVisibility(View.VISIBLE);
+//        progressBar.setVisibility(View.VISIBLE);
+//        whiteBackground.setVisibility(View.VISIBLE);
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(getString(R.string.baseUrl))
                 .addConverterFactory(ScalarsConverterFactory.create())
@@ -419,8 +456,8 @@ public class NewClientEntry extends SideNavigationMenuParentActivity implements 
         networkCall.enqueue(new Callback<String>() {
             @Override
             public void onResponse(@NonNull Call<String> call, @NonNull retrofit2.Response<String> response) {
-                progressBar.setVisibility(View.INVISIBLE);
-                whiteBackground.setVisibility(View.INVISIBLE);
+//                progressBar.setVisibility(View.INVISIBLE);
+//                whiteBackground.setVisibility(View.INVISIBLE);
                 String responseData = "";
                 responseData = response.body();
                 if (responseData!= null) {
@@ -437,8 +474,8 @@ public class NewClientEntry extends SideNavigationMenuParentActivity implements 
 
             @Override
             public void onFailure(@NonNull Call<String> call, @NonNull Throwable t) {
-                progressBar.setVisibility(View.INVISIBLE);
-                whiteBackground.setVisibility(View.INVISIBLE);
+//                progressBar.setVisibility(View.INVISIBLE);
+//                whiteBackground.setVisibility(View.INVISIBLE);
                 Log.e("Request error:", t.getMessage());
                 Toast.makeText(NewClientEntry.this,"Not Successful !!!",Toast.LENGTH_LONG).show();
             }
@@ -455,66 +492,183 @@ public class NewClientEntry extends SideNavigationMenuParentActivity implements 
                 .build();
 
         List<MultipartBody.Part> vCardParts = new ArrayList<>();
-        for (int i=0; i<vCardFileArray.size(); i++) {
-            vCardParts.add(prepareFilePart(vCardFileArray.get(i)));
-        }
-
         List<MultipartBody.Part> photoParts = new ArrayList<>();
-        for (int i=0; i<photoFileArray.size(); i++) {
-            photoParts.add(prepareFilePart(photoFileArray.get(i)));
-        }
 
-        Observable<String> vCardObservable = retrofit
-                .create(RetrofitNetworkService.class)
-                .uploadMultipleFilesDynamic(vCardParts)
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread());
-
-        Observable<String> photoObservable = retrofit
-                .create(RetrofitNetworkService.class)
-                .uploadMultipleFilesDynamic(photoParts)
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread());
-
-        Observable<String> combinedReturnValueObservable = Observable.zip(vCardObservable, photoObservable, new BiFunction<String, String, String>() {
-            @Override
-            public String apply(String vCardResponse, String photoResponse) {
-                return vCardResponse+"--"+photoResponse;
+        if(vCardFileArray.size()<1 && photoFileArray.size()>=1) {
+            for (int i=0; i<photoFileArray.size(); i++) {
+                photoParts.add(prepareFilePart(photoFileArray.get(i)));
             }
-        });
 
-        combinedReturnValueObservable
-                .observeOn(Schedulers.io())
-                .subscribeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Observer<String>() {
+            Observable<String> photoObservable = retrofit
+                    .create(RetrofitNetworkService.class)
+                    .uploadMultipleFilesDynamic(photoParts)
+                    .subscribeOn(Schedulers.newThread())
+                    .observeOn(AndroidSchedulers.mainThread());
 
-                    @Override
-                    public void onSubscribe(Disposable d) {
+            photoObservable
+                    .observeOn(Schedulers.io())
+                    .subscribeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new Observer<String>() {
 
-                    }
+                        @Override
+                        public void onSubscribe(Disposable d) {
 
-                    @Override
-                    public void onNext(String combinedReturnValue) {
-                        String stringArray[] = combinedReturnValue.split("--");
-                        JsonParser parser = new JsonParser();
-                        JsonArray vCardUrls = parser.parse(stringArray[0]).getAsJsonArray();
-                        newClient.add("VCard", vCardUrls);
-                        JsonArray photoUrls = parser.parse(stringArray[1]).getAsJsonArray();
-                        newClient.add("Photo", photoUrls);
-                        postNewClientToServer();
-                    }
+                        }
 
-                    @Override
-                    public void onError(Throwable e) {
-                        Log.e("RXANDROID", "onError: " + e.getMessage());
-                    }
+                        @Override
+                        public void onNext(String combinedReturnValue) {
+                            JsonParser parser = new JsonParser();
+                            JsonArray photoUrls = parser.parse(combinedReturnValue).getAsJsonArray();
+                            JsonArray parsedPhotoUrls = new JsonArray();
+                            for(int i = 0; i<photoUrls.size(); i++) {
+                                JsonObject jsonObject = new JsonObject();
+                                if(photoUrls.get(i).isJsonObject()) {
+                                    JsonObject tempJsonObject = photoUrls.get(i).getAsJsonObject();
+                                    jsonObject.addProperty("PhotoID", 0);
+                                    jsonObject.addProperty("PhotoURL", tempJsonObject.get("path").getAsString());
+                                }
+                                parsedPhotoUrls.add(jsonObject);
+                            }
+                            newClient.add("Photo", parsedPhotoUrls);
+                            postNewClientToServer();
+                        }
 
-                    @Override
-                    public void onComplete() {
-                        Log.e("COMPLETE", "Complete: ");
-                    }
-                });
+                        @Override
+                        public void onError(Throwable e) {
+                            Log.e("RXANDROID", "onError: " + e.getMessage());
+                        }
 
+                        @Override
+                        public void onComplete() {
+                            Log.e("COMPLETE", "Complete: ");
+                        }
+                    });
+        } else if (photoFileArray.size()<1 && vCardFileArray.size()>=1) {
+            for (int i=0; i<vCardFileArray.size(); i++) {
+                vCardParts.add(prepareFilePart(vCardFileArray.get(i)));
+            }
+
+            Observable<String> vCardObservable = retrofit
+                    .create(RetrofitNetworkService.class)
+                    .uploadMultipleFilesDynamic(vCardParts)
+                    .subscribeOn(Schedulers.newThread())
+                    .observeOn(AndroidSchedulers.mainThread());
+
+            vCardObservable
+                    .observeOn(Schedulers.io())
+                    .subscribeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new Observer<String>() {
+
+                        @Override
+                        public void onSubscribe(Disposable d) {
+
+                        }
+
+                        @Override
+                        public void onNext(String combinedReturnValue) {
+                            JsonParser parser = new JsonParser();
+                            JsonArray vCardUrls = parser.parse(combinedReturnValue).getAsJsonArray();
+                            JsonArray parsedVCardUrls = new JsonArray();
+                            for(int i = 0; i<vCardUrls.size(); i++) {
+                                JsonObject jsonObject = new JsonObject();
+                                if(vCardUrls.get(i).isJsonObject()) {
+                                    JsonObject tempJsonObject = vCardUrls.get(i).getAsJsonObject();
+                                    jsonObject.addProperty("VCardID", 0);
+                                    jsonObject.addProperty("VCardURL", tempJsonObject.get("path").getAsString());
+                                }
+                                parsedVCardUrls.add(jsonObject);
+                            }
+                            newClient.add("VCard", parsedVCardUrls);
+                            postNewClientToServer();
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+                            Log.e("RXANDROID", "onError: " + e.getMessage());
+                        }
+
+                        @Override
+                        public void onComplete() {
+                            Log.e("COMPLETE", "Complete: ");
+                        }
+                    });
+        } else if (vCardFileArray.size()<1 && photoFileArray.size()<1){
+            postNewClientToServer();
+        } else if (vCardFileArray.size()>=1 && photoFileArray.size()>=1){
+            for (int i=0; i<vCardFileArray.size(); i++) {
+                vCardParts.add(prepareFilePart(vCardFileArray.get(i)));
+            }
+
+            for (int i=0; i<photoFileArray.size(); i++) {
+                photoParts.add(prepareFilePart(photoFileArray.get(i)));
+            }
+
+            Observable<String> vCardObservable = retrofit
+                    .create(RetrofitNetworkService.class)
+                    .uploadMultipleFilesDynamic(vCardParts)
+                    .subscribeOn(Schedulers.newThread())
+                    .observeOn(AndroidSchedulers.mainThread());
+
+            Observable<String> photoObservable = retrofit
+                    .create(RetrofitNetworkService.class)
+                    .uploadMultipleFilesDynamic(photoParts)
+                    .subscribeOn(Schedulers.newThread())
+                    .observeOn(AndroidSchedulers.mainThread());
+
+            Observable<String> combinedReturnValueObservable = Observable.zip(vCardObservable, photoObservable, (vCardResponse, photoResponse) -> vCardResponse+"--"+photoResponse);
+
+            combinedReturnValueObservable
+                    .observeOn(Schedulers.io())
+                    .subscribeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new Observer<String>() {
+
+                        @Override
+                        public void onSubscribe(Disposable d) {
+
+                        }
+
+                        @Override
+                        public void onNext(String combinedReturnValue) {
+                            String stringArray[] = combinedReturnValue.split("--");
+                            JsonParser parser = new JsonParser();
+                            JsonArray vCardUrls = parser.parse(stringArray[0]).getAsJsonArray();
+                            JsonArray parsedVCardUrls = new JsonArray();
+                            for(int i = 0; i<vCardUrls.size(); i++) {
+                                JsonObject jsonObject = new JsonObject();
+                                if(vCardUrls.get(i).isJsonObject()) {
+                                    JsonObject tempJsonObject = vCardUrls.get(i).getAsJsonObject();
+                                    jsonObject.addProperty("VCardID", 0);
+                                    jsonObject.addProperty("VCardURL", tempJsonObject.get("path").getAsString());
+                                }
+                                parsedVCardUrls.add(jsonObject);
+                            }
+                            newClient.add("VCard", parsedVCardUrls);
+                            JsonArray photoUrls = parser.parse(stringArray[1]).getAsJsonArray();
+                            JsonArray parsedPhotoUrls = new JsonArray();
+                            for(int i = 0; i<photoUrls.size(); i++) {
+                                JsonObject jsonObject = new JsonObject();
+                                if(photoUrls.get(i).isJsonObject()) {
+                                    JsonObject tempJsonObject = photoUrls.get(i).getAsJsonObject();
+                                    jsonObject.addProperty("PhotoID", 0);
+                                    jsonObject.addProperty("PhotoURL", tempJsonObject.get("path").getAsString());
+                                }
+                                parsedPhotoUrls.add(jsonObject);
+                            }
+                            newClient.add("Photo", parsedPhotoUrls);
+                            postNewClientToServer();
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+                            Log.e("RXANDROID", "onError: " + e.getMessage());
+                        }
+
+                        @Override
+                        public void onComplete() {
+                            Log.e("COMPLETE", "Complete: ");
+                        }
+                    });
+        }
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -648,17 +802,21 @@ public class NewClientEntry extends SideNavigationMenuParentActivity implements 
     }
 
     @Override
-    public void onImageSelected(int position, int type) {
-        if (type == VCARD) {
-            FullScreenImageViewDialog fullScreenImageViewDialog = new FullScreenImageViewDialog(this, this, vCardBitmapArray.get(position));
-//            fullScreenImageViewDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+    public void onImageSelected(int position, int type, Bitmap bitmap) {
+        if (forUpdate) {
+            FullScreenImageViewDialog fullScreenImageViewDialog = new FullScreenImageViewDialog(this, this, bitmap);
             fullScreenImageViewDialog.setCancelable(true);
             fullScreenImageViewDialog.show();
-        } else if (type == PHOTO) {
-            FullScreenImageViewDialog fullScreenImageViewDialog = new FullScreenImageViewDialog(this, this, photoBitmapArray.get(position));
-//            fullScreenImageViewDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-            fullScreenImageViewDialog.setCancelable(true);
-            fullScreenImageViewDialog.show();
+        } else {
+            if (type == VCARD) {
+                FullScreenImageViewDialog fullScreenImageViewDialog = new FullScreenImageViewDialog(this, this, vCardBitmapArray.get(position));
+                fullScreenImageViewDialog.setCancelable(true);
+                fullScreenImageViewDialog.show();
+            } else if (type == PHOTO) {
+                FullScreenImageViewDialog fullScreenImageViewDialog = new FullScreenImageViewDialog(this, this, photoBitmapArray.get(position));
+                fullScreenImageViewDialog.setCancelable(true);
+                fullScreenImageViewDialog.show();
+            }
         }
     }
 

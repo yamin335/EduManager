@@ -10,6 +10,9 @@ import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.TextView;
 
+import com.google.gson.JsonIOException;
+import com.google.gson.JsonObject;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -21,8 +24,8 @@ import onair.onems.R;
 public class ClientListAdapter extends RecyclerView.Adapter<ClientListAdapter.MyViewHolder>
         implements Filterable {
     private Context context;
-    private List<JSONObject> clientList;
-    private List<JSONObject> clientListFiltered;
+    private List<JsonObject> clientList;
+    private List<JsonObject> clientListFiltered;
     private ClientListAdapterListener listener;
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
@@ -42,13 +45,13 @@ public class ClientListAdapter extends RecyclerView.Adapter<ClientListAdapter.My
 
             view.setOnClickListener(view1 -> {
                 // send selected client in callback
-                listener.onClientSelected(clientListFiltered.get(getAdapterPosition()));
+                listener.onClientSelected(clientListFiltered.get(getAdapterPosition()).getAsJsonObject());
             });
         }
     }
 
 
-    public ClientListAdapter(Context context, List<JSONObject> clientList, ClientListAdapterListener listener) {
+    public ClientListAdapter(Context context, List<JsonObject> clientList, ClientListAdapterListener listener) {
         this.context = context;
         this.listener = listener;
         this.clientList = clientList;
@@ -66,18 +69,18 @@ public class ClientListAdapter extends RecyclerView.Adapter<ClientListAdapter.My
 
     @Override
     public void onBindViewHolder( @NonNull MyViewHolder holder, final int position) {
-        final JSONObject client = clientListFiltered.get(position);
+        final JsonObject client = clientListFiltered.get(position);
         try {
-            holder.name.setText(client.getString("ContactPerson"));
-            holder.institute.setText(client.getString("InsName"));
-            holder.address.setText(client.getString("InstituteAddress"));
-            holder.student.setText(client.getString("NoOfStudent"));
-            holder.teacher.setText(client.getString("NoOfTeacher"));
-            holder.contact.setText("Mobile: "+client.getString("ContactNumber"));
-            holder.date.setText(client.getString("EntryDate"));
-            holder.priority.setText(client.getString("Priority"));
-            holder.instituteType.setText(client.getString("InstituteTypeName"));
-        } catch (JSONException e) {
+            holder.name.setText(client.get("ContactPerson").getAsString());
+            holder.institute.setText(client.get("InsName").getAsString());
+            holder.address.setText(client.get("InstituteAddress").getAsString());
+            holder.student.setText(client.get("NoOfStudent").getAsString());
+            holder.teacher.setText(client.get("NoOfTeacher").getAsString());
+            holder.contact.setText("Mobile: "+client.get("ContactNumber").getAsString());
+            holder.date.setText(client.get("EntryDate").getAsString());
+            holder.priority.setText(client.get("Priority").getAsString());
+            holder.instituteType.setText(client.get("InstituteTypeName").getAsString());
+        } catch (JsonIOException e) {
             e.printStackTrace();
         }
     }
@@ -96,16 +99,16 @@ public class ClientListAdapter extends RecyclerView.Adapter<ClientListAdapter.My
                 if (charString.isEmpty()) {
                     clientListFiltered = clientList;
                 } else {
-                    List<JSONObject> filteredList = new ArrayList<>();
-                    for (JSONObject row : clientList) {
+                    List<JsonObject> filteredList = new ArrayList<>();
+                    for (JsonObject row : clientList) {
 
                         // name match condition. this might differ depending on your requirement
                         // here we are looking for name or phone number match
                         try {
-                            if (row.getString("InsName").toLowerCase().contains(charString.toLowerCase()) || row.getString("ContactPerson").contains(charSequence)) {
+                            if (row.get("InsName").getAsString().toLowerCase().contains(charString.toLowerCase()) || row.get("ContactPerson").getAsString().contains(charSequence)) {
                                 filteredList.add(row);
                             }
-                        } catch (JSONException e) {
+                        } catch (JsonIOException e) {
                             e.printStackTrace();
                         }
                     }
@@ -120,13 +123,13 @@ public class ClientListAdapter extends RecyclerView.Adapter<ClientListAdapter.My
 
             @Override
             protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
-                clientListFiltered = (ArrayList<JSONObject>) filterResults.values;
+                clientListFiltered = (ArrayList<JsonObject>) filterResults.values;
                 notifyDataSetChanged();
             }
         };
     }
 
     public interface ClientListAdapterListener {
-        void onClientSelected(JSONObject client);
+        void onClientSelected(JsonObject client);
     }
 }

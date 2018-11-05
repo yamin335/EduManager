@@ -4,18 +4,25 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.app.DownloadManager;
+import android.app.NotificationManager;
 import android.content.ActivityNotFoundException;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -43,34 +50,52 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import io.reactivex.Observable;
+import io.reactivex.Observer;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 import onair.onems.R;
 import onair.onems.Services.RetrofitNetworkService;
 import onair.onems.Services.StaticHelperClass;
 import onair.onems.mainactivities.CommonToolbarParentActivity;
 import onair.onems.models.CommunicationDetailModel;
 import onair.onems.models.CommunicationTypeModel;
+import onair.onems.models.DocumentModel;
 import onair.onems.models.PriorityModel;
 import onair.onems.network.MySingleton;
+import onair.onems.syllabus.SyllabusMainScreen;
 import onair.onems.utils.FileUtils;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.converter.scalars.ScalarsConverterFactory;
 
-public class ClientCommunicationDetail extends CommonToolbarParentActivity implements FileAdapter.DeleteUri {
+import static onair.onems.Services.StaticHelperClass.isNetworkAvailable;
+
+public class ClientCommunicationDetail extends CommonToolbarParentActivity implements FileAdapter.DeleteUri, FileAdapter.DownloadFile {
 
     private Spinner spinnerCommunicationType, spinnerPriorityType;
     private String[] tempCommunicationType = {"Communication Type"};
@@ -96,6 +121,7 @@ public class ClientCommunicationDetail extends CommonToolbarParentActivity imple
     private DatePickerDialog datePickerDialog;
     private boolean forUpdate = false;
     private int updatedCommunicationType = -1, updatedPriority = -1;
+    private ArrayList<Long> refIdList = new ArrayList<>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -150,10 +176,12 @@ public class ClientCommunicationDetail extends CommonToolbarParentActivity imple
                 communicationDetailModel.setPriorityID(jsonObject.getString("PriorityID"));
                 updatedPriority = jsonObject.getInt("PriorityID");
                 communicationDetailModel.setCommunicationDate(jsonObject.getString("CommunicationDate"));
+                selectedDate = jsonObject.getString("CommunicationDate");
                 comDate.setText(jsonObject.getString("CommunicationDate"));
                 String nextMeeting = jsonObject.getString("NextMeetingDate");
-                if (!nextMeeting.equalsIgnoreCase("")&&!nextMeeting.equalsIgnoreCase("null")) {
+                if (!nextMeeting.equalsIgnoreCase("")&&!nextMeeting.equalsIgnoreCase("null")&&!nextMeeting.equalsIgnoreCase("1900-01-01T00:00:00.000Z")&&!nextMeeting.equalsIgnoreCase("1900-01-01")) {
                     communicationDetailModel.setNextMeetingDate(nextMeeting);
+                    selectedNextMeetingDate = nextMeeting;
                     yes.setChecked(true);
                     nextComDate.setText(nextMeeting);
                 }
@@ -217,6 +245,18 @@ public class ClientCommunicationDetail extends CommonToolbarParentActivity imple
         fileRecycler.setLayoutManager(layoutManager);
         fileRecycler.setItemAnimator(new DefaultItemAnimator());
         fileRecycler.setAdapter(fileAdapter);
+
+        if (forUpdate) {
+            try {
+                JSONObject jsonObject = new JSONObject(extraIntent.getStringExtra("forUpdate"));
+                fileAdapter = new FileAdapter(this, jsonObject.getJSONArray("Document"), forUpdate, this);
+                fileRecycler.setLayoutManager(layoutManager);
+                fileRecycler.setItemAnimator(new DefaultItemAnimator());
+                fileRecycler.setAdapter(fileAdapter);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
 
         spinnerCommunicationType =(Spinner)findViewById(R.id.spinnerCommunication);
         spinnerPriorityType = (Spinner)findViewById(R.id.spinnerPriority);
@@ -291,12 +331,16 @@ public class ClientCommunicationDetail extends CommonToolbarParentActivity imple
                 communicationDetailModel.setCommunicationDate(selectedDate);
                 communicationDetailModel.setNextMeetingDate(selectedNextMeetingDate);
                 communicationDetailModel.setCommunicationDetails(details.getText().toString());
-                postToServer(communicationDetailModel);
+                postDocumentsAndData();
             }
 
         });
 
         ImageView addFile = findViewById(R.id.addFile);
+        if (forUpdate) {
+            addFile.setClickable(false);
+            addFile.setVisibility(View.GONE);
+        }
         addFile.setOnClickListener((view)-> {
             if (checkPermissionREAD_EXTERNAL_STORAGE(ClientCommunicationDetail.this)) {
                 // do your stuff..
@@ -306,9 +350,212 @@ public class ClientCommunicationDetail extends CommonToolbarParentActivity imple
         });
         CommunicationTypeGetRequest();
         PriorityDataGetRequest();
+        registerReceiver(onComplete, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
     }
 
-    private void postToServer(CommunicationDetailModel communicationDetailModel) {
+    BroadcastReceiver onComplete = new BroadcastReceiver() {
+
+        public void onReceive(Context context, Intent intent) {
+
+            // get the refId from the download manager
+            long referenceId = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1);
+
+            // Open downloaded file
+            DownloadManager downloadManager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
+            DownloadManager.Query query = new DownloadManager.Query();
+            query.setFilterById(referenceId);
+            Cursor cursor = downloadManager.query(query);
+            if (cursor.moveToFirst()) {
+                int downloadStatus = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS));
+                String downloadLocalUri = cursor.getString(cursor.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI));
+                String downloadMimeType = cursor.getString(cursor.getColumnIndex(DownloadManager.COLUMN_MEDIA_TYPE));
+                if ((downloadStatus == DownloadManager.STATUS_SUCCESSFUL) && downloadLocalUri != null) {
+//                    try {
+//                        downloadManager.openDownloadedFile(referenceId);
+//                        openFile(downloadLocalUri);
+//                    } catch (IOException e) {
+//                        e.printStackTrace();
+//                    }
+                }
+            }
+            cursor.close();
+
+            // remove it from our list
+            refIdList.remove(referenceId);
+
+            // if list is empty means all downloads completed
+            if (refIdList.isEmpty()) {
+                // show a notification
+                NotificationCompat.Builder mBuilder =
+                        new NotificationCompat.Builder(ClientCommunicationDetail.this)
+                                .setSmallIcon(R.drawable.onair)
+                                .setContentTitle("Download Completed")
+                                .setContentText("All Downloads are completed");
+
+
+                NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                notificationManager.notify(455, mBuilder.build());
+            }
+        }
+    };
+
+    private boolean isPermissionAllowed() {
+        if (Build.VERSION.SDK_INT >= 23) {
+            if (checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    == PackageManager.PERMISSION_GRANTED) {
+                return true;
+            } else {
+
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+                return false;
+            }
+        } else { //permission is automatically granted on sdk<23 upon installation
+            return true;
+        }
+    }
+
+    @NonNull
+    private String getFileExtension(String string) {
+        if(string.contains(".png")||string.contains(".PNG")){
+            return ".png";
+        } else if(string.contains(".jpg")||string.contains(".JPG")){
+            return ".jpg";
+        } else if(string.contains(".jpeg")||string.contains(".JPEG")){
+            return ".jpeg";
+        } else if(string.contains(".gif")||string.contains(".GIF")){
+            return ".gif";
+        } else if(string.contains(".bmp")||string.contains(".BMP")){
+            return ".bmp";
+        } else if(string.contains(".mp3")||string.contains(".MP3")){
+            return ".mp3";
+        } else if(string.contains(".amr")||string.contains(".AMR")){
+            return ".amr";
+        } else if(string.contains(".wav")||string.contains(".WAV")){
+            return ".wav";
+        } else if(string.contains(".aac")||string.contains(".AAC")){
+            return ".aac";
+        } else if(string.contains(".mp4")||string.contains(".MP4")){
+            return ".mp4";
+        } else if(string.contains(".wmv")||string.contains(".WMV")){
+            return ".wmv";
+        } else if(string.contains(".avi")||string.contains(".AVI")){
+            return ".avi";
+        } else if(string.contains(".flv")||string.contains(".FLV")){
+            return ".flv";
+        } else if(string.contains(".mov")||string.contains(".MOV")){
+            return ".mov";
+        } else if(string.contains(".vob")||string.contains(".VOB")){
+            return ".vob";
+        } else if(string.contains(".mpeg")||string.contains(".MPEG")){
+            return ".mpeg";
+        } else if(string.contains(".3gp")||string.contains(".3GP")){
+            return ".3gp";
+        } else if(string.contains(".mpg")||string.contains(".MPG")){
+            return ".mpg";
+        } else if(string.contains(".wmv")||string.contains(".WMV")){
+            return ".wmv";
+        } else if(string.contains(".octet-stream")){
+            return ".rar";
+        } else if(string.contains(".vnd.openxmlformats-officedocument.wo")){
+            return ".doc";
+        } else if(string.contains(".plain")){
+            return ".txt";
+        } else if(string.contains(".vnd.openxmlformats-officedocument.sp")){
+            return ".xls";
+        } else if(string.contains(".x-zip-compressed")){
+            return ".zip";
+        } else if(string.contains(".vnd.openxmlformats-officedocument.presentationml.p")){
+            return ".ppt";
+        } else if(string.contains(".pdf")||string.contains(".PDF")){
+            return ".pdf";
+        } else {
+            return "UnknownFileType";
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(onComplete);
+    }
+
+    @NonNull
+    private MultipartBody.Part prepareFilePart(File file) {
+        // create RequestBody instance from file
+        RequestBody requestFile =
+                RequestBody.create(
+                        MediaType.parse("image/jpeg"),
+                        file
+                );
+
+        // MultipartBody.Part is used to send also the actual file name
+        return MultipartBody.Part.createFormData("userCrmPhoto", file.getName(), requestFile);
+    }
+
+    private void postDocumentsAndData() {
+        if (fileUriArray.size()>0) {
+            Retrofit retrofit = new Retrofit.Builder()
+//                .baseUrl(getString(R.string.baseUrl))
+                    .baseUrl("http://172.16.1.2:4000")
+                    .addConverterFactory(ScalarsConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .build();
+
+            List<MultipartBody.Part> documentParts = new ArrayList<>();
+
+            for (int i=0; i<fileUriArray.size(); i++) {
+                documentParts.add(prepareFilePart(FileUtils.getFile(this, fileUriArray.get(i))));
+            }
+
+            Observable<String> documentObservable = retrofit
+                    .create(RetrofitNetworkService.class)
+                    .uploadMultipleFilesDynamic(documentParts)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread());
+
+            documentObservable
+                    .observeOn(Schedulers.io())
+                    .subscribeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new Observer<String>() {
+
+                        @Override
+                        public void onSubscribe(Disposable d) {
+
+                        }
+
+                        @Override
+                        public void onNext(String returnValue) {
+                            JsonParser parser = new JsonParser();
+                            JsonArray documentUrls = parser.parse(returnValue).getAsJsonArray();
+                            ArrayList<DocumentModel> parsedDocumentUrls = new ArrayList<>();
+                            for(int i = 0; i<documentUrls.size(); i++) {
+                                if(documentUrls.get(i).isJsonObject()) {
+                                    JsonObject tempJsonObject = documentUrls.get(i).getAsJsonObject();
+                                    DocumentModel documentModel = new DocumentModel("0", tempJsonObject.get("path").getAsString());
+                                    parsedDocumentUrls.add(documentModel);
+                                }
+                            }
+                            communicationDetailModel.setDocument(parsedDocumentUrls);
+                            postToServer();
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+                            Log.e("RXANDROID", "onError: " + e.getMessage());
+                        }
+
+                        @Override
+                        public void onComplete() {
+                            Log.e("COMPLETE", "Complete: ");
+                        }
+                    });
+        } else {
+            postToServer();
+        }
+    }
+
+    private void postToServer() {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(getString(R.string.baseUrl))
                 .addConverterFactory(ScalarsConverterFactory.create())
@@ -326,16 +573,8 @@ public class ClientCommunicationDetail extends CommonToolbarParentActivity imple
                 responseData = response.body();
                 if (responseData!= null) {
                     if (!responseData.equals("")&&!responseData.equals("[]")) {
-//                        try {
-//                            JSONArray jsonArray = new JSONArray(responseData);
-//                            for (int i = 0; i<jsonArray.length(); i++) {
-//                                clientList.add(i, jsonArray.getJSONObject(i));
-//                            }
-//                            mAdapter.notifyDataSetChanged();
-//                        } catch (JSONException e) {
-//                            e.printStackTrace();
-//                        }
-                        Toast.makeText(ClientCommunicationDetail.this,"Successful with return value: "+responseData,Toast.LENGTH_LONG).show();
+                        Toast.makeText(ClientCommunicationDetail.this,"Success",Toast.LENGTH_LONG).show();
+                        finish();
                     }
                 }
             }
@@ -668,6 +907,45 @@ public class ClientCommunicationDetail extends CommonToolbarParentActivity imple
         if (priority != -12345) {
             spinnerPriorityType.setSelection(priority+1);
             selectedPriority = allPriority.get(priority);
+        }
+    }
+
+    @Override
+    public void onFileSelected(JSONObject jsonObject) {
+        if(isNetworkAvailable(this)){
+            if(isPermissionAllowed()){
+                try {
+                    String url = jsonObject.getString("DocumentUrl");
+                    url = url.replace("\\","/");
+                    String s[] = url.split("/");
+                    String file = s[s.length-1];
+                    String fileName = file.split("\\.")[0]+getFileExtension(url);
+
+                    // get download service
+                    DownloadManager manager = (DownloadManager)getSystemService(Context.DOWNLOAD_SERVICE);
+//                    DownloadManager.Request request = new DownloadManager.Request(Uri.parse(getString(R.string.baseUrl)+"/"+url));
+                    DownloadManager.Request request = new DownloadManager.Request(Uri.parse("http://172.16.1.2:4000"+"/"+url));
+                    request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI | DownloadManager.Request.NETWORK_MOBILE);
+                    request.setVisibleInDownloadsUi(true);
+                    request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, fileName);
+                    request.setDescription("Some descrition");
+                    request.setTitle(fileName);
+                    // in order for this if to run, you must use the android 3.2 to compile your app
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+                        request.allowScanningByMediaScanner();
+                        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+                    }
+                    long refId = manager.enqueue(request);
+                    refIdList.add(refId);
+
+                } catch (Exception e){
+                    e.printStackTrace();
+                }
+            } else {
+                Toast.makeText(this, "You denied to download!!!", Toast.LENGTH_LONG).show();
+            }
+        } else {
+            Toast.makeText(this, "Please check your INTERNET connection!!!", Toast.LENGTH_LONG).show();
         }
     }
 }

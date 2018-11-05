@@ -285,11 +285,13 @@ public class TeacherMainScreen extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if(user == 1||user == 2) {
-                    Intent mainIntent = new Intent(TeacherMainScreen.this,AttendanceAdminDashboard.class);
+                    Intent mainIntent = new Intent(TeacherMainScreen.this, AttendanceAdminDashboard.class);
                     startActivity(mainIntent);
                     finish();
                 } else {
-                    Intent mainIntent = new Intent(TeacherMainScreen.this,TakeAttendance.class);
+                    Intent mainIntent = new Intent(TeacherMainScreen.this, TakeAttendance.class);
+                    mainIntent.putExtra("fromDashBoard", true);
+                    mainIntent.putExtra("fromSideMenu", false);
                     startActivity(mainIntent);
                     finish();
                 }

@@ -90,6 +90,10 @@ public class SubjectWiseResultAdapter extends RecyclerView.Adapter<SubjectWiseRe
                     .equalsIgnoreCase("null")?"-":subjectWiseResult.getString("Grade"));
             holder.GradePoint.setText(subjectWiseResult.getString("GradePoint")
                     .equalsIgnoreCase("null")?"-":subjectWiseResult.getString("GradePoint"));
+            if (subjectWiseResult.getString("GradePoint").equalsIgnoreCase("0.0")
+                    && subjectWiseResult.getString("SubjectName").equalsIgnoreCase("Total")) {
+                holder.GradePoint.setText("F");
+            }
         } catch (JSONException e) {
             e.printStackTrace();
         }

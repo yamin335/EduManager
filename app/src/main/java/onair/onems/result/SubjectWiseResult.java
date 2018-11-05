@@ -168,8 +168,12 @@ public class SubjectWiseResult extends CommonToolbarParentActivity implements Su
             }
 
             if(totalSubject!=0) {
-                totalGradePoint/=totalSubject;
-                totalGradePoint = new BigDecimal(totalGradePoint).setScale(2, RoundingMode.HALF_UP).doubleValue();
+                if (isFail) {
+                    totalGradePoint = 0;
+                } else {
+                    totalGradePoint/=totalSubject;
+                    totalGradePoint = new BigDecimal(totalGradePoint).setScale(2, RoundingMode.HALF_UP).doubleValue();
+                }
             }
 
             if(isFail) {
