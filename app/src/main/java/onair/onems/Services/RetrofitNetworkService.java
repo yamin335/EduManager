@@ -9,6 +9,7 @@ import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import onair.onems.models.CommunicationDetailModel;
+import onair.onems.models.WorkOrderModel;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
@@ -41,7 +42,7 @@ public interface RetrofitNetworkService {
 
     @Headers("Authorization: Request_From_onEMS_Android_app")
     @GET("/api/onEms/spGetCRMCommunicationDetailList/{NewClientID}")
-    Call<String> getDetailList(@Path("NewClientID") int NewClientID);
+    Observable<String> getDetailList(@Path("NewClientID") int NewClientID);
 
     @Headers("Authorization: Request_From_onEMS_Android_app")
     @GET("/api/onEms/getInstituteType")
@@ -50,4 +51,28 @@ public interface RetrofitNetworkService {
     @Headers("Authorization: Request_From_onEMS_Android_app")
     @GET("/api/onEms/spGetCRMPriority")
     Observable<String> getCRMPriority();
+
+    @Headers("Authorization: Request_From_onEMS_Android_app")
+    @GET("/api/onEms/getPaymentMethod")
+    Observable<String> getPaymentMethod();
+
+    @Headers("Authorization: Request_From_onEMS_Android_app")
+    @POST("/api/onEms/spSetCRMWorkOrder")
+    Observable<String> postWorkOrder(@Body WorkOrderModel workOrderModel);
+
+    @Headers("Authorization: Request_From_onEMS_Android_app")
+    @GET("/api/onEms/spGetCRMWrkOrdr/{NewClientID}")
+    Observable<String> getWorkOrder(@Path("NewClientID") int NewClientID);
+
+    @Headers("Authorization: Request_From_onEMS_Android_app")
+    @GET("/api/onEms/getBranchByInsID/{InstituteID}")
+    Observable<String> getBranchByInsID(@Path("InstituteID") long InstituteID);
+
+    @Headers("Authorization: Request_From_onEMS_Android_app")
+    @GET("/api/onEms/getCmnYear")
+    Observable<String> getCmnYear();
+
+    @Headers("Authorization: Request_From_onEMS_Android_app")
+    @GET("/api/onEms/getIncomeStatementReport/{FromDate}/{TODate}/{InstituteID}/{BranchID}/{FiscalYearID}")
+    Observable<String> getIncomeStatementReport(@Path("FromDate") String FromDate, @Path("TODate") String TODate, @Path("InstituteID") long InstituteID, @Path("BranchID") long BranchID, @Path("FiscalYearID") String FiscalYearID);
 }

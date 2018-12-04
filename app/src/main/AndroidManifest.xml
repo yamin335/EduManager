@@ -338,12 +338,10 @@
             android:windowSoftInputMode="stateHidden|adjustPan" />
         <activity
             android:name=".fees_report.FeeCollectionReportMain"
-            android:label="Fees Collection Report"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".fees_report.FeeCollectionReportList"
-            android:label="Fees Collection Report"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
@@ -402,8 +400,23 @@
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
 
-        <activity android:name=".crm.ClientCommunicationDetailList"
+        <activity
+            android:name=".crm.ClientCommunicationDetailList"
             android:label="Details List"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden|adjustPan">
+
+        </activity>
+        <activity
+            android:name=".crm.WorkOrder"
+            android:label="Work Order"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden|adjustPan">
+
+        </activity>
+        <activity
+            android:name=".accounts.IncomeStatement"
+            android:label="Income Statement"
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="stateHidden|adjustPan">
 

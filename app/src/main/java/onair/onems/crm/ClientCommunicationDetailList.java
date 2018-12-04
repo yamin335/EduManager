@@ -14,8 +14,11 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -23,8 +26,14 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
+import io.reactivex.Observable;
+import io.reactivex.Observer;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 import onair.onems.R;
 import onair.onems.Services.RetrofitNetworkService;
+import onair.onems.Services.StaticHelperClass;
 import onair.onems.customised.MyDividerItemDecoration;
 import onair.onems.mainactivities.SideNavigationMenuParentActivity;
 import onair.onems.mainactivities.StudentMainScreen;
@@ -32,6 +41,7 @@ import onair.onems.mainactivities.TeacherMainScreen;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.converter.scalars.ScalarsConverterFactory;
 
@@ -44,6 +54,8 @@ public class ClientCommunicationDetailList extends SideNavigationMenuParentActiv
     private DetailListAdapter mAdapter;
     private ArrayList<JSONObject> detailList;
     private int NewClientID = 0;
+    private ProgressBar progressBar;
+    private View whiteBackground;
 
     @Override
     protected void onResume() {
@@ -73,6 +85,11 @@ public class ClientCommunicationDetailList extends SideNavigationMenuParentActiv
         mAdapter = new DetailListAdapter(this, detailList, this);
         empty = findViewById(R.id.empty);
 
+        whiteBackground = findViewById(R.id.whiteBackground);
+        progressBar = findViewById(R.id.progressBar);
+        progressBar.setVisibility(View.INVISIBLE);
+        whiteBackground.setVisibility(View.INVISIBLE);
+
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -93,6 +110,11 @@ public class ClientCommunicationDetailList extends SideNavigationMenuParentActiv
             e.printStackTrace();
         }
 
+        Button button = findViewById(R.id.button);
+        button.setOnClickListener( view -> {
+            WorkOrderGetRequest();
+        });
+
     }
 
     private void getDetailListData(int NewClientID) {
@@ -100,23 +122,30 @@ public class ClientCommunicationDetailList extends SideNavigationMenuParentActiv
                 .baseUrl(getString(R.string.baseUrl))
                 .addConverterFactory(ScalarsConverterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .build();
 
-        RetrofitNetworkService retrofitNetworkService = retrofit.create(RetrofitNetworkService.class);
+        Observable<String> detailListObservable = retrofit
+                .create(RetrofitNetworkService.class)
+                .getDetailList(NewClientID)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
 
-        // finally, execute the request
-        Call<String> networkCall = retrofitNetworkService.getDetailList(NewClientID);
-        networkCall.enqueue(new Callback<String>() {
+        detailListObservable.subscribe(new Observer<String>() {
+
             @Override
-            public void onResponse(@NonNull Call<String> call, @NonNull retrofit2.Response<String> response) {
-                String responseData = "";
-                responseData = response.body();
-                if (responseData!= null) {
-                    if (!responseData.equals("")&&!responseData.equals("[]")) {
+            public void onSubscribe(Disposable d) {
+
+            }
+
+            @Override
+            public void onNext(String detailListData) {
+                if (detailListData!= null) {
+                    if (!detailListData.equals("")&&!detailListData.equals("[]")) {
                         empty.setVisibility(View.GONE);
                         detailList.clear();
                         try {
-                            JSONArray jsonArray = new JSONArray(responseData);
+                            JSONArray jsonArray = new JSONArray(detailListData);
                             for (int i = 0; i<jsonArray.length(); i++) {
                                 detailList.add(i, jsonArray.getJSONObject(i));
                             }
@@ -129,10 +158,46 @@ public class ClientCommunicationDetailList extends SideNavigationMenuParentActiv
             }
 
             @Override
-            public void onFailure(@NonNull Call<String> call, @NonNull Throwable t) {
-                Log.e("Request error:", t.getMessage());
+            public void onError(Throwable e) {
+
+            }
+
+            @Override
+            public void onComplete() {
             }
         });
+
+//        RetrofitNetworkService retrofitNetworkService = retrofit.create(RetrofitNetworkService.class);
+//
+//        // finally, execute the request
+//        Call<String> networkCall = retrofitNetworkService.getDetailList(NewClientID);
+//        networkCall.enqueue(new Callback<String>() {
+//            @Override
+//            public void onResponse(@NonNull Call<String> call, @NonNull retrofit2.Response<String> response) {
+//                String responseData = "";
+//                responseData = response.body();
+//                if (responseData!= null) {
+//                    if (!responseData.equals("")&&!responseData.equals("[]")) {
+//                        empty.setVisibility(View.GONE);
+//                        detailList.clear();
+//                        try {
+//                            JSONArray jsonArray = new JSONArray(responseData);
+//                            for (int i = 0; i<jsonArray.length(); i++) {
+//                                detailList.add(i, jsonArray.getJSONObject(i));
+//                            }
+//                            mAdapter.notifyDataSetChanged();
+//                        } catch (JSONException e) {
+//                            e.printStackTrace();
+//                        }
+//                    }
+//                }
+//            }
+//
+//            @Override
+//            public void onFailure(@NonNull Call<String> call, @NonNull Throwable t) {
+//                Log.e("Request error:", t.getMessage());
+//            }
+//        });
     }
 
     @Override
@@ -153,5 +218,68 @@ public class ClientCommunicationDetailList extends SideNavigationMenuParentActiv
         Intent mainIntent = new Intent(ClientCommunicationDetailList.this, ClientCommunicationDetail.class);
         mainIntent.putExtra("forUpdate", detail.toString());
         startActivity(mainIntent);
+    }
+
+    private void WorkOrderGetRequest() {
+        if(StaticHelperClass.isNetworkAvailable(this)) {
+
+            progressBar.setVisibility(View.VISIBLE);
+            whiteBackground.setVisibility(View.VISIBLE);
+
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(getString(R.string.baseUrl))
+                    .addConverterFactory(ScalarsConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .build();
+            Observable<String> paymentTypeObservable = retrofit
+                    .create(RetrofitNetworkService.class)
+                    .getWorkOrder(NewClientID)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread());
+
+            paymentTypeObservable.subscribe(new Observer<String>() {
+
+                @Override
+                public void onSubscribe(Disposable d) {
+
+                }
+
+                @Override
+                public void onNext(String workOrderReturnValue) {
+                    progressBar.setVisibility(View.INVISIBLE);
+                    whiteBackground.setVisibility(View.INVISIBLE);
+                    Intent workOrderIntent = new Intent(ClientCommunicationDetailList.this, WorkOrder.class);
+                    if (!workOrderReturnValue.equalsIgnoreCase("") && !workOrderReturnValue.equalsIgnoreCase("null")
+                            && !workOrderReturnValue.equalsIgnoreCase("[]")) {
+
+                        workOrderIntent.putExtra("clientData", clientData);
+                        workOrderIntent.putExtra("forUpdate", workOrderReturnValue);
+                        startActivity(workOrderIntent);
+
+                    } else {
+                        workOrderIntent.putExtra("clientData", clientData);
+                        startActivity(workOrderIntent);
+                    }
+                }
+
+                @Override
+                public void onError(Throwable e) {
+                    progressBar.setVisibility(View.INVISIBLE);
+                    whiteBackground.setVisibility(View.INVISIBLE);
+                    Intent workOrderIntent = new Intent(ClientCommunicationDetailList.this, WorkOrder.class);
+                    workOrderIntent.putExtra("clientData", clientData);
+                    startActivity(workOrderIntent);
+                }
+
+                @Override
+                public void onComplete() {
+
+                }
+            });
+        } else {
+            Toast.makeText(ClientCommunicationDetailList.this,"Please check your internet connection and select again!!! ",
+                    Toast.LENGTH_LONG).show();
+        }
     }
 }

@@ -62,6 +62,7 @@ import java.util.Random;
 import onair.onems.PrivacyPolicy;
 import onair.onems.R;
 import onair.onems.Services.StaticHelperClass;
+import onair.onems.accounts.IncomeStatement;
 import onair.onems.app.Config;
 import onair.onems.attendance.AttendanceAdminDashboard;
 import onair.onems.contacts.ContactsMainScreen;
@@ -178,8 +179,8 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
         UserTypeID = prefs.getInt("UserTypeID",0);
         InstituteID = prefs.getLong("InstituteID",0);
         LoggedUserID = prefs.getString("UserID", "0");
-        UserName = prefs.getString("UserName", "0");
-        UserFullName = prefs.getString("UserFullName", "0");
+        UserName = prefs.getString("UserName", "");
+        UserFullName = prefs.getString("UserFullName", "");
         ImageUrl = prefs.getString("ImageUrl", "0");
         LoggedUserShiftID = prefs.getLong("ShiftID",0);
         LoggedUserMediumID = prefs.getLong("MediumID",0);
@@ -848,6 +849,11 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
         menuPrivacy.setIconImg(R.drawable.privacy_icon);
         listDataHeader.add(menuPrivacy);
 
+        ExpandedMenuModel menuAccount = new ExpandedMenuModel();
+        menuAccount.setIconName("Accounts");
+        menuAccount.setIconImg(R.drawable.ic_account_balance);
+        listDataHeader.add(menuAccount);
+
         // Adding child data
         List<String> headingDashboard = new ArrayList<>();
         List<String> headingNotice = new ArrayList<>();
@@ -892,6 +898,9 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
 
         List<String> headingPrivacy = new ArrayList<>();
 
+        List<String> headingAccount = new ArrayList<>();
+        headingAccount.add("Income Statement");
+
         // Header, Child data
         listDataChild.put(listDataHeader.get(0), headingDashboard);
         listDataChild.put(listDataHeader.get(1), headingNotice);
@@ -907,6 +916,7 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
         listDataChild.put(listDataHeader.get(11), headingReport);
         listDataChild.put(listDataHeader.get(12), headingCRM);
         listDataChild.put(listDataHeader.get(13), headingPrivacy);
+        listDataChild.put(listDataHeader.get(14), headingAccount);
 
         mMenuAdapter = new ExpandableListAdapter(this, listDataHeader, listDataChild, UserTypeID);
         expandableList.setAdapter(mMenuAdapter);
@@ -1140,7 +1150,7 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
                 }
 
                 if((i == 11) && (i1 == 0) && (l == 0)) {
-                    if(activityName.equals(FeeCollectionReportMain.class.getName())){
+                    if(activityName.equals("FeeCollectionReport")){
                         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
                         if (drawer.isDrawerOpen(GravityCompat.START)) {
                             drawer.closeDrawer(GravityCompat.START);
@@ -1154,7 +1164,7 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
                 }
 
                 if((i == 11) && (i1 == 1) && (l == 1)) {
-                    if(activityName.equals(FeeCollectionReportMain.class.getName())){
+                    if(activityName.equals("FeeSummaryReport")){
                         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
                         if (drawer.isDrawerOpen(GravityCompat.START)) {
                             drawer.closeDrawer(GravityCompat.START);
@@ -1188,6 +1198,19 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
                         }
                     } else {
                         Intent intent = new Intent(getApplicationContext(), ClientList.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                }
+
+                if((i == 14) && (i1 == 0) && (l == 0)) {
+                    if(activityName.equals(IncomeStatement.class.getName())){
+                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                        if (drawer.isDrawerOpen(GravityCompat.START)) {
+                            drawer.closeDrawer(GravityCompat.START);
+                        }
+                    } else {
+                        Intent intent = new Intent(getApplicationContext(), IncomeStatement.class);
                         startActivity(intent);
                         finish();
                     }
@@ -1275,6 +1298,11 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
         menuPrivacy.setIconImg(R.drawable.privacy_icon);
         listDataHeader.add(menuPrivacy);
 
+        ExpandedMenuModel menuAccount = new ExpandedMenuModel();
+        menuAccount.setIconName("Accounts");
+        menuAccount.setIconImg(R.drawable.ic_account_balance);
+        listDataHeader.add(menuAccount);
+
         // Adding child data
         List<String> headingDashboard = new ArrayList<>();
         List<String> headingNotice = new ArrayList<>();
@@ -1318,6 +1346,9 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
 
         List<String> headingPrivacy = new ArrayList<>();
 
+        List<String> headingAccount = new ArrayList<>();
+        headingAccount.add("Income Statement");
+
         // Header, Child data
         listDataChild.put(listDataHeader.get(0), headingDashboard);
         listDataChild.put(listDataHeader.get(1), headingNotice);
@@ -1333,6 +1364,7 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
         listDataChild.put(listDataHeader.get(11), headingReport);
         listDataChild.put(listDataHeader.get(12), headingCRM);
         listDataChild.put(listDataHeader.get(13), headingPrivacy);
+        listDataChild.put(listDataHeader.get(14), headingAccount);
 
         mMenuAdapter = new ExpandableListAdapter(this, listDataHeader, listDataChild, UserTypeID);
         expandableList.setAdapter(mMenuAdapter);
@@ -1566,14 +1598,10 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
                 }
 
                 if((i == 11) && (i1 == 0) && (l == 0)) {
-                    if(activityName.equals(FeeCollectionReportMain.class.getName())){
+                    if(activityName.equals("FeeCollectionReport")){
                         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
                         if (drawer.isDrawerOpen(GravityCompat.START)) {
                             drawer.closeDrawer(GravityCompat.START);
-                            Intent intent = new Intent(getApplicationContext(), FeeCollectionReportMain.class);
-                            intent.putExtra("Report Type", 1);
-                            startActivity(intent);
-                            finish();
                         }
                     } else {
                         Intent intent = new Intent(getApplicationContext(), FeeCollectionReportMain.class);
@@ -1584,14 +1612,10 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
                 }
 
                 if((i == 11) && (i1 == 1) && (l == 1)) {
-                    if(activityName.equals(FeeCollectionReportMain.class.getName())){
+                    if(activityName.equals("FeeSummaryReport")){
                         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
                         if (drawer.isDrawerOpen(GravityCompat.START)) {
                             drawer.closeDrawer(GravityCompat.START);
-                            Intent intent = new Intent(getApplicationContext(), FeeCollectionReportMain.class);
-                            intent.putExtra("Report Type", 2);
-                            startActivity(intent);
-                            finish();
                         }
                     } else {
                         Intent intent = new Intent(getApplicationContext(), FeeCollectionReportMain.class);
@@ -1622,6 +1646,19 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
                         }
                     } else {
                         Intent intent = new Intent(getApplicationContext(), ClientList.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                }
+
+                if((i == 14) && (i1 == 0) && (l == 0)) {
+                    if(activityName.equals(IncomeStatement.class.getName())){
+                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                        if (drawer.isDrawerOpen(GravityCompat.START)) {
+                            drawer.closeDrawer(GravityCompat.START);
+                        }
+                    } else {
+                        Intent intent = new Intent(getApplicationContext(), IncomeStatement.class);
                         startActivity(intent);
                         finish();
                     }
@@ -1708,6 +1745,11 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
         menuPrivacy.setIconImg(R.drawable.privacy_icon);
         listDataHeader.add(menuPrivacy);
 
+        ExpandedMenuModel menuAccount = new ExpandedMenuModel();
+        menuAccount.setIconName("Accounts");
+        menuAccount.setIconImg(R.drawable.ic_account_balance);
+        listDataHeader.add(menuAccount);
+
         // Adding child data
         List<String> headingDashboard = new ArrayList<>();
         List<String> headingNotice = new ArrayList<>();
@@ -1750,6 +1792,9 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
 
         List<String> headingPrivacy = new ArrayList<>();
 
+        List<String> headingAccount = new ArrayList<>();
+        headingAccount.add("Income Statement");
+
         // Header, Child data
         listDataChild.put(listDataHeader.get(0), headingDashboard);
         listDataChild.put(listDataHeader.get(1), headingNotice);
@@ -1765,6 +1810,7 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
         listDataChild.put(listDataHeader.get(11), headingReport);
         listDataChild.put(listDataHeader.get(12), headingCRM);
         listDataChild.put(listDataHeader.get(13), headingPrivacy);
+        listDataChild.put(listDataHeader.get(14), headingAccount);
 
         mMenuAdapter = new ExpandableListAdapter(this, listDataHeader, listDataChild, UserTypeID);
         expandableList.setAdapter(mMenuAdapter);
@@ -1983,7 +2029,7 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
                 }
 
                 if((i == 11) && (i1 == 0) && (l == 0)) {
-                    if(activityName.equals(FeeCollectionReportMain.class.getName())){
+                    if(activityName.equals("FeeCollectionReport")){
                         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
                         if (drawer.isDrawerOpen(GravityCompat.START)) {
                             drawer.closeDrawer(GravityCompat.START);
@@ -1997,7 +2043,7 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
                 }
 
                 if((i == 11) && (i1 == 1) && (l == 1)) {
-                    if(activityName.equals(FeeCollectionReportMain.class.getName())){
+                    if(activityName.equals("FeeSummaryReport")){
                         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
                         if (drawer.isDrawerOpen(GravityCompat.START)) {
                             drawer.closeDrawer(GravityCompat.START);
@@ -2031,6 +2077,19 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
                         }
                     } else {
                         Intent intent = new Intent(getApplicationContext(), ClientList.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                }
+
+                if((i == 14) && (i1 == 0) && (l == 0)) {
+                    if(activityName.equals(IncomeStatement.class.getName())){
+                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                        if (drawer.isDrawerOpen(GravityCompat.START)) {
+                            drawer.closeDrawer(GravityCompat.START);
+                        }
+                    } else {
+                        Intent intent = new Intent(getApplicationContext(), IncomeStatement.class);
                         startActivity(intent);
                         finish();
                     }
@@ -2289,29 +2348,29 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
                 }
 
                 if((i == 7) && (i1 == 0) && (l == 0)) {
-                    if(activityName.equals(FeeMainScreen.class.getName())){
-                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-                        if (drawer.isDrawerOpen(GravityCompat.START)) {
-                            drawer.closeDrawer(GravityCompat.START);
-                        }
-                    } else {
-                        Intent intent = new Intent(getApplicationContext(), FeeMainScreen.class);
-                        startActivity(intent);
-                        finish();
-                    }
+//                    if(activityName.equals(FeeMainScreen.class.getName())){
+//                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+//                        if (drawer.isDrawerOpen(GravityCompat.START)) {
+//                            drawer.closeDrawer(GravityCompat.START);
+//                        }
+//                    } else {
+//                        Intent intent = new Intent(getApplicationContext(), FeeMainScreen.class);
+//                        startActivity(intent);
+//                        finish();
+//                    }
                 }
 
                 if((i == 7) && (i1 == 1) && (l == 1)) {
-                    if(activityName.equals(FeesHistory.class.getName())){
-                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-                        if (drawer.isDrawerOpen(GravityCompat.START)) {
-                            drawer.closeDrawer(GravityCompat.START);
-                        }
-                    } else {
-                        Intent intent = new Intent(getApplicationContext(), FeesHistory.class);
-                        startActivity(intent);
-                        finish();
-                    }
+//                    if(activityName.equals(FeesHistory.class.getName())){
+//                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+//                        if (drawer.isDrawerOpen(GravityCompat.START)) {
+//                            drawer.closeDrawer(GravityCompat.START);
+//                        }
+//                    } else {
+//                        Intent intent = new Intent(getApplicationContext(), FeesHistory.class);
+//                        startActivity(intent);
+//                        finish();
+//                    }
                 }
                 return false;
             }

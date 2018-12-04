@@ -26,7 +26,7 @@ public class DetailListAdapter extends RecyclerView.Adapter<DetailListAdapter.My
     private DetailListAdapterListener listener;
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
-        TextView meetingDate, nextMeetingDate, detailPriority, detailMedium;
+        TextView meetingDate, nextMeetingDate, detailPriority, detailMedium, nextMeetingDateTitle;
 
         public MyViewHolder(View view) {
             super(view);
@@ -34,6 +34,7 @@ public class DetailListAdapter extends RecyclerView.Adapter<DetailListAdapter.My
             nextMeetingDate = view.findViewById(R.id.textView14);
             detailPriority = view.findViewById(R.id.priority);
             detailMedium = view.findViewById(R.id.medium);
+            nextMeetingDateTitle = view.findViewById(R.id.textView12);
 
             view.setOnClickListener(view1 -> {
                 // send selected client in callback
@@ -66,7 +67,17 @@ public class DetailListAdapter extends RecyclerView.Adapter<DetailListAdapter.My
             holder.meetingDate.setText(detailObject.getString("CommunicationDate"));
             holder.detailPriority.setText(detailObject.getString("Priority"));
             holder.detailMedium.setText(detailObject.getString("CommunicationType"));
-            holder.nextMeetingDate.setText(detailObject.getString("NextMeetingDate"));
+            if (!detailObject.getString("NextMeetingDate").equalsIgnoreCase("")
+                    &&!detailObject.getString("NextMeetingDate").equalsIgnoreCase("null")
+                    &&!detailObject.getString("NextMeetingDate").equalsIgnoreCase("1900-01-01T00:00:00.000Z")
+                    &&!detailObject.getString("NextMeetingDate").equalsIgnoreCase("1900-01-01")) {
+                holder.nextMeetingDateTitle.setVisibility(View.VISIBLE);
+                holder.nextMeetingDate.setVisibility(View.VISIBLE);
+            }
+            holder.nextMeetingDate.setText(detailObject.getString("NextMeetingDate").equalsIgnoreCase("")
+                    ||detailObject.getString("NextMeetingDate").equalsIgnoreCase("null")
+                    ||detailObject.getString("NextMeetingDate").equalsIgnoreCase("1900-01-01T00:00:00.000Z")
+                    ||detailObject.getString("NextMeetingDate").equalsIgnoreCase("1900-01-01")? "" : detailObject.getString("NextMeetingDate"));
         } catch (JSONException e) {
             e.printStackTrace();
         }

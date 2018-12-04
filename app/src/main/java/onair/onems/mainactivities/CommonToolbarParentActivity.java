@@ -22,8 +22,8 @@ public class CommonToolbarParentActivity extends AppCompatActivity {
         UserTypeID = prefs.getInt("UserTypeID",0);
         InstituteID = prefs.getLong("InstituteID",0);
         LoggedUserID = prefs.getString("UserID", "0");
-        UserName = prefs.getString("UserName", "0");
-        UserFullName = prefs.getString("UserFullName", "0");
+        UserName = prefs.getString("UserName", "");
+        UserFullName = prefs.getString("UserFullName", "");
         ImageUrl = prefs.getString("ImageUrl", "0");
         LoggedUserShiftID = prefs.getLong("ShiftID",0);
         LoggedUserMediumID = prefs.getLong("MediumID",0);

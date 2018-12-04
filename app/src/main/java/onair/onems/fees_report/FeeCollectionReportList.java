@@ -27,6 +27,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import onair.onems.R;
 import onair.onems.Services.StaticHelperClass;
@@ -58,6 +59,7 @@ public class FeeCollectionReportList extends CommonToolbarParentActivity {
                     +"/"+intent.getStringExtra("SectionID")+"/"+intent.getStringExtra("ShiftID")
                     +"/"+"0"+"/"+"0"+"/"+intent.getStringExtra("MonthID")+"/"+intent.getStringExtra("StatusID")
                     +"/"+intent.getStringExtra("SessionID");
+                Objects.requireNonNull(getSupportActionBar()).setTitle("Fee Collection Report");
                 break;
             case 2: url = getString(R.string.baseUrl)+"/api/onEms/GetAccFeesCollectionReportTopSheet/"+intent.getStringExtra("InstituteID")
                     +"/"+intent.getStringExtra("BranchID")+"/"+intent.getStringExtra("MediumID")
@@ -65,6 +67,7 @@ public class FeeCollectionReportList extends CommonToolbarParentActivity {
                     +"/"+intent.getStringExtra("SectionID")+"/"+intent.getStringExtra("ShiftID")
                     +"/"+"0"+"/"+"0"+"/"+intent.getStringExtra("MonthID")+"/"+intent.getStringExtra("StatusID")
                     +"/"+intent.getStringExtra("SessionID");
+                Objects.requireNonNull(getSupportActionBar()).setTitle("Fee Summary Report");
                 break;
         }
         ReportDataGetRequest(url);

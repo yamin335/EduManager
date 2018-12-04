@@ -14,6 +14,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
+import android.widget.Switch;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
@@ -30,6 +31,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import onair.onems.R;
 import onair.onems.Services.StaticHelperClass;
@@ -95,7 +97,7 @@ public class FeeCollectionReportMain extends SideNavigationMenuParentActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        activityName = FeeCollectionReportMain.class.getName();
+//        activityName = FeeCollectionReportMain.class.getName();
 
         LayoutInflater inflater = (LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         final View childActivityLayout = inflater.inflate(R.layout.fee_collection_report_main, null);
@@ -103,6 +105,15 @@ public class FeeCollectionReportMain extends SideNavigationMenuParentActivity {
         parentActivityLayout.addView(childActivityLayout, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
 
         ReportType = getIntent().getIntExtra("Report Type", 0);
+
+        switch(ReportType) {
+            case 1: activityName = "FeeCollectionReport";
+                Objects.requireNonNull(getSupportActionBar()).setTitle("Fee Collection Report");
+                break;
+            case 2: activityName = "FeeSummaryReport";
+                Objects.requireNonNull(getSupportActionBar()).setTitle("Fee Summary Report");
+                break;
+        }
 
         selectedBranch = new BranchModel();
         selectedShift = new ShiftModel();

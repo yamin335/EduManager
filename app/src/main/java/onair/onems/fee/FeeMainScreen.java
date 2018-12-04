@@ -50,8 +50,7 @@ public class FeeMainScreen extends SideNavigationMenuParentActivity {
     SharedPreferences  prefs;
     ListView listView;
     ArrayList<CardModel> cardModels;
-    String type[]={"Select","Cadet Card","Papal","Bikash"};
-    TextView Total_fine,Total_amount_Text,Total_due,Total_scholarship;
+    TextView Total_amount_Text;
 
     private int UserTypeID;
 
