@@ -7,39 +7,18 @@
     android:orientation="vertical"
     android:background="#01579B">
 
-    <!--<com.jaredrummler.materialspinner.MaterialSpinner-->
-        <!--android:id="@+id/spinner"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content"-->
-         <!--android:layout_marginRight="10dp"-->
-        <!--android:layout_gravity="right"-->
-        <!--table:ms_background_color="#0277BD"-->
-        <!--android:textAlignment="center"-->
-        <!--table:ms_dropdown_max_height="250dp"-->
-        <!--table:ms_text_color="#ffffff" />-->
-
-    <LinearLayout
-        android:id="@+id/linearLayout5"
+    <Spinner
+        android:id="@+id/spinnerMonth"
         android:layout_width="match_parent"
-        android:layout_height="40dp"
+        android:layout_height="wrap_content"
+        android:minHeight="35dp"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:background="@drawable/spinner_background"
-        android:elevation="5dp"
-        android:orientation="vertical"
-        android:paddingLeft="20dp"
-        android:paddingRight="10dp">
-
-        <Spinner
-            android:id="@+id/spinnerMonth"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:backgroundTint="#000000"
-            android:popupBackground="@drawable/drop_down_menu"
-            android:spinnerMode="dropdown" />
-    </LinearLayout>
+        android:popupBackground="@drawable/drop_down_menu"
+        android:spinnerMode="dropdown"
+        android:background="@drawable/spinner_background_gray_round"/>
 
     <LinearLayout
         android:layout_width="match_parent"

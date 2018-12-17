@@ -1,71 +1,67 @@
 package onair.onems.login;
 
-import android.Manifest;
 import android.app.AlertDialog;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.telephony.TelephonyManager;
-import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.google.firebase.iid.FirebaseInstanceId;
-import com.google.firebase.iid.FirebaseInstanceIdService;
+import com.github.ybq.android.spinkit.SpinKitView;
+import com.google.gson.JsonIOException;
+import com.google.gson.JsonObject;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.observers.DisposableObserver;
+import io.reactivex.schedulers.Schedulers;
 import onair.onems.R;
+import onair.onems.Services.RetrofitNetworkService;
 import onair.onems.Services.StaticHelperClass;
 import onair.onems.app.Config;
-import onair.onems.customised.CustomRequest;
 import onair.onems.customised.GuardianStudentSelectionDialog;
 import onair.onems.mainactivities.StudentMainScreen;
 import onair.onems.mainactivities.TeacherMainScreen;
-import onair.onems.network.MySingleton;
-import onair.onems.service.MyFirebaseInstanceIDService;
+import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
+import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 public class LoginScreen extends AppCompatActivity {
     private EditText takeId;
     private EditText takePassword;
     private TextView errorView;
-    private String loginUrl = "";
-    private ProgressDialog dialog, mStudentDialog, mUserTypeDialog;
     public static final String MyPREFERENCES = "LogInKey";
     public static SharedPreferences sharedPreferences;
-    private String returnValue = "[]";
     private String LoggedUserID = "";
     private String uuid = "";
     private long ID = 0;
     private String previousToken = "";
-    private JSONObject tokenJsonObject;
+    private JsonObject tokenJsonObject;
+    private CompositeDisposable finalDisposer = new CompositeDisposable();
+    private SpinKitView spinKitView;
+    private RelativeLayout mainContainer;
 
     @Override
     public void onResume() {
@@ -77,6 +73,13 @@ public class LoginScreen extends AppCompatActivity {
     public void onStart() {
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
         super.onStart();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (!finalDisposer.isDisposed())
+            finalDisposer.dispose();
     }
 
     @Override
@@ -130,6 +133,9 @@ public class LoginScreen extends AppCompatActivity {
         }
         setContentView(R.layout.login_activity);
 
+        spinKitView = findViewById(R.id.spin_kit);
+        mainContainer = findViewById(R.id.main_container);
+
         Button loginButton = (Button)findViewById(R.id.login_button);
         takeId = (EditText)findViewById(R.id.email);
         takePassword = (EditText) findViewById(R.id.password);
@@ -150,9 +156,6 @@ public class LoginScreen extends AppCompatActivity {
             public void onClick(View v) {
                 LoginScreen.this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
                 if(StaticHelperClass.isNetworkAvailable(LoginScreen.this)) {
-
-                    loginUrl = getString(R.string.baseUrl)+"/api/onEms/getLoginInformation"+"/"+
-                            takeId.getText().toString()+"/"+takePassword.getText().toString();
                     if(takeId.getText().toString().isEmpty()) {
                         takeId.setError("This field is required");
                         takeId.requestFocus();
@@ -160,7 +163,7 @@ public class LoginScreen extends AppCompatActivity {
                         takePassword.setError("This field is required");
                         takePassword.requestFocus();
                     } else {
-                        getLoginData();
+                        getLoginData(takeId.getText().toString(), takePassword.getText().toString());
                     }
                 } else {
                     Toast.makeText(LoginScreen.this,"Please check your internet connection!!!",Toast.LENGTH_LONG).show();
@@ -169,7 +172,7 @@ public class LoginScreen extends AppCompatActivity {
         });
     }
 
-    void parseLoginJsonData(String jsonString) {
+    void parseLoginData(String jsonString) {
         try {
             // Parse Json data From API
             JSONArray jsonArray = new JSONArray(jsonString);
@@ -178,7 +181,6 @@ public class LoginScreen extends AppCompatActivity {
                 takeId.setText("");
                 takePassword.setText("");
                 takeId.requestFocus();
-                dialog.dismiss();
             } else {
                 String UserID = jsonArray.getJSONObject(0).getString("UserID");
                 getUserTypes(UserID);
@@ -326,23 +328,23 @@ public class LoginScreen extends AppCompatActivity {
                 if((UserID.length()>0) && (UserTypeID == 1)) {
                     Intent mainIntent = new Intent(LoginScreen.this, TeacherMainScreen.class);
                     startActivity(mainIntent);
-                    finish();
                     saveRegistrationToken();
+                    finish();
                 } else if((UserID.length()>0) && (UserTypeID == 2)) {
                     Intent mainIntent = new Intent(LoginScreen.this, TeacherMainScreen.class);
                     startActivity(mainIntent);
-                    finish();
                     saveRegistrationToken();
+                    finish();
                 } else if((UserID.length()>0) && (UserTypeID == 3)) {
                     Intent mainIntent = new Intent(LoginScreen.this, StudentMainScreen.class);
                     startActivity(mainIntent);
-                    finish();
                     saveRegistrationToken();
+                    finish();
                 } else if((UserID.length()>0) && (UserTypeID == 4)) {
                     Intent mainIntent = new Intent(LoginScreen.this,TeacherMainScreen.class);
                     startActivity(mainIntent);
-                    finish();
                     saveRegistrationToken();
+                    finish();
                 } else if((UserID.length()>0) && (UserTypeID == 5)) {
                     saveRegistrationToken();
                     getStudents(UserID, InstituteID);
@@ -357,7 +359,6 @@ public class LoginScreen extends AppCompatActivity {
         } catch (JSONException e) {
             Toast.makeText(this,"Json : "+e,Toast.LENGTH_LONG).show();
         }
-        dialog.dismiss();
     }
 
     @Override
@@ -381,84 +382,84 @@ public class LoginScreen extends AppCompatActivity {
         alert.show();
     }
 
-    private void getLoginData() {
+    private void getLoginData(String userName, String password) {
 
-        if (StaticHelperClass.isNetworkAvailable(this)) {
+        showSpin();
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(getString(R.string.baseUrl))
+                .addConverterFactory(ScalarsConverterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create())
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                .build();
 
-            dialog = new ProgressDialog(this);
-            dialog.setTitle("Login...");
-            dialog.setMessage("Please Wait...");
-            dialog.setCancelable(false);
-            dialog.setIcon(R.drawable.onair);
-            dialog.show();
-            //Preparing Shift data from server
-            StringRequest loginRequest = new StringRequest(Request.Method.GET, loginUrl,
-                    new Response.Listener<String>() {
-                        @Override
-                        public void onResponse(String response) {
+        Observable<String> loginObservable = retrofit
+                .create(RetrofitNetworkService.class)
+                .getLoginInformation(userName, password)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
 
-                            parseLoginJsonData(response);
+        finalDisposer.add( loginObservable
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeWith(new DisposableObserver<String>() {
 
-                        }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    dialog.dismiss();
-                }
-            })
-            {
-                @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
-                    Map<String, String>  params = new HashMap<>();
-                    params.put("Authorization", "Request_From_onEMS_Android_app");
-                    return params;
-                }
-            };
-            MySingleton.getInstance(this).addToRequestQueue(loginRequest);
-        } else {
-            Toast.makeText(LoginScreen.this,"Please check your internet connection and select again!!! ",
-                    Toast.LENGTH_LONG).show();
-        }
+                    @Override
+                    public void onNext(String loginReturnData) {
+                        hideSpin();
+                        parseLoginData(loginReturnData);
+                    }
 
+                    @Override
+                    public void onComplete() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        hideSpin();
+                    }
+                }));
     }
 
     private void getStudents(String UserID, long InstituteID) {
-
         if (StaticHelperClass.isNetworkAvailable(this)) {
-            String studentUrl = getString(R.string.baseUrl)+"/api/onEms/spGetDashUserDetail/"+UserID+"/"+InstituteID;
+            showSpin();
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(getString(R.string.baseUrl))
+                    .addConverterFactory(ScalarsConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .build();
 
-            mStudentDialog = new ProgressDialog(this);
-            mStudentDialog.setTitle("Loading Students...");
-            mStudentDialog.setMessage("Please Wait...");
-            mStudentDialog.setCancelable(false);
-            mStudentDialog.setIcon(R.drawable.onair);
-            mStudentDialog.show();
-            //Preparing Shift data from server
-            StringRequest stringStudentRequest = new StringRequest(Request.Method.GET, studentUrl,
-                    new Response.Listener<String>() {
+            Observable<String> userDetailObservable = retrofit
+                    .create(RetrofitNetworkService.class)
+                    .spGetDashUserDetail(UserID, InstituteID)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread());
+
+            finalDisposer.add( userDetailObservable
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeWith(new DisposableObserver<String>() {
+
                         @Override
-                        public void onResponse(String response) {
+                        public void onNext(String returnData) {
+                            hideSpin();
+                            parseStudentJsonData(returnData);
+                        }
 
-                            parseStudentJsonData(response);
+                        @Override
+                        public void onComplete() {
 
                         }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    mStudentDialog.dismiss();
-                }
-            })
-            {
-                @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
-                    Map<String, String>  params = new HashMap<>();
-                    params.put("Authorization", "Request_From_onEMS_Android_app");
-                    return params;
-                }
-            };
-            MySingleton.getInstance(this).addToRequestQueue(stringStudentRequest);
+
+                        @Override
+                        public void onError(Throwable e) {
+                            hideSpin();
+                        }
+                    }));
         } else {
-            Toast.makeText(LoginScreen.this,"Please check your internet connection and select again!!! ",
+            Toast.makeText(LoginScreen.this,"Please check your internet connection!!! ",
                     Toast.LENGTH_LONG).show();
         }
 
@@ -486,51 +487,49 @@ public class LoginScreen extends AppCompatActivity {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        mStudentDialog.dismiss();
     }
 
     private void getUserTypes(String UserID) {
-
         if (StaticHelperClass.isNetworkAvailable(this)) {
-            String studentUrl = getString(R.string.baseUrl)+"/api/onEms/getDashBoardCmnUserType/"+UserID;
+            showSpin();
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(getString(R.string.baseUrl))
+                    .addConverterFactory(ScalarsConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .build();
 
-            mUserTypeDialog = new ProgressDialog(this);
-            mUserTypeDialog.setTitle("Loading user types...");
-            mUserTypeDialog.setMessage("Please Wait...");
-            mUserTypeDialog.setCancelable(false);
-            mUserTypeDialog.setIcon(R.drawable.onair);
-            mUserTypeDialog.show();
-            //Preparing Shift data from server
-            StringRequest stringStudentRequest = new StringRequest(Request.Method.GET, studentUrl,
-                    new Response.Listener<String>() {
+            Observable<String> userTypesObservable = retrofit
+                    .create(RetrofitNetworkService.class)
+                    .getDashBoardCmnUserType(UserID)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread());
+
+            finalDisposer.add( userTypesObservable
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeWith(new DisposableObserver<String>() {
+
                         @Override
-                        public void onResponse(String response) {
+                        public void onNext(String returnData) {
+                            hideSpin();
+                            parseUserTypeData(returnData);
+                        }
 
-                            parseUserTypeData(response);
+                        @Override
+                        public void onComplete() {
 
                         }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    mUserTypeDialog.dismiss();
-                    Toast.makeText(LoginScreen.this,"User type data not found!!! ",
-                            Toast.LENGTH_LONG).show();
-                }
-            })
-            {
-                @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
-                    Map<String, String>  params = new HashMap<>();
-                    params.put("Authorization", "Request_From_onEMS_Android_app");
-                    return params;
-                }
-            };
-            MySingleton.getInstance(this).addToRequestQueue(stringStudentRequest);
+
+                        @Override
+                        public void onError(Throwable e) {
+                            hideSpin();
+                        }
+                    }));
         } else {
-            Toast.makeText(LoginScreen.this,"Please check your internet connection and select again!!! ",
+            Toast.makeText(LoginScreen.this,"Please check your internet connection!!! ",
                     Toast.LENGTH_LONG).show();
         }
-
     }
 
     private void parseUserTypeData(String string) {
@@ -543,7 +542,6 @@ public class LoginScreen extends AppCompatActivity {
             Toast.makeText(this,"User type data not found!!! ",
                     Toast.LENGTH_LONG).show();
         }
-        mUserTypeDialog.dismiss();
     }
 
     private void saveRegistrationToken() {
@@ -560,18 +558,32 @@ public class LoginScreen extends AppCompatActivity {
 
     private void sendRegistrationToServer(final String token) {
         if(StaticHelperClass.isNetworkAvailable(this)) {
-            String url = getString(R.string.baseUrl)+"/api/onEms/getFcmTokenByUserID/"+LoggedUserID;
-            //Preparing Medium data from server
-            StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
-                    new Response.Listener<String>() {
+            showSpin();
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(getString(R.string.baseUrl))
+                    .addConverterFactory(ScalarsConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .build();
+
+            Observable<String> getTokenObservable = retrofit
+                    .create(RetrofitNetworkService.class)
+                    .getFcmTokenByUserID(LoggedUserID)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread());
+
+            finalDisposer.add( getTokenObservable
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeWith(new DisposableObserver<String>() {
                         @Override
-                        public void onResponse(String response) {
-                            returnValue = response;
-                            if (returnValue.equals("[]")) {
+                        public void onNext(String returnData) {
+                            hideSpin();
+                            if (returnData.equals("[]")) {
                                 ID = 0;
                             } else {
                                 try {
-                                    JSONArray jsonArray = new JSONArray(returnValue);
+                                    JSONArray jsonArray = new JSONArray(returnData);
                                     for (int i = 0; i<jsonArray.length(); i++) {
                                         JSONObject jsonObject = jsonArray.getJSONObject(i);
                                         if (jsonObject.getString("UserID").equals(LoggedUserID)
@@ -587,61 +599,72 @@ public class LoginScreen extends AppCompatActivity {
                             }
 
                             try {
-                                tokenJsonObject = new JSONObject();
-                                tokenJsonObject.put("ID", ID);
-                                tokenJsonObject.put("UserID", LoggedUserID);
-                                tokenJsonObject.put("Browser", "android");
-                                tokenJsonObject.put("Token", token);
-                                tokenJsonObject.put("DeviceID", uuid);
-                            } catch (JSONException e) {
+                                tokenJsonObject = new JsonObject();
+                                tokenJsonObject.addProperty("ID", ID);
+                                tokenJsonObject.addProperty("UserID", LoggedUserID);
+                                tokenJsonObject.addProperty("Browser", "android");
+                                tokenJsonObject.addProperty("Token", token);
+                                tokenJsonObject.addProperty("DeviceID", uuid);
+                            } catch (JsonIOException e) {
                                 e.printStackTrace();
                             }
                             // sending fcm token to server
                             tokenPostRequest(tokenJsonObject);
                         }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                }
-            })
-            {
-                @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
-                    Map<String, String>  params = new HashMap<>();
-                    params.put("Authorization", "Request_From_onEMS_Android_app");
-                    return params;
-                }
-            };
-            MySingleton.getInstance(this).addToRequestQueue(stringRequest);
+
+                        @Override
+                        public void onComplete() {
+
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+                            hideSpin();
+                        }
+                    }));
         } else {
-            Toast.makeText(getApplicationContext(),"Please check your internet connection and select again!!! ",
+            Toast.makeText(getApplicationContext(),"Please check your internet connection!!! ",
                     Toast.LENGTH_LONG).show();
         }
     }
 
-    private void tokenPostRequest(JSONObject postDataJsonObject) {
-        String url = getString(R.string.baseUrl)+"/api/onEms/setFcmToken";
-        CustomRequest customRequest = new CustomRequest (Request.Method.POST, url, postDataJsonObject,
-                new Response.Listener<JSONArray>() {
+    private void tokenPostRequest(JsonObject postDataJsonObject) {
+        showSpin();
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(getString(R.string.baseUrl))
+                .addConverterFactory(ScalarsConverterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create())
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                .build();
+
+        Observable<String> postTokenObservable = retrofit
+                .create(RetrofitNetworkService.class)
+                .setFcmToken(postDataJsonObject)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
+
+        finalDisposer.add( postTokenObservable
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeWith(new DisposableObserver<String>() {
+
                     @Override
-                    public void onResponse(JSONArray response) {
+                    public void onNext(String returnData) {
+                        hideSpin();
                         Toast.makeText(getApplicationContext(),"Successfully posted token",Toast.LENGTH_LONG).show();
                     }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Toast.makeText(getApplicationContext(),"ERROR posting token",Toast.LENGTH_LONG).show();
-            }
-        })
-        {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String>  params = new HashMap<>();
-                params.put("Authorization", "Request_From_onEMS_Android_app");
-                return params;
-            }
-        };
-        MySingleton.getInstance(this).addToRequestQueue(customRequest);
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        hideSpin();
+                        Toast.makeText(getApplicationContext(),"ERROR posting token",Toast.LENGTH_LONG).show();
+                    }
+                }));
     }
 
     private void createNotificationChannel() {
@@ -660,6 +683,20 @@ public class LoginScreen extends AppCompatActivity {
                 notificationManager.createNotificationChannel(channel);
             }
         }
+    }
+
+    private void showSpin() {
+        if (spinKitView.getVisibility() == View.INVISIBLE)
+            spinKitView.setVisibility(View.VISIBLE);
+        if (mainContainer.getVisibility() == View.VISIBLE)
+            mainContainer.setVisibility(View.INVISIBLE);
+    }
+
+    private void hideSpin() {
+        if (spinKitView.getVisibility() == View.VISIBLE)
+            spinKitView.setVisibility(View.INVISIBLE);
+        if (mainContainer.getVisibility() == View.INVISIBLE)
+            mainContainer.setVisibility(View.VISIBLE);
     }
 
 }

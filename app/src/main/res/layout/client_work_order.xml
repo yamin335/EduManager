@@ -12,33 +12,24 @@
         android:layout_height="wrap_content">
 
         <LinearLayout
-            android:id="@+id/priorityLayout"
+            android:id="@+id/spinnerPriority"
             android:layout_width="0dp"
-            android:layout_height="40dp"
+            android:layout_height="35dp"
             android:layout_marginBottom="8dp"
             android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
-            android:layout_weight="1"
-            android:background="@drawable/spinner_background"
-            android:elevation="2dp"
-            android:paddingEnd="10dp"
-            android:paddingStart="20dp"
+            android:background="@drawable/spinner_background_gray_round"
+            android:minHeight="30dp"
+            android:popupBackground="@drawable/drop_down_menu"
+            android:spinnerMode="dropdown"
+            android:orientation="horizontal"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/noOfInstallment"
-            app:layout_constraintVertical_bias="0.0">
-
-            <Spinner
-                android:id="@+id/spinnerPriority"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:backgroundTint="#000000"
-                android:popupBackground="@drawable/drop_down_menu"
-                android:spinnerMode="dropdown" />
-        </LinearLayout>
+            app:layout_constraintVertical_bias="0.0"/>
 
         <TextView
             android:id="@+id/labelReferredDocuments"
@@ -122,9 +113,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/workOrderNo">
 
-            <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:app="http://schemas.android.com/apk/res-auto"
-                xmlns:tools="http://schemas.android.com/tools"
+            <android.support.constraint.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
@@ -294,7 +283,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/priorityLayout" />
+            app:layout_constraintTop_toBottomOf="@+id/spinnerPriority" />
 
         <TextView
             android:id="@+id/textView17"

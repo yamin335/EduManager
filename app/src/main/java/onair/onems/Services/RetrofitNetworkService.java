@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import java.util.List;
 
 import io.reactivex.Observable;
+import io.reactivex.Single;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
@@ -20,6 +21,27 @@ import retrofit2.http.Part;
 import retrofit2.http.Path;
 
 public interface RetrofitNetworkService {
+
+    @Headers("Authorization: Request_From_onEMS_Android_app")
+    @GET("/api/onEms/getLoginInformation/{userName}/{password}")
+    Observable<String> getLoginInformation(@Path("userName") String userName, @Path("password") String password);
+
+    @Headers("Authorization: Request_From_onEMS_Android_app")
+    @GET("/api/onEms/getDashBoardCmnUserType/{UserID}")
+    Observable<String> getDashBoardCmnUserType(@Path("UserID") String UserID);
+
+    @Headers("Authorization: Request_From_onEMS_Android_app")
+    @GET("/api/onEms/spGetDashUserDetail/{UserID}/{InstituteID}")
+    Observable<String> spGetDashUserDetail(@Path("UserID") String UserID, @Path("InstituteID") long InstituteID);
+
+    @Headers("Authorization: Request_From_onEMS_Android_app")
+    @GET("/api/onEms/getFcmTokenByUserID/{UserID}")
+    Observable<String> getFcmTokenByUserID(@Path("UserID") String UserID);
+
+    @Headers("Authorization: Request_From_onEMS_Android_app")
+    @POST("/api/onEms/setFcmToken")
+    Observable<String> setFcmToken(@Body JsonObject tokenJsonObject);
+
     @Multipart
     @POST("/api/onEms/Mobile/uploads/")
     Call<String> upload(@Part MultipartBody.Part file);

@@ -1,1 +1,3 @@
-<resources></resources>
+<resources>
+    <string name="find_student">Find Student</string>
+</resources>

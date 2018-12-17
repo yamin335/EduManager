@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_height="match_parent"
     android:layout_width="match_parent"
     android:nestedScrollingEnabled="true"
@@ -11,61 +10,41 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <LinearLayout
-            android:id="@+id/communicationLayout"
+        <Spinner
+            android:id="@+id/spinnerCommunication"
             android:layout_width="0dp"
-            android:layout_height="40dp"
+            android:layout_height="wrap_content"
+            android:minHeight="30dp"
             android:layout_marginBottom="8dp"
             android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="12dp"
-            android:layout_weight="1"
-            android:background="@drawable/spinner_background"
-            android:elevation="2dp"
-            android:paddingEnd="10dp"
-            android:paddingStart="20dp"
+            android:background="@drawable/spinner_background_gray_round"
+            android:popupBackground="@drawable/drop_down_menu"
+            android:spinnerMode="dropdown"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.0">
+            app:layout_constraintVertical_bias="0.0"/>
 
-            <Spinner
-                android:id="@+id/spinnerCommunication"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:backgroundTint="#000000"
-                android:popupBackground="@drawable/drop_down_menu"
-                android:spinnerMode="dropdown" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/priorityLayout"
+        <Spinner
+            android:id="@+id/spinnerPriority"
             android:layout_width="0dp"
-            android:layout_height="40dp"
+            android:layout_height="wrap_content"
+            android:minHeight="30dp"
             android:layout_marginBottom="8dp"
             android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="12dp"
-            android:layout_weight="1"
-            android:background="@drawable/spinner_background"
-            android:elevation="2dp"
-            android:paddingEnd="10dp"
-            android:paddingStart="20dp"
+            android:background="@drawable/spinner_background_gray_round"
+            android:popupBackground="@drawable/drop_down_menu"
+            android:spinnerMode="dropdown"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/communicationLayout"
-            app:layout_constraintVertical_bias="0.0">
-
-            <Spinner
-                android:id="@+id/spinnerPriority"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:backgroundTint="#000000"
-                android:popupBackground="@drawable/drop_down_menu"
-                android:spinnerMode="dropdown" />
-        </LinearLayout>
+            app:layout_constraintTop_toBottomOf="@+id/spinnerCommunication"
+            app:layout_constraintVertical_bias="0.0"/>
 
         <EditText
             android:id="@+id/details"
@@ -138,18 +117,16 @@
 
         <Button
             android:id="@+id/proceed"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="30dp"
-            android:layout_alignParentBottom="true"
             android:layout_marginBottom="16dp"
-            android:layout_marginEnd="32dp"
-            android:layout_marginStart="32dp"
-            android:layout_marginTop="24dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="16dp"
             android:background="@drawable/button"
             android:text="Proceed"
             android:textAllCaps="false"
             android:textColor="@android:color/white"
-            android:textSize="18sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -167,7 +144,7 @@
             app:cardElevation="0dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/priorityLayout">
+            app:layout_constraintTop_toBottomOf="@+id/spinnerPriority">
 
             <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -318,8 +295,9 @@
             android:id="@+id/whiteBackground"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:background="#ffffff"
+            android:background="#000000"
             android:elevation="3dp"
+            android:alpha=".5"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

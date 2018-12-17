@@ -65,9 +65,20 @@ public class ShowAttendance extends SideNavigationMenuParentActivity {
     private long InstituteID;
     private int firstClass = 0, firstShift = 0, firstSection = 0, firstMedium = 0,
             firstDepartment = 0, UserTypeID;
+
+    private boolean fromDashBoard = false, fromSideMenu = false;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Intent intent = getIntent();
+        if (intent.hasExtra("fromDashBoard")) {
+            fromDashBoard = intent.getBooleanExtra("fromDashBoard", false);
+        }
+
+        if (intent.hasExtra("fromSideMenu")) {
+            fromSideMenu = intent.getBooleanExtra("fromSideMenu", false);
+        }
 
         activityName = ShowAttendance.class.getName();
 
@@ -313,32 +324,15 @@ public class ShowAttendance extends SideNavigationMenuParentActivity {
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            switch (UserTypeID) {
-                case 1:
-                    Intent superAdminIntent = new Intent(ShowAttendance.this, AttendanceAdminDashboard.class);
-                    startActivity(superAdminIntent);
-                    finish();
-                    break;
-                case 2:
-                    Intent instituteAdminIntent = new Intent(ShowAttendance.this, AttendanceAdminDashboard.class);
-                    startActivity(instituteAdminIntent);
-                    finish();
-                    break;
-                case 3:
-                    Intent studentIntent = new Intent(ShowAttendance.this, StudentMainScreen.class);
-                    startActivity(studentIntent);
-                    finish();
-                    break;
-                case 4:
-                    Intent teacherIntent = new Intent(ShowAttendance.this, TeacherMainScreen.class);
-                    startActivity(teacherIntent);
-                    finish();
-                    break;
-                case 5:
-                    Intent guardianIntent = new Intent(ShowAttendance.this, StudentMainScreen.class);
-                    startActivity(guardianIntent);
-                    finish();
-                    break;
+
+            if (fromSideMenu) {
+                Intent mainIntent = new Intent(ShowAttendance.this, TeacherMainScreen.class);
+                startActivity(mainIntent);
+                finish();
+            } else if (fromDashBoard) {
+                Intent mainIntent = new Intent(ShowAttendance.this, AttendanceAdminDashboard.class);
+                startActivity(mainIntent);
+                finish();
             }
         }
 

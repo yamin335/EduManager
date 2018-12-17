@@ -875,15 +875,16 @@
 
             <Button
                 android:id="@+id/updatephoto"
-                android:layout_width="match_parent"
-                android:layout_height="36dp"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
                 android:layout_margin="15dp"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
                 android:background="@drawable/button"
                 android:text="Update Photo"
                 android:layout_gravity="center"
                 android:textAllCaps="false"
-                android:textColor="#FFFFFF"
-                android:textSize="18sp" />
+                android:textColor="#FFFFFF"/>
 
         </LinearLayout>
 

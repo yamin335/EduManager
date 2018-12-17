@@ -62,6 +62,7 @@ import java.util.Random;
 import onair.onems.PrivacyPolicy;
 import onair.onems.R;
 import onair.onems.Services.StaticHelperClass;
+import onair.onems.Test;
 import onair.onems.accounts.IncomeStatement;
 import onair.onems.app.Config;
 import onair.onems.attendance.AttendanceAdminDashboard;
@@ -1053,6 +1054,8 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
                         }
                     } else {
                         Intent intent = new Intent(getApplicationContext(), ShowAttendance.class);
+                        intent.putExtra("fromDashBoard", false);
+                        intent.putExtra("fromSideMenu", true);
                         startActivity(intent);
                         finish();
                     }
@@ -1501,6 +1504,8 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
                         }
                     } else {
                         Intent intent = new Intent(getApplicationContext(), ShowAttendance.class);
+                        intent.putExtra("fromDashBoard", false);
+                        intent.putExtra("fromSideMenu", true);
                         startActivity(intent);
                         finish();
                     }
@@ -1919,6 +1924,8 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
                         }
                     } else {
                         Intent intent = new Intent(getApplicationContext(), TakeAttendance.class);
+                        intent.putExtra("fromDashBoard", false);
+                        intent.putExtra("fromSideMenu", true);
                         startActivity(intent);
                         finish();
                     }
@@ -1932,6 +1939,8 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
                         }
                     } else {
                         Intent intent = new Intent(getApplicationContext(), ShowAttendance.class);
+                        intent.putExtra("fromDashBoard", false);
+                        intent.putExtra("fromSideMenu", true);
                         startActivity(intent);
                         finish();
                     }

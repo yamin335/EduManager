@@ -8,6 +8,7 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -17,6 +18,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
@@ -35,6 +37,7 @@ import java.util.Map;
 
 import onair.onems.R;
 import onair.onems.Services.StaticHelperClass;
+import onair.onems.customised.MyDividerItemDecoration;
 import onair.onems.mainactivities.SideNavigationMenuParentActivity;
 import onair.onems.mainactivities.StudentMainScreen;
 import onair.onems.mainactivities.TeacherMainScreen;
@@ -68,6 +71,11 @@ public class ExamRoutineMainScreen extends SideNavigationMenuParentActivity {
     private ClassModel selectedClass;
     private ExamModel selectedExam;
 
+    private ProgressDialog mExamRoutineDialog;
+    private RecyclerView recyclerView;
+    private JSONArray routine;
+    private TextView className;
+
     private long MediumID = 0, ClassID = 0, SessionID = 0, ExamID = 0;
 
     @Override
@@ -95,11 +103,10 @@ public class ExamRoutineMainScreen extends SideNavigationMenuParentActivity {
         spinnerMedium =(Spinner)findViewById(R.id.spinnerMedium);
         spinnerClass = (Spinner)findViewById(R.id.spinnerClass);
         spinnerExam = (Spinner)findViewById(R.id.spinnerExam);
+        recyclerView = findViewById(R.id.routineClasses);
+        className = findViewById(R.id.className);
 
         Button showRoutine = (Button)findViewById(R.id.showRoutine);
-
-        LinearLayout mediumLayout = findViewById(R.id.mediumLayout);
-        LinearLayout classLayout = findViewById(R.id.classLayout);
 
         ArrayAdapter<String> session_spinner_adapter = new ArrayAdapter<>(this, R.layout.spinner_item, tempSessionArray);
         session_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -121,15 +128,15 @@ public class ExamRoutineMainScreen extends SideNavigationMenuParentActivity {
             SessionDataGetRequest();
             MediumDataGetRequest();
         } else if (UserTypeID == 3){
-            mediumLayout.setVisibility(View.GONE);
-            classLayout.setVisibility(View.GONE);
+            spinnerMedium.setVisibility(View.GONE);
+            spinnerClass.setVisibility(View.GONE);
             MediumID = PreferenceManager.getDefaultSharedPreferences(this).getLong("MediumID", 0);
             ClassID = PreferenceManager.getDefaultSharedPreferences(this).getLong("ClassID", 0);
             SessionDataGetRequest();
             ExamDataGetRequest();
         } else if (UserTypeID == 5) {
-            mediumLayout.setVisibility(View.GONE);
-            classLayout.setVisibility(View.GONE);
+            spinnerMedium.setVisibility(View.GONE);
+            spinnerClass.setVisibility(View.GONE);
             try {
                 JSONObject selectedStudent = new JSONObject(getSharedPreferences("CURRENT_STUDENT", Context.MODE_PRIVATE)
                         .getString("guardianSelectedStudent", "{}"));
@@ -265,13 +272,7 @@ public class ExamRoutineMainScreen extends SideNavigationMenuParentActivity {
                         Toast.makeText(ExamRoutineMainScreen.this,"Please select exam!!! ",
                                 Toast.LENGTH_LONG).show();
                     } else {
-                        Intent intent = new Intent(ExamRoutineMainScreen.this, ExamRoutineDetailsScreen.class);
-                        intent.putExtra("InstituteID", InstituteID);
-                        intent.putExtra("SessionID", SessionID);
-                        intent.putExtra("MediumID", MediumID);
-                        intent.putExtra("ClassID", ClassID);
-                        intent.putExtra("ExamID", ExamID);
-                        startActivity(intent);
+                        ExamRoutineDataGetRequest();
                     }
                 } else {
                     Toast.makeText(ExamRoutineMainScreen.this,"Please check your internet connection and select again!!! ",
@@ -569,6 +570,63 @@ public class ExamRoutineMainScreen extends SideNavigationMenuParentActivity {
             Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
         }
         mExamDialog.dismiss();
+    }
+
+    private void ExamRoutineDataGetRequest() {
+        if (StaticHelperClass.isNetworkAvailable(this)) {
+            String examRoutineUrl = getString(R.string.baseUrl)+"/api/onEms/spGetCommonClassExamRoutine/"+InstituteID
+                    +"/"+ExamID+"/"+MediumID+"/"+ClassID+"/"+"0"+"/"+SessionID;
+
+            mExamRoutineDialog = new ProgressDialog(this);
+            mExamRoutineDialog.setTitle("Loading session...");
+            mExamRoutineDialog.setMessage("Please Wait...");
+            mExamRoutineDialog.setCancelable(false);
+            mExamRoutineDialog.setIcon(R.drawable.onair);
+            mExamRoutineDialog.show();
+            //Preparing Shift data from server
+            StringRequest stringExamRoutineRequest = new StringRequest(Request.Method.GET, examRoutineUrl,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+
+                            parseExamRoutineJsonData(response);
+
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    mExamRoutineDialog.dismiss();
+                }
+            })
+            {
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    Map<String, String>  params = new HashMap<>();
+                    params.put("Authorization", "Request_From_onEMS_Android_app");
+                    return params;
+                }
+            };
+            MySingleton.getInstance(this).addToRequestQueue(stringExamRoutineRequest);
+        } else {
+            Toast.makeText(ExamRoutineMainScreen.this,"Please check your internet connection and select again!!! ",
+                    Toast.LENGTH_LONG).show();
+        }
+    }
+
+    void parseExamRoutineJsonData(String examRoutine) {
+        try {
+            routine = new JSONArray(examRoutine);
+            className.setText("Class: "+routine.getJSONObject(0).getString("ClassName"));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        ExamRoutineAdapter mAdapter = new ExamRoutineAdapter(this, routine);
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(mLayoutManager);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.addItemDecoration(new MyDividerItemDecoration(this, DividerItemDecoration.VERTICAL, 0));
+        recyclerView.setAdapter(mAdapter);
+        mExamRoutineDialog.dismiss();
     }
 
     @Override

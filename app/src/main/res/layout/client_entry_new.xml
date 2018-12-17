@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
+<android.support.v4.widget.NestedScrollView
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_height="match_parent"
     android:layout_width="match_parent"
-    android:nestedScrollingEnabled="true"
     android:background="#ffffff"
     xmlns:android="http://schemas.android.com/apk/res/android">
     <android.support.constraint.ConstraintLayout
@@ -30,49 +28,27 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.0">
 
-            <LinearLayout
-                android:id="@+id/instituteLayout"
+            <Spinner
+                android:id="@+id/spinnerInstitute"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_margin="5dp"
                 android:layout_weight="1"
-                android:background="@drawable/spinner_background"
-                android:elevation="2dp"
-                android:paddingEnd="0dp"
-                android:paddingStart="5dp"
-                android:gravity="center_vertical">
+                android:background="@drawable/spinner_background_gray_round"
+                android:minHeight="30dp"
+                android:popupBackground="@drawable/drop_down_menu"
+                android:spinnerMode="dropdown"/>
 
-                <Spinner
-                    android:id="@+id/spinnerInstitute"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:backgroundTint="#000000"
-                    android:gravity="center_vertical"
-                    android:popupBackground="@drawable/drop_down_menu"
-                    android:spinnerMode="dropdown" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/priorityLayout"
+            <Spinner
+                android:id="@+id/spinnerPriority"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_margin="5dp"
                 android:layout_weight="1"
-                android:background="@drawable/spinner_background"
-                android:elevation="2dp"
-                android:gravity="center_vertical"
-                android:paddingEnd="0dp"
-                android:paddingStart="5dp">
-
-                <Spinner
-                    android:id="@+id/spinnerPriority"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:backgroundTint="#000000"
-                    android:popupBackground="@drawable/drop_down_menu"
-                    android:spinnerMode="dropdown" />
-            </LinearLayout>
+                android:background="@drawable/spinner_background_gray_round"
+                android:minHeight="30dp"
+                android:popupBackground="@drawable/drop_down_menu"
+                android:spinnerMode="dropdown"/>
         </LinearLayout>
 
         <EditText
@@ -267,7 +243,7 @@
             android:layout_marginBottom="8dp"
             android:layout_marginEnd="8dp"
             android:layout_marginTop="16dp"
-            android:text="Photoes"
+            android:text="Photos"
             android:textColor="#0550b7"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -322,7 +298,6 @@
             android:text="Proceed"
             android:textAllCaps="false"
             android:textColor="@android:color/white"
-            android:textSize="16sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -385,5 +360,5 @@
             app:layout_constraintVertical_bias="0.39999998" />
 
     </android.support.constraint.ConstraintLayout>
-</ScrollView>
+</android.support.v4.widget.NestedScrollView>
 

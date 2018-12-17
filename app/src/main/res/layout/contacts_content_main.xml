@@ -8,8 +8,7 @@
     android:layout_height="match_parent"
     android:background="#ffffff"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="onair.onems.contacts.ContactsMainScreen"
-    tools:showIn="@layout/contacts_app_bar_main">
+    tools:context="onair.onems.contacts.ContactsMainScreen">
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recycler_view"

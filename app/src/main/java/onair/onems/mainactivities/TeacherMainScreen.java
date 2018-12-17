@@ -288,10 +288,10 @@ public class TeacherMainScreen extends AppCompatActivity {
                     Intent mainIntent = new Intent(TeacherMainScreen.this, AttendanceAdminDashboard.class);
                     startActivity(mainIntent);
                     finish();
-                } else {
+                } else if (user == 4) {
                     Intent mainIntent = new Intent(TeacherMainScreen.this, TakeAttendance.class);
-                    mainIntent.putExtra("fromDashBoard", true);
-                    mainIntent.putExtra("fromSideMenu", false);
+                    mainIntent.putExtra("fromDashBoard", false);
+                    mainIntent.putExtra("fromSideMenu", true);
                     startActivity(mainIntent);
                     finish();
                 }

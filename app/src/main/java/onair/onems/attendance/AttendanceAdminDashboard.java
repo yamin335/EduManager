@@ -77,6 +77,8 @@ public class AttendanceAdminDashboard extends SideNavigationMenuParentActivity {
             @Override
             public void onClick(View v) {
                 Intent mainIntent = new Intent(AttendanceAdminDashboard.this, TakeAttendance.class);
+                mainIntent.putExtra("fromDashBoard", true);
+                mainIntent.putExtra("fromSideMenu", false);
                 startActivity(mainIntent);
                 finish();
             }

@@ -62,7 +62,10 @@
         <activity
             android:name=".login.LoginScreen"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustResize"/>
+            <!--android:windowSoftInputMode="stateHidden|adjustPan"-->
+
         <activity
             android:name=".mainactivities.StudentMainScreen"
             android:screenOrientation="portrait"
@@ -280,22 +283,6 @@
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="stateHidden|adjustPan" />
         <activity
-            android:name=".routine.ExamRoutineDetailsScreen"
-            android:label="Exam Routine"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="stateHidden|adjustPan" />
-        <activity
-            android:name=".routine.ExamDetails"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="stateHidden|adjustPan" />
-        <activity
-            android:name=".routine.SubjectWiseExamRoutine"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="stateHidden|adjustPan" />
-        <activity
             android:name=".notice.NoticeDetails"
             android:label="Notice Details"
             android:screenOrientation="portrait"
@@ -384,7 +371,10 @@
             android:label="Communication details"
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="stateHidden|adjustPan" />
-        <activity android:name=".Test" />
+        <activity android:name=".Test"
+            android:label="Test"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden|adjustPan"/>
         <activity
             android:name=".PrivacyPolicy"
             android:label="Privacy Policy"
