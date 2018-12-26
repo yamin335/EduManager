@@ -43,16 +43,18 @@ import onair.onems.Services.StaticHelperClass;
 import onair.onems.customised.MyDividerItemDecoration;
 import onair.onems.network.MySingleton;
 
-public class SelfResult extends Fragment implements View.OnTouchListener,
+//implements View.OnTouchListener,
+
+public class SelfResult extends Fragment implements
         ResultExamAdapter.ExamAdapterListener, SubjectWiseResultAdapter.SubjectWiseResultsAdapterListener{
     private ProgressDialog mExamDialog;
     public int UserTypeID;
     public long InstituteID, UserShiftID, UserMediumID, UserClassID,
             UserDepartmentID, UserSectionID, UserSessionID;
     public String UserID;
-    private float dX;
-    private float dY;
-    private int lastAction;
+//    private float dX;
+//    private float dY;
+//    private int lastAction;
     private List<JSONObject> subjectWiseResultList;
     private SubjectWiseResultAdapter mAdapter;
     private ProgressDialog mResultDialog, mGradeDialog;
@@ -79,7 +81,9 @@ public class SelfResult extends Fragment implements View.OnTouchListener,
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.result_subject_wise_self, container, false);
         FloatingActionButton floatingActionButton = rootView.findViewById(R.id.selectExam);
-        floatingActionButton.setOnTouchListener(this);
+        floatingActionButton.setOnClickListener(view -> examDataGetRequest(rootView.getContext()));
+
+//        floatingActionButton.setOnTouchListener(this);
 
         RecyclerView recyclerView = rootView.findViewById(R.id.recycler_view);
         subjectWiseResultList = new ArrayList<>();
@@ -87,10 +91,10 @@ public class SelfResult extends Fragment implements View.OnTouchListener,
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
-        recyclerView.addItemDecoration(new MyDividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL, 10));
+        recyclerView.addItemDecoration(new MyDividerItemDecoration(rootView.getContext(), DividerItemDecoration.VERTICAL, 10));
         recyclerView.setAdapter(mAdapter);
 
-        examDataGetRequest();
+        examDataGetRequest(rootView.getContext());
         return rootView;
     }
 
@@ -114,38 +118,38 @@ public class SelfResult extends Fragment implements View.OnTouchListener,
         }
     }
 
+//    @Override
+//    public boolean onTouch(View view, MotionEvent event) {
+//        switch (event.getActionMasked()) {
+//            case MotionEvent.ACTION_DOWN:
+//                dX = view.getX() - event.getRawX();
+//                dY = view.getY() - event.getRawY();
+//                lastAction = MotionEvent.ACTION_DOWN;
+//                break;
+//
+//            case MotionEvent.ACTION_MOVE:
+//                view.setY(event.getRawY() + dY);
+//                view.setX(event.getRawX() + dX);
+//                lastAction = MotionEvent.ACTION_MOVE;
+//                break;
+//
+//            case MotionEvent.ACTION_UP:
+//                if (lastAction == MotionEvent.ACTION_DOWN){
+//
+//                }
+//                break;
+//
+//            default:
+//                return false;
+//        }
+//        return true;
+//    }
+
     @Override
-    public boolean onTouch(View view, MotionEvent event) {
-        switch (event.getActionMasked()) {
-            case MotionEvent.ACTION_DOWN:
-                dX = view.getX() - event.getRawX();
-                dY = view.getY() - event.getRawY();
-                lastAction = MotionEvent.ACTION_DOWN;
-                break;
-
-            case MotionEvent.ACTION_MOVE:
-                view.setY(event.getRawY() + dY);
-                view.setX(event.getRawX() + dX);
-                lastAction = MotionEvent.ACTION_MOVE;
-                break;
-
-            case MotionEvent.ACTION_UP:
-                if (lastAction == MotionEvent.ACTION_DOWN){
-                    examDataGetRequest();
-                }
-                break;
-
-            default:
-                return false;
-        }
-        return true;
-    }
-
-    @Override
-    public void onSubjectWiseResultSelected(JSONObject subjectWiseResul) {
+    public void onSubjectWiseResultSelected(JSONObject subjectWiseResult) {
         try {
-            if(!subjectWiseResul.getString("SubjectName").equalsIgnoreCase("Total")) {
-                ResultDetailsDialog customDialog = new ResultDetailsDialog(getActivity(), subjectWiseResul);
+            if(!subjectWiseResult.getString("SubjectName").equalsIgnoreCase("Total")) {
+                ResultDetailsDialog customDialog = new ResultDetailsDialog(getActivity(), subjectWiseResult);
                 customDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                 customDialog.setCancelable(false);
                 customDialog.show();
@@ -155,15 +159,15 @@ public class SelfResult extends Fragment implements View.OnTouchListener,
         }
     }
 
-    private void examDataGetRequest() {
-        if (StaticHelperClass.isNetworkAvailable(getActivity())) {
+    private void examDataGetRequest(Context context) {
+        if (StaticHelperClass.isNetworkAvailable(context)) {
             String examUrl = "";
             if(UserTypeID == 3){
             examUrl = getString(R.string.baseUrl)+"/api/onEms/getInsExamforDDL/"+InstituteID+
                     "/"+UserMediumID+"/"+UserClassID;
             } else if(UserTypeID == 5) {
                 try {
-                    JSONObject selectedStudent = new JSONObject(getActivity().getSharedPreferences("CURRENT_STUDENT", Context.MODE_PRIVATE)
+                    JSONObject selectedStudent = new JSONObject(context.getSharedPreferences("CURRENT_STUDENT", Context.MODE_PRIVATE)
                             .getString("guardianSelectedStudent", "{}"));
                     examUrl = getString(R.string.baseUrl)+"/api/onEms/getInsExamforDDL/"+InstituteID+
                             "/"+selectedStudent.getString("MediumID")+"/"+selectedStudent.getString("ClassID");
@@ -303,8 +307,15 @@ public class SelfResult extends Fragment implements View.OnTouchListener,
 
                     totalSubject++;
                     subjectWiseResultList.add(resultJsonArray.getJSONObject(i));
-                    totalGradePoint += resultJsonArray.getJSONObject(i).getDouble("GradePoint");
-                    totalMarks+= resultJsonArray.getJSONObject(i).getDouble("Total");
+                    if (!resultJsonArray.getJSONObject(i).getString("GradePoint").equalsIgnoreCase("")
+                            && !resultJsonArray.getJSONObject(i).getString("GradePoint").equalsIgnoreCase("null")) {
+                        totalGradePoint += resultJsonArray.getJSONObject(i).getDouble("GradePoint");
+                    }
+
+                    if (!resultJsonArray.getJSONObject(i).getString("Total").equalsIgnoreCase("")
+                            && !resultJsonArray.getJSONObject(i).getString("Total").equalsIgnoreCase("null")) {
+                        totalMarks+= resultJsonArray.getJSONObject(i).getDouble("Total");
+                    }
                     if(resultJsonArray.getJSONObject(i).getString("Grade").equalsIgnoreCase("F")) {
                         isFail = true;
                     }
@@ -332,9 +343,7 @@ public class SelfResult extends Fragment implements View.OnTouchListener,
                 totalResult.put("GradePoint", totalGradePoint);
                 subjectWiseResultList.add(totalResult);
                 mAdapter.notifyDataSetChanged();
-            }
-            else
-            {
+            } else {
                 totalResult.put("SubjectName", "");
                 totalResult.put("Total", "");
                 totalResult.put("Grade", "");

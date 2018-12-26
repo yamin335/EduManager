@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -20,34 +19,28 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
-
-
 import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
 import onair.onems.R;
 import onair.onems.Services.RetrofitNetworkService;
 import onair.onems.Services.StaticHelperClass;
-import onair.onems.crm.WorkOrder;
-import onair.onems.customised.MyDividerItemDecoration;
-import onair.onems.fees_report.FeeCollectionReportMain;
 import onair.onems.mainactivities.SideNavigationMenuParentActivity;
 import onair.onems.mainactivities.TeacherMainScreen;
 import onair.onems.models.BranchModel;
 import onair.onems.models.YearModel;
-import onair.onems.network.MySingleton;
 import onair.onems.routine.RoutineMainScreen;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
@@ -63,12 +56,17 @@ public class IncomeStatement extends SideNavigationMenuParentActivity {
     private String[] tempYearArray = {"Select Year"};
     private BranchModel selectedBranch;
     private YearModel selectedYear;
-    private ImageView fromDateIcon, toDateIcon;
     private TextView fromDateView, toDateView;
     private String fromDate = "", toDate = "";
-    private DatePickerDialog datePickerDialog;
     private RecyclerView recyclerView;
-    private IncomeStatementAdapter mAdapter;
+    private CompositeDisposable finalDisposer = new CompositeDisposable();
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (!finalDisposer.isDisposed())
+            finalDisposer.dispose();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,8 +81,8 @@ public class IncomeStatement extends SideNavigationMenuParentActivity {
 
         spinnerBranch = findViewById(R.id.spinnerBranch);
         spinnerYear = findViewById(R.id.spinnerYear);
-        fromDateIcon = findViewById(R.id.dateIcon1);
-        toDateIcon = findViewById(R.id.dateIcon2);
+        ImageView fromDateIcon = findViewById(R.id.dateIcon1);
+        ImageView toDateIcon = findViewById(R.id.dateIcon2);
         fromDateView = findViewById(R.id.comDate1);
         toDateView = findViewById(R.id.comDate2);
         recyclerView = findViewById(R.id.recycler);
@@ -185,34 +183,33 @@ public class IncomeStatement extends SideNavigationMenuParentActivity {
                     .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                     .build();
 
-            Observable<String> paymentTypeObservable = retrofit
+            Observable<String> observable = retrofit
                     .create(RetrofitNetworkService.class)
                     .getBranchByInsID(InstituteID)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread());
 
-            paymentTypeObservable.subscribe(new Observer<String>() {
+            finalDisposer.add( observable
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeWith(new DisposableObserver<String>() {
 
-                @Override
-                public void onSubscribe(Disposable d) {
+                        @Override
+                        public void onNext(String BranchDataReturnValue) {
+                            parseBranchData(BranchDataReturnValue);
+                        }
 
-                }
+                        @Override
+                        public void onError(Throwable e) {
 
-                @Override
-                public void onNext(String BranchDataReturnValue) {
-                    parseBranchData(BranchDataReturnValue);
-                }
+                        }
 
-                @Override
-                public void onError(Throwable e) {
+                        @Override
+                        public void onComplete() {
 
-                }
+                        }
+                    }));
 
-                @Override
-                public void onComplete() {
-
-                }
-            });
         } else {
             Toast.makeText(IncomeStatement.this,"Please check your internet connection and select again!!! ",
                     Toast.LENGTH_LONG).show();
@@ -257,34 +254,33 @@ public class IncomeStatement extends SideNavigationMenuParentActivity {
                     .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                     .build();
 
-            Observable<String> paymentTypeObservable = retrofit
+            Observable<String> observable = retrofit
                     .create(RetrofitNetworkService.class)
                     .getCmnYear()
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread());
 
-            paymentTypeObservable.subscribe(new Observer<String>() {
+            finalDisposer.add( observable
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeWith(new DisposableObserver<String>() {
 
-                @Override
-                public void onSubscribe(Disposable d) {
+                        @Override
+                        public void onNext(String YearDataReturnValue) {
+                            parseYearData(YearDataReturnValue);
+                        }
 
-                }
+                        @Override
+                        public void onError(Throwable e) {
 
-                @Override
-                public void onNext(String YearDataReturnValue) {
-                    parseYearData(YearDataReturnValue);
-                }
+                        }
 
-                @Override
-                public void onError(Throwable e) {
+                        @Override
+                        public void onComplete() {
 
-                }
+                        }
+                    }));
 
-                @Override
-                public void onComplete() {
-
-                }
-            });
         } else {
             Toast.makeText(IncomeStatement.this,"Please check your internet connection and select again!!! ",
                     Toast.LENGTH_LONG).show();
@@ -324,13 +320,13 @@ public class IncomeStatement extends SideNavigationMenuParentActivity {
         int mMonth = c.get(Calendar.MONTH); // current month
         int mDay = c.get(Calendar.DAY_OF_MONTH); // current day
         // date picker dialog
-        datePickerDialog = new DatePickerDialog(IncomeStatement.this,
+        DatePickerDialog datePickerDialog = new DatePickerDialog(IncomeStatement.this,
                 (view, year, monthOfYear, dayOfMonth) -> {
                     if (dateType == 1) {
-                        fromDate = (monthOfYear + 1)+"-"+dayOfMonth+"-"+year;
+                        fromDate = (monthOfYear + 1) + "-" + dayOfMonth + "-" + year;
                         fromDateView.setText(fromDate);
-                    } else if (dateType == 2){
-                        toDate = (monthOfYear + 1)+"-"+dayOfMonth+"-"+year;
+                    } else if (dateType == 2) {
+                        toDate = (monthOfYear + 1) + "-" + dayOfMonth + "-" + year;
                         toDateView.setText(toDate);
                     }
 
@@ -354,28 +350,27 @@ public class IncomeStatement extends SideNavigationMenuParentActivity {
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread());
 
-            incomeStatementObservable.subscribe(new Observer<String>() {
+            finalDisposer.add( incomeStatementObservable
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeWith(new DisposableObserver<String>() {
 
-                @Override
-                public void onSubscribe(Disposable d) {
+                        @Override
+                        public void onNext(String incomeStatementReturnValue) {
+                            parseIncomeStatement(incomeStatementReturnValue);
+                        }
 
-                }
+                        @Override
+                        public void onError(Throwable e) {
 
-                @Override
-                public void onNext(String incomeStatementReturnValue) {
-                    parseIncomeStatement(incomeStatementReturnValue);
-                }
+                        }
 
-                @Override
-                public void onError(Throwable e) {
+                        @Override
+                        public void onComplete() {
 
-                }
+                        }
+                    }));
 
-                @Override
-                public void onComplete() {
-
-                }
-            });
         } else {
             Toast.makeText(IncomeStatement.this,"Please check your internet connection and select again!!! ",
                     Toast.LENGTH_LONG).show();
@@ -383,7 +378,7 @@ public class IncomeStatement extends SideNavigationMenuParentActivity {
     }
 
     private void parseIncomeStatement(String incomeStatement) {
-        mAdapter = new IncomeStatementAdapter(this, incomeStatement);
+        IncomeStatementAdapter mAdapter = new IncomeStatementAdapter(this, incomeStatement);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());

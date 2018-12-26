@@ -13,9 +13,6 @@ import android.widget.TextView;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonObject;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.List;
 

@@ -45,11 +45,6 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -63,14 +58,12 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import io.reactivex.Observable;
-import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.Disposable;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -83,11 +76,7 @@ import onair.onems.models.CommunicationDetailModel;
 import onair.onems.models.CommunicationTypeModel;
 import onair.onems.models.DocumentModel;
 import onair.onems.models.PriorityModel;
-import onair.onems.network.MySingleton;
-import onair.onems.syllabus.SyllabusMainScreen;
 import onair.onems.utils.FileUtils;
-import retrofit2.Call;
-import retrofit2.Callback;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -122,6 +111,16 @@ public class ClientCommunicationDetail extends CommonToolbarParentActivity imple
     private boolean forUpdate = false;
     private int updatedCommunicationType = -1, updatedPriority = -1;
     private ArrayList<Long> refIdList = new ArrayList<>();
+    private CompositeDisposable finalDisposer = new CompositeDisposable();
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(onComplete);
+        if (!finalDisposer.isDisposed())
+            finalDisposer.dispose();
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -473,12 +472,6 @@ public class ClientCommunicationDetail extends CommonToolbarParentActivity imple
         }
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        unregisterReceiver(onComplete);
-    }
-
     @NonNull
     private MultipartBody.Part prepareFilePart(File file) {
         // create RequestBody instance from file
@@ -514,15 +507,10 @@ public class ClientCommunicationDetail extends CommonToolbarParentActivity imple
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread());
 
-            documentObservable
+            finalDisposer.add(documentObservable
                     .observeOn(Schedulers.io())
                     .subscribeOn(AndroidSchedulers.mainThread())
-                    .subscribe(new Observer<String>() {
-
-                        @Override
-                        public void onSubscribe(Disposable d) {
-
-                        }
+                    .subscribeWith(new DisposableObserver<String>() {
 
                         @Override
                         public void onNext(String returnValue) {
@@ -549,7 +537,7 @@ public class ClientCommunicationDetail extends CommonToolbarParentActivity imple
                         public void onComplete() {
                             Log.e("COMPLETE", "Complete: ");
                         }
-                    });
+                    }));
         } else {
             postToServer();
         }
@@ -560,31 +548,40 @@ public class ClientCommunicationDetail extends CommonToolbarParentActivity imple
                 .baseUrl(getString(R.string.baseUrl))
                 .addConverterFactory(ScalarsConverterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .build();
 
-        RetrofitNetworkService retrofitNetworkService = retrofit.create(RetrofitNetworkService.class);
+        Observable<String> observable = retrofit
+                .create(RetrofitNetworkService.class)
+                .postCommunicationDetail(communicationDetailModel)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
 
-        // finally, execute the request
-        Call<String> networkCall = retrofitNetworkService.postCommunicationDetail(communicationDetailModel);
-        networkCall.enqueue(new Callback<String>() {
-            @Override
-            public void onResponse(@NonNull Call<String> call, @NonNull retrofit2.Response<String> response) {
-                String responseData = "";
-                responseData = response.body();
-                if (responseData!= null) {
-                    if (!responseData.equals("")&&!responseData.equals("[]")) {
-                        Toast.makeText(ClientCommunicationDetail.this,"Success",Toast.LENGTH_LONG).show();
-                        finish();
+        finalDisposer.add( observable
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeWith(new DisposableObserver<String>() {
+
+                    @Override
+                    public void onNext(String response) {
+                        if (response!= null) {
+                            if (!response.equals("")&&!response.equals("[]")) {
+                                Toast.makeText(ClientCommunicationDetail.this,"Success",Toast.LENGTH_LONG).show();
+                                finish();
+                            }
+                        }
                     }
-                }
-            }
 
-            @Override
-            public void onFailure(@NonNull Call<String> call, @NonNull Throwable t) {
-                Log.e("Request error:", t.getMessage());
-                Toast.makeText(ClientCommunicationDetail.this,"Not Successful !!!",Toast.LENGTH_LONG).show();
-            }
-        });
+                    @Override
+                    public void onError(Throwable e) {
+                        Toast.makeText(ClientCommunicationDetail.this,"Not Successful !!!",Toast.LENGTH_LONG).show();
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                }));
     }
 
     private void showNextMeetingDate() {
@@ -764,34 +761,42 @@ public class ClientCommunicationDetail extends CommonToolbarParentActivity imple
         if(StaticHelperClass.isNetworkAvailable(this)) {
             progressBar.setVisibility(View.VISIBLE);
             whiteBackground.setVisibility(View.VISIBLE);
-            String url = getString(R.string.baseUrl)+"/api/onEms/spGetCRMCommunicationType";
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(getString(R.string.baseUrl))
+                    .addConverterFactory(ScalarsConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .build();
 
-            StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
-                    new Response.Listener<String>() {
+            Observable<String> observable = retrofit
+                    .create(RetrofitNetworkService.class)
+                    .spGetCRMCommunicationType()
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread());
+
+            finalDisposer.add( observable
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeWith(new DisposableObserver<String>() {
+
                         @Override
-                        public void onResponse(String response) {
-
+                        public void onNext(String response) {
                             parseCommunicationTypeData(response);
+                            progressBar.setVisibility(View.INVISIBLE);
+                            whiteBackground.setVisibility(View.INVISIBLE);
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+                            progressBar.setVisibility(View.INVISIBLE);
+                            whiteBackground.setVisibility(View.INVISIBLE);
+                        }
+
+                        @Override
+                        public void onComplete() {
 
                         }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    progressBar.setVisibility(View.INVISIBLE);
-                    whiteBackground.setVisibility(View.INVISIBLE);
-                    Toast.makeText(ClientCommunicationDetail.this,"Error: "+error,
-                            Toast.LENGTH_LONG).show();
-                }
-            })
-            {
-                @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
-                    Map<String, String>  params = new HashMap<>();
-                    params.put("Authorization", "Request_From_onEMS_Android_app");
-                    return params;
-                }
-            };
-            MySingleton.getInstance(this).addToRequestQueue(stringRequest);
+                    }));
         } else {
             Toast.makeText(ClientCommunicationDetail.this,"Please check your internet connection and select again!!! ",
                     Toast.LENGTH_LONG).show();
@@ -837,36 +842,45 @@ public class ClientCommunicationDetail extends CommonToolbarParentActivity imple
 
     private void PriorityDataGetRequest() {
         if(StaticHelperClass.isNetworkAvailable(this)) {
-            String url = getString(R.string.baseUrl)+"/api/onEms/spGetCRMPriority";
             progressBar.setVisibility(View.VISIBLE);
             whiteBackground.setVisibility(View.VISIBLE);
-            //Preparing Medium data from server
-            StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
-                    new Response.Listener<String>() {
-                        @Override
-                        public void onResponse(String response) {
 
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(getString(R.string.baseUrl))
+                    .addConverterFactory(ScalarsConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .build();
+
+            Observable<String> observable = retrofit
+                    .create(RetrofitNetworkService.class)
+                    .getCRMPriority()
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread());
+
+            finalDisposer.add( observable
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeWith(new DisposableObserver<String>() {
+
+                        @Override
+                        public void onNext(String response) {
                             parsePriorityData(response);
+                            progressBar.setVisibility(View.INVISIBLE);
+                            whiteBackground.setVisibility(View.INVISIBLE);
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+                            progressBar.setVisibility(View.INVISIBLE);
+                            whiteBackground.setVisibility(View.INVISIBLE);
+                        }
+
+                        @Override
+                        public void onComplete() {
 
                         }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    progressBar.setVisibility(View.INVISIBLE);
-                    whiteBackground.setVisibility(View.INVISIBLE);
-                    Toast.makeText(ClientCommunicationDetail.this,"Error: "+error,
-                            Toast.LENGTH_LONG).show();
-                }
-            })
-            {
-                @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
-                    Map<String, String>  params = new HashMap<>();
-                    params.put("Authorization", "Request_From_onEMS_Android_app");
-                    return params;
-                }
-            };
-            MySingleton.getInstance(this).addToRequestQueue(stringRequest);
+                    }));
         } else {
             Toast.makeText(ClientCommunicationDetail.this,"Please check your internet connection and select again!!! ",
                     Toast.LENGTH_LONG).show();

@@ -34,7 +34,7 @@ public class ForgotPassSelectDialog extends Dialog implements View.OnClickListen
     private Context context;
     private ProgressDialog tokenDialog, mailDialog, smsDialog;
     private String returnValue, selectedWay, smail, sphone;
-    private int clearToProcess = 0;
+    private boolean isPhoneOk = false, isMailOk = false;
     private long InstituteID;
     private boolean isPhone = false, isMail = false;
 
@@ -78,14 +78,14 @@ public class ForgotPassSelectDialog extends Dialog implements View.OnClickListen
                     radioMail = radio.replace(g, "*****");
                 }
                 mail.setText(radioMail);
-                clearToProcess = 1;
+                isMailOk = true;
             }
 
             if(sphone.length()>10) {
                 String s = sphone.substring(3, 9);
                 String radioPhone = sphone.replace(s, "******");
                 phone.setText(radioPhone);
-                clearToProcess = 2;
+                isPhoneOk = true;
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -132,9 +132,9 @@ public class ForgotPassSelectDialog extends Dialog implements View.OnClickListen
     }
 
     private void sendVerifyCode() {
-        if(clearToProcess==1&&isMail) {
+        if(isMailOk && isMail) {
             sendVerifyCodeViaMail();
-        } else if(clearToProcess==2&&isPhone) {
+        } else if(isPhoneOk && isPhone) {
             getInstituteSmsToken();
         } else if(selectedWay.equals("don't")) {
             Toast.makeText(context,"Please try a valid authentication !!!",Toast.LENGTH_LONG).show();

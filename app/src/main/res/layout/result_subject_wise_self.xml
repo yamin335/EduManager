@@ -83,17 +83,17 @@
         android:layout_height="match_parent"
         android:scrollbars="vertical"
         android:layout_below="@id/labels"/>
+
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/selectExam"
-        android:layout_width="wrap_content"
+        android:layout_width="30dp"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
         android:layout_alignParentBottom="true"
-        android:layout_marginRight="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
-        app:srcCompat="@drawable/nav_exam"
-        android:tint="@color/white"/>
+        app:srcCompat="@drawable/ic_arrow_up"
+        android:tint="@color/white"
+        android:scaleType="center"/>
 
 </RelativeLayout>

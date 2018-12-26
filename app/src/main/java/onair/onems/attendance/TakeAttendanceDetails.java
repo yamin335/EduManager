@@ -1,12 +1,10 @@
 package onair.onems.attendance;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -17,34 +15,48 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.LinearLayout;
 import android.widget.Toast;
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
 import com.google.gson.Gson;
+import com.google.gson.JsonIOException;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.observers.DisposableObserver;
+import io.reactivex.schedulers.Schedulers;
 import onair.onems.R;
+import onair.onems.Services.RetrofitNetworkService;
 import onair.onems.Services.StaticHelperClass;
-import onair.onems.customised.CustomRequest;
 import onair.onems.mainactivities.CommonToolbarParentActivity;
 import onair.onems.models.AttendanceSheetModel;
 import onair.onems.models.AttendanceStudentModel;
-import onair.onems.network.MySingleton;
+import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
+import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.converter.scalars.ScalarsConverterFactory;
+
 public class TakeAttendanceDetails extends CommonToolbarParentActivity {
 
     private TakeAttendanceAdapter adapter;
     private ArrayList<AttendanceStudentModel> attendanceSheetArrayList;
-    private long InstituteID,MediumID,ShiftID,ClassID,SectionID,SubjectID,DepertmentID;
-    private String date, StudentDataGetUrl, postUrl, UserID, SubAtdID;
-    private ProgressDialog dialog;
+    private long InstituteID, MediumID, ShiftID, ClassID, SectionID, SubjectID, DepertmentID;
+    private String date, UserID, SubAtdID;
     private JSONArray StudentJsonArray;
-    private JSONObject postDataJsonObject;
+    private JsonObject postDataJsonObject;
+    private CompositeDisposable finalDisposer = new CompositeDisposable();
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (!finalDisposer.isDisposed())
+            finalDisposer.dispose();
+    }
 
     @Override
     public void onResume() {
@@ -69,13 +81,6 @@ public class TakeAttendanceDetails extends CommonToolbarParentActivity {
 
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
 
-        dialog = new ProgressDialog(this);
-        dialog.setTitle("Loading...");
-        dialog.setMessage("Please Wait...");
-        dialog.setCancelable(false);
-        dialog.setIcon(R.drawable.onair);
-        dialog.show();
-
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         UserID = prefs.getString("UserID", "0");
 
@@ -88,10 +93,6 @@ public class TakeAttendanceDetails extends CommonToolbarParentActivity {
         SubjectID = StudentSelection.getLong("SubjectID",0);
         DepertmentID = StudentSelection.getLong("DepertmentID",0);
         date = StudentSelection.getString("Date", "");
-
-        postUrl = getString(R.string.baseUrl)+"/api/onEms/setHrmSubWiseAtd";
-
-        StudentDataGetUrl = getString(R.string.baseUrl)+"/api/onEms/getHrmSubWiseAtdDetail/"+InstituteID+"/"+MediumID+"/"+ShiftID+"/"+ClassID+"/"+SectionID+"/"+SubjectID+"/"+DepertmentID+"/"+date;
 
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
 
@@ -150,11 +151,8 @@ public class TakeAttendanceDetails extends CommonToolbarParentActivity {
                 SubAtdID = studentJsonObject.getString("SubAtdID");
             }
             adapter.notifyDataSetChanged();
-            dialog.dismiss();
-
         } catch (JSONException e) {
             Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
-            dialog.dismiss();
         }
 
     }
@@ -191,7 +189,6 @@ public class TakeAttendanceDetails extends CommonToolbarParentActivity {
                 attendanceSheetModel.setattendenceArr(attendanceSheetArrayList);
                 Gson gson = new Gson();
                 String json = gson.toJson(attendanceSheetModel);
-                dialog.show();
                 postUsingVolley(json);
                 return true;
             }
@@ -205,75 +202,95 @@ public class TakeAttendanceDetails extends CommonToolbarParentActivity {
     }
 
     public void postUsingVolley(String json) {
-        dialog.show();
         try {
-            postDataJsonObject = new JSONObject(json);
-        } catch (JSONException e) {
+            postDataJsonObject = new JsonObject();
+            JsonParser parser = new JsonParser();
+            postDataJsonObject = parser.parse(json).getAsJsonObject();
+
+        } catch (JsonIOException e) {
             e.printStackTrace();
         }
-        CustomRequest customRequest = new CustomRequest (Request.Method.POST, postUrl, postDataJsonObject,
-                new Response.Listener<JSONArray>() {
-                    @Override
-                    public void onResponse(JSONArray response) {
-                        dialog.dismiss();
-                        try {
+
+        if(StaticHelperClass.isNetworkAvailable(this)) {
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(getString(R.string.baseUrl))
+                    .addConverterFactory(ScalarsConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .build();
+
+            Observable<String> observable = retrofit
+                    .create(RetrofitNetworkService.class)
+                    .setHrmSubWiseAtd(postDataJsonObject)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread());
+
+            finalDisposer.add( observable
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeWith(new DisposableObserver<String>() {
+
+                        @Override
+                        public void onNext(String response) {
                             Toast.makeText(TakeAttendanceDetails.this,"Attendance successfully taken",Toast.LENGTH_LONG).show();
                             finish();
-                        } catch (Exception e) {
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
 
                         }
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Toast.makeText(TakeAttendanceDetails.this,"Not Response: "+error.toString(),Toast.LENGTH_LONG).show();
-                dialog.dismiss();
-            }
-        })
-        {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String>  params = new HashMap<>();
-                params.put("Authorization", "Request_From_onEMS_Android_app");
-                return params;
-            }
-        };
-        MySingleton.getInstance(this).addToRequestQueue(customRequest);
+
+                        @Override
+                        public void onComplete() {
+
+                        }
+                    }));
+        } else {
+            Toast.makeText(TakeAttendanceDetails.this,"Please check your internet connection!!!",Toast.LENGTH_LONG).show();
+        }
     }
 
     @Override
     public void onBackPressed() {
-//        NavUtils.navigateUpFromSameTask(this);
         super.onBackPressed();
     }
 
     public void StudentDataGetRequest(){
         if(StaticHelperClass.isNetworkAvailable(this)) {
-            dialog.show();
-            //Preparing claas data from server
-            StringRequest stringStudentDataRequest = new StringRequest(Request.Method.GET, StudentDataGetUrl,
-                    new Response.Listener<String>() {
-                        @Override
-                        public void onResponse(String response) {
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(getString(R.string.baseUrl))
+                    .addConverterFactory(ScalarsConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .build();
 
+            Observable<String> observable = retrofit
+                    .create(RetrofitNetworkService.class)
+                    .getHrmSubWiseAtdDetail(InstituteID, MediumID, ShiftID, ClassID, SectionID, SubjectID, DepertmentID, date)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread());
+
+            finalDisposer.add( observable
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeWith(new DisposableObserver<String>() {
+
+                        @Override
+                        public void onNext(String response) {
                             prepareAlbums(response);
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
 
                         }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    dialog.dismiss();
-                }
-            })
-            {
-                @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
-                    Map<String, String>  params = new HashMap<>();
-                    params.put("Authorization", "Request_From_onEMS_Android_app");
-                    return params;
-                }
-            };
-            MySingleton.getInstance(this).addToRequestQueue(stringStudentDataRequest);
+
+                        @Override
+                        public void onComplete() {
+
+                        }
+                    }));
         } else {
             Toast.makeText(TakeAttendanceDetails.this,"Please check your internet connection!!!",Toast.LENGTH_LONG).show();
         }

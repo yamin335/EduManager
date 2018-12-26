@@ -1,21 +1,47 @@
 package onair.onems;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.databinding.DataBindingUtil;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.support.design.widget.TextInputEditText;
+import android.support.v4.content.LocalBroadcastManager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
+import onair.onems.Services.StaticHelperClass;
 import onair.onems.databinding.TestBinding;
 import onair.onems.mainactivities.SideNavigationMenuParentActivity;
 import onair.onems.models.TestModel;
 
 public class Test extends SideNavigationMenuParentActivity {
+    private BroadcastReceiver networkConnectivityReceiver;
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        LocalBroadcastManager.getInstance(this).registerReceiver(networkConnectivityReceiver,
+                new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(networkConnectivityReceiver);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +77,17 @@ public class Test extends SideNavigationMenuParentActivity {
                     testModel.getName().setValue(s.toString());
             }
         });
+
+        networkConnectivityReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if (StaticHelperClass.isNetworkAvailable(context)) {
+                    Toast.makeText(context,"Network connected!",Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(context,"Network not connected",Toast.LENGTH_LONG).show();
+                }
+            }
+        };
 
     }
 }

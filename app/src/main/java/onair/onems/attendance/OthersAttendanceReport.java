@@ -1,6 +1,5 @@
 package onair.onems.attendance;
 
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -14,18 +13,18 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.Toast;
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.observers.DisposableObserver;
+import io.reactivex.schedulers.Schedulers;
 import onair.onems.R;
+import onair.onems.Services.RetrofitNetworkService;
 import onair.onems.Services.StaticHelperClass;
 import onair.onems.models.ClassModel;
 import onair.onems.models.DepartmentModel;
@@ -33,11 +32,13 @@ import onair.onems.models.MediumModel;
 import onair.onems.models.MonthModel;
 import onair.onems.models.SectionModel;
 import onair.onems.models.ShiftModel;
-import onair.onems.network.MySingleton;
+import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
+import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 public class OthersAttendanceReport extends Fragment {
     private Spinner spinnerClass, spinnerShift, spinnerSection, spinnerMedium, spinnerDepartment, spinnerMonth;
-    private ProgressDialog mShiftDialog, mMediumDialog, mClassDialog, mDepartmentDialog, mSectionDialog, mMonthDialog;
     private ArrayList<ClassModel> allClassArrayList;
     private ArrayList<ShiftModel> allShiftArrayList;
     private ArrayList<SectionModel> allSectionArrayList;
@@ -59,18 +60,21 @@ public class OthersAttendanceReport extends Fragment {
     private long InstituteID;
     private int firstClass = 0, firstShift = 0, firstSection = 0, firstMedium = 0,
             firstDepartment = 0;
-    public OthersAttendanceReport()
-    {
+
+    private CompositeDisposable finalDisposer = new CompositeDisposable();
+    public OthersAttendanceReport() {
 
     }
-    public static OthersAttendanceReport newInstance()
-    {
-        OthersAttendanceReport fragment = new OthersAttendanceReport();
-        return fragment;
-    }
+
     @Override
-    public void onCreate(Bundle savedInstanceState)
-    {
+    public void onDestroy() {
+        super.onDestroy();
+        if (!finalDisposer.isDisposed())
+            finalDisposer.dispose();
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
     }
 
@@ -277,29 +281,26 @@ public class OthersAttendanceReport extends Fragment {
             }
         });
 
-        student_find_button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(selectedMedium.getMediumID() == -2) {
-                    Toast.makeText(getActivity(),"Please select a medium!!!",Toast.LENGTH_LONG).show();
-                } else if(selectedClass.getClassID() == -2) {
-                    Toast.makeText(getActivity(),"Please select a class!!!",Toast.LENGTH_LONG).show();
-                } else if((selectedDepartment.getDepartmentID() == -2)&&(allDepartmentArrayList.size()>0)) {
-                    Toast.makeText(getActivity(),"Please select a department!!!",Toast.LENGTH_LONG).show();
-                } else if((selectedSection.getSectionID() == -2)&&(allSectionArrayList.size()>0)) {
-                    Toast.makeText(getActivity(),"Please select a section!!!",Toast.LENGTH_LONG).show();
-                } else if(selectedMonth.getMonthID() == 0) {
-                    Toast.makeText(getActivity(),"Please select a month!!!",Toast.LENGTH_LONG).show();
-                } else {
-                    Intent intent = new Intent(getActivity(), StudentAttendanceShow.class);
-                    intent.putExtra("ShiftID", selectedShift.getShiftID());
-                    intent.putExtra("MediumID", selectedMedium.getMediumID());
-                    intent.putExtra("ClassID", selectedClass.getClassID());
-                    intent.putExtra("DepartmentID", selectedDepartment.getDepartmentID());
-                    intent.putExtra("SectionID", selectedSection.getSectionID());
-                    intent.putExtra("MonthID", selectedMonth.getMonthID());
-                    startActivity(intent);
-                }
+        student_find_button.setOnClickListener(view -> {
+            if(selectedMedium.getMediumID() == -2) {
+                Toast.makeText(getActivity(),"Please select a medium!!!",Toast.LENGTH_LONG).show();
+            } else if(selectedClass.getClassID() == -2) {
+                Toast.makeText(getActivity(),"Please select a class!!!",Toast.LENGTH_LONG).show();
+            } else if((selectedDepartment.getDepartmentID() == -2)&&(allDepartmentArrayList.size()>0)) {
+                Toast.makeText(getActivity(),"Please select a department!!!",Toast.LENGTH_LONG).show();
+            } else if((selectedSection.getSectionID() == -2)&&(allSectionArrayList.size()>0)) {
+                Toast.makeText(getActivity(),"Please select a section!!!",Toast.LENGTH_LONG).show();
+            } else if(selectedMonth.getMonthID() == 0) {
+                Toast.makeText(getActivity(),"Please select a month!!!",Toast.LENGTH_LONG).show();
+            } else {
+                Intent intent = new Intent(getActivity(), StudentAttendanceShow.class);
+                intent.putExtra("ShiftID", selectedShift.getShiftID());
+                intent.putExtra("MediumID", selectedMedium.getMediumID());
+                intent.putExtra("ClassID", selectedClass.getClassID());
+                intent.putExtra("DepartmentID", selectedDepartment.getDepartmentID());
+                intent.putExtra("SectionID", selectedSection.getSectionID());
+                intent.putExtra("MonthID", selectedMonth.getMonthID());
+                startActivity(intent);
             }
         });
 
@@ -327,13 +328,10 @@ public class OthersAttendanceReport extends Fragment {
                 ArrayAdapter<String> shift_spinner_adapter = new ArrayAdapter<>(getActivity(),R.layout.spinner_item, strings);
                 shift_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinnerShift.setAdapter(shift_spinner_adapter);
-                mShiftDialog.dismiss();
             } catch (IndexOutOfBoundsException e) {
-                mShiftDialog.dismiss();
                 Toast.makeText(getActivity(),"No shift found !!!",Toast.LENGTH_LONG).show();
             }
         } catch (JSONException e) {
-            mShiftDialog.dismiss();
             Toast.makeText(getActivity(),""+e,Toast.LENGTH_LONG).show();
         }
     }
@@ -361,13 +359,10 @@ public class OthersAttendanceReport extends Fragment {
                 ArrayAdapter<String> medium_spinner_adapter = new ArrayAdapter<>(getActivity(),R.layout.spinner_item, strings);
                 medium_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinnerMedium.setAdapter(medium_spinner_adapter);
-                mMediumDialog.dismiss();
             } catch (IndexOutOfBoundsException e) {
-                mMediumDialog.dismiss();
                 Toast.makeText(getActivity(),"No medium found !!!",Toast.LENGTH_LONG).show();
             }
         } catch (JSONException e) {
-            mMediumDialog.dismiss();
             Toast.makeText(getActivity(),""+e,Toast.LENGTH_LONG).show();
         }
     }
@@ -394,13 +389,10 @@ public class OthersAttendanceReport extends Fragment {
                 ArrayAdapter<String> class_spinner_adapter = new ArrayAdapter<>(getActivity(),R.layout.spinner_item, strings);
                 class_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinnerClass.setAdapter(class_spinner_adapter);
-                mClassDialog.dismiss();
             } catch (IndexOutOfBoundsException e) {
-                mClassDialog.dismiss();
                 Toast.makeText(getActivity(),"No class found !!!",Toast.LENGTH_LONG).show();
             }
         } catch (JSONException e) {
-            mClassDialog.dismiss();
             Toast.makeText(getActivity(),""+e,Toast.LENGTH_LONG).show();
         }
     }
@@ -430,13 +422,10 @@ public class OthersAttendanceReport extends Fragment {
                 ArrayAdapter<String> department_spinner_adapter = new ArrayAdapter<>(getActivity(),R.layout.spinner_item, strings);
                 department_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinnerDepartment.setAdapter(department_spinner_adapter);
-                mDepartmentDialog.dismiss();
             } catch (IndexOutOfBoundsException e) {
-                mDepartmentDialog.dismiss();
                 Toast.makeText(getActivity(),"No department found !!!",Toast.LENGTH_LONG).show();
             }
         } catch (JSONException e) {
-            mDepartmentDialog.dismiss();
             Toast.makeText(getActivity(),""+e,Toast.LENGTH_LONG).show();
         }
     }
@@ -462,13 +451,10 @@ public class OthersAttendanceReport extends Fragment {
                 ArrayAdapter<String> section_spinner_adapter = new ArrayAdapter<>(getActivity(),R.layout.spinner_item, strings);
                 section_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinnerSection.setAdapter(section_spinner_adapter);
-                mSectionDialog.dismiss();
             } catch (IndexOutOfBoundsException e) {
-                mSectionDialog.dismiss();
                 Toast.makeText(getActivity(),"No section found !!!",Toast.LENGTH_LONG).show();
             }
         } catch (JSONException e) {
-            mSectionDialog.dismiss();
             Toast.makeText(getActivity(),""+e,Toast.LENGTH_LONG).show();
         }
     }
@@ -495,14 +481,11 @@ public class OthersAttendanceReport extends Fragment {
                 ArrayAdapter<String> month_spinner_adapter = new ArrayAdapter<>(getActivity(),R.layout.spinner_item, strings);
                 month_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinnerMonth.setAdapter(month_spinner_adapter);
-                mMonthDialog.dismiss();
             } catch (IndexOutOfBoundsException e) {
-                mMonthDialog.dismiss();
                 Toast.makeText(getActivity(),"No class found !!!",Toast.LENGTH_LONG).show();
             }
 
         } catch (JSONException e) {
-            mMonthDialog.dismiss();
             Toast.makeText(getActivity(),""+e,Toast.LENGTH_LONG).show();
         }
 
@@ -510,38 +493,41 @@ public class OthersAttendanceReport extends Fragment {
 
     private void ShiftDataGetRequest() {
         if (StaticHelperClass.isNetworkAvailable(getActivity())) {
-            String shiftUrl = getString(R.string.baseUrl)+"/api/onEms/getInsShift/"+InstituteID;
 
-            mShiftDialog = new ProgressDialog(getActivity());
-            mShiftDialog.setTitle("Loading...");
-            mShiftDialog.setMessage("Please Wait...");
-            mShiftDialog.setCancelable(false);
-            mShiftDialog.setIcon(R.drawable.onair);
-            mShiftDialog.show();
-            //Preparing Shift data from server
-            StringRequest stringShiftRequest = new StringRequest(Request.Method.GET, shiftUrl,
-                    new Response.Listener<String>() {
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(getString(R.string.baseUrl))
+                    .addConverterFactory(ScalarsConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .build();
+
+            Observable<String> observable = retrofit
+                    .create(RetrofitNetworkService.class)
+                    .getInsShift(InstituteID)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread());
+
+            finalDisposer.add( observable
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeWith(new DisposableObserver<String>() {
+
                         @Override
-                        public void onResponse(String response) {
-
+                        public void onNext(String response) {
                             parseShiftJsonData(response);
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
 
                         }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    mShiftDialog.dismiss();
-                }
-            })
-            {
-                @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
-                    Map<String, String>  params = new HashMap<>();
-                    params.put("Authorization", "Request_From_onEMS_Android_app");
-                    return params;
-                }
-            };
-            MySingleton.getInstance(getActivity()).addToRequestQueue(stringShiftRequest);
+
+                        @Override
+                        public void onComplete() {
+
+                        }
+                    }));
+
         } else {
             Toast.makeText(getActivity(),"Please check your internet connection and select again!!! ",
                     Toast.LENGTH_LONG).show();
@@ -550,38 +536,39 @@ public class OthersAttendanceReport extends Fragment {
 
     private void MediumDataGetRequest() {
         if(StaticHelperClass.isNetworkAvailable(getActivity())) {
-            String mediumUrl = getString(R.string.baseUrl)+"/api/onEms/getInstituteMediumDdl/"+InstituteID;
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(getString(R.string.baseUrl))
+                    .addConverterFactory(ScalarsConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .build();
 
-            mMediumDialog = new ProgressDialog(getActivity());
-            mMediumDialog.setTitle("Loading...");
-            mMediumDialog.setMessage("Please Wait...");
-            mMediumDialog.setCancelable(false);
-            mMediumDialog.setIcon(R.drawable.onair);
-            mMediumDialog.show();
-            //Preparing Medium data from server
-            StringRequest stringMediumRequest = new StringRequest(Request.Method.GET, mediumUrl,
-                    new Response.Listener<String>() {
+            Observable<String> observable = retrofit
+                    .create(RetrofitNetworkService.class)
+                    .getInstituteMediumDdl(InstituteID)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread());
+
+            finalDisposer.add( observable
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeWith(new DisposableObserver<String>() {
+
                         @Override
-                        public void onResponse(String response) {
-
+                        public void onNext(String response) {
                             parseMediumJsonData(response);
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
 
                         }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    mMediumDialog.dismiss();
-                }
-            })
-            {
-                @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
-                    Map<String, String>  params = new HashMap<>();
-                    params.put("Authorization", "Request_From_onEMS_Android_app");
-                    return params;
-                }
-            };
-            MySingleton.getInstance(getActivity()).addToRequestQueue(stringMediumRequest);
+
+                        @Override
+                        public void onComplete() {
+
+                        }
+                    }));
         } else {
             Toast.makeText(getActivity(),"Please check your internet connection and select again!!! ",
                     Toast.LENGTH_LONG).show();
@@ -590,41 +577,40 @@ public class OthersAttendanceReport extends Fragment {
 
     private void ClassDataGetRequest() {
         if(StaticHelperClass.isNetworkAvailable(getActivity())) {
-
             CheckSelectedData();
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(getString(R.string.baseUrl))
+                    .addConverterFactory(ScalarsConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .build();
 
-            String classUrl = getString(R.string.baseUrl)+"/api/onEms/MediumWiseClassDDL/"+InstituteID+"/"+selectedMedium.getMediumID();
+            Observable<String> observable = retrofit
+                    .create(RetrofitNetworkService.class)
+                    .MediumWiseClassDDL(InstituteID, selectedMedium.getMediumID())
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread());
 
-            mClassDialog = new ProgressDialog(getActivity());
-            mClassDialog.setTitle("Loading...");
-            mClassDialog.setMessage("Please Wait...");
-            mClassDialog.setCancelable(false);
-            mClassDialog.setIcon(R.drawable.onair);
-            mClassDialog.show();
-            //Preparing claas data from server
-            StringRequest stringClassRequest = new StringRequest(Request.Method.GET, classUrl,
-                    new Response.Listener<String>() {
+            finalDisposer.add( observable
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeWith(new DisposableObserver<String>() {
+
                         @Override
-                        public void onResponse(String response) {
-
+                        public void onNext(String response) {
                             parseClassJsonData(response);
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
 
                         }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    mClassDialog.dismiss();
-                }
-            })
-            {
-                @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
-                    Map<String, String>  params = new HashMap<>();
-                    params.put("Authorization", "Request_From_onEMS_Android_app");
-                    return params;
-                }
-            };
-            MySingleton.getInstance(getActivity()).addToRequestQueue(stringClassRequest);
+
+                        @Override
+                        public void onComplete() {
+
+                        }
+                    }));
         } else {
             Toast.makeText(getActivity(),"Please check your internet connection and select again!!! ",
                     Toast.LENGTH_LONG).show();
@@ -636,39 +622,39 @@ public class OthersAttendanceReport extends Fragment {
 
             CheckSelectedData();
 
-            String departmentUrl = getString(R.string.baseUrl)+"/api/onEms/ClassWiseDepartmentDDL/"+InstituteID+"/"+
-                    selectedClass.getClassID()+"/"+selectedMedium.getMediumID();
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(getString(R.string.baseUrl))
+                    .addConverterFactory(ScalarsConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .build();
 
-            mDepartmentDialog = new ProgressDialog(getActivity());
-            mDepartmentDialog.setTitle("Loading...");
-            mDepartmentDialog.setMessage("Please Wait...");
-            mDepartmentDialog.setCancelable(false);
-            mDepartmentDialog.setIcon(R.drawable.onair);
-            mDepartmentDialog.show();
-            //Preparing Department data from server
-            StringRequest stringDepartmentRequest = new StringRequest(Request.Method.GET, departmentUrl,
-                    new Response.Listener<String>() {
+            Observable<String> observable = retrofit
+                    .create(RetrofitNetworkService.class)
+                    .ClassWiseDepartmentDDL(InstituteID, selectedClass.getClassID(), selectedMedium.getMediumID())
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread());
+
+            finalDisposer.add( observable
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeWith(new DisposableObserver<String>() {
+
                         @Override
-                        public void onResponse(String response) {
-
+                        public void onNext(String response) {
                             parseDepartmentJsonData(response);
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
 
                         }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    mDepartmentDialog.dismiss();
-                }
-            })
-            {
-                @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
-                    Map<String, String>  params = new HashMap<>();
-                    params.put("Authorization", "Request_From_onEMS_Android_app");
-                    return params;
-                }
-            };
-            MySingleton.getInstance(getActivity()).addToRequestQueue(stringDepartmentRequest);
+
+                        @Override
+                        public void onComplete() {
+
+                        }
+                    }));
         } else {
             Toast.makeText(getActivity(),"Please check your internet connection and select again!!! ",
                     Toast.LENGTH_LONG).show();
@@ -680,78 +666,81 @@ public class OthersAttendanceReport extends Fragment {
 
             CheckSelectedData();
 
-            String sectionUrl = getString(R.string.baseUrl)+"/api/onEms/getInsSection/"+InstituteID+"/"+
-                    selectedClass.getClassID()+"/"+selectedDepartment.getDepartmentID();
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(getString(R.string.baseUrl))
+                    .addConverterFactory(ScalarsConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .build();
 
-            mSectionDialog = new ProgressDialog(getActivity());
-            mSectionDialog.setTitle("Loading...");
-            mSectionDialog.setMessage("Please Wait...");
-            mSectionDialog.setCancelable(false);
-            mSectionDialog.setIcon(R.drawable.onair);
-            mSectionDialog.show();
-            //Preparing section data from server
-            StringRequest stringSectionRequest = new StringRequest(Request.Method.GET, sectionUrl,
-                    new Response.Listener<String>() {
+            Observable<String> observable = retrofit
+                    .create(RetrofitNetworkService.class)
+                    .getInsSection(InstituteID, selectedClass.getClassID(), selectedDepartment.getDepartmentID())
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread());
+
+            finalDisposer.add( observable
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeWith(new DisposableObserver<String>() {
+
                         @Override
-                        public void onResponse(String response) {
-
+                        public void onNext(String response) {
                             parseSectionJsonData(response);
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
 
                         }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    mSectionDialog.dismiss();
-                }
-            })
-            {
-                @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
-                    Map<String, String>  params = new HashMap<>();
-                    params.put("Authorization", "Request_From_onEMS_Android_app");
-                    return params;
-                }
-            };
-            MySingleton.getInstance(getActivity()).addToRequestQueue(stringSectionRequest);
+
+                        @Override
+                        public void onComplete() {
+
+                        }
+                    }));
         } else {
             Toast.makeText(getActivity(),"Please check your internet connection and select again!!! ",
                     Toast.LENGTH_LONG).show();
         }
     }
+
     void MonthDataGetRequest(){
         if(StaticHelperClass.isNetworkAvailable(getActivity())) {
-            mMonthDialog = new ProgressDialog(getActivity());
-            mMonthDialog.setTitle("Loading...");
-            mMonthDialog.setMessage("Please Wait...");
-            mMonthDialog.setCancelable(false);
-            mMonthDialog.setIcon(R.drawable.onair);
-            mMonthDialog.show();
-            String monthUrl=getString(R.string.baseUrl)+"/api/onEms/getMonth";
-            StringRequest stringMonthRequest = new StringRequest(Request.Method.GET, monthUrl,
-                    new Response.Listener<String>()
-                    {
-                        @Override
-                        public void onResponse(String response)
-                        {
 
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(getString(R.string.baseUrl))
+                    .addConverterFactory(ScalarsConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .build();
+
+            Observable<String> observable = retrofit
+                    .create(RetrofitNetworkService.class)
+                    .getMonth()
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread());
+
+            finalDisposer.add( observable
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeWith(new DisposableObserver<String>() {
+
+                        @Override
+                        public void onNext(String response) {
                             parseMonthJsonData(response);
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
 
                         }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    mMonthDialog.dismiss();
-                }
-            })
-            {
-                @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
-                    Map<String, String>  params = new HashMap<>();
-                    params.put("Authorization", "Request_From_onEMS_Android_app");
-                    return params;
-                }
-            };
-            MySingleton.getInstance(getActivity()).addToRequestQueue(stringMonthRequest);
+
+                        @Override
+                        public void onComplete() {
+
+                        }
+                    }));
         } else {
             Toast.makeText(getActivity(),"Please check your internet connection and select again!!! ",
                     Toast.LENGTH_LONG).show();
@@ -780,9 +769,9 @@ public class OthersAttendanceReport extends Fragment {
             selectedDepartment.setDepartmentID("0");
         }
     }
+
     @Override
-    public void onStop()
-    {
+    public void onStop() {
         super.onStop();
     }
 

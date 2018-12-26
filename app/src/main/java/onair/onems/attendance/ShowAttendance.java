@@ -17,21 +17,19 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.Toast;
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.observers.DisposableObserver;
+import io.reactivex.schedulers.Schedulers;
 import onair.onems.R;
+import onair.onems.Services.RetrofitNetworkService;
 import onair.onems.Services.StaticHelperClass;
 import onair.onems.mainactivities.SideNavigationMenuParentActivity;
-import onair.onems.mainactivities.StudentMainScreen;
 import onair.onems.mainactivities.TeacherMainScreen;
 import onair.onems.models.ClassModel;
 import onair.onems.models.DepartmentModel;
@@ -39,11 +37,13 @@ import onair.onems.models.MediumModel;
 import onair.onems.models.MonthModel;
 import onair.onems.models.SectionModel;
 import onair.onems.models.ShiftModel;
-import onair.onems.network.MySingleton;
+import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
+import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 public class ShowAttendance extends SideNavigationMenuParentActivity {
     private Spinner spinnerClass, spinnerShift, spinnerSection, spinnerMedium, spinnerDepartment, spinnerMonth;
-    private ProgressDialog mShiftDialog, mMediumDialog, mClassDialog, mDepartmentDialog, mSectionDialog, mMonthDialog;
     private ArrayList<ClassModel> allClassArrayList;
     private ArrayList<ShiftModel> allShiftArrayList;
     private ArrayList<SectionModel> allSectionArrayList;
@@ -64,9 +64,18 @@ public class ShowAttendance extends SideNavigationMenuParentActivity {
     private MonthModel selectedMonth = null;
     private long InstituteID;
     private int firstClass = 0, firstShift = 0, firstSection = 0, firstMedium = 0,
-            firstDepartment = 0, UserTypeID;
+            firstDepartment = 0;
 
     private boolean fromDashBoard = false, fromSideMenu = false;
+    private CompositeDisposable finalDisposer = new CompositeDisposable();
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (!finalDisposer.isDisposed())
+            finalDisposer.dispose();
+    }
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -324,7 +333,6 @@ public class ShowAttendance extends SideNavigationMenuParentActivity {
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-
             if (fromSideMenu) {
                 Intent mainIntent = new Intent(ShowAttendance.this, TeacherMainScreen.class);
                 startActivity(mainIntent);
@@ -360,13 +368,10 @@ public class ShowAttendance extends SideNavigationMenuParentActivity {
                 ArrayAdapter<String> shift_spinner_adapter = new ArrayAdapter<>(this,R.layout.spinner_item, strings);
                 shift_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinnerShift.setAdapter(shift_spinner_adapter);
-                mShiftDialog.dismiss();
             } catch (IndexOutOfBoundsException e) {
-                mShiftDialog.dismiss();
                 Toast.makeText(this,"No shift found !!!",Toast.LENGTH_LONG).show();
             }
         } catch (JSONException e) {
-            mShiftDialog.dismiss();
             Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
         }
     }
@@ -394,13 +399,10 @@ public class ShowAttendance extends SideNavigationMenuParentActivity {
                 ArrayAdapter<String> medium_spinner_adapter = new ArrayAdapter<>(this,R.layout.spinner_item, strings);
                 medium_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinnerMedium.setAdapter(medium_spinner_adapter);
-                mMediumDialog.dismiss();
             } catch (IndexOutOfBoundsException e) {
-                mMediumDialog.dismiss();
                 Toast.makeText(this,"No medium found !!!",Toast.LENGTH_LONG).show();
             }
         } catch (JSONException e) {
-            mMediumDialog.dismiss();
             Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
         }
     }
@@ -427,13 +429,10 @@ public class ShowAttendance extends SideNavigationMenuParentActivity {
                 ArrayAdapter<String> class_spinner_adapter = new ArrayAdapter<>(this,R.layout.spinner_item, strings);
                 class_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinnerClass.setAdapter(class_spinner_adapter);
-                mClassDialog.dismiss();
             } catch (IndexOutOfBoundsException e) {
-                mClassDialog.dismiss();
                 Toast.makeText(this,"No class found !!!",Toast.LENGTH_LONG).show();
             }
         } catch (JSONException e) {
-            mClassDialog.dismiss();
             Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
         }
     }
@@ -463,13 +462,10 @@ public class ShowAttendance extends SideNavigationMenuParentActivity {
                 ArrayAdapter<String> department_spinner_adapter = new ArrayAdapter<>(this,R.layout.spinner_item, strings);
                 department_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinnerDepartment.setAdapter(department_spinner_adapter);
-                mDepartmentDialog.dismiss();
             } catch (IndexOutOfBoundsException e) {
-                mDepartmentDialog.dismiss();
                 Toast.makeText(this,"No department found !!!",Toast.LENGTH_LONG).show();
             }
         } catch (JSONException e) {
-            mDepartmentDialog.dismiss();
             Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
         }
     }
@@ -495,13 +491,10 @@ public class ShowAttendance extends SideNavigationMenuParentActivity {
                 ArrayAdapter<String> section_spinner_adapter = new ArrayAdapter<>(this,R.layout.spinner_item, strings);
                 section_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinnerSection.setAdapter(section_spinner_adapter);
-                mSectionDialog.dismiss();
             } catch (IndexOutOfBoundsException e) {
-                mSectionDialog.dismiss();
                 Toast.makeText(this,"No section found !!!",Toast.LENGTH_LONG).show();
             }
         } catch (JSONException e) {
-            mSectionDialog.dismiss();
             Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
         }
     }
@@ -530,54 +523,51 @@ public class ShowAttendance extends SideNavigationMenuParentActivity {
                 ArrayAdapter<String> month_spinner_adapter = new ArrayAdapter<>(this,R.layout.spinner_item, strings);
                 month_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinnerMonth.setAdapter(month_spinner_adapter);
-                mMonthDialog.dismiss();
             } catch (IndexOutOfBoundsException e) {
-                mMonthDialog.dismiss();
                 Toast.makeText(this,"No class found !!!",Toast.LENGTH_LONG).show();
             }
 
         } catch (JSONException e) {
             Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
-            mMonthDialog.dismiss();
-
         }
 
     }
 
     private void ShiftDataGetRequest() {
         if (StaticHelperClass.isNetworkAvailable(this)) {
-            String shiftUrl = getString(R.string.baseUrl)+"/api/onEms/getInsShift/"+InstituteID;
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(getString(R.string.baseUrl))
+                    .addConverterFactory(ScalarsConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .build();
 
-            mShiftDialog = new ProgressDialog(this);
-            mShiftDialog.setTitle("Loading...");
-            mShiftDialog.setMessage("Please Wait...");
-            mShiftDialog.setCancelable(false);
-            mShiftDialog.setIcon(R.drawable.onair);
-            mShiftDialog.show();
-            //Preparing Shift data from server
-            StringRequest stringShiftRequest = new StringRequest(Request.Method.GET, shiftUrl,
-                    new Response.Listener<String>() {
+            Observable<String> observable = retrofit
+                    .create(RetrofitNetworkService.class)
+                    .getInsShift(InstituteID)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread());
+
+            finalDisposer.add( observable
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeWith(new DisposableObserver<String>() {
+
                         @Override
-                        public void onResponse(String response) {
-
+                        public void onNext(String response) {
                             parseShiftJsonData(response);
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
 
                         }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    mShiftDialog.dismiss();
-                }
-            })
-            {
-                @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
-                    Map<String, String>  params = new HashMap<>();
-                    params.put("Authorization", "Request_From_onEMS_Android_app");
-                    return params;
-                }
-            };
-            MySingleton.getInstance(this).addToRequestQueue(stringShiftRequest);
+
+                        @Override
+                        public void onComplete() {
+
+                        }
+                    }));
         } else {
             Toast.makeText(ShowAttendance.this,"Please check your internet connection and select again!!! ",
                     Toast.LENGTH_LONG).show();
@@ -586,38 +576,39 @@ public class ShowAttendance extends SideNavigationMenuParentActivity {
 
     private void MediumDataGetRequest() {
         if(StaticHelperClass.isNetworkAvailable(this)) {
-            String mediumUrl = getString(R.string.baseUrl)+"/api/onEms/getInstituteMediumDdl/"+InstituteID;
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(getString(R.string.baseUrl))
+                    .addConverterFactory(ScalarsConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .build();
 
-            mMediumDialog = new ProgressDialog(this);
-            mMediumDialog.setTitle("Loading...");
-            mMediumDialog.setMessage("Please Wait...");
-            mMediumDialog.setCancelable(false);
-            mMediumDialog.setIcon(R.drawable.onair);
-            mMediumDialog.show();
-            //Preparing Medium data from server
-            StringRequest stringMediumRequest = new StringRequest(Request.Method.GET, mediumUrl,
-                    new Response.Listener<String>() {
+            Observable<String> observable = retrofit
+                    .create(RetrofitNetworkService.class)
+                    .getInstituteMediumDdl(InstituteID)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread());
+
+            finalDisposer.add( observable
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeWith(new DisposableObserver<String>() {
+
                         @Override
-                        public void onResponse(String response) {
-
+                        public void onNext(String response) {
                             parseMediumJsonData(response);
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
 
                         }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    mMediumDialog.dismiss();
-                }
-            })
-            {
-                @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
-                    Map<String, String>  params = new HashMap<>();
-                    params.put("Authorization", "Request_From_onEMS_Android_app");
-                    return params;
-                }
-            };
-            MySingleton.getInstance(this).addToRequestQueue(stringMediumRequest);
+
+                        @Override
+                        public void onComplete() {
+
+                        }
+                    }));
         } else {
             Toast.makeText(ShowAttendance.this,"Please check your internet connection and select again!!! ",
                     Toast.LENGTH_LONG).show();
@@ -629,38 +620,39 @@ public class ShowAttendance extends SideNavigationMenuParentActivity {
 
             CheckSelectedData();
 
-            String classUrl = getString(R.string.baseUrl)+"/api/onEms/MediumWiseClassDDL/"+InstituteID+"/"+selectedMedium.getMediumID();
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(getString(R.string.baseUrl))
+                    .addConverterFactory(ScalarsConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .build();
 
-            mClassDialog = new ProgressDialog(this);
-            mClassDialog.setTitle("Loading...");
-            mClassDialog.setMessage("Please Wait...");
-            mClassDialog.setCancelable(false);
-            mClassDialog.setIcon(R.drawable.onair);
-            mClassDialog.show();
-            //Preparing claas data from server
-            StringRequest stringClassRequest = new StringRequest(Request.Method.GET, classUrl,
-                    new Response.Listener<String>() {
+            Observable<String> observable = retrofit
+                    .create(RetrofitNetworkService.class)
+                    .MediumWiseClassDDL(InstituteID, selectedMedium.getMediumID())
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread());
+
+            finalDisposer.add( observable
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeWith(new DisposableObserver<String>() {
+
                         @Override
-                        public void onResponse(String response) {
-
+                        public void onNext(String response) {
                             parseClassJsonData(response);
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
 
                         }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    mClassDialog.dismiss();
-                }
-            })
-            {
-                @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
-                    Map<String, String>  params = new HashMap<>();
-                    params.put("Authorization", "Request_From_onEMS_Android_app");
-                    return params;
-                }
-            };
-            MySingleton.getInstance(this).addToRequestQueue(stringClassRequest);
+
+                        @Override
+                        public void onComplete() {
+
+                        }
+                    }));
         } else {
             Toast.makeText(ShowAttendance.this,"Please check your internet connection and select again!!! ",
                     Toast.LENGTH_LONG).show();
@@ -672,39 +664,39 @@ public class ShowAttendance extends SideNavigationMenuParentActivity {
 
             CheckSelectedData();
 
-            String departmentUrl = getString(R.string.baseUrl)+"/api/onEms/ClassWiseDepartmentDDL/"+InstituteID+"/"+
-                    selectedClass.getClassID()+"/"+selectedMedium.getMediumID();
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(getString(R.string.baseUrl))
+                    .addConverterFactory(ScalarsConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .build();
 
-            mDepartmentDialog = new ProgressDialog(this);
-            mDepartmentDialog.setTitle("Loading...");
-            mDepartmentDialog.setMessage("Please Wait...");
-            mDepartmentDialog.setCancelable(false);
-            mDepartmentDialog.setIcon(R.drawable.onair);
-            mDepartmentDialog.show();
-            //Preparing Department data from server
-            StringRequest stringDepartmentRequest = new StringRequest(Request.Method.GET, departmentUrl,
-                    new Response.Listener<String>() {
+            Observable<String> observable = retrofit
+                    .create(RetrofitNetworkService.class)
+                    .ClassWiseDepartmentDDL(InstituteID, selectedClass.getClassID(), selectedMedium.getMediumID())
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread());
+
+            finalDisposer.add( observable
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeWith(new DisposableObserver<String>() {
+
                         @Override
-                        public void onResponse(String response) {
-
+                        public void onNext(String response) {
                             parseDepartmentJsonData(response);
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
 
                         }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    mDepartmentDialog.dismiss();
-                }
-            })
-            {
-                @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
-                    Map<String, String>  params = new HashMap<>();
-                    params.put("Authorization", "Request_From_onEMS_Android_app");
-                    return params;
-                }
-            };
-            MySingleton.getInstance(this).addToRequestQueue(stringDepartmentRequest);
+
+                        @Override
+                        public void onComplete() {
+
+                        }
+                    }));
         } else {
             Toast.makeText(ShowAttendance.this,"Please check your internet connection and select again!!! ",
                     Toast.LENGTH_LONG).show();
@@ -716,39 +708,39 @@ public class ShowAttendance extends SideNavigationMenuParentActivity {
 
             CheckSelectedData();
 
-            String sectionUrl = getString(R.string.baseUrl)+"/api/onEms/getInsSection/"+InstituteID+"/"+
-                    selectedClass.getClassID()+"/"+selectedDepartment.getDepartmentID();
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(getString(R.string.baseUrl))
+                    .addConverterFactory(ScalarsConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .build();
 
-            mSectionDialog = new ProgressDialog(this);
-            mSectionDialog.setTitle("Loading...");
-            mSectionDialog.setMessage("Please Wait...");
-            mSectionDialog.setCancelable(false);
-            mSectionDialog.setIcon(R.drawable.onair);
-            mSectionDialog.show();
-            //Preparing section data from server
-            StringRequest stringSectionRequest = new StringRequest(Request.Method.GET, sectionUrl,
-                    new Response.Listener<String>() {
+            Observable<String> observable = retrofit
+                    .create(RetrofitNetworkService.class)
+                    .getInsSection(InstituteID, selectedClass.getClassID(), selectedDepartment.getDepartmentID())
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread());
+
+            finalDisposer.add( observable
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeWith(new DisposableObserver<String>() {
+
                         @Override
-                        public void onResponse(String response) {
-
+                        public void onNext(String response) {
                             parseSectionJsonData(response);
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
 
                         }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    mSectionDialog.dismiss();
-                }
-            })
-            {
-                @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
-                    Map<String, String>  params = new HashMap<>();
-                    params.put("Authorization", "Request_From_onEMS_Android_app");
-                    return params;
-                }
-            };
-            MySingleton.getInstance(this).addToRequestQueue(stringSectionRequest);
+
+                        @Override
+                        public void onComplete() {
+
+                        }
+                    }));
         } else {
             Toast.makeText(ShowAttendance.this,"Please check your internet connection and select again!!! ",
                     Toast.LENGTH_LONG).show();
@@ -756,60 +748,61 @@ public class ShowAttendance extends SideNavigationMenuParentActivity {
     }
 
     void MonthDataGetRequest(){
-        String monthUrl=getString(R.string.baseUrl)+"/api/onEms/getMonth";
-        mMonthDialog = new ProgressDialog(this);
-        mMonthDialog.setTitle("Loading...");
-        mMonthDialog.setMessage("Please Wait...");
-        mMonthDialog.setCancelable(false);
-        mMonthDialog.setIcon(R.drawable.onair);
-        mMonthDialog.show();
-        StringRequest stringMonthRequest = new StringRequest(Request.Method.GET, monthUrl,
-                new Response.Listener<String>()
-                {
-                    @Override
-                    public void onResponse(String response)
-                    {
+        if(StaticHelperClass.isNetworkAvailable(ShowAttendance.this)) {
 
-                        parseMonthJsonData(response);
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(getString(R.string.baseUrl))
+                    .addConverterFactory(ScalarsConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .build();
 
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
+            Observable<String> observable = retrofit
+                    .create(RetrofitNetworkService.class)
+                    .getMonth()
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread());
 
-                mMonthDialog.dismiss();
-            }
-        })
-        {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String>  params = new HashMap<>();
-                params.put("Authorization", "Request_From_onEMS_Android_app");
-                return params;
-            }
-        };
-        MySingleton.getInstance(this).addToRequestQueue(stringMonthRequest);
+            finalDisposer.add( observable
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeWith(new DisposableObserver<String>() {
+
+                        @Override
+                        public void onNext(String response) {
+                            parseMonthJsonData(response);
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+
+                        }
+
+                        @Override
+                        public void onComplete() {
+
+                        }
+                    }));
+        } else {
+            Toast.makeText(ShowAttendance.this,"Please check your internet connection and select again!!! ",
+                    Toast.LENGTH_LONG).show();
+        }
     }
 
     private void CheckSelectedData(){
-        if(selectedClass.getClassID() == -2)
-        {
+        if(selectedClass.getClassID() == -2) {
             selectedClass.setClassID("0");
         }
-        if(selectedShift.getShiftID() == -2)
-        {
+        if(selectedShift.getShiftID() == -2) {
             selectedShift.setShiftID("0");
         }
-        if(selectedSection.getSectionID() == -2)
-        {
+        if(selectedSection.getSectionID() == -2) {
             selectedSection.setSectionID("0");
         }
-        if(selectedMedium.getMediumID() == -2)
-        {
+        if(selectedMedium.getMediumID() == -2) {
             selectedMedium.setMediumID("0");
         }
-        if(selectedDepartment.getDepartmentID() == -2)
-        {
+        if(selectedDepartment.getDepartmentID() == -2) {
             selectedDepartment.setDepartmentID("0");
         }
     }

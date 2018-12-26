@@ -3,14 +3,12 @@ package onair.onems.fees_report;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
@@ -20,11 +18,6 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -32,7 +25,6 @@ import java.util.Objects;
 import onair.onems.R;
 import onair.onems.Services.StaticHelperClass;
 import onair.onems.mainactivities.CommonToolbarParentActivity;
-import onair.onems.models.BranchModel;
 import onair.onems.network.MySingleton;
 
 public class FeeCollectionReportList extends CommonToolbarParentActivity {
@@ -118,9 +110,7 @@ public class FeeCollectionReportList extends CommonToolbarParentActivity {
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
-//            holder.recyclerView.addItemDecoration(new MyDividerItemDecoration(context, DividerItemDecoration.VERTICAL, 20));
         recyclerView.setAdapter(mAdapter);
-        String s = jsonString;
         mDialog.dismiss();
     }
 }

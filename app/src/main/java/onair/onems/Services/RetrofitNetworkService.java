@@ -5,10 +5,7 @@ import com.google.gson.JsonObject;
 import java.util.List;
 
 import io.reactivex.Observable;
-import io.reactivex.Single;
 import okhttp3.MultipartBody;
-import okhttp3.RequestBody;
-import okhttp3.ResponseBody;
 import onair.onems.models.CommunicationDetailModel;
 import onair.onems.models.WorkOrderModel;
 import retrofit2.Call;
@@ -42,6 +39,93 @@ public interface RetrofitNetworkService {
     @POST("/api/onEms/setFcmToken")
     Observable<String> setFcmToken(@Body JsonObject tokenJsonObject);
 
+    @Headers("Authorization: Request_From_onEMS_Android_app")
+    @GET("/api/onEms/getTotalTeacherAndTotalAttendence/{today}/{InstituteID}/{TeacherTypeID}")
+    Observable<String> getTotalTeacherAndTotalAttendence(@Path("today") String today, @Path("InstituteID") long InstituteID, @Path("TeacherTypeID") String TeacherTypeID);
+
+    @Headers("Authorization: Request_From_onEMS_Android_app")
+    @GET("/api/onEms/getTotalStudentAndTotalAttendenceDashBoard/{today}/{InstituteID}/{StudentTypeID}")
+    Observable<String> getTotalStudentAndTotalAttendenceDashBoard(@Path("today") String today, @Path("InstituteID") long InstituteID, @Path("StudentTypeID") String StudentTypeID);
+
+    @Headers("Authorization: Request_From_onEMS_Android_app")
+    @GET("/api/onEms/getInsShift/{InstituteID}")
+    Observable<String> getInsShift(@Path("InstituteID") long InstituteID);
+
+    @Headers("Authorization: Request_From_onEMS_Android_app")
+    @GET("/api/onEms/getInstituteMediumDdl/{InstituteID}")
+    Observable<String> getInstituteMediumDdl(@Path("InstituteID") long InstituteID);
+
+    @Headers("Authorization: Request_From_onEMS_Android_app")
+    @GET("/api/onEms/MediumWiseClassDDL/{InstituteID}/{MediumID}")
+    Observable<String> MediumWiseClassDDL(@Path("InstituteID") long InstituteID, @Path("MediumID") long MediumID);
+
+    @Headers("Authorization: Request_From_onEMS_Android_app")
+    @GET("/api/onEms/getClassWiseInsExame/{InstituteID}/{MediumID}/{ClassID}")
+    Observable<String> getClassWiseInsExame(@Path("InstituteID") long InstituteID, @Path("MediumID") long MediumID, @Path("ClassID") long ClassID);
+
+    @Headers("Authorization: Request_From_onEMS_Android_app")
+    @GET("/api/onEms/ClassWiseDepartmentDDL/{InstituteID}/{ClassID}/{MediumID}")
+    Observable<String> ClassWiseDepartmentDDL(@Path("InstituteID") long InstituteID, @Path("ClassID") long ClassID, @Path("MediumID") long MediumID);
+
+    @Headers("Authorization: Request_From_onEMS_Android_app")
+    @GET("/api/onEms/getInsSection/{InstituteID}/{ClassID}/{DepartmentID}")
+    Observable<String> getInsSection(@Path("InstituteID") long InstituteID, @Path("ClassID") long ClassID, @Path("DepartmentID") long DepartmentID);
+
+    @Headers("Authorization: Request_From_onEMS_Android_app")
+    @GET("/api/onEms/getMonth")
+    Observable<String> getMonth();
+
+    @Headers("Authorization: Request_From_onEMS_Android_app")
+    @GET("/api/onEms/getStudentMonthlyDeviceAttendance/{ShiftID}/{MediumID}/{ClassID}/{SectionID}/{DepartmentID}/{MonthID}/{UserID}/{InstituteID}")
+    Observable<String> getStudentMonthlyDeviceAttendance(@Path("ShiftID") long ShiftID, @Path("MediumID") long MediumID,
+                                                         @Path("ClassID") long ClassID, @Path("SectionID") long SectionID,
+                                                         @Path("DepartmentID") long DepartmentID, @Path("MonthID") int MonthID,
+                                                         @Path("UserID") String UserID, @Path("InstituteID") long InstituteID);
+
+    @Headers("Authorization: Request_From_onEMS_Android_app")
+    @GET("/api/onEms/getHrmSubWiseAtdDetail/{InstituteID}/{MediumID}/{ShiftID}/{ClassID}/{SectionID}/{DepartmentID}")
+    Observable<String> getHrmSubWiseAtdDetail(@Path("InstituteID") long InstituteID, @Path("MediumID") long MediumID,
+                                              @Path("ShiftID") long ShiftID, @Path("ClassID") long ClassID,
+                                              @Path("SectionID") long SectionID, @Path("DepartmentID") long DepartmentID);
+
+    @Headers("Authorization: Request_From_onEMS_Android_app")
+    @GET("/api/onEms/getHrmSubWiseAtdByStudentID/{ShiftID}/{MediumID}/{ClassID}/{SectionID}/{DepartmentID}/{UserID}/{Date}/{InstituteID}")
+    Observable<String> getHrmSubWiseAtdByStudentID(@Path("ShiftID") long ShiftID, @Path("MediumID") long MediumID,
+                                                         @Path("ClassID") long ClassID, @Path("SectionID") long SectionID,
+                                                         @Path("DepartmentID") long DepartmentID, @Path("UserID") String UserID,
+                                                         @Path("Date") String Date, @Path("InstituteID") long InstituteID);
+
+    @Headers("Authorization: Request_From_onEMS_Android_app")
+    @GET("/api/onEms/getHrmSubWiseAtdDetail/{InstituteID}/{MediumID}/{ShiftID}/{ClassID}/{SectionID}/{SubjectID}/{DepartmentID}/{date}")
+    Observable<String> getHrmSubWiseAtdDetail(@Path("InstituteID") long InstituteID, @Path("MediumID") long MediumID,
+                                              @Path("ShiftID") long ShiftID, @Path("ClassID") long ClassID,
+                                              @Path("SectionID") long SectionID, @Path("SubjectID") long SubjectID,
+                                              @Path("DepartmentID") long DepartmentID, @Path("date") String date);
+
+    @Headers("Authorization: Request_From_onEMS_Android_app")
+    @GET("/api/onEms/getInsSubject/{InstituteID}/{DepartmentID}/{MediumID}/{ClassID}")
+    Observable<String> getInsSubject(@Path("InstituteID") long InstituteID, @Path("DepartmentID") long DepartmentID,
+                                              @Path("MediumID") long MediumID, @Path("ClassID") long ClassID);
+
+    @Headers("Authorization: Request_From_onEMS_Android_app")
+    @GET("/api/onEms/getSubjectWiseMarks/0/{InstituteID}/{ClassID}/{SectionID}/{DepartmentID}/{MediumID}/{ShiftID}/{SubjectID}/{ExamID}")
+    Observable<String> getSubjectWiseMarks(@Path("InstituteID") long InstituteID, @Path("ClassID") long ClassID,
+                                                         @Path("SectionID") long SectionID, @Path("DepartmentID") long DepartmentID,
+                                                         @Path("MediumID") long MediumID, @Path("ShiftID") long ShiftID,
+                                                         @Path("SubjectID") long SubjectID, @Path("ExamID") long ExamID);
+
+    @Headers("Authorization: Request_From_onEMS_Android_app")
+    @POST("/api/onEms/setHrmSubWiseAtd")
+    Observable<String> setHrmSubWiseAtd(@Body JsonObject jsonObject);
+
+    @Headers("Authorization: Request_From_onEMS_Android_app")
+    @POST("/api/onEms/setMarks")
+    Observable<String> setMarks(@Body JsonObject jsonObject);
+
+    @Headers("Authorization: Request_From_onEMS_Android_app")
+    @GET("/api/onEms/spGetCRMCommunicationType")
+    Observable<String> spGetCRMCommunicationType();
+
     @Multipart
     @POST("/api/onEms/Mobile/uploads/")
     Call<String> upload(@Part MultipartBody.Part file);
@@ -52,15 +136,15 @@ public interface RetrofitNetworkService {
 
     @Headers("Authorization: Request_From_onEMS_Android_app")
     @POST("/api/onEms/spSetCRMNewClientEntry")
-    Call<String> postNewClient(@Body JsonObject newClient);
+    Observable<String> postNewClient(@Body JsonObject newClient);
 
     @Headers("Authorization: Request_From_onEMS_Android_app")
     @GET("/api/onEms/spGetCRMClientList/{AgentID}")
-    Call<String> getClientList(@Path("AgentID") String AgentID);
+    Observable<String> getClientList(@Path("AgentID") String AgentID);
 
     @Headers("Authorization: Request_From_onEMS_Android_app")
     @POST("/api/onEms/spSetCRMCommunicationDetail")
-    Call<String> postCommunicationDetail(@Body CommunicationDetailModel communicationDetailModel);
+    Observable<String> postCommunicationDetail(@Body CommunicationDetailModel communicationDetailModel);
 
     @Headers("Authorization: Request_From_onEMS_Android_app")
     @GET("/api/onEms/spGetCRMCommunicationDetailList/{NewClientID}")

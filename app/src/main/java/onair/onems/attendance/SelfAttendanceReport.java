@@ -1,12 +1,9 @@
 package onair.onems.attendance;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
@@ -20,39 +17,39 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Map;
 import de.codecrafters.tableview.TableView;
 import de.codecrafters.tableview.listeners.TableDataClickListener;
 import de.codecrafters.tableview.model.TableColumnWeightModel;
 import de.codecrafters.tableview.toolkit.SimpleTableDataAdapter;
 import de.codecrafters.tableview.toolkit.SimpleTableHeaderAdapter;
 import de.codecrafters.tableview.toolkit.TableDataRowBackgroundProviders;
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.observers.DisposableObserver;
+import io.reactivex.schedulers.Schedulers;
 import onair.onems.R;
 import onair.onems.Services.GlideApp;
+import onair.onems.Services.RetrofitNetworkService;
 import onair.onems.Services.StaticHelperClass;
 import onair.onems.models.MonthModel;
 import onair.onems.models.DailyAttendanceModel;
-import onair.onems.network.MySingleton;
+import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
+import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 public class SelfAttendanceReport extends Fragment {
     private TableView tableView;
     private Spinner spinnerMonth;
     private String UserID="";
-    private ProgressDialog dialog;
     private Configuration config;
     private long SectionID, ClassID, ShiftID, MediumID, DepartmentID, InstituteID;
     private SimpleTableHeaderAdapter simpleTableHeaderAdapter;
@@ -61,12 +58,19 @@ public class SelfAttendanceReport extends Fragment {
     private MonthModel selectedMonth = null;
     private ArrayList<DailyAttendanceModel> dailyAttendanceList;
     private DailyAttendanceModel selectedDay;
-    private int UserTypeID;
     private TextView totalClass, totalPresent;
-    private String UserFullName, RollNo, RFID, ImageUrl = "";
+    private String ImageUrl = "";
+    private CompositeDisposable finalDisposer = new CompositeDisposable();
     public SelfAttendanceReport()
     {
 
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (!finalDisposer.isDisposed())
+            finalDisposer.dispose();
     }
 
     @Override
@@ -89,23 +93,25 @@ public class SelfAttendanceReport extends Fragment {
         tableView.setColumnCount(4);
 
         SharedPreferences sharedPre = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        UserTypeID = sharedPre.getInt("UserTypeID",0);
+        int userTypeID = sharedPre.getInt("UserTypeID", 0);
         InstituteID=sharedPre.getLong("InstituteID",0);
-        if(UserTypeID == 3) {
+        String userFullName = "";
+        String rollNo = "";
+        String RFID = "";
+        if(userTypeID == 3) {
             DepartmentID=sharedPre.getLong("SDepartmentID",0);
             ShiftID=sharedPre.getLong("ShiftID",0);
             MediumID=sharedPre.getLong("MediumID",0);
             ClassID=sharedPre.getLong("ClassID",0);
             SectionID=sharedPre.getLong("SectionID",0);
-            UserFullName = sharedPre.getString("UserFullName","");
-            RollNo = sharedPre.getString("RollNo","");
+            userFullName = sharedPre.getString("UserFullName","");
+            rollNo = sharedPre.getString("RollNo","");
             RFID = sharedPre.getString("RFID","");
             ImageUrl = sharedPre.getString("ImageUrl","");
-            name.setText(UserFullName);
-            roll.setText("Roll: "+RollNo);
-            id.setText("ID: "+RFID);
-        } else if(UserTypeID == 5) {
-//            DepartmentID=sharedPre.getLong("DepartmentID",0);
+            name.setText(userFullName);
+            roll.setText("Roll: "+ rollNo);
+            id.setText("ID: "+ RFID);
+        } else if(userTypeID == 5) {
             try {
                 JSONObject selectedStudent = new JSONObject(getActivity().getSharedPreferences("CURRENT_STUDENT", Context.MODE_PRIVATE)
                         .getString("guardianSelectedStudent", "{}"));
@@ -135,23 +141,27 @@ public class SelfAttendanceReport extends Fragment {
                     DepartmentID = Long.parseLong(selectedStudent.getString("DepartmentID"));
                 }
                 UserID = selectedStudent.getString("UserID");
-                UserFullName = selectedStudent.getString("UserFullName");
-                RollNo = selectedStudent.getString("RollNo");
+                userFullName = selectedStudent.getString("UserFullName");
+                rollNo = selectedStudent.getString("RollNo");
                 RFID = selectedStudent.getString("RFID");
                 ImageUrl = selectedStudent.getString("ImageUrl");
-                name.setText(UserFullName);
-                roll.setText("Roll: "+RollNo);
-                id.setText("ID: "+RFID);
+                name.setText(userFullName);
+                roll.setText("Roll: "+ rollNo);
+                id.setText("ID: "+ RFID);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
         }
 
-        GlideApp.with(this)
-                .load(getString(R.string.baseUrl)+"/"+ImageUrl.replace("\\","/")).apply(RequestOptions.circleCropTransform())
-                .diskCacheStrategy(DiskCacheStrategy.NONE)
-                .skipMemoryCache(true)
-                .into(studentImage);
+        try {
+            GlideApp.with(this)
+                    .load(getString(R.string.baseUrl)+"/"+ImageUrl.replace("\\","/")).apply(RequestOptions.circleCropTransform())
+                    .diskCacheStrategy(DiskCacheStrategy.NONE)
+                    .skipMemoryCache(true)
+                    .into(studentImage);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         selectedMonth = new MonthModel();
 
@@ -159,13 +169,6 @@ public class SelfAttendanceReport extends Fragment {
         ArrayAdapter<String> month_spinner_adapter = new ArrayAdapter<>(getActivity(), R.layout.spinner_item, tempMonthArray);
         month_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerMonth.setAdapter(month_spinner_adapter);
-
-        dialog = new ProgressDialog(getActivity());
-        dialog.setTitle("Loading...");
-        dialog.setMessage("Please Wait...");
-        dialog.setCancelable(false);
-        dialog.setIcon(R.drawable.onair);
-        dialog.show();
 
         simpleTableHeaderAdapter = new SimpleTableHeaderAdapter(getActivity(),"SI","Date","Present", "Late(min)");
 
@@ -232,8 +235,7 @@ public class SelfAttendanceReport extends Fragment {
             JSONArray MonthJsonArray = new JSONArray(jsonString);
             ArrayList<String> monthArrayList = new ArrayList<>();
             //monthArrayList.add("Select Month");
-            for(int i = 0; i < MonthJsonArray.length(); ++i)
-            {
+            for(int i = 0; i < MonthJsonArray.length(); ++i) {
                 JSONObject monthJsonObject = MonthJsonArray.getJSONObject(i);
                 MonthModel monthModel = new MonthModel(monthJsonObject.getString("MonthID"), monthJsonObject.getString("MonthName"));
                 allMonthArrayList.add(monthModel);
@@ -248,18 +250,12 @@ public class SelfAttendanceReport extends Fragment {
                 spinnerMonth.setAdapter(month_spinner_adapter);
                 Calendar c = Calendar.getInstance();
                 spinnerMonth.setSelection(c.get(Calendar.MONTH));
-                dialog.dismiss();
-            }
-            catch (IndexOutOfBoundsException e)
-            {
-                dialog.dismiss();
+            } catch (IndexOutOfBoundsException e) {
                 Toast.makeText(getActivity(),"No class found !!!",Toast.LENGTH_LONG).show();
             }
 
         } catch (JSONException e) {
             Toast.makeText(getActivity(),""+e,Toast.LENGTH_LONG).show();
-            dialog.dismiss();
-
         }
 
     }
@@ -297,42 +293,47 @@ public class SelfAttendanceReport extends Fragment {
                 simpleTableHeaderAdapter.setTextSize(10);
                 simpleTabledataAdapter.setTextSize(10);
             }
-            dialog.dismiss();
         } catch (JSONException e) {
-            dialog.dismiss();
             Toast.makeText(getActivity(),""+e,Toast.LENGTH_LONG).show();
         }
     }
 
     void MonthDataGetRequest(){
         if(StaticHelperClass.isNetworkAvailable(getActivity())) {
-            dialog.show();
-            String monthUrl=getString(R.string.baseUrl)+"/api/onEms/getMonth";
-            StringRequest stringMonthRequest = new StringRequest(Request.Method.GET, monthUrl,
-                    new Response.Listener<String>()
-                    {
-                        @Override
-                        public void onResponse(String response)
-                        {
 
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(getString(R.string.baseUrl))
+                    .addConverterFactory(ScalarsConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .build();
+
+            Observable<String> observable = retrofit
+                    .create(RetrofitNetworkService.class)
+                    .getMonth()
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread());
+
+            finalDisposer.add( observable
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeWith(new DisposableObserver<String>() {
+
+                        @Override
+                        public void onNext(String response) {
                             parseMonthJsonData(response);
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
 
                         }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    dialog.dismiss();
-                }
-            })
-            {
-                @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
-                    Map<String, String>  params = new HashMap<>();
-                    params.put("Authorization", "Request_From_onEMS_Android_app");
-                    return params;
-                }
-            };
-            MySingleton.getInstance(getActivity()).addToRequestQueue(stringMonthRequest);
+
+                        @Override
+                        public void onComplete() {
+
+                        }
+                    }));
         } else {
             Toast.makeText(getActivity(),"Please check your internet connection and select again!!! ",
                     Toast.LENGTH_LONG).show();
@@ -341,30 +342,39 @@ public class SelfAttendanceReport extends Fragment {
 
     void MonthlyAttendanceDataGetRequest(int MonthID){
         if(StaticHelperClass.isNetworkAvailable(getActivity())) {
-            dialog.show();
-            String monthAttendanceUrl = getString(R.string.baseUrl)+"/api/onEms/getStudentMonthlyDeviceAttendance/"+
-                    ShiftID+"/"+MediumID+"/"+ClassID+"/"+SectionID+"/"+DepartmentID+"/"+ MonthID+"/"+UserID+"/"+InstituteID;
-            StringRequest stringRequest = new StringRequest(Request.Method.GET, monthAttendanceUrl,
-                    new Response.Listener<String>() {
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(getString(R.string.baseUrl))
+                    .addConverterFactory(ScalarsConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .build();
+
+            Observable<String> observable = retrofit
+                    .create(RetrofitNetworkService.class)
+                    .getStudentMonthlyDeviceAttendance(ShiftID, MediumID, ClassID, SectionID, DepartmentID, MonthID, UserID, InstituteID)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread());
+
+            finalDisposer.add( observable
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeWith(new DisposableObserver<String>() {
+
                         @Override
-                        public void onResponse(String response) {
+                        public void onNext(String response) {
                             parseMonthlyAttendanceJsonData(response);
                         }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    dialog.dismiss();
-                }
-            })
-            {
-                @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
-                    Map<String, String>  params = new HashMap<>();
-                    params.put("Authorization", "Request_From_onEMS_Android_app");
-                    return params;
-                }
-            };
-            MySingleton.getInstance(getActivity()).addToRequestQueue(stringRequest);
+
+                        @Override
+                        public void onError(Throwable e) {
+
+                        }
+
+                        @Override
+                        public void onComplete() {
+
+                        }
+                    }));
         } else {
             Toast.makeText(getActivity(),"Please check your internet connection and select again!!! ",
                     Toast.LENGTH_LONG).show();

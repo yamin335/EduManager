@@ -1,6 +1,5 @@
 package onair.onems.attendance;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -8,7 +7,6 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -28,17 +26,35 @@ import de.codecrafters.tableview.model.TableColumnWeightModel;
 import de.codecrafters.tableview.toolkit.SimpleTableDataAdapter;
 import de.codecrafters.tableview.toolkit.SimpleTableHeaderAdapter;
 import de.codecrafters.tableview.toolkit.TableDataRowBackgroundProviders;
+import io.reactivex.Observable;
+import io.reactivex.Observer;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 import onair.onems.R;
+import onair.onems.Services.RetrofitNetworkService;
+import onair.onems.Services.StaticHelperClass;
 import onair.onems.mainactivities.CommonToolbarParentActivity;
 import onair.onems.network.MySingleton;
+import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
+import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 public class StudentSubjectWiseAttendance extends CommonToolbarParentActivity {
-    private ProgressDialog dialog;
     private Configuration config;
     private TableView tableView;
     private SimpleTableHeaderAdapter simpleTableHeaderAdapter;
-    private String subjectWiseAttendanceUrl;
-    long InstituteID=0, SectionID=0, ClassID=0, MediumID=0, ShiftID=0, DepartmentID = 0;
+    private long InstituteID=0, SectionID=0, ClassID=0, MediumID=0, ShiftID=0, DepartmentID = 0;
+    private Disposable disposable;
+    private String UserID, Date;
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (!disposable.isDisposed())
+            disposable.dispose();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,14 +74,6 @@ public class StudentSubjectWiseAttendance extends CommonToolbarParentActivity {
         simpleTableHeaderAdapter.setTextColor(ContextCompat.getColor(this, R.color.table_header_text));
         tableView.setHeaderAdapter(simpleTableHeaderAdapter);
 
-        // Loding Show
-        dialog = new ProgressDialog(this);
-        dialog.setTitle("Loading...");
-        dialog.setMessage("Please Wait...");
-        dialog.setCancelable(false);
-        dialog.setIcon(R.drawable.onair);
-        dialog.show();
-
         //Loding show end code
         // get Internal Data using SharedPreferences
         Intent intent = getIntent();
@@ -74,13 +82,8 @@ public class StudentSubjectWiseAttendance extends CommonToolbarParentActivity {
         ClassID = intent.getLongExtra("ClassID", 0);
         DepartmentID = intent.getLongExtra("DepartmentID", 0);
         SectionID = intent.getLongExtra("SectionID", 0);
-        String UserID = intent.getStringExtra("UserID");
-        String Date = intent.getStringExtra("Date");
-
-        // get Internal Data using SharedPreferences end
-        subjectWiseAttendanceUrl = getString(R.string.baseUrl)+"/api/onEms/getHrmSubWiseAtdByStudentID/"
-                +ShiftID + "/" + MediumID + "/" + ClassID + "/" + SectionID
-                +"/"+DepartmentID+ "/" + UserID + "/" + Date+"/"+InstituteID;
+        UserID = intent.getStringExtra("UserID");
+        Date = intent.getStringExtra("Date");
 
         int colorEvenRows = getResources().getColor(R.color.table_data_row_even);
         int colorOddRows = getResources().getColor(R.color.table_data_row_odd);
@@ -151,35 +154,55 @@ public class StudentSubjectWiseAttendance extends CommonToolbarParentActivity {
                 simpleTableHeaderAdapter.setTextSize(10);
                 simpleTabledataAdapter.setTextSize(10);
             }
-            dialog.dismiss();
 
         } catch (Exception e) {
             Toast.makeText(this, "" + e, Toast.LENGTH_LONG).show();
-            dialog.dismiss();
         }
     }
 
     public void AttendanceDataGetRequest(){
-        StringRequest stringSubjectWiseAttendanceRequest = new StringRequest(Request.Method.GET, subjectWiseAttendanceUrl,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        parseSubjectWiseAttendanceJsonData(response);
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                dialog.dismiss();
-            }
-        })
-        {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String>  params = new HashMap<String, String>();
-                params.put("Authorization", "Request_From_onEMS_Android_app");
-                return params;
-            }
-        };
-        MySingleton.getInstance(this).addToRequestQueue(stringSubjectWiseAttendanceRequest);
+        if(StaticHelperClass.isNetworkAvailable(this)) {
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(getString(R.string.baseUrl))
+                    .addConverterFactory(ScalarsConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .build();
+
+            Observable<String> observable = retrofit
+                    .create(RetrofitNetworkService.class)
+                    .getHrmSubWiseAtdByStudentID(ShiftID, MediumID, ClassID, SectionID, DepartmentID, UserID, Date, InstituteID)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread());
+
+            observable
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new Observer<String>() {
+
+                        @Override
+                        public void onSubscribe(Disposable d) {
+                            disposable = d;
+                        }
+
+                        @Override
+                        public void onNext(String response) {
+                            parseSubjectWiseAttendanceJsonData(response);
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+
+                        }
+
+                        @Override
+                        public void onComplete() {
+
+                        }
+                    });
+        } else {
+            Toast.makeText(StudentSubjectWiseAttendance.this,"Please check your internet connection and select again!!! ",
+                    Toast.LENGTH_LONG).show();
+        }
     }
 }

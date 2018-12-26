@@ -2,13 +2,10 @@ package onair.onems.result;
 
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.preference.PreferenceManager;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.view.GravityCompat;
@@ -19,14 +16,10 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
@@ -51,23 +44,14 @@ import onair.onems.customised.MyDividerItemDecoration;
 import onair.onems.mainactivities.SideNavigationMenuParentActivity;
 import onair.onems.mainactivities.StudentMainScreen;
 import onair.onems.mainactivities.TeacherMainScreen;
-import onair.onems.models.ClassModel;
-import onair.onems.models.MediumModel;
 import onair.onems.network.MySingleton;
-import onair.onems.syllabus.FloatingMenuDialog;
-import onair.onems.syllabus.SyllabusMainScreen;
-
-import static onair.onems.Services.StaticHelperClass.dpToPx;
 
 public class ResultGradeStructure extends SideNavigationMenuParentActivity
-        implements View.OnTouchListener, MediumAdapter.MediumAdapterListener, ClassAdapter.ClassAdapterListener {
+        implements MediumAdapter.MediumAdapterListener, ClassAdapter.ClassAdapterListener {
 
     private RecyclerView recyclerView;
     private ProgressDialog mResultDialog, mMediumDialog, mClassDialog;
     private String MediumID = "";
-    private float dX;
-    private float dY;
-    private int lastAction;
     private FloatingActionButton floatingMenu, menuItemMedium, menuItemClass;
     private ConstraintLayout constraintLayout;
     private CardView cardMedium, cardClass;
@@ -141,26 +125,18 @@ public class ResultGradeStructure extends SideNavigationMenuParentActivity
         rotate_backward = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.rotate_backward);
 
         constraintLayout = findViewById(R.id.draggableFloatingMenu);
-        constraintLayout.setOnTouchListener(this);
+        constraintLayout.setOnClickListener(view-> animateFAB());
 
         cardMedium = findViewById(R.id.cardMedium);
-        cardMedium.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                MediumDataGetRequest();
-            }
-        });
+        cardMedium.setOnClickListener(v -> MediumDataGetRequest());
 
         cardClass = findViewById(R.id.cardClass);
-        cardClass.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(!MediumID.equalsIgnoreCase("")) {
-                    ClassDataGetRequest(MediumID);
-                } else {
-                    Toast.makeText(ResultGradeStructure.this,"No class found, please select medium first!!! ",
-                            Toast.LENGTH_LONG).show();
-                }
+        cardClass.setOnClickListener(v -> {
+            if(!MediumID.equalsIgnoreCase("")) {
+                ClassDataGetRequest(MediumID);
+            } else {
+                Toast.makeText(ResultGradeStructure.this,"No class found, please select medium first!!! ",
+                        Toast.LENGTH_LONG).show();
             }
         });
 
@@ -172,26 +148,18 @@ public class ResultGradeStructure extends SideNavigationMenuParentActivity
         menuItemMedium.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#EE5A24")));
         menuItemMedium.setRippleColor(Color.parseColor("#e50b00"));
 
-        menuItemMedium.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                MediumDataGetRequest();
-            }
-        });
+        menuItemMedium.setOnClickListener(v -> MediumDataGetRequest());
 
         menuItemClass = findViewById(R.id.classs);
         menuItemClass.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#009432")));
         menuItemClass.setRippleColor(Color.parseColor("#036625"));
 
-        menuItemClass.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(!MediumID.equalsIgnoreCase("")) {
-                    ClassDataGetRequest(MediumID);
-                } else {
-                    Toast.makeText(ResultGradeStructure.this,"No class found, please select medium first!!! ",
-                            Toast.LENGTH_LONG).show();
-                }
+        menuItemClass.setOnClickListener(v -> {
+            if(!MediumID.equalsIgnoreCase("")) {
+                ClassDataGetRequest(MediumID);
+            } else {
+                Toast.makeText(ResultGradeStructure.this,"No class found, please select medium first!!! ",
+                        Toast.LENGTH_LONG).show();
             }
         });
 
@@ -226,33 +194,6 @@ public class ResultGradeStructure extends SideNavigationMenuParentActivity
             cardMedium.setClickable(true);
             isFabOpen = true;
         }
-    }
-
-    @Override
-    public boolean onTouch(View view, MotionEvent event) {
-        switch (event.getActionMasked()) {
-            case MotionEvent.ACTION_DOWN:
-                dX = view.getX() - event.getRawX();
-                dY = view.getY() - event.getRawY();
-                lastAction = MotionEvent.ACTION_DOWN;
-                break;
-
-            case MotionEvent.ACTION_MOVE:
-                view.setY(event.getRawY() + dY);
-                view.setX(event.getRawX() + dX);
-                lastAction = MotionEvent.ACTION_MOVE;
-                break;
-
-            case MotionEvent.ACTION_UP:
-                if (lastAction == MotionEvent.ACTION_DOWN){
-                    animateFAB();
-                }
-                break;
-
-            default:
-                return false;
-        }
-        return true;
     }
 
     private void ResultGradeDataGetRequest(String MediumID, String ClassID){

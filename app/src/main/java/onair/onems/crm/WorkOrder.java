@@ -61,7 +61,9 @@ import java.util.Locale;
 import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -109,6 +111,15 @@ public class WorkOrder extends CommonToolbarParentActivity implements FileAdapte
     private static final String TAG = "ClientComDetail:";
     private ArrayList<Long> refIdList = new ArrayList<>();
     private Button proceed;
+    private CompositeDisposable finalDisposer = new CompositeDisposable();
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(onComplete);
+        if (!finalDisposer.isDisposed())
+            finalDisposer.dispose();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -440,12 +451,6 @@ public class WorkOrder extends CommonToolbarParentActivity implements FileAdapte
         }
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        unregisterReceiver(onComplete);
-    }
-
     @NonNull
     private MultipartBody.Part prepareFilePart(File file) {
         // create RequestBody instance from file
@@ -481,15 +486,10 @@ public class WorkOrder extends CommonToolbarParentActivity implements FileAdapte
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread());
 
-            documentObservable
+            finalDisposer.add( documentObservable
                     .observeOn(Schedulers.io())
                     .subscribeOn(AndroidSchedulers.mainThread())
-                    .subscribe(new Observer<String>() {
-
-                        @Override
-                        public void onSubscribe(Disposable d) {
-
-                        }
+                    .subscribeWith(new DisposableObserver<String>() {
 
                         @Override
                         public void onNext(String returnValue) {
@@ -516,7 +516,8 @@ public class WorkOrder extends CommonToolbarParentActivity implements FileAdapte
                         public void onComplete() {
                             Log.e("COMPLETE", "Complete: ");
                         }
-                    });
+                    }));
+
         } else {
             workOrderPostRequest();
         }
@@ -537,31 +538,30 @@ public class WorkOrder extends CommonToolbarParentActivity implements FileAdapte
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread());
 
-            orderPostObservable.subscribe(new Observer<String>() {
+            finalDisposer.add(orderPostObservable
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeWith(new DisposableObserver<String>() {
 
-                @Override
-                public void onSubscribe(Disposable d) {
+                        @Override
+                        public void onNext(String paymentTypeReturnValue) {
+                            Toast.makeText(WorkOrder.this,"Successful",
+                                    Toast.LENGTH_LONG).show();
+                            finish();
+                        }
 
-                }
+                        @Override
+                        public void onError(Throwable e) {
+                            Toast.makeText(WorkOrder.this,"Not Successful",
+                                    Toast.LENGTH_LONG).show();
+                        }
 
-                @Override
-                public void onNext(String paymentTypeReturnValue) {
-                    Toast.makeText(WorkOrder.this,"Successful",
-                            Toast.LENGTH_LONG).show();
-                    finish();
-                }
+                        @Override
+                        public void onComplete() {
 
-                @Override
-                public void onError(Throwable e) {
-                    Toast.makeText(WorkOrder.this,"Not Successful",
-                            Toast.LENGTH_LONG).show();
-                }
+                        }
+                    }));
 
-                @Override
-                public void onComplete() {
-
-                }
-            });
         } else {
             Toast.makeText(WorkOrder.this,"Please check your internet connection and select again!!! ",
                     Toast.LENGTH_LONG).show();
@@ -583,28 +583,27 @@ public class WorkOrder extends CommonToolbarParentActivity implements FileAdapte
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread());
 
-            paymentTypeObservable.subscribe(new Observer<String>() {
+            finalDisposer.add(paymentTypeObservable
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeWith(new DisposableObserver<String>() {
 
-                @Override
-                public void onSubscribe(Disposable d) {
+                        @Override
+                        public void onNext(String paymentTypeReturnValue) {
+                            parsePaymentTypeData(paymentTypeReturnValue);
+                        }
 
-                }
+                        @Override
+                        public void onError(Throwable e) {
 
-                @Override
-                public void onNext(String paymentTypeReturnValue) {
-                    parsePaymentTypeData(paymentTypeReturnValue);
-                }
+                        }
 
-                @Override
-                public void onError(Throwable e) {
+                        @Override
+                        public void onComplete() {
 
-                }
+                        }
+                    }));
 
-                @Override
-                public void onComplete() {
-
-                }
-            });
         } else {
             Toast.makeText(WorkOrder.this,"Please check your internet connection and select again!!! ",
                     Toast.LENGTH_LONG).show();

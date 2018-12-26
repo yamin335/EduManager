@@ -6,17 +6,11 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Filter;
-import android.widget.Filterable;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import onair.onems.R;
 
@@ -33,16 +27,11 @@ public class StudentListAdapter extends RecyclerView.Adapter<StudentListAdapter.
             name = view.findViewById(R.id.name);
             roll = view.findViewById(R.id.roll);
 
-            view.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    try {
-                        listener.onStudentSelected(studentList.getJSONObject(getAdapterPosition()));
-//                        Toast.makeText(context,studentList.getJSONObject(getAdapterPosition()).getString("UserName")+" -- Clicked!!!",
-//                                Toast.LENGTH_LONG).show();
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
+            view.setOnClickListener(holderView -> {
+                try {
+                    listener.onStudentSelected(studentList.getJSONObject(getAdapterPosition()));
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
             });
         }

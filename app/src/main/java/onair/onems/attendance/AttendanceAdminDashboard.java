@@ -1,6 +1,5 @@
 package onair.onems.attendance;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -10,42 +9,46 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.observers.DisposableObserver;
+import io.reactivex.schedulers.Schedulers;
 import onair.onems.R;
+import onair.onems.Services.RetrofitNetworkService;
 import onair.onems.Services.StaticHelperClass;
 import onair.onems.mainactivities.SideNavigationMenuParentActivity;
 import onair.onems.mainactivities.TeacherMainScreen;
-import onair.onems.models.SectionModel;
-import onair.onems.network.MySingleton;
+import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
+import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 public class AttendanceAdminDashboard extends SideNavigationMenuParentActivity {
 
     private long InstituteID;
-    private int UserTypeID;
-    private ProgressDialog mTeacherDialog, mStudentDialog;
     private String today;
+    private CompositeDisposable finalDisposer = new CompositeDisposable();
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (!finalDisposer.isDisposed())
+            finalDisposer.dispose();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,39 +103,42 @@ public class AttendanceAdminDashboard extends SideNavigationMenuParentActivity {
     private void teacherAttendanceDataGetRequest() {
         if(StaticHelperClass.isNetworkAvailable(this)) {
 
-            String teacherUrl = getString(R.string.baseUrl)+"/api/onEms/getTotalTeacherAndTotalAttendence/"+today+"/"+
-                    InstituteID+"/"+"4";
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(getString(R.string.baseUrl))
+                    .addConverterFactory(ScalarsConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .build();
 
-            mTeacherDialog = new ProgressDialog(this);
-            mTeacherDialog.setTitle("Loading...");
-            mTeacherDialog.setMessage("Please Wait...");
-            mTeacherDialog.setCancelable(false);
-            mTeacherDialog.setIcon(R.drawable.onair);
-            mTeacherDialog.show();
-            //Preparing section data from server
-            StringRequest stringTeacherRequest = new StringRequest(Request.Method.GET, teacherUrl,
-                    new Response.Listener<String>() {
+            Observable<String> observable = retrofit
+                    .create(RetrofitNetworkService.class)
+                    .getTotalTeacherAndTotalAttendence(today, InstituteID, "4")
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io());
+
+            finalDisposer.add( observable
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io())
+                    .subscribeWith(new DisposableObserver<String>() {
+
                         @Override
-                        public void onResponse(String response) {
-
+                        public void onNext(String response) {
                             parseTeacherAttendanceJsonData(response);
+                        }
+
+                        @Override
+                        public void onComplete() {
 
                         }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    mTeacherDialog.dismiss();
-                }
-            })
-            {
-                @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
-                    Map<String, String>  params = new HashMap<>();
-                    params.put("Authorization", "Request_From_onEMS_Android_app");
-                    return params;
-                }
-            };
-            MySingleton.getInstance(this).addToRequestQueue(stringTeacherRequest);
+
+                        @Override
+                        public void onError(Throwable e) {
+                            Toast.makeText(AttendanceAdminDashboard.this,"Error occurred!!! ",
+                                    Toast.LENGTH_LONG).show();
+                        }
+                    }));
         } else {
             Toast.makeText(AttendanceAdminDashboard.this,"Please check your internet connection and select again!!! ",
                     Toast.LENGTH_LONG).show();
@@ -142,39 +148,42 @@ public class AttendanceAdminDashboard extends SideNavigationMenuParentActivity {
     private void studentAttendanceDataGetRequest() {
         if(StaticHelperClass.isNetworkAvailable(this)) {
 
-            String studentUrl = getString(R.string.baseUrl)+"/api/onEms/getTotalStudentAndTotalAttendenceDashBoard/"+today+"/"+
-                    InstituteID+"/"+3;
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(getString(R.string.baseUrl))
+                    .addConverterFactory(ScalarsConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .build();
 
-            mStudentDialog = new ProgressDialog(this);
-            mStudentDialog.setTitle("Loading...");
-            mStudentDialog.setMessage("Please Wait...");
-            mStudentDialog.setCancelable(false);
-            mStudentDialog.setIcon(R.drawable.onair);
-            mStudentDialog.show();
-            //Preparing section data from server
-            StringRequest stringSectionRequest = new StringRequest(Request.Method.GET, studentUrl,
-                    new Response.Listener<String>() {
+            Observable<String> observable = retrofit
+                    .create(RetrofitNetworkService.class)
+                    .getTotalStudentAndTotalAttendenceDashBoard(today, InstituteID, "3")
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io());
+
+            finalDisposer.add( observable
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io())
+                    .subscribeWith(new DisposableObserver<String>() {
+
                         @Override
-                        public void onResponse(String response) {
-
+                        public void onNext(String response) {
                             parseStudentAttendanceJsonData(response);
+                        }
+
+                        @Override
+                        public void onComplete() {
 
                         }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    mStudentDialog.dismiss();
-                }
-            })
-            {
-                @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
-                    Map<String, String>  params = new HashMap<>();
-                    params.put("Authorization", "Request_From_onEMS_Android_app");
-                    return params;
-                }
-            };
-            MySingleton.getInstance(this).addToRequestQueue(stringSectionRequest);
+
+                        @Override
+                        public void onError(Throwable e) {
+                            Toast.makeText(AttendanceAdminDashboard.this,"Error occurred!!! ",
+                                    Toast.LENGTH_LONG).show();
+                        }
+                    }));
         } else {
             Toast.makeText(AttendanceAdminDashboard.this,"Please check your internet connection and select again!!! ",
                     Toast.LENGTH_LONG).show();
@@ -200,9 +209,7 @@ public class AttendanceAdminDashboard extends SideNavigationMenuParentActivity {
             presentTeacher.setText(Integer.toString(present));
             absentTeacher.setText(Integer.toString(absent));
             percentageTeacher.setText(Double.toString(attendancePercentage)+"%");
-            mTeacherDialog.dismiss();
         } catch (JSONException e) {
-            mTeacherDialog.dismiss();
             Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
         }
     }
@@ -226,9 +233,7 @@ public class AttendanceAdminDashboard extends SideNavigationMenuParentActivity {
             presentStudent.setText(Integer.toString(present));
             absentStudent.setText(Integer.toString(absent));
             percentageStudent.setText(Double.toString(attendancePercentage)+"%");
-            mStudentDialog.dismiss();
         } catch (JSONException e) {
-            mStudentDialog.dismiss();
             Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
         }
     }

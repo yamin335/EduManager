@@ -11,13 +11,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
-import com.google.gson.JsonObject;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -27,7 +24,6 @@ import java.util.ArrayList;
 
 import onair.onems.R;
 import onair.onems.Services.GlideApp;
-import onair.onems.icard.StudentiCardDetailsEdit;
 
 public class ImageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private Context context;

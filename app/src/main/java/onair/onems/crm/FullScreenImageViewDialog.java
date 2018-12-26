@@ -4,13 +4,9 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.Matrix;
 import android.os.Bundle;
-import android.view.MotionEvent;
-import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.Window;
-import android.widget.Button;
 import android.widget.ImageView;
 
 import onair.onems.R;

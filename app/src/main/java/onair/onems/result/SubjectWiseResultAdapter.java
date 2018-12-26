@@ -3,6 +3,7 @@ package onair.onems.result;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,13 +31,7 @@ public class SubjectWiseResultAdapter extends RecyclerView.Adapter<SubjectWiseRe
             Grade = view.findViewById(R.id.grade);
             GradePoint = view.findViewById(R.id.comment);
 
-            view.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    // send selected contact in callback
-                    listener.onSubjectWiseResultSelected(subjectWiseResultList.get(getAdapterPosition()));
-                }
-            });
+            view.setOnClickListener(view1 -> listener.onSubjectWiseResultSelected(subjectWiseResultList.get(getAdapterPosition())));
          }
     }
 
@@ -47,8 +42,9 @@ public class SubjectWiseResultAdapter extends RecyclerView.Adapter<SubjectWiseRe
         this.subjectWiseResultList = subjectWiseResultModelList;
     }
 
+    @NonNull
     @Override
-    public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.result_subject_wise_row_item, parent, false);
 
@@ -56,7 +52,7 @@ public class SubjectWiseResultAdapter extends RecyclerView.Adapter<SubjectWiseRe
     }
 
     @Override
-    public void onBindViewHolder(MyViewHolder holder, final int position) {
+    public void onBindViewHolder(@NonNull MyViewHolder holder, final int position) {
         JSONObject subjectWiseResult = subjectWiseResultList.get(position);
         try {
             if(subjectWiseResult.getString("SubjectName").equalsIgnoreCase("Total")) {
@@ -84,12 +80,17 @@ public class SubjectWiseResultAdapter extends RecyclerView.Adapter<SubjectWiseRe
                 holder.GradePoint.setTextColor(Color.parseColor("#01466c"));
                 holder.GradePoint.setTypeface(null, Typeface.NORMAL);
             }
-            holder.SubjectName.setText(subjectWiseResult.getString("SubjectName"));
-            holder.Mark.setText(subjectWiseResult.getString("Total"));
+
+            holder.SubjectName.setText(subjectWiseResult.getString("SubjectName")
+                    .equalsIgnoreCase("null")?"--":subjectWiseResult.getString("SubjectName"));
+
+            holder.Mark.setText(subjectWiseResult.getString("Total")
+                    .equalsIgnoreCase("null")?"--":subjectWiseResult.getString("Total"));
+
             holder.Grade.setText(subjectWiseResult.getString("Grade")
-                    .equalsIgnoreCase("null")?"-":subjectWiseResult.getString("Grade"));
+                    .equalsIgnoreCase("null")?"--":subjectWiseResult.getString("Grade"));
             holder.GradePoint.setText(subjectWiseResult.getString("GradePoint")
-                    .equalsIgnoreCase("null")?"-":subjectWiseResult.getString("GradePoint"));
+                    .equalsIgnoreCase("null")?"--":subjectWiseResult.getString("GradePoint"));
             if (subjectWiseResult.getString("GradePoint").equalsIgnoreCase("0.0")
                     && subjectWiseResult.getString("SubjectName").equalsIgnoreCase("Total")) {
                 holder.GradePoint.setText("F");

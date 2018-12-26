@@ -63,9 +63,11 @@ import java.util.concurrent.Callable;
 import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 import io.reactivex.observers.DefaultObserver;
+import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.functions.Action;
 import io.reactivex.functions.BiFunction;
@@ -121,8 +123,14 @@ public class NewClientEntry extends SideNavigationMenuParentActivity implements 
     private boolean forUpdate = false;
     private int updatedPriority = 0, updatedInstituteType = 0;
     public static final int CLIENT_COMMUNICATION_DETAIL = 222;
-    private String responseDataForPhoto = "";
-    private String responseDataForVCard = "";
+    private CompositeDisposable finalDisposer = new CompositeDisposable();
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (!finalDisposer.isDisposed())
+            finalDisposer.dispose();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -443,43 +451,49 @@ public class NewClientEntry extends SideNavigationMenuParentActivity implements 
     private void postNewClientToServer() {
 //        progressBar.setVisibility(View.VISIBLE);
 //        whiteBackground.setVisibility(View.VISIBLE);
+
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(getString(R.string.baseUrl))
                 .addConverterFactory(ScalarsConverterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .build();
 
-        RetrofitNetworkService retrofitNetworkService = retrofit.create(RetrofitNetworkService.class);
+        Observable<String> observable = retrofit
+                .create(RetrofitNetworkService.class)
+                .postNewClient(newClient)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
 
-        // finally, execute the request
-        Call<String> networkCall = retrofitNetworkService.postNewClient(newClient);
-        networkCall.enqueue(new Callback<String>() {
-            @Override
-            public void onResponse(@NonNull Call<String> call, @NonNull retrofit2.Response<String> response) {
-//                progressBar.setVisibility(View.INVISIBLE);
-//                whiteBackground.setVisibility(View.INVISIBLE);
-                String responseData = "";
-                responseData = response.body();
-                if (responseData!= null) {
-                    if (!responseData.equals("")&&!responseData.equals("[]")) {
-                        Toast.makeText(NewClientEntry.this,"Success",Toast.LENGTH_LONG).show();
-                        if (forUpdate && UserTypeID == 1) {
-                            Intent mainIntent = new Intent(NewClientEntry.this, ClientList.class);
-                            startActivity(mainIntent);
-                            finish();
+        finalDisposer.add( observable
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeWith(new DisposableObserver<String>() {
+
+                    @Override
+                    public void onNext(String response) {
+                        if (response!= null) {
+                            if (!response.equals("")&&!response.equals("[]")) {
+                                Toast.makeText(NewClientEntry.this,"Success",Toast.LENGTH_LONG).show();
+                                if (forUpdate && UserTypeID == 1) {
+                                    Intent mainIntent = new Intent(NewClientEntry.this, ClientList.class);
+                                    startActivity(mainIntent);
+                                    finish();
+                                }
+                            }
                         }
                     }
-                }
-            }
 
-            @Override
-            public void onFailure(@NonNull Call<String> call, @NonNull Throwable t) {
-//                progressBar.setVisibility(View.INVISIBLE);
-//                whiteBackground.setVisibility(View.INVISIBLE);
-                Log.e("Request error:", t.getMessage());
-                Toast.makeText(NewClientEntry.this,"Not Successful !!!",Toast.LENGTH_LONG).show();
-            }
-        });
+                    @Override
+                    public void onError(Throwable e) {
+                        Toast.makeText(NewClientEntry.this,"Not Successful !!!",Toast.LENGTH_LONG).show();
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                }));
     }
 
     private void entryNewClientByPostingDataToServer() {
@@ -505,15 +519,10 @@ public class NewClientEntry extends SideNavigationMenuParentActivity implements 
                     .subscribeOn(Schedulers.newThread())
                     .observeOn(AndroidSchedulers.mainThread());
 
-            photoObservable
+            finalDisposer.add(photoObservable
                     .observeOn(Schedulers.io())
                     .subscribeOn(AndroidSchedulers.mainThread())
-                    .subscribe(new Observer<String>() {
-
-                        @Override
-                        public void onSubscribe(Disposable d) {
-
-                        }
+                    .subscribeWith(new DisposableObserver<String>() {
 
                         @Override
                         public void onNext(String combinedReturnValue) {
@@ -542,7 +551,8 @@ public class NewClientEntry extends SideNavigationMenuParentActivity implements 
                         public void onComplete() {
                             Log.e("COMPLETE", "Complete: ");
                         }
-                    });
+                    }));
+
         } else if (photoFileArray.size()<1 && vCardFileArray.size()>=1) {
             for (int i=0; i<vCardFileArray.size(); i++) {
                 vCardParts.add(prepareFilePart(vCardFileArray.get(i)));
@@ -554,15 +564,10 @@ public class NewClientEntry extends SideNavigationMenuParentActivity implements 
                     .subscribeOn(Schedulers.newThread())
                     .observeOn(AndroidSchedulers.mainThread());
 
-            vCardObservable
+            finalDisposer.add( vCardObservable
                     .observeOn(Schedulers.io())
                     .subscribeOn(AndroidSchedulers.mainThread())
-                    .subscribe(new Observer<String>() {
-
-                        @Override
-                        public void onSubscribe(Disposable d) {
-
-                        }
+                    .subscribeWith(new DisposableObserver<String>() {
 
                         @Override
                         public void onNext(String combinedReturnValue) {
@@ -591,7 +596,8 @@ public class NewClientEntry extends SideNavigationMenuParentActivity implements 
                         public void onComplete() {
                             Log.e("COMPLETE", "Complete: ");
                         }
-                    });
+                    }));
+
         } else if (vCardFileArray.size()<1 && photoFileArray.size()<1){
             postNewClientToServer();
         } else if (vCardFileArray.size()>=1 && photoFileArray.size()>=1){
@@ -617,15 +623,10 @@ public class NewClientEntry extends SideNavigationMenuParentActivity implements 
 
             Observable<String> combinedReturnValueObservable = Observable.zip(vCardObservable, photoObservable, (vCardResponse, photoResponse) -> vCardResponse+"--"+photoResponse);
 
-            combinedReturnValueObservable
+            finalDisposer.add(combinedReturnValueObservable
                     .observeOn(Schedulers.io())
                     .subscribeOn(AndroidSchedulers.mainThread())
-                    .subscribe(new Observer<String>() {
-
-                        @Override
-                        public void onSubscribe(Disposable d) {
-
-                        }
+                    .subscribeWith(new DisposableObserver<String>() {
 
                         @Override
                         public void onNext(String combinedReturnValue) {
@@ -667,7 +668,7 @@ public class NewClientEntry extends SideNavigationMenuParentActivity implements 
                         public void onComplete() {
                             Log.e("COMPLETE", "Complete: ");
                         }
-                    });
+                    }));
         }
     }
 
@@ -836,31 +837,28 @@ public class NewClientEntry extends SideNavigationMenuParentActivity implements 
                     .getInstituteType()
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread());
+            finalDisposer.add(insTypeObservable
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeWith(new DisposableObserver<String>() {
 
-            insTypeObservable.subscribe(new Observer<String>() {
+                        @Override
+                        public void onNext(String insTypeReturnValue) {
+                            parseInstituteTypeData(insTypeReturnValue);
+                        }
 
-                @Override
-                public void onSubscribe(Disposable d) {
+                        @Override
+                        public void onError(Throwable e) {
+                            progressBar.setVisibility(View.INVISIBLE);
+                            whiteBackground.setVisibility(View.INVISIBLE);
+                        }
 
-                }
-
-                @Override
-                public void onNext(String insTypeReturnValue) {
-                    parseInstituteTypeData(insTypeReturnValue);
-                }
-
-                @Override
-                public void onError(Throwable e) {
-                    progressBar.setVisibility(View.INVISIBLE);
-                    whiteBackground.setVisibility(View.INVISIBLE);
-                }
-
-                @Override
-                public void onComplete() {
-                    progressBar.setVisibility(View.INVISIBLE);
-                    whiteBackground.setVisibility(View.INVISIBLE);
-                }
-            });
+                        @Override
+                        public void onComplete() {
+                            progressBar.setVisibility(View.INVISIBLE);
+                            whiteBackground.setVisibility(View.INVISIBLE);
+                        }
+                    }));
         } else {
             Toast.makeText(NewClientEntry.this,"Please check your internet connection and select again!!! ",
                     Toast.LENGTH_LONG).show();
@@ -921,31 +919,28 @@ public class NewClientEntry extends SideNavigationMenuParentActivity implements 
                     .getCRMPriority()
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread());
+            finalDisposer.add(priorityObservable
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeWith(new DisposableObserver<String>() {
 
-            priorityObservable.subscribe(new Observer<String>() {
+                        @Override
+                        public void onNext(String priorityReturnValue) {
+                            parsePriorityData(priorityReturnValue);
+                        }
 
-                @Override
-                public void onSubscribe(Disposable d) {
+                        @Override
+                        public void onError(Throwable e) {
+                            progressBar.setVisibility(View.INVISIBLE);
+                            whiteBackground.setVisibility(View.INVISIBLE);
+                        }
 
-                }
-
-                @Override
-                public void onNext(String priorityReturnValue) {
-                    parsePriorityData(priorityReturnValue);
-                }
-
-                @Override
-                public void onError(Throwable e) {
-                    progressBar.setVisibility(View.INVISIBLE);
-                    whiteBackground.setVisibility(View.INVISIBLE);
-                }
-
-                @Override
-                public void onComplete() {
-                    progressBar.setVisibility(View.INVISIBLE);
-                    whiteBackground.setVisibility(View.INVISIBLE);
-                }
-            });
+                        @Override
+                        public void onComplete() {
+                            progressBar.setVisibility(View.INVISIBLE);
+                            whiteBackground.setVisibility(View.INVISIBLE);
+                        }
+                    }));
         } else {
             Toast.makeText(NewClientEntry.this,"Please check your internet connection and select again!!! ",
                     Toast.LENGTH_LONG).show();

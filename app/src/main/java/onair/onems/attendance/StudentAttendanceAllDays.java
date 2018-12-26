@@ -36,12 +36,22 @@ import de.codecrafters.tableview.model.TableColumnWeightModel;
 import de.codecrafters.tableview.toolkit.SimpleTableDataAdapter;
 import de.codecrafters.tableview.toolkit.SimpleTableHeaderAdapter;
 import de.codecrafters.tableview.toolkit.TableDataRowBackgroundProviders;
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.observers.DisposableObserver;
+import io.reactivex.schedulers.Schedulers;
 import onair.onems.R;
 import onair.onems.Services.GlideApp;
+import onair.onems.Services.RetrofitNetworkService;
 import onair.onems.Services.StaticHelperClass;
 import onair.onems.mainactivities.CommonToolbarParentActivity;
 import onair.onems.models.DailyAttendanceModel;
 import onair.onems.network.MySingleton;
+import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
+import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 public class StudentAttendanceAllDays extends CommonToolbarParentActivity
 {
@@ -50,11 +60,22 @@ public class StudentAttendanceAllDays extends CommonToolbarParentActivity
     private TableView tableView;
     private SimpleTableHeaderAdapter simpleTableHeaderAdapter;
     private Configuration config;
-    private ProgressDialog dialog;
-    private String RFID="", monthAttendanceUrl="", UserFullName="", RollNo="", UserID = "";
-    private long InstituteID=0, SectionID=0, ClassID=0, MediumID=0, ShiftID=0, DepartmentID = 0;
-    private int MonthID=0;
+    private String UserID = "";
+    private long SectionID=0;
+    private long ClassID=0;
+    private long MediumID=0;
+    private long ShiftID=0;
+    private long DepartmentID = 0;
     private TextView totalClass, totalPresent;
+    private int MonthID = 0;
+    private CompositeDisposable finalDisposer = new CompositeDisposable();
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (!finalDisposer.isDisposed())
+            finalDisposer.dispose();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,20 +94,8 @@ public class StudentAttendanceAllDays extends CommonToolbarParentActivity
         TextView roll=(TextView) findViewById(R.id.roll);
         TextView id=(TextView) findViewById(R.id.Id);
 
-        dialog = new ProgressDialog(this);
-        dialog.setTitle("Loading...");
-        dialog.setMessage("Please Wait...");
-        dialog.setCancelable(false);
-        dialog.setIcon(R.drawable.onair);
-        dialog.show();
-
-        //Loding show end code
-
         dailyAttendanceList = new ArrayList<>();
         selectedDay = new DailyAttendanceModel();
-        // get Internal Data using SharedPreferences
-        SharedPreferences sharedPre = PreferenceManager.getDefaultSharedPreferences(this);
-        InstituteID = sharedPre.getLong("InstituteID",0);
 
         Intent intent = getIntent();
         ShiftID = intent.getLongExtra("ShiftID", 0);
@@ -95,9 +104,9 @@ public class StudentAttendanceAllDays extends CommonToolbarParentActivity
         DepartmentID = intent.getLongExtra("DepartmentID", 0);
         SectionID = intent.getLongExtra("SectionID", 0);
         MonthID = intent.getIntExtra("MonthID", 0);
-        RFID = intent.getStringExtra("RFID");
-        UserFullName = intent.getStringExtra("UserFullName");
-        RollNo = intent.getStringExtra("RollNo");
+        String RFID = intent.getStringExtra("RFID");
+        String userFullName = intent.getStringExtra("UserFullName");
+        String rollNo = intent.getStringExtra("RollNo");
         UserID = intent.getStringExtra("UserID");
         String ImageUrl = intent.getStringExtra("ImageUrl");
 
@@ -107,20 +116,13 @@ public class StudentAttendanceAllDays extends CommonToolbarParentActivity
                   .diskCacheStrategy(DiskCacheStrategy.NONE)
                   .skipMemoryCache(true)
                   .into(studentImage);
-      }
-      catch (Exception e)
-      {
-
+      } catch (Exception e) {
+          e.printStackTrace();
       }
 
-        // get Internal Data using SharedPreferences end
-        name.setText(""+UserFullName);
-        roll.setText("Roll: "+RollNo);
-        id.setText("ID: "+RFID);
-
-        monthAttendanceUrl = getString(R.string.baseUrl)+"/api/onEms/getStudentMonthlyDeviceAttendance/"+
-                ShiftID+"/"+MediumID+"/"+ClassID+"/"+SectionID+"/"+DepartmentID+"/"+MonthID+"/"+UserID+"/"+InstituteID;
-        // Add Header of The Table
+        name.setText(""+ userFullName);
+        roll.setText("Roll: "+ rollNo);
+        id.setText("ID: "+ RFID);
 
         simpleTableHeaderAdapter = new SimpleTableHeaderAdapter(this, "SI","Date","Present", "Late(m)");
         simpleTableHeaderAdapter.setTextColor(ContextCompat.getColor(this, R.color.table_header_text));
@@ -228,37 +230,46 @@ public class StudentAttendanceAllDays extends CommonToolbarParentActivity
                 simpleTabledataAdapter.setTextSize(10);
             }
         } catch (JSONException e) {
-            dialog.dismiss();
             Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
         }
-        dialog.dismiss();
     }
 
     public void AttendanceDataGetRequest(){
         if(StaticHelperClass.isNetworkAvailable(this)) {
-            StringRequest stringRequest = new StringRequest(Request.Method.GET, monthAttendanceUrl,
-                    new Response.Listener<String>() {
-                        @Override
-                        public void onResponse(String response) {
 
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(getString(R.string.baseUrl))
+                    .addConverterFactory(ScalarsConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .build();
+
+            Observable<String> observable = retrofit
+                    .create(RetrofitNetworkService.class)
+                    .getStudentMonthlyDeviceAttendance(ShiftID, MediumID, ClassID, SectionID, DepartmentID, MonthID, UserID, InstituteID)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread());
+
+            finalDisposer.add( observable
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeWith(new DisposableObserver<String>() {
+
+                        @Override
+                        public void onNext(String response) {
                             parseMonthlyAttendanceJsonData(response);
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
 
                         }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    dialog.dismiss();
-                }
-            })
-            {
-                @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
-                    Map<String, String>  params = new HashMap<>();
-                    params.put("Authorization", "Request_From_onEMS_Android_app");
-                    return params;
-                }
-            };
-            MySingleton.getInstance(this).addToRequestQueue(stringRequest);
+
+                        @Override
+                        public void onComplete() {
+
+                        }
+                    }));
         } else {
             Toast.makeText(StudentAttendanceAllDays.this,"Please check your internet connection and select again!!! ",
                     Toast.LENGTH_LONG).show();

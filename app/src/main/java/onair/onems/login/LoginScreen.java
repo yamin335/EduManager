@@ -3,16 +3,20 @@ package onair.onems.login;
 import android.app.AlertDialog;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.net.ConnectivityManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.WindowManager;
@@ -62,17 +66,26 @@ public class LoginScreen extends AppCompatActivity {
     private CompositeDisposable finalDisposer = new CompositeDisposable();
     private SpinKitView spinKitView;
     private RelativeLayout mainContainer;
+    private BroadcastReceiver networkConnectivityReceiver;
 
     @Override
     public void onResume() {
-        this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
         super.onResume();
+        this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+        LocalBroadcastManager.getInstance(this).registerReceiver(networkConnectivityReceiver,
+                new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
     }
 
     @Override
     public void onStart() {
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
         super.onStart();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(networkConnectivityReceiver);
     }
 
     @Override
@@ -85,6 +98,16 @@ public class LoginScreen extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        networkConnectivityReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if (StaticHelperClass.isNetworkAvailable(context)) {
+                    Toast.makeText(context,"Network connected!",Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(context,"Network not connected",Toast.LENGTH_LONG).show();
+                }
+            }
+        };
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         if (!prefs.getBoolean("firstTime", false)) {
             // <---- run your one time code here
@@ -383,42 +406,48 @@ public class LoginScreen extends AppCompatActivity {
     }
 
     private void getLoginData(String userName, String password) {
+        if (StaticHelperClass.isNetworkAvailable(this)) {
+            showSpin();
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(getString(R.string.baseUrl))
+                    .addConverterFactory(ScalarsConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .build();
 
-        showSpin();
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(getString(R.string.baseUrl))
-                .addConverterFactory(ScalarsConverterFactory.create())
-                .addConverterFactory(GsonConverterFactory.create())
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                .build();
+            Observable<String> loginObservable = retrofit
+                    .create(RetrofitNetworkService.class)
+                    .getLoginInformation(userName, password)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io());
 
-        Observable<String> loginObservable = retrofit
-                .create(RetrofitNetworkService.class)
-                .getLoginInformation(userName, password)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread());
+            finalDisposer.add( loginObservable
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io())
+                    .subscribeWith(new DisposableObserver<String>() {
 
-        finalDisposer.add( loginObservable
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeWith(new DisposableObserver<String>() {
+                        @Override
+                        public void onNext(String loginReturnData) {
+                            hideSpin();
+                            parseLoginData(loginReturnData);
+                        }
 
-                    @Override
-                    public void onNext(String loginReturnData) {
-                        hideSpin();
-                        parseLoginData(loginReturnData);
-                    }
+                        @Override
+                        public void onComplete() {
 
-                    @Override
-                    public void onComplete() {
+                        }
 
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        hideSpin();
-                    }
-                }));
+                        @Override
+                        public void onError(Throwable e) {
+                            hideSpin();
+                        }
+                    }));
+        } else {
+            Toast.makeText(LoginScreen.this,"Please check your internet connection!!! ",
+                    Toast.LENGTH_LONG).show();
+        }
     }
 
     private void getStudents(String UserID, long InstituteID) {
@@ -435,11 +464,13 @@ public class LoginScreen extends AppCompatActivity {
                     .create(RetrofitNetworkService.class)
                     .spGetDashUserDetail(UserID, InstituteID)
                     .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread());
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io());
 
             finalDisposer.add( userDetailObservable
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io())
                     .subscribeWith(new DisposableObserver<String>() {
 
                         @Override
@@ -503,11 +534,13 @@ public class LoginScreen extends AppCompatActivity {
                     .create(RetrofitNetworkService.class)
                     .getDashBoardCmnUserType(UserID)
                     .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread());
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io());
 
             finalDisposer.add( userTypesObservable
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io())
                     .subscribeWith(new DisposableObserver<String>() {
 
                         @Override
@@ -570,11 +603,13 @@ public class LoginScreen extends AppCompatActivity {
                     .create(RetrofitNetworkService.class)
                     .getFcmTokenByUserID(LoggedUserID)
                     .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread());
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io());
 
             finalDisposer.add( getTokenObservable
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io())
                     .subscribeWith(new DisposableObserver<String>() {
                         @Override
                         public void onNext(String returnData) {
@@ -641,11 +676,13 @@ public class LoginScreen extends AppCompatActivity {
                 .create(RetrofitNetworkService.class)
                 .setFcmToken(postDataJsonObject)
                 .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread());
+                .observeOn(AndroidSchedulers.mainThread())
+                .unsubscribeOn(Schedulers.io());
 
         finalDisposer.add( postTokenObservable
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
+                .unsubscribeOn(Schedulers.io())
                 .subscribeWith(new DisposableObserver<String>() {
 
                     @Override
