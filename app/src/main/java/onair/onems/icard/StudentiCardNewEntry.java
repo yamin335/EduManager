@@ -45,8 +45,6 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.google.gson.Gson;
-import com.koushikdutta.async.future.FutureCallback;
-import com.koushikdutta.ion.Ion;
 import com.theartofdev.edmodo.cropper.CropImageView;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -553,19 +551,19 @@ public class StudentiCardNewEntry extends SideNavigationMenuParentActivity {
     }
 
     private void uploadImageWithIon(File file) {
-        Ion.with(getApplicationContext())
-                .load(getString(R.string.baseUrl)+"/api/onEms/Mobile/uploads")
-                .progressDialog(mStudentDataPostDialog)
-                .setMultipartParameter("name", "source")
-                .setMultipartFile("file", "image/jpeg", file)
-                .asString()
-                .setCallback(new FutureCallback<String>() {
-                    @Override
-                    public void onCompleted(Exception e, String result) {
-                        //do stuff with result
-                        postStudentData(result);
-                    }
-                });
+//        Ion.with(getApplicationContext())
+//                .load(getString(R.string.baseUrl)+"/api/onEms/Mobile/uploads")
+//                .progressDialog(mStudentDataPostDialog)
+//                .setMultipartParameter("name", "source")
+//                .setMultipartFile("file", "image/jpeg", file)
+//                .asString()
+//                .setCallback(new FutureCallback<String>() {
+//                    @Override
+//                    public void onCompleted(Exception e, String result) {
+//                        //do stuff with result
+//                        postStudentData(result);
+//                    }
+//                });
     }
 
     private void uploadImageWithRetrofit2(File file) {

@@ -93,7 +93,7 @@
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
         app:srcCompat="@drawable/ic_arrow_up"
-        android:tint="@color/white"
+        android:tint="#ffffff"
         android:scaleType="center"/>
 
 </RelativeLayout>

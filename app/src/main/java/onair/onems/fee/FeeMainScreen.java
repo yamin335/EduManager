@@ -17,6 +17,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,7 +27,6 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.jaredrummler.materialspinner.MaterialSpinner;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -39,7 +39,7 @@ import onair.onems.mainactivities.StudentMainScreen;
 
 public class FeeMainScreen extends SideNavigationMenuParentActivity {
 
-    MaterialSpinner spinner,type_spinner;
+    Spinner spinner,type_spinner;
     String monthUrl = "", monthFeesDetailsUrl="",monthFineDetailsUrl="",monthDueDetailsUrl="",monthScholarshipUrl="";
     ProgressDialog dialog;
     int MonthID[];
@@ -76,151 +76,151 @@ public class FeeMainScreen extends SideNavigationMenuParentActivity {
         LinearLayout parentActivityLayout = (LinearLayout) findViewById(R.id.contentMain);
         parentActivityLayout.addView(childActivityLayout, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
 
-        Total_amount_Text=(TextView) findViewById(R.id.total_amount);
-        listView = (ListView) findViewById(R.id.list_cards);
-        prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        RFID= prefs.getString("RFID","");
-        UserID=prefs.getString("UserID","");
-        monthselectindex= prefs.getInt("monthselectindex",0);
-        paymentButton=(Button)findViewById(R.id.btn_payment);
-        paymentButton.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                Intent mainIntent = new Intent(FeeMainScreen.this,payment.class);
-                FeeMainScreen.this.startActivity(mainIntent);
-
-            }
-        });
-
-        UserTypeID = prefs.getInt("UserTypeID",0);
-
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            if(position==0)
-            {
-                Intent myIntent = new Intent(getApplicationContext(), FeesDetails.class);
-                startActivityForResult(myIntent, 0);
-
-            }
-                if(position==2)
-                {
-                    Intent myIntent = new Intent(getApplicationContext(), FineDetails.class);
-                    startActivityForResult(myIntent, 0);
-
-
-                }
-
-            }
-        });
-
-        monthUrl=getString(R.string.baseUrl)+"/api/onEms/getMonth";
-        dialog = new ProgressDialog(this);
-        dialog.setMessage("Loading....");
-        dialog.show();
-
-
-        RequestQueue queueMonth = Volley.newRequestQueue(this);
-        StringRequest stringMonthRequest = new StringRequest(Request.Method.GET, monthUrl,
-                new Response.Listener<String>()
-                {
-                    @Override
-                    public void onResponse(String response)
-                    {
-
-                       parseMonthJsonData(response);
-
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-
-                dialog.dismiss();
-            }
-        });
-
-        queueMonth.add(stringMonthRequest);
-        spinner = (MaterialSpinner) findViewById(R.id.spinner_month);
-        type_spinner = (MaterialSpinner) findViewById(R.id.payment_type);
-        ArrayList al = new ArrayList();
-        al.add("Select");
-        al.add("Cadet Card");
-        al.add("Bikash");
-        al.add("Paypal");
-        ArrayAdapter adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, al);
-        type_spinner.setAdapter(adapter);
-        monthFeesDetailsUrl = getString(R.string.baseUrl)+"/api/onEms/getMonthWiseFees/"+InstituteID+"/"
-                +LoggedUserShiftID+"/"+LoggedUserDepartmentID+"/"+LoggedUserMediumID+"/"+LoggedUserClassID+"/"+monthselectindex;
-        RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
-
-        StringRequest stringRequestFee = new StringRequest(Request.Method.GET,  monthFeesDetailsUrl,
-                new Response.Listener<String>()
-                {
-                    @Override
-                    public void onResponse(String response) {
-
-                        parseMonthlyFeesDetailsJsonData(response);
-
-
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-
-                dialog.dismiss();
-            }
-        });
-        queue.add( stringRequestFee);
-
-//   Monthly Fine collection
-
-
-
-        //   Monthly Fine collection finished
-
-
-        spinner.setOnItemSelectedListener(new MaterialSpinner.OnItemSelectedListener<String>()
-        {
-
-            @Override public void onItemSelected(MaterialSpinner view, int position, long id, String item)
-            {
-                int monthid=MonthID[position];
-                monthselectindex = monthid;
-                SharedPreferences.Editor editor = prefs.edit();
-                editor.putInt("monthselectindex",monthid);
-                editor.commit();
-                monthFeesDetailsUrl = getString(R.string.baseUrl)+"/api/onEms/getMonthWiseFees/"+
-                        InstituteID+"/"+LoggedUserShiftID+"/"+LoggedUserDepartmentID+"/"+LoggedUserMediumID+
-                        "/"+LoggedUserClassID+"/"+monthselectindex;
-                RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
-
-                StringRequest stringRequest = new StringRequest(Request.Method.GET, monthFeesDetailsUrl,
-                        new Response.Listener<String>()
-                        {
-                            @Override
-                            public void onResponse(String response)
-                            {
-                                parseMonthlyFeesDetailsJsonData(response);
-
-                            }
-                        }, new Response.ErrorListener()
-                {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-
-                        dialog.dismiss();
-                    }
-                });
-
-                queue.add(stringRequest);
-
-
-
-            }
-        });
+//        Total_amount_Text=(TextView) findViewById(R.id.total_amount);
+//        listView = (ListView) findViewById(R.id.list_cards);
+//        prefs = PreferenceManager.getDefaultSharedPreferences(this);
+//        RFID= prefs.getString("RFID","");
+//        UserID=prefs.getString("UserID","");
+//        monthselectindex= prefs.getInt("monthselectindex",0);
+//        paymentButton=(Button)findViewById(R.id.btn_payment);
+//        paymentButton.setOnClickListener(new View.OnClickListener()
+//        {
+//            @Override
+//            public void onClick(View v)
+//            {
+//                Intent mainIntent = new Intent(FeeMainScreen.this,payment.class);
+//                FeeMainScreen.this.startActivity(mainIntent);
+//
+//            }
+//        });
+//
+//        UserTypeID = prefs.getInt("UserTypeID",0);
+//
+//        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//
+//            @Override
+//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+//            if(position==0)
+//            {
+//                Intent myIntent = new Intent(getApplicationContext(), FeesDetails.class);
+//                startActivityForResult(myIntent, 0);
+//
+//            }
+//                if(position==2)
+//                {
+//                    Intent myIntent = new Intent(getApplicationContext(), FineDetails.class);
+//                    startActivityForResult(myIntent, 0);
+//
+//
+//                }
+//
+//            }
+//        });
+//
+//        monthUrl=getString(R.string.baseUrl)+"/api/onEms/getMonth";
+//        dialog = new ProgressDialog(this);
+//        dialog.setMessage("Loading....");
+//        dialog.show();
+//
+//
+//        RequestQueue queueMonth = Volley.newRequestQueue(this);
+//        StringRequest stringMonthRequest = new StringRequest(Request.Method.GET, monthUrl,
+//                new Response.Listener<String>()
+//                {
+//                    @Override
+//                    public void onResponse(String response)
+//                    {
+//
+//                       parseMonthJsonData(response);
+//
+//                    }
+//                }, new Response.ErrorListener() {
+//            @Override
+//            public void onErrorResponse(VolleyError error) {
+//
+//                dialog.dismiss();
+//            }
+//        });
+//
+//        queueMonth.add(stringMonthRequest);
+//        spinner = (MaterialSpinner) findViewById(R.id.spinner_month);
+//        type_spinner = (MaterialSpinner) findViewById(R.id.payment_type);
+//        ArrayList al = new ArrayList();
+//        al.add("Select");
+//        al.add("Cadet Card");
+//        al.add("Bikash");
+//        al.add("Paypal");
+//        ArrayAdapter adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, al);
+//        type_spinner.setAdapter(adapter);
+//        monthFeesDetailsUrl = getString(R.string.baseUrl)+"/api/onEms/getMonthWiseFees/"+InstituteID+"/"
+//                +LoggedUserShiftID+"/"+LoggedUserDepartmentID+"/"+LoggedUserMediumID+"/"+LoggedUserClassID+"/"+monthselectindex;
+//        RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
+//
+//        StringRequest stringRequestFee = new StringRequest(Request.Method.GET,  monthFeesDetailsUrl,
+//                new Response.Listener<String>()
+//                {
+//                    @Override
+//                    public void onResponse(String response) {
+//
+//                        parseMonthlyFeesDetailsJsonData(response);
+//
+//
+//                    }
+//                }, new Response.ErrorListener() {
+//            @Override
+//            public void onErrorResponse(VolleyError error) {
+//
+//                dialog.dismiss();
+//            }
+//        });
+//        queue.add( stringRequestFee);
+//
+////   Monthly Fine collection
+//
+//
+//
+//        //   Monthly Fine collection finished
+//
+//
+//        spinner.setOnItemSelectedListener(new MaterialSpinner.OnItemSelectedListener<String>()
+//        {
+//
+//            @Override public void onItemSelected(MaterialSpinner view, int position, long id, String item)
+//            {
+//                int monthid=MonthID[position];
+//                monthselectindex = monthid;
+//                SharedPreferences.Editor editor = prefs.edit();
+//                editor.putInt("monthselectindex",monthid);
+//                editor.commit();
+//                monthFeesDetailsUrl = getString(R.string.baseUrl)+"/api/onEms/getMonthWiseFees/"+
+//                        InstituteID+"/"+LoggedUserShiftID+"/"+LoggedUserDepartmentID+"/"+LoggedUserMediumID+
+//                        "/"+LoggedUserClassID+"/"+monthselectindex;
+//                RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
+//
+//                StringRequest stringRequest = new StringRequest(Request.Method.GET, monthFeesDetailsUrl,
+//                        new Response.Listener<String>()
+//                        {
+//                            @Override
+//                            public void onResponse(String response)
+//                            {
+//                                parseMonthlyFeesDetailsJsonData(response);
+//
+//                            }
+//                        }, new Response.ErrorListener()
+//                {
+//                    @Override
+//                    public void onErrorResponse(VolleyError error) {
+//
+//                        dialog.dismiss();
+//                    }
+//                });
+//
+//                queue.add(stringRequest);
+//
+//
+//
+//            }
+//        });
 
     }
     void parseMonthJsonData(String jsonString)
@@ -240,7 +240,7 @@ public class FeeMainScreen extends SideNavigationMenuParentActivity {
 
             ArrayAdapter adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, al);
             spinner.setAdapter(adapter);
-            spinner.setSelectedIndex(monthselectindex-1);
+//            spinner.setSelectedIndex(monthselectindex-1);
 
         } catch (Exception e)
         {
