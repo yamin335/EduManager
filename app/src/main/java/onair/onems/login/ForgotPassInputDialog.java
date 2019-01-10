@@ -27,15 +27,32 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.Map;
 
+import io.reactivex.Observable;
+import io.reactivex.Observer;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 import onair.onems.R;
+import onair.onems.Services.RetrofitNetworkService;
 import onair.onems.Services.StaticHelperClass;
 import onair.onems.network.MySingleton;
+import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
+import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 public class ForgotPassInputDialog extends Dialog implements View.OnClickListener {
     private Activity parentActivity;
     private Context context;
     private EditText input;
-    private ProgressDialog dialog;
+    private Disposable finalDisposer;
+
+    @Override
+    public void dismiss() {
+        super.dismiss();
+        if (!finalDisposer.isDisposed())
+            finalDisposer.dispose();
+    }
 
     ForgotPassInputDialog(Activity activity, Context context) {
         super(activity);
@@ -74,39 +91,47 @@ public class ForgotPassInputDialog extends Dialog implements View.OnClickListene
             Toast.makeText(context,"Please input email, phone or username !!!",Toast.LENGTH_LONG).show();
         } else {
             if(StaticHelperClass.isNetworkAvailable(context)) {
-                dialog = new ProgressDialog(context);
-                dialog.setTitle("Verifying...");
-                dialog.setMessage("Please Wait...");
-                dialog.setCancelable(false);
-                dialog.setIcon(R.drawable.onair);
-                dialog.show();
+                Retrofit retrofit = new Retrofit.Builder()
+                        .baseUrl(context.getString(R.string.baseUrl))
+                        .addConverterFactory(ScalarsConverterFactory.create())
+                        .addConverterFactory(GsonConverterFactory.create())
+                        .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                        .build();
 
-                String verifyUrl = context.getString(R.string.baseUrl)+"/api/onEms/getUserEmailPhoneIfExist/"
-                        +input;
+                Observable<String> observable = retrofit
+                        .create(RetrofitNetworkService.class)
+                        .getUserEmailPhoneIfExist(input)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .unsubscribeOn(Schedulers.io());
 
-                StringRequest request = new StringRequest(Request.Method.GET, verifyUrl,
-                        new Response.Listener<String>() {
+                observable
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .unsubscribeOn(Schedulers.io())
+                        .subscribe(new Observer<String>() {
+
                             @Override
-                            public void onResponse(String response) {
+                            public void onSubscribe(Disposable d) {
+                                finalDisposer = d;
+                            }
+
+                            @Override
+                            public void onNext(String response) {
                                 parseReturnData(response);
                             }
-                        }, new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        dialog.dismiss();
-                        dismiss();
-                        Toast.makeText(context,"SERVER Error !!!",Toast.LENGTH_LONG).show();
-                    }
-                })
-                {
-                    @Override
-                    public Map<String, String> getHeaders() throws AuthFailureError {
-                        Map<String, String>  params = new HashMap<>();
-                        params.put("Authorization", "Request_From_onEMS_Android_app");
-                        return params;
-                    }
-                };
-                MySingleton.getInstance(context).addToRequestQueue(request);
+
+                            @Override
+                            public void onComplete() {
+
+                            }
+
+                            @Override
+                            public void onError(Throwable e) {
+                                dismiss();
+                                Toast.makeText(context,"SERVER Error !!!",Toast.LENGTH_LONG).show();
+                            }
+                        });
             } else {
                 Toast.makeText(context,"Please check your INTERNET connection !!!",Toast.LENGTH_LONG).show();
             }
@@ -118,20 +143,17 @@ public class ForgotPassInputDialog extends Dialog implements View.OnClickListene
             JSONObject returnValue = new JSONArray(string).getJSONObject(0);
             int result = returnValue.getInt("result");
             if(result == 1) {
-                dialog.dismiss();
                 dismiss();
                 ForgotPassSelectDialog forgotPassSelectDialog = new ForgotPassSelectDialog(parentActivity, context, returnValue.toString());
                 forgotPassSelectDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                 forgotPassSelectDialog.setCancelable(false);
                 forgotPassSelectDialog.show();
             } else {
-                dialog.dismiss();
                 dismiss();
                 Toast.makeText(context,"please input valid email, phone or username !!!", Toast.LENGTH_LONG).show();
             }
         } catch (JSONException e) {
             e.printStackTrace();
-            dialog.dismiss();
             dismiss();
             Toast.makeText(context,"Error in JsonParsing !!!", Toast.LENGTH_LONG).show();
         }

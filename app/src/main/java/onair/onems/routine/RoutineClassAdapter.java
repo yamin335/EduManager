@@ -2,20 +2,17 @@ package onair.onems.routine;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.widget.LinearLayout;
+
 import android.widget.TextView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.ArrayList;
 
 import onair.onems.R;
 
@@ -51,8 +48,9 @@ public class RoutineClassAdapter extends RecyclerView.Adapter<RoutineClassAdapte
         }
     }
 
+    @NonNull
     @Override
-    public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.routine_class_row_item, parent, false);
 
@@ -70,7 +68,7 @@ public class RoutineClassAdapter extends RecyclerView.Adapter<RoutineClassAdapte
     }
 
     @Override
-    public void onBindViewHolder(final MyViewHolder holder, final int position) {
+    public void onBindViewHolder(@NonNull final MyViewHolder holder, final int position) {
         JSONObject object = null;
         try {
             object = classJsonArray.getJSONObject(position);
@@ -125,9 +123,9 @@ public class RoutineClassAdapter extends RecyclerView.Adapter<RoutineClassAdapte
             try {
                 holder.subjectName.setText(object.getString("SubjectName").replace(",", ",\n"));
                 holder.classTime.setText(object.getString("StartTime")+" - "+object.getString("EndTime"));
-                if(!object.getString("TeacherName").equalsIgnoreCase("")) {
-                   // holder.teacherName.setText("Teacher: "+object.getString("TeacherName").replace("_", ",\n"));
-                }
+//                if(!object.getString("TeacherName").equalsIgnoreCase("")) {
+//                   // holder.teacherName.setText("Teacher: "+object.getString("TeacherName").replace("_", ",\n"));
+//                }
 
                 if(object.getString("SubjectName").equals("")&&object.getString("TeacherName").equals(""))
                 {

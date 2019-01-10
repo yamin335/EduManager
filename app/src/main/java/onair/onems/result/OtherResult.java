@@ -20,6 +20,7 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.google.gson.JsonObject;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -29,7 +30,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.observers.DisposableObserver;
+import io.reactivex.schedulers.Schedulers;
 import onair.onems.R;
+import onair.onems.Services.RetrofitNetworkService;
 import onair.onems.Services.StaticHelperClass;
 import onair.onems.models.ClassModel;
 import onair.onems.models.DepartmentModel;
@@ -39,15 +46,16 @@ import onair.onems.models.SectionModel;
 import onair.onems.models.SessionModel;
 import onair.onems.models.ShiftModel;
 import onair.onems.network.MySingleton;
+import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
+import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 public class OtherResult extends Fragment {
 
     private Spinner spinnerClass, spinnerShift, spinnerSection,
             spinnerMedium, spinnerDepartment, spinnerStudent,
             spinnerSession, spinnerExam;
-    private ProgressDialog mShiftDialog, mMediumDialog, mClassDialog,
-            mDepartmentDialog, mSectionDialog, mStudentListGetDialog,
-            mSessionDialog, mExamDialog;
 
     private ArrayList<ClassModel> allClassArrayList;
     private ArrayList<ShiftModel> allShiftArrayList;
@@ -81,6 +89,14 @@ public class OtherResult extends Fragment {
     private JSONArray allStudentJsonArray;
     private long InstituteID;
     private String LoggedUserID = "";
+    private CompositeDisposable finalDisposer = new CompositeDisposable();
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (!finalDisposer.isDisposed())
+            finalDisposer.dispose();
+    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -434,38 +450,42 @@ public class OtherResult extends Fragment {
 
     private void SessionDataGetRequest() {
         if (StaticHelperClass.isNetworkAvailable(getActivity())) {
-            String sessionUrl = getString(R.string.baseUrl)+"/api/onEms/getallsession";
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(getString(R.string.baseUrl))
+                    .addConverterFactory(ScalarsConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .build();
 
-            mSessionDialog = new ProgressDialog(getActivity());
-            mSessionDialog.setTitle("Loading session...");
-            mSessionDialog.setMessage("Please Wait...");
-            mSessionDialog.setCancelable(false);
-            mSessionDialog.setIcon(R.drawable.onair);
-            mSessionDialog.show();
-            //Preparing Shift data from server
-            StringRequest stringSessionRequest = new StringRequest(Request.Method.GET, sessionUrl,
-                    new Response.Listener<String>() {
+            Observable<String> observable = retrofit
+                    .create(RetrofitNetworkService.class)
+                    .getallsession()
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io());
+
+            finalDisposer.add( observable
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io())
+                    .subscribeWith(new DisposableObserver<String>() {
+
                         @Override
-                        public void onResponse(String response) {
+                        public void onNext(String response) {
                             parseSessionJsonData(response);
                         }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    mSessionDialog.dismiss();
-                    Toast.makeText(getActivity(),"Session not found!!! ",
-                            Toast.LENGTH_LONG).show();
-                }
-            })
-            {
-                @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
-                    Map<String, String>  params = new HashMap<>();
-                    params.put("Authorization", "Request_From_onEMS_Android_app");
-                    return params;
-                }
-            };
-            MySingleton.getInstance(getActivity()).addToRequestQueue(stringSessionRequest);
+
+                        @Override
+                        public void onError(Throwable e) {
+                            Toast.makeText(getActivity(),"Session not found!!! ",
+                                    Toast.LENGTH_LONG).show();
+                        }
+
+                        @Override
+                        public void onComplete() {
+
+                        }
+                    }));
         } else {
             Toast.makeText(getActivity(),"Please check your internet connection and select again!!! ",
                     Toast.LENGTH_LONG).show();
@@ -499,45 +519,45 @@ public class OtherResult extends Fragment {
         } catch (JSONException e) {
             Toast.makeText(getActivity(),""+e,Toast.LENGTH_LONG).show();
         }
-        mSessionDialog.dismiss();
     }
 
     private void ShiftDataGetRequest() {
         if (StaticHelperClass.isNetworkAvailable(getActivity())) {
-            String shiftUrl = getString(R.string.baseUrl)+"/api/onEms/getInsShift/"+InstituteID;
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(getString(R.string.baseUrl))
+                    .addConverterFactory(ScalarsConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .build();
 
-            mShiftDialog = new ProgressDialog(getActivity());
-            mShiftDialog.setTitle("Loading shift...");
-            mShiftDialog.setMessage("Please Wait...");
-            mShiftDialog.setCancelable(true);
-            mShiftDialog.setIcon(R.drawable.onair);
-            mShiftDialog.show();
-            //Preparing Shift data from server
-            StringRequest stringShiftRequest = new StringRequest(Request.Method.GET, shiftUrl,
-                    new Response.Listener<String>() {
+            Observable<String> observable = retrofit
+                    .create(RetrofitNetworkService.class)
+                    .getInsShift(InstituteID)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io());
+
+            finalDisposer.add( observable
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io())
+                    .subscribeWith(new DisposableObserver<String>() {
+
                         @Override
-                        public void onResponse(String response) {
-
+                        public void onNext(String response) {
                             parseShiftJsonData(response);
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
 
                         }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    mShiftDialog.dismiss();
-                    Toast.makeText(getActivity(),"Shift not found!!! ",
-                            Toast.LENGTH_LONG).show();
-                }
-            })
-            {
-                @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
-                    Map<String, String>  params = new HashMap<>();
-                    params.put("Authorization", "Request_From_onEMS_Android_app");
-                    return params;
-                }
-            };
-            MySingleton.getInstance(getActivity()).addToRequestQueue(stringShiftRequest);
+
+                        @Override
+                        public void onComplete() {
+
+                        }
+                    }));
         } else {
             Toast.makeText(getActivity(),"Please check your internet connection and select again!!! ",
                     Toast.LENGTH_LONG).show();
@@ -571,45 +591,45 @@ public class OtherResult extends Fragment {
         } catch (JSONException e) {
             Toast.makeText(getActivity(),""+e,Toast.LENGTH_LONG).show();
         }
-        mShiftDialog.dismiss();
     }
 
     private void MediumDataGetRequest() {
         if(StaticHelperClass.isNetworkAvailable(getActivity())) {
-            String mediumUrl = getString(R.string.baseUrl)+"/api/onEms/getInstituteMediumDdl/"+InstituteID;
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(getString(R.string.baseUrl))
+                    .addConverterFactory(ScalarsConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .build();
 
-            mMediumDialog = new ProgressDialog(getActivity());
-            mMediumDialog.setTitle("Loading medium...");
-            mMediumDialog.setMessage("Please Wait...");
-            mMediumDialog.setCancelable(true);
-            mMediumDialog.setIcon(R.drawable.onair);
-            mMediumDialog.show();
-            //Preparing Medium data from server
-            StringRequest stringMediumRequest = new StringRequest(Request.Method.GET, mediumUrl,
-                    new Response.Listener<String>() {
+            Observable<String> observable = retrofit
+                    .create(RetrofitNetworkService.class)
+                    .getInstituteMediumDdl(InstituteID)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io());
+
+            finalDisposer.add( observable
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io())
+                    .subscribeWith(new DisposableObserver<String>() {
+
                         @Override
-                        public void onResponse(String response) {
-
+                        public void onNext(String response) {
                             parseMediumJsonData(response);
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
 
                         }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    mMediumDialog.dismiss();
-                    Toast.makeText(getActivity(),"Medium not found!!! ",
-                            Toast.LENGTH_LONG).show();
-                }
-            })
-            {
-                @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
-                    Map<String, String>  params = new HashMap<>();
-                    params.put("Authorization", "Request_From_onEMS_Android_app");
-                    return params;
-                }
-            };
-            MySingleton.getInstance(getActivity()).addToRequestQueue(stringMediumRequest);
+
+                        @Override
+                        public void onComplete() {
+
+                        }
+                    }));
         } else {
             Toast.makeText(getActivity(),"Please check your internet connection and select again!!! ",
                     Toast.LENGTH_LONG).show();
@@ -645,48 +665,46 @@ public class OtherResult extends Fragment {
         } catch (JSONException e) {
             Toast.makeText(getActivity(),""+e,Toast.LENGTH_LONG).show();
         }
-        mMediumDialog.dismiss();
     }
 
     private void ClassDataGetRequest() {
         if(StaticHelperClass.isNetworkAvailable(getActivity())) {
-
             CheckSelectedData();
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(getString(R.string.baseUrl))
+                    .addConverterFactory(ScalarsConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .build();
 
-            String classUrl = getString(R.string.baseUrl)+"/api/onEms/MediumWiseClassDDL/"+InstituteID+"/"+selectedMedium.getMediumID();
+            Observable<String> observable = retrofit
+                    .create(RetrofitNetworkService.class)
+                    .MediumWiseClassDDL(InstituteID, selectedMedium.getMediumID())
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io());
 
-            mClassDialog = new ProgressDialog(getActivity());
-            mClassDialog.setTitle("Loading class...");
-            mClassDialog.setMessage("Please Wait...");
-            mClassDialog.setCancelable(true);
-            mClassDialog.setIcon(R.drawable.onair);
-            mClassDialog.show();
-            //Preparing claas data from server
-            StringRequest stringClassRequest = new StringRequest(Request.Method.GET, classUrl,
-                    new Response.Listener<String>() {
+            finalDisposer.add( observable
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io())
+                    .subscribeWith(new DisposableObserver<String>() {
+
                         @Override
-                        public void onResponse(String response) {
-
+                        public void onNext(String response) {
                             parseClassJsonData(response);
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
 
                         }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    mClassDialog.dismiss();
-                    Toast.makeText(getActivity(),"Class not found!!! ",
-                            Toast.LENGTH_LONG).show();
-                }
-            })
-            {
-                @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
-                    Map<String, String>  params = new HashMap<>();
-                    params.put("Authorization", "Request_From_onEMS_Android_app");
-                    return params;
-                }
-            };
-            MySingleton.getInstance(getActivity()).addToRequestQueue(stringClassRequest);
+
+                        @Override
+                        public void onComplete() {
+
+                        }
+                    }));
         } else {
             Toast.makeText(getActivity(),"Please check your internet connection and select again!!! ",
                     Toast.LENGTH_LONG).show();
@@ -721,49 +739,46 @@ public class OtherResult extends Fragment {
         } catch (JSONException e) {
             Toast.makeText(getActivity(),""+e,Toast.LENGTH_LONG).show();
         }
-        mClassDialog.dismiss();
     }
 
     private void DepartmentDataGetRequest() {
         if(StaticHelperClass.isNetworkAvailable(getActivity())) {
-
             CheckSelectedData();
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(getString(R.string.baseUrl))
+                    .addConverterFactory(ScalarsConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .build();
 
-            String departmentUrl = getString(R.string.baseUrl)+"/api/onEms/ClassWiseDepartmentDDL/"+InstituteID+"/"+
-                    selectedClass.getClassID()+"/"+selectedMedium.getMediumID();
+            Observable<String> observable = retrofit
+                    .create(RetrofitNetworkService.class)
+                    .ClassWiseDepartmentDDL(InstituteID, selectedClass.getClassID(), selectedMedium.getMediumID())
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io());
 
-            mDepartmentDialog = new ProgressDialog(getActivity());
-            mDepartmentDialog.setTitle("Loading department...");
-            mDepartmentDialog.setMessage("Please Wait...");
-            mDepartmentDialog.setCancelable(true);
-            mDepartmentDialog.setIcon(R.drawable.onair);
-            mDepartmentDialog.show();
-            //Preparing Department data from server
-            StringRequest stringDepartmentRequest = new StringRequest(Request.Method.GET, departmentUrl,
-                    new Response.Listener<String>() {
+            finalDisposer.add( observable
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io())
+                    .subscribeWith(new DisposableObserver<String>() {
+
                         @Override
-                        public void onResponse(String response) {
-
+                        public void onNext(String response) {
                             parseDepartmentJsonData(response);
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
 
                         }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    mDepartmentDialog.dismiss();
-                    Toast.makeText(getActivity(),"Department not found!!! ",
-                            Toast.LENGTH_LONG).show();
-                }
-            })
-            {
-                @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
-                    Map<String, String>  params = new HashMap<>();
-                    params.put("Authorization", "Request_From_onEMS_Android_app");
-                    return params;
-                }
-            };
-            MySingleton.getInstance(getActivity()).addToRequestQueue(stringDepartmentRequest);
+
+                        @Override
+                        public void onComplete() {
+
+                        }
+                    }));
         } else {
             Toast.makeText(getActivity(),"Please check your internet connection and select again!!! ",
                     Toast.LENGTH_LONG).show();
@@ -801,49 +816,46 @@ public class OtherResult extends Fragment {
         } catch (JSONException e) {
             Toast.makeText(getActivity(),""+e,Toast.LENGTH_LONG).show();
         }
-        mDepartmentDialog.dismiss();
     }
 
     private void SectionDataGetRequest() {
         if(StaticHelperClass.isNetworkAvailable(getActivity())) {
-
             CheckSelectedData();
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(getString(R.string.baseUrl))
+                    .addConverterFactory(ScalarsConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .build();
 
-            String sectionUrl = getString(R.string.baseUrl)+"/api/onEms/getInsSection/"+InstituteID+"/"+
-                    selectedClass.getClassID()+"/"+selectedDepartment.getDepartmentID();
+            Observable<String> observable = retrofit
+                    .create(RetrofitNetworkService.class)
+                    .getInsSection(InstituteID, selectedClass.getClassID(), selectedDepartment.getDepartmentID())
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io());
 
-            mSectionDialog = new ProgressDialog(getActivity());
-            mSectionDialog.setTitle("Loading section...");
-            mSectionDialog.setMessage("Please Wait...");
-            mSectionDialog.setCancelable(true);
-            mSectionDialog.setIcon(R.drawable.onair);
-            mSectionDialog.show();
-            //Preparing section data from server
-            StringRequest stringSectionRequest = new StringRequest(Request.Method.GET, sectionUrl,
-                    new Response.Listener<String>() {
+            finalDisposer.add( observable
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io())
+                    .subscribeWith(new DisposableObserver<String>() {
+
                         @Override
-                        public void onResponse(String response) {
-
+                        public void onNext(String response) {
                             parseSectionJsonData(response);
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
 
                         }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    mSectionDialog.dismiss();
-                    Toast.makeText(getActivity(),"Section not found!!! ",
-                            Toast.LENGTH_LONG).show();
-                }
-            })
-            {
-                @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
-                    Map<String, String>  params = new HashMap<>();
-                    params.put("Authorization", "Request_From_onEMS_Android_app");
-                    return params;
-                }
-            };
-            MySingleton.getInstance(getActivity()).addToRequestQueue(stringSectionRequest);
+
+                        @Override
+                        public void onComplete() {
+
+                        }
+                    }));
         } else {
             Toast.makeText(getActivity(),"Please check your internet connection and select again!!! ",
                     Toast.LENGTH_LONG).show();
@@ -877,47 +889,45 @@ public class OtherResult extends Fragment {
         } catch (JSONException e) {
             Toast.makeText(getActivity(),""+e,Toast.LENGTH_LONG).show();
         }
-        mSectionDialog.dismiss();
     }
 
     private void ExamDataGetRequest() {
         if (StaticHelperClass.isNetworkAvailable(getActivity())) {
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(getString(R.string.baseUrl))
+                    .addConverterFactory(ScalarsConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .build();
 
-            String examUrl = getString(R.string.baseUrl)+"/api/onEms/getClassWiseInsExame/"
-                    +InstituteID+"/"+selectedMedium.getMediumID()+"/"+selectedClass.getClassID();
+            Observable<String> observable = retrofit
+                    .create(RetrofitNetworkService.class)
+                    .getClassWiseInsExame(InstituteID, selectedMedium.getMediumID(), selectedClass.getClassID())
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io());
 
-            mExamDialog = new ProgressDialog(getActivity());
-            mExamDialog.setTitle("Loading exam...");
-            mExamDialog.setMessage("Please Wait...");
-            mExamDialog.setCancelable(false);
-            mExamDialog.setIcon(R.drawable.onair);
-            mExamDialog.show();
-            //Preparing Shift data from server
-            StringRequest stringExamRequest = new StringRequest(Request.Method.GET, examUrl,
-                    new Response.Listener<String>() {
+            finalDisposer.add( observable
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io())
+                    .subscribeWith(new DisposableObserver<String>() {
+
                         @Override
-                        public void onResponse(String response) {
-
+                        public void onNext(String response) {
                             parseExamJsonData(response);
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
 
                         }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    mExamDialog.dismiss();
-                    Toast.makeText(getActivity(),"Exam not found!!! ",
-                            Toast.LENGTH_LONG).show();
-                }
-            })
-            {
-                @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
-                    Map<String, String>  params = new HashMap<>();
-                    params.put("Authorization", "Request_From_onEMS_Android_app");
-                    return params;
-                }
-            };
-            MySingleton.getInstance(getActivity()).addToRequestQueue(stringExamRequest);
+
+                        @Override
+                        public void onComplete() {
+
+                        }
+                    }));
         } else {
             Toast.makeText(getActivity(),"Please check your internet connection and select again!!! ",
                     Toast.LENGTH_LONG).show();
@@ -955,65 +965,61 @@ public class OtherResult extends Fragment {
         } catch (JSONException e) {
             Toast.makeText(getActivity(),""+e,Toast.LENGTH_LONG).show();
         }
-        mExamDialog.dismiss();
     }
 
     private void GetStudentListPostRequest() {
         if(StaticHelperClass.isNetworkAvailable(getActivity())) {
-            mStudentListGetDialog = new ProgressDialog(getActivity());
-            mStudentListGetDialog.setTitle("Loading student...");
-            mStudentListGetDialog.setMessage("Please Wait...");
-            mStudentListGetDialog.setCancelable(false);
-            mStudentListGetDialog.setIcon(R.drawable.onair);
-            mStudentListGetDialog.show();
+            CheckSelectedData();
+            JsonObject jsonObject = new JsonObject();
+            jsonObject.addProperty("pageNumber", "0");
+            jsonObject.addProperty("pageSize", "10000");
+            jsonObject.addProperty("IsPaging", "0");
+            jsonObject.addProperty("InstituteID", Long.toString(InstituteID));
+            jsonObject.addProperty("LoggedUserID", LoggedUserID);
+            jsonObject.addProperty("ExamID", String.valueOf(selectedExam.getExamID()));
+            jsonObject.addProperty("UserID", "0");
+            jsonObject.addProperty("ClassID", Long.toString(selectedClass.getClassID()));
+            jsonObject.addProperty("SectionID", Long.toString(selectedSection.getSectionID()));
+            jsonObject.addProperty("DepartmentID", Long.toString(selectedDepartment.getDepartmentID()));
+            jsonObject.addProperty("MediumID", Long.toString(selectedMedium.getMediumID()));
+            jsonObject.addProperty("ShiftID", Long.toString(selectedShift.getShiftID()));
 
-            String getStudentDataPostUrl = getString(R.string.baseUrl)+"/api/onEms/getStudentList";
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(getString(R.string.baseUrl))
+                    .addConverterFactory(ScalarsConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .build();
 
-            //Preparing Student data from server
-            StringRequest stringStudentListPostRequest = new StringRequest(Request.Method.POST, getStudentDataPostUrl,
-                    new Response.Listener<String>() {
+            Observable<String> observable = retrofit
+                    .create(RetrofitNetworkService.class)
+                    .getStudentList(jsonObject)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io());
+
+            finalDisposer.add( observable
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io())
+                    .subscribeWith(new DisposableObserver<String>() {
+
                         @Override
-                        public void onResponse(String response) {
-
+                        public void onNext(String response) {
                             parseStudentJsonData(response);
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+                            Toast.makeText(getActivity(),"Student not found!!! ",
+                                    Toast.LENGTH_LONG).show();
+                        }
+
+                        @Override
+                        public void onComplete() {
 
                         }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    mStudentListGetDialog.dismiss();
-                    Toast.makeText(getActivity(),"Student not found!!! ",
-                            Toast.LENGTH_LONG).show();
-                }
-            }) {
-                @Override
-                protected Map<String, String> getParams() {
-                    CheckSelectedData();
-                    Map<String, String>  params = new HashMap<>();
-                    params.put("pageNumber", "0");
-                    params.put("pageSize", "10000");
-                    params.put("IsPaging", "0");
-                    params.put("InstituteID", Long.toString(InstituteID));
-                    params.put("LoggedUserID", LoggedUserID);
-                    params.put("ExamID", String.valueOf(selectedExam.getExamID()));
-                    params.put("UserID", "0");
-                    params.put("ClassID", Long.toString(selectedClass.getClassID()));
-                    params.put("SectionID", Long.toString(selectedSection.getSectionID()));
-                    params.put("DepartmentID", Long.toString(selectedDepartment.getDepartmentID()));
-                    params.put("MediumID", Long.toString(selectedMedium.getMediumID()));
-                    params.put("ShiftID", Long.toString(selectedShift.getShiftID()));
-
-                    return params;
-                }
-                @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
-                    Map<String, String>  params = new HashMap<>();
-                    params.put("Authorization", "Request_From_onEMS_Android_app");
-                    return params;
-                }
-            };
-            MySingleton.getInstance(getActivity()).addToRequestQueue(stringStudentListPostRequest);
-
+                    }));
         } else {
             Toast.makeText(getActivity(),"Please check your internet connection and select again!!! ",
                     Toast.LENGTH_LONG).show();
@@ -1043,7 +1049,6 @@ public class OtherResult extends Fragment {
         } catch (JSONException e) {
             Toast.makeText(getActivity(),""+e,Toast.LENGTH_LONG).show();
         }
-        mStudentListGetDialog.dismiss();
     }
 
     private void CheckSelectedData(){

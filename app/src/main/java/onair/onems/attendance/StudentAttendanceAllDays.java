@@ -1,14 +1,10 @@
 package onair.onems.attendance;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -16,11 +12,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 
@@ -28,8 +19,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 import de.codecrafters.tableview.TableView;
 import de.codecrafters.tableview.listeners.TableDataClickListener;
 import de.codecrafters.tableview.model.TableColumnWeightModel;
@@ -47,7 +36,6 @@ import onair.onems.Services.RetrofitNetworkService;
 import onair.onems.Services.StaticHelperClass;
 import onair.onems.mainactivities.CommonToolbarParentActivity;
 import onair.onems.models.DailyAttendanceModel;
-import onair.onems.network.MySingleton;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -248,11 +236,13 @@ public class StudentAttendanceAllDays extends CommonToolbarParentActivity
                     .create(RetrofitNetworkService.class)
                     .getStudentMonthlyDeviceAttendance(ShiftID, MediumID, ClassID, SectionID, DepartmentID, MonthID, UserID, InstituteID)
                     .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread());
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io());
 
             finalDisposer.add( observable
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io())
                     .subscribeWith(new DisposableObserver<String>() {
 
                         @Override

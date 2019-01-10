@@ -13,7 +13,6 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
@@ -26,7 +25,6 @@ import android.support.v7.widget.CardView;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -46,6 +44,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.observers.DisposableObserver;
+import io.reactivex.schedulers.Schedulers;
+import onair.onems.Services.RetrofitNetworkService;
 import onair.onems.Services.StaticHelperClass;
 import onair.onems.app.Config;
 import onair.onems.contacts.ContactsMainScreen;
@@ -53,6 +57,7 @@ import onair.onems.fee.FeeMainScreen;
 import onair.onems.R;
 import onair.onems.attendance.StudentAttendanceReport;
 import onair.onems.homework.HomeworkMainScreen;
+import onair.onems.login.ChangePasswordDialog;
 import onair.onems.login.LoginScreen;
 import onair.onems.network.MySingleton;
 import onair.onems.notice.NoticeMainScreen;
@@ -62,6 +67,10 @@ import onair.onems.result.ResultMainScreen;
 import onair.onems.routine.RoutineMainScreen;
 import onair.onems.syllabus.SyllabusMainScreen;
 import onair.onems.user.Profile;
+import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
+import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 import static onair.onems.login.LoginScreen.MyPREFERENCES;
 
@@ -79,8 +88,15 @@ public class StudentMainScreen extends AppCompatActivity {
     private TextView textDashboard, textProfile, textNotification, textContacts, notificationCounter;
     private ImageView iconDashboard, iconProfile, iconNotification, iconContacts;
     private BroadcastReceiver mRegistrationBroadcastReceiver;
-    private ProgressDialog dialog;
     private boolean returnValue = false;
+    private CompositeDisposable finalDisposer = new CompositeDisposable();
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (!finalDisposer.isDisposed())
+            finalDisposer.dispose();
+    }
 
     @Override
     protected void onStart() {
@@ -611,46 +627,45 @@ public class StudentMainScreen extends AppCompatActivity {
         }
     }
 
-
     private boolean logOut() {
         if (StaticHelperClass.isNetworkAvailable(this)) {
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(getString(R.string.baseUrl))
+                    .addConverterFactory(ScalarsConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .build();
 
-            String logOutUrl = getString(R.string.baseUrl)+"/api/onEms/deleteFcmToken/"+LoggedUserID+"/"+"android"+"/"+getSharedPreferences("UNIQUE_ID", Context.MODE_PRIVATE)
-                    .getString("uuid", "");
+            Observable<String> observable = retrofit
+                    .create(RetrofitNetworkService.class)
+                    .deleteFcmToken(LoggedUserID, "android", getSharedPreferences("UNIQUE_ID", Context.MODE_PRIVATE).getString("uuid", ""))
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io());
 
-            dialog = new ProgressDialog(this);
-            dialog.setTitle("Logging Out...");
-            dialog.setMessage("Please Wait...");
-            dialog.setCancelable(false);
-            dialog.setIcon(R.drawable.onair);
-            dialog.show();
-            //Preparing Shift data from server
-            StringRequest loginRequest = new StringRequest(Request.Method.DELETE, logOutUrl,
-                    new Response.Listener<String>() {
+            finalDisposer.add( observable
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io())
+                    .subscribeWith(new DisposableObserver<String>() {
+
                         @Override
-                        public void onResponse(String response) {
-
+                        public void onNext(String response) {
                             doLogOut(response);
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+                            returnValue = false;
+                            Toast.makeText(StudentMainScreen.this,"Server error while logging out!!! ",
+                                    Toast.LENGTH_LONG).show();
+                        }
+
+                        @Override
+                        public void onComplete() {
 
                         }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    returnValue = false;
-                    dialog.dismiss();
-                    Toast.makeText(StudentMainScreen.this,"Server error while logging out!!! ",
-                            Toast.LENGTH_LONG).show();
-                }
-            })
-            {
-                @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
-                    Map<String, String>  params = new HashMap<>();
-                    params.put("Authorization", "Request_From_onEMS_Android_app");
-                    return params;
-                }
-            };
-            MySingleton.getInstance(this).addToRequestQueue(loginRequest);
+                    }));
         } else {
             Toast.makeText(StudentMainScreen.this,"Please check your internet connection and select again!!! ",
                     Toast.LENGTH_LONG).show();

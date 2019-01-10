@@ -300,7 +300,6 @@ public class SelfAttendanceReport extends Fragment {
 
     void MonthDataGetRequest(){
         if(StaticHelperClass.isNetworkAvailable(getActivity())) {
-
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
                     .addConverterFactory(ScalarsConverterFactory.create())
@@ -312,11 +311,13 @@ public class SelfAttendanceReport extends Fragment {
                     .create(RetrofitNetworkService.class)
                     .getMonth()
                     .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread());
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io());
 
             finalDisposer.add( observable
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io())
                     .subscribeWith(new DisposableObserver<String>() {
 
                         @Override
@@ -353,11 +354,13 @@ public class SelfAttendanceReport extends Fragment {
                     .create(RetrofitNetworkService.class)
                     .getStudentMonthlyDeviceAttendance(ShiftID, MediumID, ClassID, SectionID, DepartmentID, MonthID, UserID, InstituteID)
                     .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread());
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io());
 
             finalDisposer.add( observable
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io())
                     .subscribeWith(new DisposableObserver<String>() {
 
                         @Override

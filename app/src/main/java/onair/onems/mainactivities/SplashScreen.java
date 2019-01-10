@@ -62,8 +62,7 @@ public class SplashScreen extends AppCompatActivity {
         }, SPLASH_DISPLAY_LENGTH);
     }
 
-    private void flyIn()
-    {
+    private void flyIn() {
         animation = AnimationUtils.loadAnimation(this, R.anim.logo_animation);
         Logo.startAnimation(animation);
 
@@ -90,8 +89,7 @@ public class SplashScreen extends AppCompatActivity {
 
         animation.setAnimationListener(new Animation.AnimationListener() {
             @Override
-            public void onAnimationEnd(Animation arg0)
-            {
+            public void onAnimationEnd(Animation arg0) {
                 Intent mainIntent = new Intent(SplashScreen.this, LoginScreen.class);
                 SplashScreen.this.startActivity(mainIntent);
                 SplashScreen.this.finish();

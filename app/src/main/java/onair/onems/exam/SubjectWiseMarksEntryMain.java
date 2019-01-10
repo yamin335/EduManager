@@ -377,11 +377,13 @@ public class SubjectWiseMarksEntryMain extends SideNavigationMenuParentActivity 
                     .create(RetrofitNetworkService.class)
                     .getInsShift(InstituteID)
                     .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread());
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io());
 
             finalDisposer.add( observable
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io())
                     .subscribeWith(new DisposableObserver<String>() {
 
                         @Override
@@ -444,11 +446,13 @@ public class SubjectWiseMarksEntryMain extends SideNavigationMenuParentActivity 
                     .create(RetrofitNetworkService.class)
                     .getInstituteMediumDdl(InstituteID)
                     .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread());
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io());
 
             finalDisposer.add( observable
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io())
                     .subscribeWith(new DisposableObserver<String>() {
 
                         @Override
@@ -514,11 +518,13 @@ public class SubjectWiseMarksEntryMain extends SideNavigationMenuParentActivity 
                     .create(RetrofitNetworkService.class)
                     .MediumWiseClassDDL(InstituteID, selectedMedium.getMediumID())
                     .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread());
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io());
 
             finalDisposer.add( observable
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io())
                     .subscribeWith(new DisposableObserver<String>() {
 
                         @Override
@@ -583,11 +589,13 @@ public class SubjectWiseMarksEntryMain extends SideNavigationMenuParentActivity 
                     .create(RetrofitNetworkService.class)
                     .ClassWiseDepartmentDDL(InstituteID, selectedClass.getClassID(), selectedMedium.getMediumID())
                     .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread());
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io());
 
             finalDisposer.add( observable
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io())
                     .subscribeWith(new DisposableObserver<String>() {
 
                         @Override
@@ -724,11 +732,13 @@ public class SubjectWiseMarksEntryMain extends SideNavigationMenuParentActivity 
                     .create(RetrofitNetworkService.class)
                     .getInsSubject(InstituteID, selectedDepartment.getDepartmentID(), selectedMedium.getMediumID(), selectedClass.getClassID())
                     .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread());
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io());
 
             finalDisposer.add( observable
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io())
                     .subscribeWith(new DisposableObserver<String>() {
 
                         @Override
@@ -795,11 +805,13 @@ public class SubjectWiseMarksEntryMain extends SideNavigationMenuParentActivity 
                     .create(RetrofitNetworkService.class)
                     .getClassWiseInsExame(InstituteID, selectedMedium.getMediumID(), selectedClass.getClassID())
                     .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread());
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io());
 
             finalDisposer.add( observable
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io())
                     .subscribeWith(new DisposableObserver<String>() {
 
                         @Override

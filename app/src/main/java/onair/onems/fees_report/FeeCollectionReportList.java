@@ -1,6 +1,5 @@
 package onair.onems.fees_report;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,29 +9,33 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
-import android.widget.Toast;
-
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 
+import io.reactivex.Observable;
+import io.reactivex.Observer;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 import onair.onems.R;
-import onair.onems.Services.StaticHelperClass;
+import onair.onems.Services.RetrofitNetworkService;
 import onair.onems.mainactivities.CommonToolbarParentActivity;
-import onair.onems.network.MySingleton;
+import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
+import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 public class FeeCollectionReportList extends CommonToolbarParentActivity {
 
     private int  ReportType;
-    private String url = "";
+    private Disposable finalDisposer;
 
-    private ProgressDialog mDialog;
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (!finalDisposer.isDisposed())
+            finalDisposer.dispose();
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,63 +47,99 @@ public class FeeCollectionReportList extends CommonToolbarParentActivity {
 
         Intent intent = getIntent();
         ReportType = intent.getIntExtra("Report Type", 0);
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(getString(R.string.baseUrl))
+                .addConverterFactory(ScalarsConverterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create())
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                .build();
+
         switch (ReportType) {
-            case 1: url = getString(R.string.baseUrl)+"/api/onEms/GetAccFeesCollectionReport/"+intent.getStringExtra("InstituteID")
-                    +"/"+intent.getStringExtra("BranchID")+"/"+intent.getStringExtra("MediumID")
-                    +"/"+intent.getStringExtra("ClassID")+"/"+intent.getStringExtra("DepartmentID")
-                    +"/"+intent.getStringExtra("SectionID")+"/"+intent.getStringExtra("ShiftID")
-                    +"/"+"0"+"/"+"0"+"/"+intent.getStringExtra("MonthID")+"/"+intent.getStringExtra("StatusID")
-                    +"/"+intent.getStringExtra("SessionID");
+            case 1:
+                Observable<String> collectionObservable = retrofit
+                        .create(RetrofitNetworkService.class)
+                        .GetAccFeesCollectionReport(intent.getStringExtra("InstituteID")
+                                ,intent.getStringExtra("BranchID"), intent.getStringExtra("MediumID")
+                                ,intent.getStringExtra("ClassID"), intent.getStringExtra("DepartmentID")
+                                ,intent.getStringExtra("SectionID"), intent.getStringExtra("ShiftID")
+                                ,"0","0", intent.getStringExtra("MonthID")
+                                , intent.getStringExtra("StatusID"), intent.getStringExtra("SessionID"))
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .unsubscribeOn(Schedulers.io());
+
+                collectionObservable.subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .unsubscribeOn(Schedulers.io())
+                        .subscribe(new Observer<String>() {
+                            @Override
+                            public void onSubscribe(Disposable d) {
+                                finalDisposer = d;
+                            }
+
+                            @Override
+                            public void onNext(String response) {
+                                if (response!= null) {
+                                    if (!response.equals("")&&!response.equals("[]")) {
+                                        parseJsonData(response);
+                                    }
+                                }
+                            }
+
+                            @Override
+                            public void onError(Throwable e) {
+
+                            }
+
+                            @Override
+                            public void onComplete() {
+                            }
+                        });
                 Objects.requireNonNull(getSupportActionBar()).setTitle("Fee Collection Report");
                 break;
-            case 2: url = getString(R.string.baseUrl)+"/api/onEms/GetAccFeesCollectionReportTopSheet/"+intent.getStringExtra("InstituteID")
-                    +"/"+intent.getStringExtra("BranchID")+"/"+intent.getStringExtra("MediumID")
-                    +"/"+intent.getStringExtra("ClassID")+"/"+intent.getStringExtra("DepartmentID")
-                    +"/"+intent.getStringExtra("SectionID")+"/"+intent.getStringExtra("ShiftID")
-                    +"/"+"0"+"/"+"0"+"/"+intent.getStringExtra("MonthID")+"/"+intent.getStringExtra("StatusID")
-                    +"/"+intent.getStringExtra("SessionID");
+            case 2:
+                Observable<String> summaryObservable = retrofit
+                        .create(RetrofitNetworkService.class)
+                        .GetAccFeesCollectionReportTopSheet(intent.getStringExtra("InstituteID")
+                                ,intent.getStringExtra("BranchID"), intent.getStringExtra("MediumID")
+                                ,intent.getStringExtra("ClassID"), intent.getStringExtra("DepartmentID")
+                                ,intent.getStringExtra("SectionID"), intent.getStringExtra("ShiftID")
+                                ,"0","0", intent.getStringExtra("MonthID")
+                                , intent.getStringExtra("StatusID"), intent.getStringExtra("SessionID"))
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .unsubscribeOn(Schedulers.io());
+
+                summaryObservable.subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .unsubscribeOn(Schedulers.io())
+                        .subscribe(new Observer<String>() {
+                            @Override
+                            public void onSubscribe(Disposable d) {
+                                finalDisposer = d;
+                            }
+
+                            @Override
+                            public void onNext(String response) {
+                                if (response!= null) {
+                                    if (!response.equals("")&&!response.equals("[]")) {
+                                        parseJsonData(response);
+                                    }
+                                }
+                            }
+
+                            @Override
+                            public void onError(Throwable e) {
+
+                            }
+
+                            @Override
+                            public void onComplete() {
+                            }
+                        });
                 Objects.requireNonNull(getSupportActionBar()).setTitle("Fee Summary Report");
                 break;
-        }
-        ReportDataGetRequest(url);
-    }
-
-    private void ReportDataGetRequest(String url) {
-        if (StaticHelperClass.isNetworkAvailable(this)) {
-
-            mDialog = new ProgressDialog(this);
-            mDialog.setTitle("Loading Data...");
-            mDialog.setMessage("Please Wait...");
-            mDialog.setCancelable(false);
-            mDialog.setIcon(R.drawable.onair);
-            mDialog.show();
-            //Preparing Shift data from server
-            StringRequest stringShiftRequest = new StringRequest(Request.Method.GET, url,
-                    new Response.Listener<String>() {
-                        @Override
-                        public void onResponse(String response) {
-
-                            parseJsonData(response);
-
-                        }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    mDialog.dismiss();
-                }
-            })
-            {
-                @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
-                    Map<String, String>  params = new HashMap<>();
-                    params.put("Authorization", "Request_From_onEMS_Android_app");
-                    return params;
-                }
-            };
-            MySingleton.getInstance(this).addToRequestQueue(stringShiftRequest);
-        } else {
-            Toast.makeText(FeeCollectionReportList.this,"Please check your internet connection and select again!!! ",
-                    Toast.LENGTH_LONG).show();
         }
     }
 
@@ -111,6 +150,5 @@ public class FeeCollectionReportList extends CommonToolbarParentActivity {
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(mAdapter);
-        mDialog.dismiss();
     }
 }

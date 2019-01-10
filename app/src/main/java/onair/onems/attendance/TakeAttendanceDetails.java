@@ -223,11 +223,13 @@ public class TakeAttendanceDetails extends CommonToolbarParentActivity {
                     .create(RetrofitNetworkService.class)
                     .setHrmSubWiseAtd(postDataJsonObject)
                     .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread());
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io());
 
             finalDisposer.add( observable
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io())
                     .subscribeWith(new DisposableObserver<String>() {
 
                         @Override
@@ -269,11 +271,13 @@ public class TakeAttendanceDetails extends CommonToolbarParentActivity {
                     .create(RetrofitNetworkService.class)
                     .getHrmSubWiseAtdDetail(InstituteID, MediumID, ShiftID, ClassID, SectionID, SubjectID, DepertmentID, date)
                     .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread());
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io());
 
             finalDisposer.add( observable
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io())
                     .subscribeWith(new DisposableObserver<String>() {
 
                         @Override

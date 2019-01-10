@@ -38,16 +38,25 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.observers.DisposableObserver;
+import io.reactivex.schedulers.Schedulers;
 import onair.onems.R;
+import onair.onems.Services.RetrofitNetworkService;
 import onair.onems.Services.StaticHelperClass;
 import onair.onems.customised.MyDividerItemDecoration;
 import onair.onems.network.MySingleton;
+import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
+import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 //implements View.OnTouchListener,
 
 public class SelfResult extends Fragment implements
         ResultExamAdapter.ExamAdapterListener, SubjectWiseResultAdapter.SubjectWiseResultsAdapterListener{
-    private ProgressDialog mExamDialog;
     public int UserTypeID;
     public long InstituteID, UserShiftID, UserMediumID, UserClassID,
             UserDepartmentID, UserSectionID, UserSessionID;
@@ -57,10 +66,18 @@ public class SelfResult extends Fragment implements
 //    private int lastAction;
     private List<JSONObject> subjectWiseResultList;
     private SubjectWiseResultAdapter mAdapter;
-    private ProgressDialog mResultDialog, mGradeDialog;
     private boolean isFail = false;
     private JSONArray resultGradingSystem;
     private String ExamID = "";
+    private CompositeDisposable finalDisposer = new CompositeDisposable();
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (!finalDisposer.isDisposed())
+            finalDisposer.dispose();
+    }
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -81,7 +98,20 @@ public class SelfResult extends Fragment implements
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.result_subject_wise_self, container, false);
         FloatingActionButton floatingActionButton = rootView.findViewById(R.id.selectExam);
-        floatingActionButton.setOnClickListener(view -> examDataGetRequest(rootView.getContext()));
+        floatingActionButton.setOnClickListener(view -> {
+            if(UserTypeID == 3){
+                examDataGetRequest(rootView.getContext(), InstituteID, UserMediumID, UserClassID);
+            } else if(UserTypeID == 5) {
+                try {
+                    JSONObject selectedStudent = new JSONObject(rootView.getContext().getSharedPreferences("CURRENT_STUDENT", Context.MODE_PRIVATE)
+                            .getString("guardianSelectedStudent", "{}"));
+                    examDataGetRequest(rootView.getContext(), InstituteID, Long.parseLong(selectedStudent.getString("MediumID")),
+                            Long.parseLong(selectedStudent.getString("ClassID")));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
 
 //        floatingActionButton.setOnTouchListener(this);
 
@@ -94,7 +124,18 @@ public class SelfResult extends Fragment implements
         recyclerView.addItemDecoration(new MyDividerItemDecoration(rootView.getContext(), DividerItemDecoration.VERTICAL, 10));
         recyclerView.setAdapter(mAdapter);
 
-        examDataGetRequest(rootView.getContext());
+        if(UserTypeID == 3){
+            examDataGetRequest(rootView.getContext(), InstituteID, UserMediumID, UserClassID);
+        } else if(UserTypeID == 5) {
+            try {
+                JSONObject selectedStudent = new JSONObject(rootView.getContext().getSharedPreferences("CURRENT_STUDENT", Context.MODE_PRIVATE)
+                        .getString("guardianSelectedStudent", "{}"));
+                examDataGetRequest(rootView.getContext(), InstituteID, Long.parseLong(selectedStudent.getString("MediumID")),
+                        Long.parseLong(selectedStudent.getString("ClassID")));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
         return rootView;
     }
 
@@ -112,7 +153,17 @@ public class SelfResult extends Fragment implements
     public void onExamSelected(JSONObject exam) {
         try {
             ExamID = exam.getString("ExamID");
-            ResultGradeDataGetRequest();
+            if(UserTypeID == 3){
+                ResultGradeDataGetRequest(InstituteID, Long.toString(UserMediumID), Long.toString(UserClassID));
+            } else if(UserTypeID == 5) {
+                try {
+                    JSONObject selectedStudent = new JSONObject(getActivity().getSharedPreferences("CURRENT_STUDENT", Context.MODE_PRIVATE)
+                            .getString("guardianSelectedStudent", "{}"));
+                    ResultGradeDataGetRequest(InstituteID, selectedStudent.getString("MediumID"), selectedStudent.getString("ClassID"));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -159,54 +210,43 @@ public class SelfResult extends Fragment implements
         }
     }
 
-    private void examDataGetRequest(Context context) {
+    private void examDataGetRequest(Context context, long InstituteID, long MediumID, long ClassID) {
         if (StaticHelperClass.isNetworkAvailable(context)) {
-            String examUrl = "";
-            if(UserTypeID == 3){
-            examUrl = getString(R.string.baseUrl)+"/api/onEms/getInsExamforDDL/"+InstituteID+
-                    "/"+UserMediumID+"/"+UserClassID;
-            } else if(UserTypeID == 5) {
-                try {
-                    JSONObject selectedStudent = new JSONObject(context.getSharedPreferences("CURRENT_STUDENT", Context.MODE_PRIVATE)
-                            .getString("guardianSelectedStudent", "{}"));
-                    examUrl = getString(R.string.baseUrl)+"/api/onEms/getInsExamforDDL/"+InstituteID+
-                            "/"+selectedStudent.getString("MediumID")+"/"+selectedStudent.getString("ClassID");
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(getString(R.string.baseUrl))
+                    .addConverterFactory(ScalarsConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .build();
 
-            mExamDialog = new ProgressDialog(getActivity());
-            mExamDialog.setTitle("Loading exam...");
-            mExamDialog.setMessage("Please Wait...");
-            mExamDialog.setCancelable(false);
-            mExamDialog.setIcon(R.drawable.onair);
-            mExamDialog.show();
+            Observable<String> observable = retrofit
+                    .create(RetrofitNetworkService.class)
+                    .getClassWiseInsExame(InstituteID, MediumID, ClassID)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io());
 
-            //Preparing exam
-            StringRequest request = new StringRequest(Request.Method.GET, examUrl,
-                    new Response.Listener<String>() {
+            finalDisposer.add( observable
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io())
+                    .subscribeWith(new DisposableObserver<String>() {
+
                         @Override
-                        public void onResponse(String response) {
+                        public void onNext(String response) {
                             parseExamData(response);
                         }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    mExamDialog.dismiss();
-                    Toast.makeText(getActivity(),"Exam data not found!!! ",
-                            Toast.LENGTH_LONG).show();
-                }
-            })
-            {
-                @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
-                    Map<String, String>  params = new HashMap<>();
-                    params.put("Authorization", "Request_From_onEMS_Android_app");
-                    return params;
-                }
-            };
-            MySingleton.getInstance(getActivity()).addToRequestQueue(request);
+
+                        @Override
+                        public void onError(Throwable e) {
+
+                        }
+
+                        @Override
+                        public void onComplete() {
+
+                        }
+                    }));
         } else {
             Toast.makeText(getActivity(),"Please check your internet connection and select again!!! ",
                     Toast.LENGTH_LONG).show();
@@ -223,61 +263,49 @@ public class SelfResult extends Fragment implements
             Toast.makeText(getActivity(),"Exam data not found!!! ",
                     Toast.LENGTH_LONG).show();
         }
-        mExamDialog.dismiss();
     }
 
-    private void ResultDataGetRequest(String ExamID) {
+    private void ResultDataGetRequest(String ExamID, String UserID, String InstituteID,String ClassID,
+                                      String SectionID, String DepartmentID, String MediumID,
+                                      String ShiftID, String SessionID) {
         if (StaticHelperClass.isNetworkAvailable(getActivity())) {
-            String resultDataGetUrl = "";
-            if(UserTypeID == 3){
-                resultDataGetUrl = getString(R.string.baseUrl)+"/api/onEms/SubjectWiseMarksByStudent/"
-                        +UserID+"/"+InstituteID+"/"+UserClassID+"/"+UserSectionID+"/"+UserDepartmentID+"/"+UserMediumID
-                        +"/"+UserShiftID+"/"+UserSessionID+"/"+ExamID;
-            } else if(UserTypeID == 5) {
-                try {
-                    JSONObject selectedStudent = new JSONObject(getActivity().getSharedPreferences("CURRENT_STUDENT", Context.MODE_PRIVATE)
-                            .getString("guardianSelectedStudent", "{}"));
-                    resultDataGetUrl = getString(R.string.baseUrl)+"/api/onEms/SubjectWiseMarksByStudent/"
-                            +selectedStudent.getString("UserID")+"/"+InstituteID+"/"+
-                            selectedStudent.getString("ClassID")+"/"+selectedStudent.getString("SectionID")+"/"+
-                            selectedStudent.getString("DepartmentID")+"/"+selectedStudent.getString("MediumID")
-                            +"/"+selectedStudent.getString("ShiftID")+"/"+selectedStudent.getString("SessionID")+"/"+ExamID;
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(getString(R.string.baseUrl))
+                    .addConverterFactory(ScalarsConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .build();
 
-            mResultDialog = new ProgressDialog(getActivity());
-            mResultDialog.setTitle("Loading result...");
-            mResultDialog.setMessage("Please Wait...");
-            mResultDialog.setCancelable(false);
-            mResultDialog.setIcon(R.drawable.onair);
-            mResultDialog.show();
+            Observable<String> observable = retrofit
+                    .create(RetrofitNetworkService.class)
+                    .SubjectWiseMarksByStudent(UserID, InstituteID, ClassID, SectionID, DepartmentID,
+                            MediumID, ShiftID, SessionID, ExamID)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io());
 
-            //Preparing Shift data from server
-            StringRequest stringResultRequest = new StringRequest(Request.Method.GET, resultDataGetUrl,
-                    new Response.Listener<String>() {
+            finalDisposer.add( observable
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io())
+                    .subscribeWith(new DisposableObserver<String>() {
+
                         @Override
-                        public void onResponse(String response) {
+                        public void onNext(String response) {
                             prepareResult(response);
                         }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    mResultDialog.dismiss();
-                    Toast.makeText(getActivity(),"Result not found!!! ",
-                            Toast.LENGTH_LONG).show();
-                }
-            })
-            {
-                @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
-                    Map<String, String>  params = new HashMap<>();
-                    params.put("Authorization", "Request_From_onEMS_Android_app");
-                    return params;
-                }
-            };
-            MySingleton.getInstance(getActivity()).addToRequestQueue(stringResultRequest);
+
+                        @Override
+                        public void onError(Throwable e) {
+                            Toast.makeText(getActivity(),"Result not found!!! ",
+                                    Toast.LENGTH_LONG).show();
+                        }
+
+                        @Override
+                        public void onComplete() {
+
+                        }
+                    }));
         } else {
             Toast.makeText(getActivity(),"Please check your internet connection and select again!!! ",
                     Toast.LENGTH_LONG).show();
@@ -323,8 +351,12 @@ public class SelfResult extends Fragment implements
             }
 
             if(totalSubject!=0) {
-                totalGradePoint/=totalSubject;
-                totalGradePoint = new BigDecimal(totalGradePoint).setScale(2, RoundingMode.HALF_UP).doubleValue();
+                if (isFail) {
+                    totalGradePoint = 0;
+                } else {
+                    totalGradePoint/=totalSubject;
+                    totalGradePoint = new BigDecimal(totalGradePoint).setScale(2, RoundingMode.HALF_UP).doubleValue();
+                }
             }
 
 
@@ -355,55 +387,46 @@ public class SelfResult extends Fragment implements
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        mResultDialog.dismiss();
     }
 
-    private void ResultGradeDataGetRequest(){
+    private void ResultGradeDataGetRequest(long InstituteID, String MediumID, String ClassID){
         if (StaticHelperClass.isNetworkAvailable(getActivity())) {
-            String resultGradeDataGetUrl = "";
-            if(UserTypeID == 3){
-                resultGradeDataGetUrl = getString(R.string.baseUrl)+"/api/onEms/getinsGradeForReport/"+InstituteID+"/"+UserMediumID+"/"+UserClassID;
-            } else if(UserTypeID == 5) {
-                try {
-                    JSONObject selectedStudent = new JSONObject(getActivity().getSharedPreferences("CURRENT_STUDENT", Context.MODE_PRIVATE)
-                            .getString("guardianSelectedStudent", "{}"));
-                    resultGradeDataGetUrl = getString(R.string.baseUrl)+"/api/onEms/getinsGradeForReport/"+InstituteID+"/"+selectedStudent.getString("MediumID")+"/"+selectedStudent.getString("ClassID");
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(getString(R.string.baseUrl))
+                    .addConverterFactory(ScalarsConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .build();
 
-            mGradeDialog = new ProgressDialog(getActivity());
-            mGradeDialog.setTitle("Loading Grade Sheet...");
-            mGradeDialog.setMessage("Please Wait...");
-            mGradeDialog.setCancelable(false);
-            mGradeDialog.setIcon(R.drawable.onair);
-            mGradeDialog.show();
+            Observable<String> observable = retrofit
+                    .create(RetrofitNetworkService.class)
+                    .getinsGradeForReport(InstituteID, MediumID, ClassID)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io());
 
-            //Preparing Shift data from server
-            StringRequest stringResultRequest = new StringRequest(Request.Method.GET, resultGradeDataGetUrl,
-                    new Response.Listener<String>() {
+            finalDisposer.add( observable
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io())
+                    .subscribeWith(new DisposableObserver<String>() {
+
                         @Override
-                        public void onResponse(String response) {
+                        public void onNext(String response) {
                             prepareResultGradeSheet(response);
                         }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    mGradeDialog.dismiss();
-                    Toast.makeText(getActivity(),"Grade sheet not found!!! ",
-                            Toast.LENGTH_LONG).show();
-                }
-            })
-            {
-                @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
-                    Map<String, String>  params = new HashMap<>();
-                    params.put("Authorization", "Request_From_onEMS_Android_app");
-                    return params;
-                }
-            };
-            MySingleton.getInstance(getActivity()).addToRequestQueue(stringResultRequest);
+
+                        @Override
+                        public void onError(Throwable e) {
+                            Toast.makeText(getActivity(),"Grade sheet not found!!! ",
+                                    Toast.LENGTH_LONG).show();
+                        }
+
+                        @Override
+                        public void onComplete() {
+
+                        }
+                    }));
         } else {
             Toast.makeText(getActivity(),"Please check your internet connection and select again!!! ",
                     Toast.LENGTH_LONG).show();
@@ -411,10 +434,24 @@ public class SelfResult extends Fragment implements
     }
 
     private void prepareResultGradeSheet(String result) {
-        mGradeDialog.dismiss();
         try {
             resultGradingSystem = new JSONArray(result);
-            ResultDataGetRequest(ExamID);
+            if(UserTypeID == 3){
+                ResultDataGetRequest(ExamID, UserID, Long.toString(InstituteID), Long.toString(UserClassID),
+                        Long.toString(UserSectionID), Long.toString(UserDepartmentID), Long.toString(UserMediumID),
+                        Long.toString(UserShiftID), Long.toString(UserSessionID));
+            } else if(UserTypeID == 5) {
+                try {
+                    JSONObject selectedStudent = new JSONObject(getActivity().getSharedPreferences("CURRENT_STUDENT", Context.MODE_PRIVATE)
+                            .getString("guardianSelectedStudent", "{}"));
+                    ResultDataGetRequest(ExamID, selectedStudent.getString("UserID"), Long.toString(InstituteID),
+                            selectedStudent.getString("ClassID"), selectedStudent.getString("SectionID"),
+                            selectedStudent.getString("DepartmentID"), selectedStudent.getString("MediumID"),
+                            selectedStudent.getString("ShiftID"), selectedStudent.getString("SessionID"));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
         } catch (JSONException e) {
             e.printStackTrace();
         }

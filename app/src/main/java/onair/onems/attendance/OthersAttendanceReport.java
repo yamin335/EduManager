@@ -505,11 +505,13 @@ public class OthersAttendanceReport extends Fragment {
                     .create(RetrofitNetworkService.class)
                     .getInsShift(InstituteID)
                     .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread());
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io());
 
             finalDisposer.add( observable
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io())
                     .subscribeWith(new DisposableObserver<String>() {
 
                         @Override
@@ -547,11 +549,13 @@ public class OthersAttendanceReport extends Fragment {
                     .create(RetrofitNetworkService.class)
                     .getInstituteMediumDdl(InstituteID)
                     .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread());
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io());
 
             finalDisposer.add( observable
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io())
                     .subscribeWith(new DisposableObserver<String>() {
 
                         @Override
@@ -589,11 +593,13 @@ public class OthersAttendanceReport extends Fragment {
                     .create(RetrofitNetworkService.class)
                     .MediumWiseClassDDL(InstituteID, selectedMedium.getMediumID())
                     .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread());
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io());
 
             finalDisposer.add( observable
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io())
                     .subscribeWith(new DisposableObserver<String>() {
 
                         @Override
@@ -633,11 +639,13 @@ public class OthersAttendanceReport extends Fragment {
                     .create(RetrofitNetworkService.class)
                     .ClassWiseDepartmentDDL(InstituteID, selectedClass.getClassID(), selectedMedium.getMediumID())
                     .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread());
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io());
 
             finalDisposer.add( observable
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io())
                     .subscribeWith(new DisposableObserver<String>() {
 
                         @Override
@@ -677,11 +685,13 @@ public class OthersAttendanceReport extends Fragment {
                     .create(RetrofitNetworkService.class)
                     .getInsSection(InstituteID, selectedClass.getClassID(), selectedDepartment.getDepartmentID())
                     .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread());
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io());
 
             finalDisposer.add( observable
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io())
                     .subscribeWith(new DisposableObserver<String>() {
 
                         @Override
@@ -719,11 +729,13 @@ public class OthersAttendanceReport extends Fragment {
                     .create(RetrofitNetworkService.class)
                     .getMonth()
                     .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread());
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io());
 
             finalDisposer.add( observable
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io())
                     .subscribeWith(new DisposableObserver<String>() {
 
                         @Override

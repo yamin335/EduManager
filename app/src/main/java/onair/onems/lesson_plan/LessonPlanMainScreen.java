@@ -49,7 +49,13 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.observers.DisposableObserver;
+import io.reactivex.schedulers.Schedulers;
 import onair.onems.R;
+import onair.onems.Services.RetrofitNetworkService;
 import onair.onems.Services.StaticHelperClass;
 import onair.onems.homework.HomeworkAdapter;
 import onair.onems.homework.HomeworkMainScreen;
@@ -59,6 +65,10 @@ import onair.onems.mainactivities.TeacherMainScreen;
 import onair.onems.network.MySingleton;
 import onair.onems.syllabus.DigitalContentAdapter;
 import onair.onems.syllabus.SyllabusMainScreen;
+import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
+import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 import static onair.onems.Services.StaticHelperClass.isNetworkAvailable;
 
@@ -73,8 +83,16 @@ public class LessonPlanMainScreen extends SideNavigationMenuParentActivity imple
     private DigitalContentAdapter mDigitalAdapter, mLessonPlanDigitalAdapter;
     private LessonPlanAdapter mAdapter;
     private DatePickerDialog datePickerDialog;
-    private ProgressDialog mDigitalDialog, mLessonDialog;
     private String selectedDate = "";
+    private CompositeDisposable finalDisposer = new CompositeDisposable();
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(onComplete);
+        if (!finalDisposer.isDisposed())
+            finalDisposer.dispose();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,12 +104,6 @@ public class LessonPlanMainScreen extends SideNavigationMenuParentActivity imple
         final View rowView = inflater.inflate(R.layout.lesson_plan_main_screen, null);
         LinearLayout parent = (LinearLayout) findViewById(R.id.contentMain);
         parent.addView(rowView, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
-
-        mDigitalDialog = new ProgressDialog(this);
-        mDigitalDialog.setTitle("Loading digital content...");
-        mDigitalDialog.setMessage("Please Wait...");
-        mDigitalDialog.setCancelable(false);
-        mDigitalDialog.setIcon(R.drawable.onair);
 
         homeworkDate = findViewById(R.id.date);
         datePicker = findViewById(R.id.pickDate);
@@ -177,65 +189,65 @@ public class LessonPlanMainScreen extends SideNavigationMenuParentActivity imple
                 e.printStackTrace();
             }
         }
-
         registerReceiver(onComplete, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
         lessonPlanGetRequest(selectedDate);
     }
 
     private void lessonPlanGetRequest(String date) {
         if (StaticHelperClass.isNetworkAvailable(this)) {
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(getString(R.string.baseUrl))
+                    .addConverterFactory(ScalarsConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .build();
 
-            String lessonPlanUrl = getString(R.string.baseUrl)+"/api/onEms/getDateWiseLessonPlan/"+InstituteID+
-                    "/"+LoggedUserMediumID+"/"+LoggedUserClassID+"/"+LoggedUserDepartmentID+"/"+
-                    LoggedUserSectionID+"/"+date;
+            Observable<String> observable = retrofit
+                    .create(RetrofitNetworkService.class)
+                    .getDateWiseLessonPlan(InstituteID, LoggedUserMediumID, LoggedUserClassID, LoggedUserDepartmentID,
+                            LoggedUserSectionID, date)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io());
 
-            mLessonDialog = new ProgressDialog(this);
-            mLessonDialog.setTitle("Loading lesson plan...");
-            mLessonDialog.setMessage("Please Wait...");
-            mLessonDialog.setCancelable(false);
-            mLessonDialog.setIcon(R.drawable.onair);
-            mLessonDialog.show();
+            finalDisposer.add( observable
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io())
+                    .subscribeWith(new DisposableObserver<String>() {
 
-            //Preparing homework
-            StringRequest request = new StringRequest(Request.Method.GET, lessonPlanUrl,
-                    new Response.Listener<String>() {
                         @Override
-                        public void onResponse(String response) {
+                        public void onNext(String response) {
                             parseLessonPlan(response);
                         }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    digitalContentList.clear();
-                    mDigitalAdapter.notifyDataSetChanged();
-                    digitalContentEmpty.setVisibility(View.VISIBLE);
 
-                    lessonPlanList.clear();
-                    mAdapter.notifyDataSetChanged();
-                    lessonPlanEmpty.setVisibility(View.VISIBLE);
+                        @Override
+                        public void onError(Throwable e) {
+                            digitalContentList.clear();
+                            mDigitalAdapter.notifyDataSetChanged();
+                            digitalContentEmpty.setVisibility(View.VISIBLE);
 
-                    homeworkDate.setText("");
-                    topicTitle.setText("");
-                    topicDetails.setText("");
+                            lessonPlanList.clear();
+                            mAdapter.notifyDataSetChanged();
+                            lessonPlanEmpty.setVisibility(View.VISIBLE);
 
-                    lessonPlanDigitalContentList.clear();
-                    mLessonPlanDigitalAdapter.notifyDataSetChanged();
-                    lessonDigitalEmpty.setVisibility(View.VISIBLE);
+                            homeworkDate.setText("");
+                            topicTitle.setText("");
+                            topicDetails.setText("");
 
-                    mLessonDialog.dismiss();
-                    Toast.makeText(LessonPlanMainScreen.this,"Lesson plan not found!!! ",
-                            Toast.LENGTH_LONG).show();
-                }
-            })
-            {
-                @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
-                    Map<String, String>  params = new HashMap<>();
-                    params.put("Authorization", "Request_From_onEMS_Android_app");
-                    return params;
-                }
-            };
-            MySingleton.getInstance(this).addToRequestQueue(request);
+                            lessonPlanDigitalContentList.clear();
+                            mLessonPlanDigitalAdapter.notifyDataSetChanged();
+                            lessonDigitalEmpty.setVisibility(View.VISIBLE);
+
+                            Toast.makeText(LessonPlanMainScreen.this,"Lesson plan not found!!! ",
+                                    Toast.LENGTH_LONG).show();
+                        }
+
+                        @Override
+                        public void onComplete() {
+
+                        }
+                    }));
         } else {
             Toast.makeText(this,"Please check your internet connection and select again!!! ",
                     Toast.LENGTH_LONG).show();
@@ -276,7 +288,6 @@ public class LessonPlanMainScreen extends SideNavigationMenuParentActivity imple
             Toast.makeText(this,"Lesson plan not found!!! ",
                     Toast.LENGTH_LONG).show();
         }
-        mLessonDialog.dismiss();
     }
 
     @Override
@@ -293,37 +304,45 @@ public class LessonPlanMainScreen extends SideNavigationMenuParentActivity imple
     private void digitalContentGetRequest(String SyllabusID) {
         if (StaticHelperClass.isNetworkAvailable(this)) {
 
-            String digitalContentUrl = getString(R.string.baseUrl)+"/api/onEms/getUrlMasterByID/"+SyllabusID;
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(getString(R.string.baseUrl))
+                    .addConverterFactory(ScalarsConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .build();
 
-            mDigitalDialog.show();
+            Observable<String> observable = retrofit
+                    .create(RetrofitNetworkService.class)
+                    .getUrlMasterByID(SyllabusID)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io());
 
-            //Preparing digital content
-            StringRequest request = new StringRequest(Request.Method.GET, digitalContentUrl,
-                    new Response.Listener<String>() {
+            finalDisposer.add( observable
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io())
+                    .subscribeWith(new DisposableObserver<String>() {
+
                         @Override
-                        public void onResponse(String response) {
+                        public void onNext(String response) {
                             parseDigitalContent(response);
                         }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    digitalContentList.clear();
-                    mDigitalAdapter.notifyDataSetChanged();
-                    digitalContentEmpty.setVisibility(View.VISIBLE);
-                    mDigitalDialog.dismiss();
-                    Toast.makeText(LessonPlanMainScreen.this,"Digital content not found!!! ",
-                            Toast.LENGTH_LONG).show();
-                }
-            })
-            {
-                @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
-                    Map<String, String>  params = new HashMap<>();
-                    params.put("Authorization", "Request_From_onEMS_Android_app");
-                    return params;
-                }
-            };
-            MySingleton.getInstance(this).addToRequestQueue(request);
+
+                        @Override
+                        public void onError(Throwable e) {
+                            digitalContentList.clear();
+                            mDigitalAdapter.notifyDataSetChanged();
+                            digitalContentEmpty.setVisibility(View.VISIBLE);
+                            Toast.makeText(LessonPlanMainScreen.this,"Digital content not found!!! ",
+                                    Toast.LENGTH_LONG).show();
+                        }
+
+                        @Override
+                        public void onComplete() {
+
+                        }
+                    }));
         } else {
             Toast.makeText(this,"Please check your internet connection and select again!!! ",
                     Toast.LENGTH_LONG).show();
@@ -349,43 +368,50 @@ public class LessonPlanMainScreen extends SideNavigationMenuParentActivity imple
             Toast.makeText(this,"Digital content not found!!! ",
                     Toast.LENGTH_LONG).show();
         }
-        mDigitalDialog.dismiss();
     }
 
     private void lessonDigitalContentGetRequest(String SyllabusDetailID) {
         if (StaticHelperClass.isNetworkAvailable(this)) {
 
-            String digitalContentUrl = getString(R.string.baseUrl)+"/api/onEms/getDateWiseLessonPlanDetail/"+SyllabusDetailID;
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(getString(R.string.baseUrl))
+                    .addConverterFactory(ScalarsConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .build();
 
-            mDigitalDialog.show();
+            Observable<String> observable = retrofit
+                    .create(RetrofitNetworkService.class)
+                    .getDateWiseLessonPlanDetail(SyllabusDetailID)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io());
 
-            //Preparing digital content
-            StringRequest request = new StringRequest(Request.Method.GET, digitalContentUrl,
-                    new Response.Listener<String>() {
+            finalDisposer.add( observable
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io())
+                    .subscribeWith(new DisposableObserver<String>() {
+
                         @Override
-                        public void onResponse(String response) {
+                        public void onNext(String response) {
                             parseLessonDigitalContent(response);
                         }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    lessonPlanDigitalContentList.clear();
-                    mLessonPlanDigitalAdapter.notifyDataSetChanged();
-                    lessonDigitalEmpty.setVisibility(View.VISIBLE);
-                    mDigitalDialog.dismiss();
-                    Toast.makeText(LessonPlanMainScreen.this,"Digital content not found!!! ",
-                            Toast.LENGTH_LONG).show();
-                }
-            })
-            {
-                @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
-                    Map<String, String>  params = new HashMap<>();
-                    params.put("Authorization", "Request_From_onEMS_Android_app");
-                    return params;
-                }
-            };
-            MySingleton.getInstance(this).addToRequestQueue(request);
+
+                        @Override
+                        public void onError(Throwable e) {
+                            lessonPlanDigitalContentList.clear();
+                            mLessonPlanDigitalAdapter.notifyDataSetChanged();
+                            lessonDigitalEmpty.setVisibility(View.VISIBLE);
+                            Toast.makeText(LessonPlanMainScreen.this,"Digital content not found!!! ",
+                                    Toast.LENGTH_LONG).show();
+                        }
+
+                        @Override
+                        public void onComplete() {
+
+                        }
+                    }));
         } else {
             Toast.makeText(this,"Please check your internet connection and select again!!! ",
                     Toast.LENGTH_LONG).show();
@@ -412,7 +438,6 @@ public class LessonPlanMainScreen extends SideNavigationMenuParentActivity imple
             Toast.makeText(this,"Digital content not found!!! ",
                     Toast.LENGTH_LONG).show();
         }
-        mDigitalDialog.dismiss();
     }
 
     @Override
@@ -598,11 +623,5 @@ public class LessonPlanMainScreen extends SideNavigationMenuParentActivity imple
         } else {
             return "UnknownFileType";
         }
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        unregisterReceiver(onComplete);
     }
 }

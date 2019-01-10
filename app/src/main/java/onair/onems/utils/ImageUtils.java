@@ -153,9 +153,10 @@ public final class ImageUtils {
         return Base64.encodeToString(b, Base64.DEFAULT);
     }
 
-    public static File getFileFromBitmap(Bitmap bitmap, Context context) {
+    public static File getFileFromBitmap(Bitmap bitmap, Context context) throws IOException{
         //create a file to write bitmap data
         File file = new File(context.getCacheDir(), "Image"+System.currentTimeMillis());
+        //file = new File(Environment.getExternalStorageDirectory() + File.separator + "temporary_file.jpg");
         try {
             file.createNewFile();
             //Convert bitmap to byte array
@@ -171,6 +172,7 @@ public final class ImageUtils {
 
         } catch (IOException e) {
             Log.d("", e.toString());
+            throw e;
         }
         return file;
     }

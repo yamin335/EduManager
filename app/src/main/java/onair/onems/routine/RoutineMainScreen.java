@@ -41,7 +41,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.observers.DisposableObserver;
+import io.reactivex.schedulers.Schedulers;
 import onair.onems.R;
+import onair.onems.Services.RetrofitNetworkService;
 import onair.onems.Services.StaticHelperClass;
 import onair.onems.mainactivities.SideNavigationMenuParentActivity;
 import onair.onems.mainactivities.StudentMainScreen;
@@ -50,16 +56,27 @@ import onair.onems.models.ShiftModel;
 import onair.onems.network.MySingleton;
 import onair.onems.result.ResultMainScreen;
 import onair.onems.syllabus.ExamSelectionDialog;
+import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
+import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 public class RoutineMainScreen extends SideNavigationMenuParentActivity implements ShiftSelectionAdapter.ShiftSelectionListener{
 
-    private ProgressDialog dialog;
     private JSONArray saturdayJsonArray, sundayJsonArray, mondayJsonArray, tuesdayJsonArray, wednesdayJsonArray, thursdayJsonArray, fridayJsonArray;
     private ViewPager viewPager;
     private TabLayout tabLayout;
     private FloatingActionButton fabShift;
-    private ProgressDialog mShiftDialog;
     private boolean hasShift = false;
+    private CompositeDisposable finalDisposer = new CompositeDisposable();
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (!finalDisposer.isDisposed())
+            finalDisposer.dispose();
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -112,7 +129,11 @@ public class RoutineMainScreen extends SideNavigationMenuParentActivity implemen
     @Override
     public void onShiftSelected(JSONObject shift) {
         try {
-            RoutineDataGetRequest(shift.getLong("ShiftID"));
+            if(UserTypeID == 1||UserTypeID == 2) {
+                RoutineDataGetRequestForAdmin(shift.getLong("ShiftID"));
+            } else if(UserTypeID == 4) {
+                RoutineDataGetRequest(shift.getLong("ShiftID"));
+            }
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -242,46 +263,87 @@ public class RoutineMainScreen extends SideNavigationMenuParentActivity implemen
         viewPager.setCurrentItem(currentDay);
     }
 
-    private void RoutineDataGetRequest(long ShiftID) {
+    private void RoutineDataGetRequestForAdmin(long ShiftID) {
         if(StaticHelperClass.isNetworkAvailable(this)) {
-            dialog = new ProgressDialog(this);
-            dialog.setTitle("Loading Routine...");
-            dialog.setMessage("Please Wait...");
-            dialog.setCancelable(false);
-            dialog.setIcon(R.drawable.onair);
-            dialog.show();
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(getString(R.string.baseUrl))
+                    .addConverterFactory(ScalarsConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .build();
 
-            String routineUrl = "";
+            Observable<String> observable = retrofit
+                    .create(RetrofitNetworkService.class)
+                    .spGetCommonClassRoutine(InstituteID, ShiftID)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io());
 
-            if(UserTypeID == 1||UserTypeID == 2) {
-                routineUrl = getString(R.string.baseUrl)+"/api/onEms/spGetCommonClassRoutine/"
-                        +InstituteID+"/"+ShiftID;
-            } else if(UserTypeID == 4) {
-                routineUrl = getString(R.string.baseUrl)+"/api/onEms/spGetTeacherStudentMyClassRoutine/"
-                        +InstituteID+"/"+LoggedUserClassID+"/"+LoggedUserID;
-            }
+            finalDisposer.add( observable
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io())
+                    .subscribeWith(new DisposableObserver<String>() {
 
-            StringRequest request = new StringRequest(Request.Method.GET, routineUrl,
-                    new Response.Listener<String>() {
                         @Override
-                        public void onResponse(String response) {
+                        public void onNext(String response) {
                             parseReturnData(response);
                         }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    dialog.dismiss();
-                }
-            })
-            {
-                @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
-                    Map<String, String>  params = new HashMap<>();
-                    params.put("Authorization", "Request_From_onEMS_Android_app");
-                    return params;
-                }
-            };
-            MySingleton.getInstance(this).addToRequestQueue(request);
+
+                        @Override
+                        public void onError(Throwable e) {
+                            Toast.makeText(RoutineMainScreen.this,"Routine not found!!! ",
+                                    Toast.LENGTH_LONG).show();
+                        }
+
+                        @Override
+                        public void onComplete() {
+
+                        }
+                    }));
+        } else {
+            Toast.makeText(this,"Please check your INTERNET connection !!!",Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private void RoutineDataGetRequest(long ShiftID) {
+        if(StaticHelperClass.isNetworkAvailable(this)) {
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(getString(R.string.baseUrl))
+                    .addConverterFactory(ScalarsConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .build();
+
+            Observable<String> observable = retrofit
+                    .create(RetrofitNetworkService.class)
+                    .spGetTeacherStudentMyClassRoutine(InstituteID, LoggedUserClassID, LoggedUserID)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io());
+
+            finalDisposer.add( observable
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io())
+                    .subscribeWith(new DisposableObserver<String>() {
+
+                        @Override
+                        public void onNext(String response) {
+                            parseReturnData(response);
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+                            Toast.makeText(RoutineMainScreen.this,"Routine not found!!! ",
+                                    Toast.LENGTH_LONG).show();
+                        }
+
+                        @Override
+                        public void onComplete() {
+
+                        }
+                    }));
         } else {
             Toast.makeText(this,"Please check your INTERNET connection !!!",Toast.LENGTH_LONG).show();
         }
@@ -328,45 +390,45 @@ public class RoutineMainScreen extends SideNavigationMenuParentActivity implemen
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        dialog.dismiss();
     }
 
     private void ShiftDataGetRequest() {
         if (StaticHelperClass.isNetworkAvailable(this)) {
-            String shiftUrl = getString(R.string.baseUrl)+"/api/onEms/getInsShift/"+InstituteID;
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(getString(R.string.baseUrl))
+                    .addConverterFactory(ScalarsConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .build();
 
-            mShiftDialog = new ProgressDialog(this);
-            mShiftDialog.setTitle("Loading shift...");
-            mShiftDialog.setMessage("Please Wait...");
-            mShiftDialog.setCancelable(true);
-            mShiftDialog.setIcon(R.drawable.onair);
-            mShiftDialog.show();
-            //Preparing Shift data from server
-            StringRequest stringShiftRequest = new StringRequest(Request.Method.GET, shiftUrl,
-                    new Response.Listener<String>() {
+            Observable<String> observable = retrofit
+                    .create(RetrofitNetworkService.class)
+                    .getInsShift(InstituteID)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io());
+
+            finalDisposer.add( observable
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io())
+                    .subscribeWith(new DisposableObserver<String>() {
+
                         @Override
-                        public void onResponse(String response) {
-
+                        public void onNext(String response) {
                             parseShiftJsonData(response);
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
 
                         }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    mShiftDialog.dismiss();
-                    Toast.makeText(RoutineMainScreen.this,"Shift not found!!! ",
-                            Toast.LENGTH_LONG).show();
-                }
-            })
-            {
-                @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
-                    Map<String, String>  params = new HashMap<>();
-                    params.put("Authorization", "Request_From_onEMS_Android_app");
-                    return params;
-                }
-            };
-            MySingleton.getInstance(this).addToRequestQueue(stringShiftRequest);
+
+                        @Override
+                        public void onComplete() {
+
+                        }
+                    }));
         } else {
             Toast.makeText(RoutineMainScreen.this,"Please check your internet connection and select again!!! ",
                     Toast.LENGTH_LONG).show();
@@ -386,6 +448,5 @@ public class RoutineMainScreen extends SideNavigationMenuParentActivity implemen
             shiftSelectionDialog.setCancelable(false);
             shiftSelectionDialog.show();
         }
-        mShiftDialog.dismiss();
     }
 }

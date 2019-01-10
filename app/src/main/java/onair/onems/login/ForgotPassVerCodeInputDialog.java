@@ -30,16 +30,33 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.observers.DisposableObserver;
+import io.reactivex.schedulers.Schedulers;
 import onair.onems.R;
+import onair.onems.Services.RetrofitNetworkService;
 import onair.onems.Services.StaticHelperClass;
 import onair.onems.network.MySingleton;
+import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
+import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 public class ForgotPassVerCodeInputDialog extends Dialog implements View.OnClickListener {
     private Activity parentActivity;
     private Context context;
-    private ProgressDialog dialog;
     private String returnValue, selectedWay, sentVerificationCode;
     private EditText input;
+    private CompositeDisposable finalDisposer = new CompositeDisposable();
+
+    @Override
+    public void dismiss() {
+        super.dismiss();
+        if (!finalDisposer.isDisposed())
+            finalDisposer.dispose();
+    }
 
     ForgotPassVerCodeInputDialog(Activity activity, Context context, String returnValue, String selectedWay, String sentVerificationCode) {
         super(activity);
@@ -95,39 +112,42 @@ public class ForgotPassVerCodeInputDialog extends Dialog implements View.OnClick
     private void resendVerifyCode() {
         if(StaticHelperClass.isNetworkAvailable(context)) {
             int verificationCode = new Random().nextInt(900000)+100000;
-            dialog = new ProgressDialog(context);
-            dialog.setTitle("Sending verify code...");
-            dialog.setMessage("Please Wait...");
-            dialog.setCancelable(false);
-            dialog.setIcon(R.drawable.onair);
-            dialog.show();
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(context.getString(R.string.baseUrl))
+                    .addConverterFactory(ScalarsConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .build();
 
-            String verificationUrl = context.getString(R.string.baseUrl)+"/api/onEms/sendCodeThrouMail/"
-                    +selectedWay+"/"+verificationCode;
+            Observable<String> observable = retrofit
+                    .create(RetrofitNetworkService.class)
+                    .sendCodeThrouMail(selectedWay, verificationCode)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io());
 
-            StringRequest request = new StringRequest(Request.Method.GET, verificationUrl,
-                    new Response.Listener<String>() {
+            finalDisposer.add( observable
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io())
+                    .subscribeWith(new DisposableObserver<String>() {
+
                         @Override
-                        public void onResponse(String response) {
+                        public void onNext(String response) {
                             parseReturnData(response);
                         }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    dialog.dismiss();
-                    dismiss();
-                    Toast.makeText(context,"SERVER Error !!!",Toast.LENGTH_LONG).show();
-                }
-            })
-            {
-                @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
-                    Map<String, String>  params = new HashMap<>();
-                    params.put("Authorization", "Request_From_onEMS_Android_app");
-                    return params;
-                }
-            };
-            MySingleton.getInstance(context).addToRequestQueue(request);
+
+                        @Override
+                        public void onError(Throwable e) {
+                            dismiss();
+                            Toast.makeText(context,"SERVER Error !!!",Toast.LENGTH_LONG).show();
+                        }
+
+                        @Override
+                        public void onComplete() {
+
+                        }
+                    }));
         } else {
             Toast.makeText(context,"Please check your INTERNET connection !!!",Toast.LENGTH_LONG).show();
         }
@@ -140,12 +160,10 @@ public class ForgotPassVerCodeInputDialog extends Dialog implements View.OnClick
             String status = jsonObject.getString("Message");
             if(RandomNo.length()>3&&status.equalsIgnoreCase("sent")) {
                 sentVerificationCode = RandomNo;
-                dialog.dismiss();
                 Toast.makeText(context,"Verification code sent !!!",Toast.LENGTH_LONG).show();
             }
         } catch (JSONException e) {
             e.printStackTrace();
-            dialog.dismiss();
             dismiss();
             Toast.makeText(context,"Error in json parsing !!!",Toast.LENGTH_LONG).show();
         }

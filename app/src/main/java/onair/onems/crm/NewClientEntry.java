@@ -443,7 +443,6 @@ public class NewClientEntry extends SideNavigationMenuParentActivity implements 
                         MediaType.parse("image/jpeg"),
                         file
                 );
-
         // MultipartBody.Part is used to send also the actual file name
         return MultipartBody.Part.createFormData("userCrmPhoto", file.getName(), requestFile);
     }
@@ -463,11 +462,13 @@ public class NewClientEntry extends SideNavigationMenuParentActivity implements 
                 .create(RetrofitNetworkService.class)
                 .postNewClient(newClient)
                 .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread());
+                .observeOn(AndroidSchedulers.mainThread())
+                .unsubscribeOn(Schedulers.io());
 
         finalDisposer.add( observable
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
+                .unsubscribeOn(Schedulers.io())
                 .subscribeWith(new DisposableObserver<String>() {
 
                     @Override
@@ -517,11 +518,13 @@ public class NewClientEntry extends SideNavigationMenuParentActivity implements 
                     .create(RetrofitNetworkService.class)
                     .uploadMultipleFilesDynamic(photoParts)
                     .subscribeOn(Schedulers.newThread())
-                    .observeOn(AndroidSchedulers.mainThread());
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io());
 
             finalDisposer.add(photoObservable
                     .observeOn(Schedulers.io())
                     .subscribeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io())
                     .subscribeWith(new DisposableObserver<String>() {
 
                         @Override
@@ -562,11 +565,13 @@ public class NewClientEntry extends SideNavigationMenuParentActivity implements 
                     .create(RetrofitNetworkService.class)
                     .uploadMultipleFilesDynamic(vCardParts)
                     .subscribeOn(Schedulers.newThread())
-                    .observeOn(AndroidSchedulers.mainThread());
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io());
 
             finalDisposer.add( vCardObservable
                     .observeOn(Schedulers.io())
                     .subscribeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io())
                     .subscribeWith(new DisposableObserver<String>() {
 
                         @Override
@@ -613,19 +618,22 @@ public class NewClientEntry extends SideNavigationMenuParentActivity implements 
                     .create(RetrofitNetworkService.class)
                     .uploadMultipleFilesDynamic(vCardParts)
                     .subscribeOn(Schedulers.newThread())
-                    .observeOn(AndroidSchedulers.mainThread());
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io());
 
             Observable<String> photoObservable = retrofit
                     .create(RetrofitNetworkService.class)
                     .uploadMultipleFilesDynamic(photoParts)
                     .subscribeOn(Schedulers.newThread())
-                    .observeOn(AndroidSchedulers.mainThread());
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io());
 
             Observable<String> combinedReturnValueObservable = Observable.zip(vCardObservable, photoObservable, (vCardResponse, photoResponse) -> vCardResponse+"--"+photoResponse);
 
             finalDisposer.add(combinedReturnValueObservable
                     .observeOn(Schedulers.io())
                     .subscribeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io())
                     .subscribeWith(new DisposableObserver<String>() {
 
                         @Override
@@ -694,11 +702,19 @@ public class NewClientEntry extends SideNavigationMenuParentActivity implements 
                 }
                 if (requestCode == REQUEST_VCARD) {
                     vCardBitmapArray.add(bitmap);
-                    vCardFileArray.add(ImageUtils.getFileFromBitmap(bitmap, this));
+                    try {
+                        vCardFileArray.add(ImageUtils.getFileFromBitmap(bitmap, this));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                     vCardAdapter.notifyDataSetChanged();
                 } else if (requestCode == REQUEST_PHOTO) {
                     photoBitmapArray.add(bitmap);
-                    photoFileArray.add(ImageUtils.getFileFromBitmap(bitmap, this));
+                    try {
+                        photoFileArray.add(ImageUtils.getFileFromBitmap(bitmap, this));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                     photoAdapter.notifyDataSetChanged();
                 }
 
@@ -714,11 +730,19 @@ public class NewClientEntry extends SideNavigationMenuParentActivity implements 
                 }
                 if (requestCode == REQUEST_VCARD) {
                     vCardBitmapArray.add(bitmap);
-                    vCardFileArray.add(ImageUtils.getFileFromBitmap(bitmap, this));
+                    try {
+                        vCardFileArray.add(ImageUtils.getFileFromBitmap(bitmap, this));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                     vCardAdapter.notifyDataSetChanged();
                 } else if (requestCode == REQUEST_PHOTO) {
                     photoBitmapArray.add(bitmap);
-                    photoFileArray.add(ImageUtils.getFileFromBitmap(bitmap, this));
+                    try {
+                        photoFileArray.add(ImageUtils.getFileFromBitmap(bitmap, this));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                     photoAdapter.notifyDataSetChanged();
                 }
             }
@@ -836,10 +860,13 @@ public class NewClientEntry extends SideNavigationMenuParentActivity implements 
                     .create(RetrofitNetworkService.class)
                     .getInstituteType()
                     .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread());
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io());
+
             finalDisposer.add(insTypeObservable
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io())
                     .subscribeWith(new DisposableObserver<String>() {
 
                         @Override
@@ -918,10 +945,13 @@ public class NewClientEntry extends SideNavigationMenuParentActivity implements 
                     .create(RetrofitNetworkService.class)
                     .getCRMPriority()
                     .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread());
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io());
+
             finalDisposer.add(priorityObservable
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io())
                     .subscribeWith(new DisposableObserver<String>() {
 
                         @Override

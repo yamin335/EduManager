@@ -34,20 +34,38 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.observers.DisposableObserver;
+import io.reactivex.schedulers.Schedulers;
 import onair.onems.R;
+import onair.onems.Services.RetrofitNetworkService;
 import onair.onems.Services.StaticHelperClass;
 import onair.onems.customised.MyDividerItemDecoration;
 import onair.onems.mainactivities.CommonToolbarParentActivity;
 import onair.onems.network.MySingleton;
+import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
+import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 public class SubjectWiseResult extends CommonToolbarParentActivity implements SubjectWiseResultAdapter.SubjectWiseResultsAdapterListener{
 
     private List<JSONObject> subjectWiseResultList;
     private SubjectWiseResultAdapter mAdapter;
-    private ProgressDialog mResultDialog, mGradeDialog;
-    private String UserID, ShiftID, MediumID, ClassID, DepartmentID, SectionID, SessionID, ExamID, InstituteID;
+    private String UserID, ShiftID, MediumID, ClassID, DepartmentID, SectionID, SessionID, ExamID;
     private boolean isFail = false;
     private JSONArray resultGradingSystem;
+    private CompositeDisposable finalDisposer = new CompositeDisposable();
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (!finalDisposer.isDisposed())
+            finalDisposer.dispose();
+    }
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -66,7 +84,6 @@ public class SubjectWiseResult extends CommonToolbarParentActivity implements Su
         SectionID = intent.getStringExtra("SectionID");
         SessionID = intent.getStringExtra("SessionID");
         ExamID = intent.getStringExtra("ExamID");
-        InstituteID = intent.getStringExtra("InstituteID");
 
         RecyclerView recyclerView = findViewById(R.id.recycler_view);
         subjectWiseResultList = new ArrayList<>();
@@ -97,39 +114,43 @@ public class SubjectWiseResult extends CommonToolbarParentActivity implements Su
 
     private void ResultDataGetRequest() {
         if (StaticHelperClass.isNetworkAvailable(this)) {
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(getString(R.string.baseUrl))
+                    .addConverterFactory(ScalarsConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .build();
 
-            String resultDataGetUrl = getString(R.string.baseUrl)+"/api/onEms/SubjectWiseMarksByStudent/"
-                    +UserID+"/"+InstituteID+"/"+ClassID+"/"+SectionID+"/"+DepartmentID+"/"+MediumID
-                    +"/"+ShiftID+"/"+SessionID+"/"+ExamID;
+            Observable<String> observable = retrofit
+                    .create(RetrofitNetworkService.class)
+                    .SubjectWiseMarksByStudent(UserID, Long.toString(InstituteID), ClassID, SectionID, DepartmentID,
+                            MediumID, ShiftID, SessionID, ExamID)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io());
 
-            mResultDialog = new ProgressDialog(this);
-            mResultDialog.setTitle("Loading session...");
-            mResultDialog.setMessage("Please Wait...");
-            mResultDialog.setCancelable(false);
-            mResultDialog.setIcon(R.drawable.onair);
+            finalDisposer.add( observable
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io())
+                    .subscribeWith(new DisposableObserver<String>() {
 
-            //Preparing Shift data from server
-            StringRequest stringResultRequest = new StringRequest(Request.Method.GET, resultDataGetUrl,
-                    new Response.Listener<String>() {
                         @Override
-                        public void onResponse(String response) {
+                        public void onNext(String response) {
                             prepareResult(response);
                         }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    mResultDialog.dismiss();
-                }
-            })
-            {
-                @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
-                    Map<String, String>  params = new HashMap<>();
-                    params.put("Authorization", "Request_From_onEMS_Android_app");
-                    return params;
-                }
-            };
-            MySingleton.getInstance(this).addToRequestQueue(stringResultRequest);
+
+                        @Override
+                        public void onError(Throwable e) {
+                            Toast.makeText(SubjectWiseResult.this,"Result not found!!! ",
+                                    Toast.LENGTH_LONG).show();
+                        }
+
+                        @Override
+                        public void onComplete() {
+
+                        }
+                    }));
         } else {
             Toast.makeText(SubjectWiseResult.this,"Please check your internet connection and select again!!! ",
                     Toast.LENGTH_LONG).show();
@@ -140,7 +161,7 @@ public class SubjectWiseResult extends CommonToolbarParentActivity implements Su
         try {
             subjectWiseResultList.clear();
             JSONArray resultJsonArray = new JSONArray(result);
-            int totalMarks = 0;
+            double totalMarks = 0;
             double totalGradePoint = 0.0;
             String totalGrade = "";
             int totalSubject = 0;
@@ -159,8 +180,16 @@ public class SubjectWiseResult extends CommonToolbarParentActivity implements Su
 
                     totalSubject++;
                     subjectWiseResultList.add(resultJsonArray.getJSONObject(i));
-                    totalGradePoint += resultJsonArray.getJSONObject(i).getDouble("GradePoint");
-                    totalMarks+= resultJsonArray.getJSONObject(i).getInt("Total");
+                    if (!resultJsonArray.getJSONObject(i).getString("GradePoint").equalsIgnoreCase("")
+                            && !resultJsonArray.getJSONObject(i).getString("GradePoint").equalsIgnoreCase("null")) {
+                        totalGradePoint += resultJsonArray.getJSONObject(i).getDouble("GradePoint");
+                    }
+
+                    if (!resultJsonArray.getJSONObject(i).getString("Total").equalsIgnoreCase("")
+                            && !resultJsonArray.getJSONObject(i).getString("Total").equalsIgnoreCase("null")) {
+                        totalMarks+= resultJsonArray.getJSONObject(i).getDouble("Total");
+                    }
+
                     if(resultJsonArray.getJSONObject(i).getString("Grade").equalsIgnoreCase("F")) {
                         isFail = true;
                     }
@@ -183,54 +212,65 @@ public class SubjectWiseResult extends CommonToolbarParentActivity implements Su
             }
 
             JSONObject totalResult = new JSONObject();
-            totalResult.put("SubjectName", "Total");
-            totalResult.put("Total",Integer.toString(totalMarks));
-            totalResult.put("Grade", totalGrade);
-            totalResult.put("GradePoint", totalGradePoint);
-            if(resultJsonArray.length()!=0){
+            if(resultJsonArray.length()>0) {
+                totalResult.put("SubjectName", "Total");
+                totalResult.put("Total", Double.toString(totalMarks));
+                totalResult.put("Grade", totalGrade);
+                totalResult.put("GradePoint", totalGradePoint);
                 subjectWiseResultList.add(totalResult);
+                mAdapter.notifyDataSetChanged();
+            } else {
+                totalResult.put("SubjectName", "");
+                totalResult.put("Total", "");
+                totalResult.put("Grade", "");
+                totalResult.put("GradePoint", "");
+                subjectWiseResultList.add(totalResult);
+                mAdapter.notifyDataSetChanged();
             }
-            mAdapter.notifyDataSetChanged();
+
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        mResultDialog.dismiss();
     }
 
     private void ResultGradeDataGetRequest(){
         if (StaticHelperClass.isNetworkAvailable(this)) {
-            String resultGradeDataGetUrl = getString(R.string.baseUrl)+"/api/onEms/getinsGradeForReport/"+InstituteID+"/"+MediumID+"/"+ClassID;
-            mGradeDialog = new ProgressDialog(this);
-            mGradeDialog.setTitle("Loading Grade Sheet...");
-            mGradeDialog.setMessage("Please Wait...");
-            mGradeDialog.setCancelable(false);
-            mGradeDialog.setIcon(R.drawable.onair);
-            mGradeDialog.show();
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(getString(R.string.baseUrl))
+                    .addConverterFactory(ScalarsConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .build();
 
-            //Preparing Shift data from server
-            StringRequest stringResultRequest = new StringRequest(Request.Method.GET, resultGradeDataGetUrl,
-                    new Response.Listener<String>() {
+            Observable<String> observable = retrofit
+                    .create(RetrofitNetworkService.class)
+                    .getinsGradeForReport(InstituteID, MediumID, ClassID)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io());
+
+            finalDisposer.add( observable
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io())
+                    .subscribeWith(new DisposableObserver<String>() {
+
                         @Override
-                        public void onResponse(String response) {
+                        public void onNext(String response) {
                             prepareResultGradeSheet(response);
                         }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    mGradeDialog.dismiss();
-                    Toast.makeText(SubjectWiseResult.this,"Grade sheet not found!!! ",
-                            Toast.LENGTH_LONG).show();
-                }
-            })
-            {
-                @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
-                    Map<String, String>  params = new HashMap<>();
-                    params.put("Authorization", "Request_From_onEMS_Android_app");
-                    return params;
-                }
-            };
-            MySingleton.getInstance(this).addToRequestQueue(stringResultRequest);
+
+                        @Override
+                        public void onError(Throwable e) {
+                            Toast.makeText(SubjectWiseResult.this,"Grade sheet not found!!! ",
+                                    Toast.LENGTH_LONG).show();
+                        }
+
+                        @Override
+                        public void onComplete() {
+
+                        }
+                    }));
         } else {
             Toast.makeText(this,"Please check your internet connection and select again!!! ",
                     Toast.LENGTH_LONG).show();
@@ -238,7 +278,6 @@ public class SubjectWiseResult extends CommonToolbarParentActivity implements Su
     }
 
     private void prepareResultGradeSheet(String result) {
-        mGradeDialog.dismiss();
         try {
             resultGradingSystem = new JSONArray(result);
             ResultDataGetRequest();

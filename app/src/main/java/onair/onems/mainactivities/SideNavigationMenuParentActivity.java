@@ -11,12 +11,7 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
-import android.support.design.internal.BottomNavigationItemView;
-import android.support.design.internal.BottomNavigationMenuView;
-import android.support.design.internal.BottomNavigationPresenter;
-import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
@@ -29,13 +24,10 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ExpandableListView;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -59,10 +51,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.observers.DisposableObserver;
+import io.reactivex.schedulers.Schedulers;
 import onair.onems.PrivacyPolicy;
 import onair.onems.R;
+import onair.onems.Services.RetrofitNetworkService;
 import onair.onems.Services.StaticHelperClass;
-import onair.onems.Test;
 import onair.onems.accounts.IncomeStatement;
 import onair.onems.app.Config;
 import onair.onems.attendance.AttendanceAdminDashboard;
@@ -74,13 +72,12 @@ import onair.onems.exam.SubjectWiseMarksEntryMain;
 import onair.onems.fees_report.FeeCollectionReportMain;
 import onair.onems.homework.HomeworkMainScreenForAdmin;
 import onair.onems.lesson_plan.LessonPlanMainScreenForAdmin;
+import onair.onems.login.ChangePasswordDialog;
 import onair.onems.network.MySingleton;
 import onair.onems.notification.NotificationAdapter;
 import onair.onems.notification.NotificationDetails;
 import onair.onems.notification.NotificationMainScreen;
 import onair.onems.routine.ExamRoutineMainScreen;
-import onair.onems.fee.FeeMainScreen;
-import onair.onems.fee.FeesHistory;
 import onair.onems.homework.HomeworkMainScreen;
 import onair.onems.lesson_plan.LessonPlanMainScreen;
 import onair.onems.login.LoginScreen;
@@ -100,7 +97,10 @@ import onair.onems.studentlist.ReportAllStudentMain;
 import onair.onems.syllabus.SyllabusMainScreen;
 import onair.onems.syllabus.SyllabusMainScreenForAdmin;
 import onair.onems.user.Profile;
-import onair.onems.utils.NotificationUtils;
+import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
+import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 public class SideNavigationMenuParentActivity extends AppCompatActivity implements NotificationAdapter.DecreaseCounterListener,
         NotificationAdapter.IncreaseCounterListener {
@@ -120,9 +120,16 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
     private TextView textDashboard, textProfile, textNotification, textContacts, notificationCounter;
     private ImageView iconDashboard, iconProfile, iconNotification, iconContacts;
     private NotificationReceiverListener notificationReceiverListener;
-    private ProgressDialog dialog;
     private boolean returnValue = false;
     public Toolbar toolbar;
+    private CompositeDisposable finalDisposer = new CompositeDisposable();
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (!finalDisposer.isDisposed())
+            finalDisposer.dispose();
+    }
 
     @Override
     protected void onStart() {
@@ -317,84 +324,6 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
             }
         });
 
-//        bottomNavigationView = findViewById(R.id.navigation);
-//        bottomNavigationView.getMenu().getItem(0).setCheckable(false);
-//        bottomNavigationView.getMenu().getItem(1).setCheckable(false);
-//        bottomNavigationView.getMenu().getItem(2).setCheckable(false);
-//        bottomNavigationView.getMenu().getItem(3).setCheckable(false);
-//        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
-//            @Override
-//            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-//                item.setCheckable(true);
-//                bottomNavigationView.postDelayed(() -> {
-//                    int itemId = item.getItemId();
-//                    if (itemId == R.id.navigation_dashboard) {
-//                        switch (UserTypeID) {
-//                            case 1: startActivity(new Intent(SideNavigationMenuParentActivity.this, TeacherMainScreen.class));
-//                                break;
-//                            case 2: startActivity(new Intent(SideNavigationMenuParentActivity.this, TeacherMainScreen.class));
-//                                break;
-//                            case 3: startActivity(new Intent(SideNavigationMenuParentActivity.this, StudentMainScreen.class));
-//                                break;
-//                            case 4: startActivity(new Intent(SideNavigationMenuParentActivity.this, TeacherMainScreen.class));
-//                                break;
-//                            case 5: startActivity(new Intent(SideNavigationMenuParentActivity.this, StudentMainScreen.class));
-//                                break;
-//                        }
-//                    } else if (itemId == R.id.navigation_profile) {
-//
-//                    } else if (itemId == R.id.navigation_notification) {
-////                        startActivity(new Intent(this, NotificationsActivity.class));
-//                    } else if(itemId == R.id.navigation_contact) {
-//
-//                    }
-////                    finish();
-//                }, 300);
-//                return true;
-//            }
-//        });
-//        BottomNavigationMenuView bottomNavigationMenuView = (BottomNavigationMenuView) bottomNavigationView.getChildAt(0);
-//        View v = bottomNavigationMenuView.getChildAt(2);
-//        BottomNavigationItemView itemView = (BottomNavigationItemView) v;
-//        View badge = LayoutInflater.from(this).inflate(R.layout.notification_badge_container, bottomNavigationMenuView, false);
-//        itemView.addView(badge);
-//
-//        TextView textView = itemView.findViewById(R.id.notificationCounter);
-//        textView.setText("20");
-
-        //
-//        notificationMenuItem = menu.findItem(R.id.notificationCounterMenuId);
-//        View actionView = notificationMenuItem.getActionView();
-//        if(actionView!=null){
-//            notificationBell = actionView.findViewById(R.id.notificationBell);
-//            notificationCounter = actionView.findViewById(R.id.notificationCounter);
-//            notificationBell.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//                    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(SideNavigationMenuParentActivity.this);
-//                    SharedPreferences.Editor editor = prefs.edit();
-//                    editor.putInt("Notification", 0);
-//                    editor.apply();
-//                    notificationCounter.setText("");
-//                    notificationCounter.setVisibility(View.INVISIBLE);
-//                }
-//            });
-//
-//            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-//            SharedPreferences.Editor editor = prefs.edit();
-//            int number = prefs.getInt("Notification",0);
-//            if(number>0){
-//                notificationCounter.setVisibility(View.VISIBLE);
-//                notificationCounter.setText(Integer.toString(number));
-//            } else {
-//                notificationCounter.setVisibility(View.INVISIBLE);
-//            }
-//        }
-
-//        final ActionBar actionBar = getSupportActionBar();
-//        actionBar.setHomeAsUpIndicator(android.R.drawable.ic_menu_add);
-//        actionBar.setDisplayHomeAsUpEnabled(true);
-
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         View view = getLayoutInflater().inflate(R.layout.onems_nav_header_main,null);
         navigationView.addHeaderView(view);
@@ -579,34 +508,6 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
                         .setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
                 break;
         }
-//
-//        notificationMenuItem = menu.findItem(R.id.notificationCounterMenuId);
-//        View actionView = notificationMenuItem.getActionView();
-//        if(actionView!=null){
-//            notificationBell = actionView.findViewById(R.id.notificationBell);
-//            notificationCounter = actionView.findViewById(R.id.notificationCounter);
-//            notificationBell.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//                    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(SideNavigationMenuParentActivity.this);
-//                    SharedPreferences.Editor editor = prefs.edit();
-//                    editor.putInt("Notification", 0);
-//                    editor.apply();
-//                    notificationCounter.setText("");
-//                    notificationCounter.setVisibility(View.INVISIBLE);
-//                }
-//            });
-//
-//            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-//            SharedPreferences.Editor editor = prefs.edit();
-//            int number = prefs.getInt("Notification",0);
-//            if(number>0){
-//                notificationCounter.setVisibility(View.VISIBLE);
-//                notificationCounter.setText(Integer.toString(number));
-//            } else {
-//                notificationCounter.setVisibility(View.INVISIBLE);
-//            }
-//        }
         return true;
     }
 
@@ -704,43 +605,43 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
 
     private boolean logOut() {
         if (StaticHelperClass.isNetworkAvailable(this)) {
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(getString(R.string.baseUrl))
+                    .addConverterFactory(ScalarsConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .build();
 
-            String logOutUrl = getString(R.string.baseUrl)+"/api/onEms/deleteFcmToken/"+LoggedUserID+"/"+"android"+"/"+getSharedPreferences("UNIQUE_ID", Context.MODE_PRIVATE)
-                    .getString("uuid", "");
+            Observable<String> observable = retrofit
+                    .create(RetrofitNetworkService.class)
+                    .deleteFcmToken(LoggedUserID, "android", getSharedPreferences("UNIQUE_ID", Context.MODE_PRIVATE).getString("uuid", ""))
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io());
 
-            dialog = new ProgressDialog(this);
-            dialog.setTitle("Logging Out...");
-            dialog.setMessage("Please Wait...");
-            dialog.setCancelable(false);
-            dialog.setIcon(R.drawable.onair);
-            dialog.show();
-            //Preparing Shift data from server
-            StringRequest loginRequest = new StringRequest(Request.Method.DELETE, logOutUrl,
-                    new Response.Listener<String>() {
+            finalDisposer.add( observable
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io())
+                    .subscribeWith(new DisposableObserver<String>() {
+
                         @Override
-                        public void onResponse(String response) {
-
+                        public void onNext(String response) {
                             doLogOut(response);
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+                            returnValue = false;
+                            Toast.makeText(SideNavigationMenuParentActivity.this,"Server error while logging out!!! ",
+                                    Toast.LENGTH_LONG).show();
+                        }
+
+                        @Override
+                        public void onComplete() {
 
                         }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    returnValue = false;
-                    dialog.dismiss();
-                    Toast.makeText(SideNavigationMenuParentActivity.this,"Server error while logging out!!! ",
-                            Toast.LENGTH_LONG).show();
-                }
-            })
-            {
-                @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
-                    Map<String, String>  params = new HashMap<>();
-                    params.put("Authorization", "Request_From_onEMS_Android_app");
-                    return params;
-                }
-            };
-            MySingleton.getInstance(this).addToRequestQueue(loginRequest);
+                    }));
         } else {
             Toast.makeText(SideNavigationMenuParentActivity.this,"Please check your internet connection and select again!!! ",
                     Toast.LENGTH_LONG).show();

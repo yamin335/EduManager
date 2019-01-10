@@ -7,6 +7,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -26,15 +27,34 @@ import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
+
+import io.reactivex.Observable;
+import io.reactivex.Observer;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 import onair.onems.R;
+import onair.onems.Services.RetrofitNetworkService;
 import onair.onems.Services.StaticHelperClass;
 import onair.onems.network.MySingleton;
+import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
+import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 public class Sunday extends Fragment {
-    private long InstituteID, ShiftID, MediumID, ClassID, DepartmentID, SectionID, UserTypeID;
+    private long UserTypeID;
     private RoutineAdapter mAdapter;
     private RecyclerView recyclerView;
-    private String UserID;
+    private Disposable finalDisposer;
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (!finalDisposer.isDisposed())
+            finalDisposer.dispose();
+    }
 
     public Sunday() {
 
@@ -46,24 +66,24 @@ public class Sunday extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View rootView = inflater.inflate(R.layout.routine_day_pager_item, container, false);
         recyclerView = rootView.findViewById(R.id.routinePeriods);
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        InstituteID = prefs.getLong("InstituteID",0);
-        ShiftID = prefs.getLong("ShiftID",0);
-        MediumID = prefs.getLong("MediumID",0);
-        ClassID = prefs.getLong("ClassID",0);
-        SectionID = prefs.getLong("SectionID",0);
+        long instituteID = prefs.getLong("InstituteID", 0);
+        long shiftID = prefs.getLong("ShiftID", 0);
+        long mediumID = prefs.getLong("MediumID", 0);
+        long classID = prefs.getLong("ClassID", 0);
+        long sectionID = prefs.getLong("SectionID", 0);
         UserTypeID = prefs.getInt("UserTypeID",0);
+        long departmentID;
         if(UserTypeID == 3) {
-            DepartmentID = prefs.getLong("SDepartmentID",0);
+            departmentID = prefs.getLong("SDepartmentID",0);
         } else {
-            DepartmentID = prefs.getLong("DepartmentID",0);
+            departmentID = prefs.getLong("DepartmentID",0);
         }
-        UserID = prefs.getString("UserID","0");
 
         if(UserTypeID==1||UserTypeID==2||UserTypeID==4) {
             Bundle bundle = getArguments();
@@ -77,68 +97,72 @@ public class Sunday extends Fragment {
             recyclerView.setItemAnimator(new DefaultItemAnimator());
             recyclerView.setHasFixedSize(true);
             recyclerView.setAdapter(mAdapter);
-        } else if(UserTypeID==3||UserTypeID==5) {
-            sundayRoutineDataGetRequest();
+        } else if(UserTypeID == 3) {
+            sundayRoutineDataGetRequest(Long.toString(shiftID), Long.toString(mediumID),
+                    Long.toString(classID), Long.toString(sectionID), Long.toString(departmentID),
+                    Long.toString(2), Long.toString(instituteID));
+        } else if(UserTypeID == 5) {
+            try {
+                JSONObject selectedStudent = new JSONObject(Objects.requireNonNull(getActivity()).getSharedPreferences("CURRENT_STUDENT", Context.MODE_PRIVATE)
+                        .getString("guardianSelectedStudent", "{}"));
+                sundayRoutineDataGetRequest(selectedStudent.getString("ShiftID"), selectedStudent.getString("MediumID")
+                        ,selectedStudent.getString("ClassID"),selectedStudent.getString("SectionID")
+                        ,selectedStudent.getString("DepartmentID"),"2", Long.toString(instituteID));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
 
         return  rootView;
     }
 
-    void sundayRoutineDataGetRequest() {
-        if(StaticHelperClass.isNetworkAvailable(getActivity())) {
+    void sundayRoutineDataGetRequest(String ShiftID, String MediumID, String ClassID, String SectionID,
+                                     String DepartmentID, String DayID, String InstituteID) {
+        if(StaticHelperClass.isNetworkAvailable(Objects.requireNonNull(getActivity()))) {
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(getString(R.string.baseUrl))
+                    .addConverterFactory(ScalarsConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .build();
 
-            String sundayRoutineDataGetUrl = "";
-            if(UserTypeID == 3) {
-                sundayRoutineDataGetUrl = getString(R.string.baseUrl)+"/api/onEms/spGetDashClassRoutine/"+ShiftID
-                        +"/"+MediumID+"/"+ClassID+"/"+SectionID+"/"+DepartmentID+"/2/"+InstituteID;
-            } else if(UserTypeID == 5) {
-                try {
-                    JSONObject selectedStudent = new JSONObject(getActivity().getSharedPreferences("CURRENT_STUDENT", Context.MODE_PRIVATE)
-                            .getString("guardianSelectedStudent", "{}"));
-                    sundayRoutineDataGetUrl = getString(R.string.baseUrl)+"/api/onEms/spGetDashClassRoutine/"+
-                            selectedStudent.getString("ShiftID")+"/"+selectedStudent.getString("MediumID")
-                            +"/"+selectedStudent.getString("ClassID")+"/"+selectedStudent.getString("SectionID")
-                            +"/"+selectedStudent.getString("DepartmentID")+"/2/"+InstituteID;
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
+            Observable<String> observable = retrofit
+                    .create(RetrofitNetworkService.class)
+                    .spGetDashClassRoutine(ShiftID, MediumID, ClassID, SectionID, DepartmentID, DayID, InstituteID)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io());
 
-            final ProgressDialog sundayRoutineGetDialog = new ProgressDialog(getActivity());
-            sundayRoutineGetDialog.setTitle("Loading...");
-            sundayRoutineGetDialog.setMessage("Please Wait...");
-            sundayRoutineGetDialog.setCancelable(false);
-            sundayRoutineGetDialog.setIcon(R.drawable.onair);
-            sundayRoutineGetDialog.show();
+            observable
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io())
+                    .subscribe(new Observer<String>() {
 
-            StringRequest sundayRoutineRequest = new StringRequest(Request.Method.GET, sundayRoutineDataGetUrl,
-                    new Response.Listener<String>() {
                         @Override
-                        public void onResponse(String response) {
+                        public void onSubscribe(Disposable d) {
+                            finalDisposer = d;
+                        }
 
+                        @Override
+                        public void onNext(String response) {
                             mAdapter = new RoutineAdapter(getActivity(), response, UserTypeID);
                             RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity());
                             recyclerView.setLayoutManager(mLayoutManager);
                             recyclerView.setItemAnimator(new DefaultItemAnimator());
                             recyclerView.setAdapter(mAdapter);
-
-                            sundayRoutineGetDialog.dismiss();
                         }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    sundayRoutineGetDialog.dismiss();
-                }
-            })
-            {
-                @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
-                    Map<String, String>  params = new HashMap<>();
-                    params.put("Authorization", "Request_From_onEMS_Android_app");
-                    return params;
-                }
-            };
-            MySingleton.getInstance(getActivity()).addToRequestQueue(sundayRoutineRequest);
+
+                        @Override
+                        public void onComplete() {
+
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+                            Toast.makeText(getActivity() ,"Error getting routine !!!",Toast.LENGTH_LONG).show();
+                        }
+                    });
         } else {
             Toast.makeText(getActivity(),"Please check your internet connection !!!",Toast.LENGTH_LONG).show();
         }

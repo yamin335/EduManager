@@ -1,9 +1,7 @@
 package onair.onems.service;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
@@ -14,8 +12,7 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
-import com.google.firebase.iid.FirebaseInstanceId;
-import com.google.firebase.iid.FirebaseInstanceIdService;
+import com.google.firebase.messaging.FirebaseMessagingService;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -27,12 +24,10 @@ import java.util.Map;
 import onair.onems.R;
 import onair.onems.Services.StaticHelperClass;
 import onair.onems.app.Config;
-import onair.onems.attendance.ShowAttendance;
-import onair.onems.attendance.TakeAttendanceDetails;
 import onair.onems.customised.CustomRequest;
 import onair.onems.network.MySingleton;
 
-public class MyFirebaseInstanceIDService extends FirebaseInstanceIdService {
+public class MyFirebaseInstanceIDService extends FirebaseMessagingService {
     private static final String TAG = MyFirebaseInstanceIDService.class.getSimpleName();
     private String returnValue = "[]";
     private String LoggedUserID = "";
@@ -40,29 +35,30 @@ public class MyFirebaseInstanceIDService extends FirebaseInstanceIdService {
     private long ID = 0;
     private String previousToken = "";
     private JSONObject tokenJsonObject;
+
     @Override
-    public void onTokenRefresh() {
-        super.onTokenRefresh();
+    public void onNewToken(String token) {
         LoggedUserID = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString("UserID", "0");
         uuid = getApplicationContext().getSharedPreferences("UNIQUE_ID", Context.MODE_PRIVATE)
                 .getString("uuid", "");
         previousToken = getApplicationContext().getSharedPreferences(Config.SHARED_PREF, Context.MODE_PRIVATE)
                 .getString("regId", "");
-        String refreshedToken = FirebaseInstanceId.getInstance().getToken();
+//        String refreshedToken = FirebaseInstanceId.getInstance().getToken();
+//        FirebaseInstanceId.getInstance().getInstanceId();
 
         // Saving reg id to shared preferences
-        storeRegIdInPref(refreshedToken);
+        storeRegIdInPref(token);
 
-        Log.d("Token: ", refreshedToken);
+        Log.d("Token: ", token);
 
         if(!LoggedUserID.equals("0")){
             // sending reg id to your server
-            sendRegistrationToServer(refreshedToken);
+            sendRegistrationToServer(token);
         }
 
         // Notify UI that registration has completed, so the progress indicator can be hidden.
         Intent registrationComplete = new Intent(Config.REGISTRATION_COMPLETE);
-        registrationComplete.putExtra("token", refreshedToken);
+        registrationComplete.putExtra("token", token);
         LocalBroadcastManager.getInstance(this).sendBroadcast(registrationComplete);
     }
 
@@ -151,6 +147,6 @@ public class MyFirebaseInstanceIDService extends FirebaseInstanceIdService {
         getApplicationContext().getSharedPreferences(Config.SHARED_PREF, Context.MODE_PRIVATE)
         .edit()
         .putString("regId", token)
-        .apply();
+        .commit();
     }
 }

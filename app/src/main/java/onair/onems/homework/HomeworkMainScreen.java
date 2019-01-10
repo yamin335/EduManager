@@ -11,8 +11,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
@@ -21,7 +19,6 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -51,16 +48,22 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.observers.DisposableObserver;
+import io.reactivex.schedulers.Schedulers;
 import onair.onems.R;
+import onair.onems.Services.RetrofitNetworkService;
 import onair.onems.Services.StaticHelperClass;
-import onair.onems.attendance.TakeAttendance;
 import onair.onems.mainactivities.SideNavigationMenuParentActivity;
 import onair.onems.mainactivities.StudentMainScreen;
-import onair.onems.mainactivities.TeacherMainScreen;
 import onair.onems.network.MySingleton;
 import onair.onems.syllabus.DigitalContentAdapter;
-import onair.onems.syllabus.ExamSelectionDialog;
-import onair.onems.syllabus.SyllabusMainScreen;
+import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
+import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 import static onair.onems.Services.StaticHelperClass.isNetworkAvailable;
 
@@ -70,13 +73,21 @@ public class HomeworkMainScreen extends SideNavigationMenuParentActivity impleme
     private ArrayList<JSONObject> homeworkList;
     private ArrayList<JSONObject> digitalContentList;
     private HomeworkAdapter mAdapter;
-    private ProgressDialog mHomeworkDialog;
     private TextView error, errorDigital, homeworkDate, topic, details;
     private DatePickerDialog datePickerDialog;
     private Button datePicker;
     private DigitalContentAdapter mDigitalAdapter;
     private ArrayList<Long> refIdList = new ArrayList<>();
     private String selectedDate = "";
+    private CompositeDisposable finalDisposer = new CompositeDisposable();
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(onComplete);
+        if (!finalDisposer.isDisposed())
+            finalDisposer.dispose();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -212,51 +223,52 @@ public class HomeworkMainScreen extends SideNavigationMenuParentActivity impleme
 
     private void homeworkGetRequest(String date) {
         if (StaticHelperClass.isNetworkAvailable(this)) {
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(getString(R.string.baseUrl))
+                    .addConverterFactory(ScalarsConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .build();
 
-            String homeworkUrl = getString(R.string.baseUrl)+"/api/onEms/getMyInsHomeWork/"+InstituteID+
-                    "/"+LoggedUserMediumID+"/"+LoggedUserClassID+"/"+LoggedUserDepartmentID+"/"+
-                    LoggedUserSectionID+"/"+LoggedUserShiftID+"/"+date;
+            Observable<String> observable = retrofit
+                    .create(RetrofitNetworkService.class)
+                    .getMyInsHomeWork(InstituteID, LoggedUserMediumID, LoggedUserClassID,
+                            LoggedUserDepartmentID, LoggedUserSectionID, LoggedUserShiftID, date)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io());
 
-            mHomeworkDialog = new ProgressDialog(this);
-            mHomeworkDialog.setTitle("Loading homework...");
-            mHomeworkDialog.setMessage("Please Wait...");
-            mHomeworkDialog.setCancelable(false);
-            mHomeworkDialog.setIcon(R.drawable.onair);
-            mHomeworkDialog.show();
+            finalDisposer.add( observable
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io())
+                    .subscribeWith(new DisposableObserver<String>() {
 
-            //Preparing homework
-            StringRequest request = new StringRequest(Request.Method.GET, homeworkUrl,
-                    new Response.Listener<String>() {
                         @Override
-                        public void onResponse(String response) {
+                        public void onNext(String response) {
                             parseHomeworkData(response);
                         }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError e) {
-                    homeworkList.clear();
-                    mAdapter.notifyDataSetChanged();
-                    error.setVisibility(View.VISIBLE);
-                    homeworkDate.setText("");
-                    details.setText("");
-                    topic.setText("");
-                    errorDigital.setVisibility(View.VISIBLE);
-                    digitalContentList.clear();
-                    mDigitalAdapter.notifyDataSetChanged();
-                    mHomeworkDialog.dismiss();
-                    Toast.makeText(HomeworkMainScreen.this,"Homework data not found!!! ",
-                            Toast.LENGTH_LONG).show();
-                }
-            })
-            {
-                @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
-                    Map<String, String>  params = new HashMap<>();
-                    params.put("Authorization", "Request_From_onEMS_Android_app");
-                    return params;
-                }
-            };
-            MySingleton.getInstance(this).addToRequestQueue(request);
+
+                        @Override
+                        public void onError(Throwable e) {
+                            homeworkList.clear();
+                            mAdapter.notifyDataSetChanged();
+                            error.setVisibility(View.VISIBLE);
+                            homeworkDate.setText("");
+                            details.setText("");
+                            topic.setText("");
+                            errorDigital.setVisibility(View.VISIBLE);
+                            digitalContentList.clear();
+                            mDigitalAdapter.notifyDataSetChanged();
+                            Toast.makeText(HomeworkMainScreen.this,"Homework data not found!!! ",
+                                    Toast.LENGTH_LONG).show();
+                        }
+
+                        @Override
+                        public void onComplete() {
+
+                        }
+                    }));
         } else {
             Toast.makeText(this,"Please check your internet connection and select again!!! ",
                     Toast.LENGTH_LONG).show();
@@ -289,48 +301,49 @@ public class HomeworkMainScreen extends SideNavigationMenuParentActivity impleme
             Toast.makeText(this,"Homework not found!!! ",
                     Toast.LENGTH_LONG).show();
         }
-        mHomeworkDialog.dismiss();
     }
 
     private void homeworkDigitalContentGetRequest(String HomeWorkID) {
         if (StaticHelperClass.isNetworkAvailable(this)) {
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(getString(R.string.baseUrl))
+                    .addConverterFactory(ScalarsConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .build();
 
-            String digitalContentUrl = getString(R.string.baseUrl)+"/api/onEms/getMyInsHomeWorkDetail/"+HomeWorkID;
+            Observable<String> observable = retrofit
+                    .create(RetrofitNetworkService.class)
+                    .getMyInsHomeWorkDetail(HomeWorkID)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io());
 
-            mHomeworkDialog = new ProgressDialog(this);
-            mHomeworkDialog.setTitle("Loading digital content...");
-            mHomeworkDialog.setMessage("Please Wait...");
-            mHomeworkDialog.setCancelable(false);
-            mHomeworkDialog.setIcon(R.drawable.onair);
-            mHomeworkDialog.show();
+            finalDisposer.add( observable
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io())
+                    .subscribeWith(new DisposableObserver<String>() {
 
-            //Preparing digital content
-            StringRequest request = new StringRequest(Request.Method.GET, digitalContentUrl,
-                    new Response.Listener<String>() {
                         @Override
-                        public void onResponse(String response) {
+                        public void onNext(String response) {
                             parseDigitalContent(response);
                         }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    errorDigital.setVisibility(View.VISIBLE);
-                    digitalContentList.clear();
-                    mDigitalAdapter.notifyDataSetChanged();
-                    mHomeworkDialog.dismiss();
-                    Toast.makeText(HomeworkMainScreen.this,"Digital content not found!!! ",
-                            Toast.LENGTH_LONG).show();
-                }
-            })
-            {
-                @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
-                    Map<String, String>  params = new HashMap<>();
-                    params.put("Authorization", "Request_From_onEMS_Android_app");
-                    return params;
-                }
-            };
-            MySingleton.getInstance(this).addToRequestQueue(request);
+
+                        @Override
+                        public void onError(Throwable e) {
+                            errorDigital.setVisibility(View.VISIBLE);
+                            digitalContentList.clear();
+                            mDigitalAdapter.notifyDataSetChanged();
+                            Toast.makeText(HomeworkMainScreen.this,"Digital content not found!!! ",
+                                    Toast.LENGTH_LONG).show();
+                        }
+
+                        @Override
+                        public void onComplete() {
+
+                        }
+                    }));
         } else {
             Toast.makeText(this,"Please check your internet connection and select again!!! ",
                     Toast.LENGTH_LONG).show();
@@ -357,7 +370,6 @@ public class HomeworkMainScreen extends SideNavigationMenuParentActivity impleme
             Toast.makeText(this,"Digital content not found!!! ",
                     Toast.LENGTH_LONG).show();
         }
-        mHomeworkDialog.dismiss();
     }
 
     BroadcastReceiver onComplete = new BroadcastReceiver() {
@@ -460,66 +472,60 @@ public class HomeworkMainScreen extends SideNavigationMenuParentActivity impleme
 
     @NonNull
     private String getFileExtension(String string) {
-        if(string.contains(".png")||string.contains(".PNG")){
+        if(string.contains(".png")||string.contains(".PNG")) {
             return ".png";
-        } else if(string.contains(".jpg")||string.contains(".JPG")){
+        } else if(string.contains(".jpg")||string.contains(".JPG")) {
             return ".jpg";
-        } else if(string.contains(".jpeg")||string.contains(".JPEG")){
+        } else if(string.contains(".jpeg")||string.contains(".JPEG")) {
             return ".jpeg";
-        } else if(string.contains(".gif")||string.contains(".GIF")){
+        } else if(string.contains(".gif")||string.contains(".GIF")) {
             return ".gif";
-        } else if(string.contains(".bmp")||string.contains(".BMP")){
+        } else if(string.contains(".bmp")||string.contains(".BMP")) {
             return ".bmp";
-        } else if(string.contains(".mp3")||string.contains(".MP3")){
+        } else if(string.contains(".mp3")||string.contains(".MP3")) {
             return ".mp3";
-        } else if(string.contains(".amr")||string.contains(".AMR")){
+        } else if(string.contains(".amr")||string.contains(".AMR")) {
             return ".amr";
-        } else if(string.contains(".wav")||string.contains(".WAV")){
+        } else if(string.contains(".wav")||string.contains(".WAV")) {
             return ".wav";
-        } else if(string.contains(".aac")||string.contains(".AAC")){
+        } else if(string.contains(".aac")||string.contains(".AAC")) {
             return ".aac";
-        } else if(string.contains(".mp4")||string.contains(".MP4")){
+        } else if(string.contains(".mp4")||string.contains(".MP4")) {
             return ".mp4";
-        } else if(string.contains(".wmv")||string.contains(".WMV")){
+        } else if(string.contains(".wmv")||string.contains(".WMV")) {
             return ".wmv";
-        } else if(string.contains(".avi")||string.contains(".AVI")){
+        } else if(string.contains(".avi")||string.contains(".AVI")) {
             return ".avi";
-        } else if(string.contains(".flv")||string.contains(".FLV")){
+        } else if(string.contains(".flv")||string.contains(".FLV")) {
             return ".flv";
-        } else if(string.contains(".mov")||string.contains(".MOV")){
+        } else if(string.contains(".mov")||string.contains(".MOV")) {
             return ".mov";
-        } else if(string.contains(".vob")||string.contains(".VOB")){
+        } else if(string.contains(".vob")||string.contains(".VOB")) {
             return ".vob";
-        } else if(string.contains(".mpeg")||string.contains(".MPEG")){
+        } else if(string.contains(".mpeg")||string.contains(".MPEG")) {
             return ".mpeg";
-        } else if(string.contains(".3gp")||string.contains(".3GP")){
+        } else if(string.contains(".3gp")||string.contains(".3GP")) {
             return ".3gp";
-        } else if(string.contains(".mpg")||string.contains(".MPG")){
+        } else if(string.contains(".mpg")||string.contains(".MPG")) {
             return ".mpg";
-        } else if(string.contains(".wmv")||string.contains(".WMV")){
+        } else if(string.contains(".wmv")||string.contains(".WMV")) {
             return ".wmv";
-        } else if(string.contains(".octet-stream")){
+        } else if(string.contains(".octet-stream")) {
             return ".rar";
-        } else if(string.contains(".vnd.openxmlformats-officedocument.wo")){
+        } else if(string.contains(".vnd.openxmlformats-officedocument.wo")) {
             return ".doc";
-        } else if(string.contains(".plain")){
+        } else if(string.contains(".plain")) {
             return ".txt";
-        } else if(string.contains(".vnd.openxmlformats-officedocument.sp")){
+        } else if(string.contains(".vnd.openxmlformats-officedocument.sp")) {
             return ".xls";
-        } else if(string.contains(".x-zip-compressed")){
+        } else if(string.contains(".x-zip-compressed")) {
             return ".zip";
-        } else if(string.contains(".vnd.openxmlformats-officedocument.presentationml.p")){
+        } else if(string.contains(".vnd.openxmlformats-officedocument.presentationml.p")) {
             return ".ppt";
-        } else if(string.contains(".pdf")||string.contains(".PDF")){
+        } else if(string.contains(".pdf")||string.contains(".PDF")) {
             return ".pdf";
         } else {
             return "UnknownFileType";
         }
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        unregisterReceiver(onComplete);
     }
 }

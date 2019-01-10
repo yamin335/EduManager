@@ -85,11 +85,13 @@ public class ClientList extends SideNavigationMenuParentActivity implements Clie
                 .create(RetrofitNetworkService.class)
                 .getClientList(LoggedUserID)
                 .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread());
+                .observeOn(AndroidSchedulers.mainThread())
+                .unsubscribeOn(Schedulers.io());
 
         detailListObservable
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
+                .unsubscribeOn(Schedulers.io())
                 .subscribe(new Observer<String>() {
 
                     @Override

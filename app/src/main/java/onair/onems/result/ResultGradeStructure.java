@@ -38,19 +38,28 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.observers.DisposableObserver;
+import io.reactivex.schedulers.Schedulers;
 import onair.onems.R;
+import onair.onems.Services.RetrofitNetworkService;
 import onair.onems.Services.StaticHelperClass;
 import onair.onems.customised.MyDividerItemDecoration;
 import onair.onems.mainactivities.SideNavigationMenuParentActivity;
 import onair.onems.mainactivities.StudentMainScreen;
 import onair.onems.mainactivities.TeacherMainScreen;
 import onair.onems.network.MySingleton;
+import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
+import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 public class ResultGradeStructure extends SideNavigationMenuParentActivity
         implements MediumAdapter.MediumAdapterListener, ClassAdapter.ClassAdapterListener {
 
     private RecyclerView recyclerView;
-    private ProgressDialog mResultDialog, mMediumDialog, mClassDialog;
     private String MediumID = "";
     private FloatingActionButton floatingMenu, menuItemMedium, menuItemClass;
     private ConstraintLayout constraintLayout;
@@ -59,6 +68,14 @@ public class ResultGradeStructure extends SideNavigationMenuParentActivity
     private Boolean isFabOpen = false;
     private ResultStructureAdapter mAdapter;
     private List<JSONObject> ResultGradeSheet;
+    private CompositeDisposable finalDisposer = new CompositeDisposable();
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (!finalDisposer.isDisposed())
+            finalDisposer.dispose();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -198,40 +215,42 @@ public class ResultGradeStructure extends SideNavigationMenuParentActivity
 
     private void ResultGradeDataGetRequest(String MediumID, String ClassID){
         if (StaticHelperClass.isNetworkAvailable(this)) {
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(getString(R.string.baseUrl))
+                    .addConverterFactory(ScalarsConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .build();
 
-            String resultGradeDataGetUrl = getString(R.string.baseUrl)+"/api/onEms/getinsGradeForReport/"+InstituteID+"/"+MediumID+"/"+ClassID;
+            Observable<String> observable = retrofit
+                    .create(RetrofitNetworkService.class)
+                    .getinsGradeForReport(InstituteID, MediumID, ClassID)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io());
 
-            mResultDialog = new ProgressDialog(this);
-            mResultDialog.setTitle("Loading Grade Sheet...");
-            mResultDialog.setMessage("Please Wait...");
-            mResultDialog.setCancelable(false);
-            mResultDialog.setIcon(R.drawable.onair);
-            mResultDialog.show();
+            finalDisposer.add( observable
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io())
+                    .subscribeWith(new DisposableObserver<String>() {
 
-            //Preparing Shift data from server
-            StringRequest stringResultRequest = new StringRequest(Request.Method.GET, resultGradeDataGetUrl,
-                    new Response.Listener<String>() {
                         @Override
-                        public void onResponse(String response) {
+                        public void onNext(String response) {
                             prepareResultGradeSheet(response);
                         }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    mResultDialog.dismiss();
-                    Toast.makeText(ResultGradeStructure.this,"Grade sheet not found!!! ",
-                            Toast.LENGTH_LONG).show();
-                }
-            })
-            {
-                @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
-                    Map<String, String>  params = new HashMap<>();
-                    params.put("Authorization", "Request_From_onEMS_Android_app");
-                    return params;
-                }
-            };
-            MySingleton.getInstance(this).addToRequestQueue(stringResultRequest);
+
+                        @Override
+                        public void onError(Throwable e) {
+                            Toast.makeText(ResultGradeStructure.this,"Grade sheet not found!!! ",
+                                    Toast.LENGTH_LONG).show();
+                        }
+
+                        @Override
+                        public void onComplete() {
+
+                        }
+                    }));
         } else {
             Toast.makeText(ResultGradeStructure.this,"Please check your internet connection and select again!!! ",
                     Toast.LENGTH_LONG).show();
@@ -249,45 +268,45 @@ public class ResultGradeStructure extends SideNavigationMenuParentActivity
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        mResultDialog.dismiss();
     }
 
     private void MediumDataGetRequest() {
         if(StaticHelperClass.isNetworkAvailable(this)) {
-            String mediumUrl = getString(R.string.baseUrl)+"/api/onEms/getInstituteMediumDdl/"+InstituteID;
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(getString(R.string.baseUrl))
+                    .addConverterFactory(ScalarsConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .build();
 
-            mMediumDialog = new ProgressDialog(this);
-            mMediumDialog.setTitle("Loading medium...");
-            mMediumDialog.setMessage("Please Wait...");
-            mMediumDialog.setCancelable(true);
-            mMediumDialog.setIcon(R.drawable.onair);
-            mMediumDialog.show();
-            //Preparing Medium data from server
-            StringRequest stringMediumRequest = new StringRequest(Request.Method.GET, mediumUrl,
-                    new Response.Listener<String>() {
+            Observable<String> observable = retrofit
+                    .create(RetrofitNetworkService.class)
+                    .getInstituteMediumDdl(InstituteID)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io());
+
+            finalDisposer.add( observable
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io())
+                    .subscribeWith(new DisposableObserver<String>() {
+
                         @Override
-                        public void onResponse(String response) {
-
+                        public void onNext(String response) {
                             parseMediumJsonData(response);
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
 
                         }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    mMediumDialog.dismiss();
-                    Toast.makeText(ResultGradeStructure.this,"Medium not found!!! ",
-                            Toast.LENGTH_LONG).show();
-                }
-            })
-            {
-                @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
-                    Map<String, String>  params = new HashMap<>();
-                    params.put("Authorization", "Request_From_onEMS_Android_app");
-                    return params;
-                }
-            };
-            MySingleton.getInstance(this).addToRequestQueue(stringMediumRequest);
+
+                        @Override
+                        public void onComplete() {
+
+                        }
+                    }));
         } else {
             Toast.makeText(ResultGradeStructure.this,"Please check your internet connection and select again!!! ",
                     Toast.LENGTH_LONG).show();
@@ -304,46 +323,47 @@ public class ResultGradeStructure extends SideNavigationMenuParentActivity
             Toast.makeText(this,"Medium not found!!! ",
                     Toast.LENGTH_LONG).show();
         }
-        mMediumDialog.dismiss();
     }
 
     private void ClassDataGetRequest(String MediumID) {
         if(StaticHelperClass.isNetworkAvailable(this)) {
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(getString(R.string.baseUrl))
+                    .addConverterFactory(ScalarsConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .build();
 
-            String classUrl = getString(R.string.baseUrl)+"/api/onEms/MediumWiseClassDDL/"+InstituteID+"/"+MediumID;
+            Observable<String> observable = retrofit
+                    .create(RetrofitNetworkService.class)
+                    .MediumWiseClassDDL(InstituteID, MediumID.equalsIgnoreCase("null")||
+                            MediumID.equalsIgnoreCase("")||MediumID==null?0:Long.parseLong(MediumID))
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io());
 
-            mClassDialog = new ProgressDialog(this);
-            mClassDialog.setTitle("Loading class...");
-            mClassDialog.setMessage("Please Wait...");
-            mClassDialog.setCancelable(true);
-            mClassDialog.setIcon(R.drawable.onair);
-            mClassDialog.show();
-            //Preparing claas data from server
-            StringRequest stringClassRequest = new StringRequest(Request.Method.GET, classUrl,
-                    new Response.Listener<String>() {
+            finalDisposer.add( observable
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io())
+                    .subscribeWith(new DisposableObserver<String>() {
+
                         @Override
-                        public void onResponse(String response) {
-
+                        public void onNext(String response) {
                             parseClassJsonData(response);
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+                            Toast.makeText(ResultGradeStructure.this,"Class not found!!! ",
+                                    Toast.LENGTH_LONG).show();
+                        }
+
+                        @Override
+                        public void onComplete() {
 
                         }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    mClassDialog.dismiss();
-                    Toast.makeText(ResultGradeStructure.this,"Class not found!!! ",
-                            Toast.LENGTH_LONG).show();
-                }
-            })
-            {
-                @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
-                    Map<String, String>  params = new HashMap<>();
-                    params.put("Authorization", "Request_From_onEMS_Android_app");
-                    return params;
-                }
-            };
-            MySingleton.getInstance(this).addToRequestQueue(stringClassRequest);
+                    }));
         } else {
             Toast.makeText(ResultGradeStructure.this,"Please check your internet connection and select again!!! ",
                     Toast.LENGTH_LONG).show();
@@ -360,7 +380,6 @@ public class ResultGradeStructure extends SideNavigationMenuParentActivity
             Toast.makeText(this,"Class not found!!! ",
                     Toast.LENGTH_LONG).show();
         }
-        mClassDialog.dismiss();
     }
 
     @Override

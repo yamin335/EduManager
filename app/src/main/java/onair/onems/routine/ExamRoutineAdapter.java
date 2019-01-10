@@ -1,6 +1,7 @@
 package onair.onems.routine;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,8 +30,9 @@ public class ExamRoutineAdapter extends RecyclerView.Adapter<ExamRoutineAdapter.
         this.routine = routine;
     }
 
+    @NonNull
     @Override
-    public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.exam_routine_row_item, parent, false);
 
@@ -38,7 +40,7 @@ public class ExamRoutineAdapter extends RecyclerView.Adapter<ExamRoutineAdapter.
     }
 
     @Override
-    public void onBindViewHolder(final MyViewHolder holder, final int position) {
+    public void onBindViewHolder(@NonNull final MyViewHolder holder, final int position) {
 
         try {
             holder.date.setText(routine.getJSONObject(position).getString("ExamDate")+", "+routine.getJSONObject(position).getString("NameDay"));

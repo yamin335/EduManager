@@ -131,11 +131,13 @@ public class ClientCommunicationDetailList extends SideNavigationMenuParentActiv
                 .create(RetrofitNetworkService.class)
                 .getDetailList(NewClientID)
                 .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread());
+                .observeOn(AndroidSchedulers.mainThread())
+                .unsubscribeOn(Schedulers.io());
 
         finalDisposer.add( detailListObservable
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
+                .unsubscribeOn(Schedulers.io())
                 .subscribeWith(new DisposableObserver<String>() {
 
                     @Override
@@ -205,11 +207,13 @@ public class ClientCommunicationDetailList extends SideNavigationMenuParentActiv
                     .create(RetrofitNetworkService.class)
                     .getWorkOrder(NewClientID)
                     .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread());
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io());
 
             finalDisposer.add(paymentTypeObservable
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io())
                     .subscribeWith(new DisposableObserver<String>() {
 
                         @Override

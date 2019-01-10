@@ -160,11 +160,13 @@ public class StudentAttendanceShow extends CommonToolbarParentActivity {
                     .create(RetrofitNetworkService.class)
                     .getHrmSubWiseAtdDetail(instituteID, mediumID, shiftID, classID, sectionID, departmentID)
                     .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread());
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io());
 
             observable
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io())
                     .subscribe(new Observer<String>() {
 
                         @Override

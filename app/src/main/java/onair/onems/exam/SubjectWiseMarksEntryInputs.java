@@ -170,6 +170,7 @@ public class SubjectWiseMarksEntryInputs extends CommonToolbarParentActivity {
 
             }
         };
+
         TextWatcher writtenTextWatcher = new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -192,6 +193,7 @@ public class SubjectWiseMarksEntryInputs extends CommonToolbarParentActivity {
 
             }
         };
+
         TextWatcher practicalTextWatcher = new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -214,6 +216,7 @@ public class SubjectWiseMarksEntryInputs extends CommonToolbarParentActivity {
 
             }
         };
+
         TextWatcher attendanceTextWatcher = new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {

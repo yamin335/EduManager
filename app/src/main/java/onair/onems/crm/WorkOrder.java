@@ -484,11 +484,13 @@ public class WorkOrder extends CommonToolbarParentActivity implements FileAdapte
                     .create(RetrofitNetworkService.class)
                     .uploadMultipleFilesDynamic(documentParts)
                     .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread());
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io());
 
             finalDisposer.add( documentObservable
                     .observeOn(Schedulers.io())
                     .subscribeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io())
                     .subscribeWith(new DisposableObserver<String>() {
 
                         @Override
@@ -536,11 +538,13 @@ public class WorkOrder extends CommonToolbarParentActivity implements FileAdapte
                     .create(RetrofitNetworkService.class)
                     .postWorkOrder(newWorkOrder)
                     .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread());
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io());
 
             finalDisposer.add(orderPostObservable
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io())
                     .subscribeWith(new DisposableObserver<String>() {
 
                         @Override
@@ -581,11 +585,13 @@ public class WorkOrder extends CommonToolbarParentActivity implements FileAdapte
                     .create(RetrofitNetworkService.class)
                     .getPaymentMethod()
                     .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread());
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io());
 
             finalDisposer.add(paymentTypeObservable
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io())
                     .subscribeWith(new DisposableObserver<String>() {
 
                         @Override

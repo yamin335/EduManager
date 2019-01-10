@@ -23,6 +23,7 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.system.ErrnoException;
@@ -47,6 +48,10 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonIOException;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
 import com.theartofdev.edmodo.cropper.CropImageView;
@@ -63,12 +68,28 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.observers.DisposableObserver;
+import io.reactivex.schedulers.Schedulers;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 import onair.onems.R;
 import onair.onems.Services.GlideApp;
+import onair.onems.Services.RetrofitNetworkService;
 import onair.onems.customised.CustomRequest;
 import onair.onems.mainactivities.CommonToolbarParentActivity;
 import onair.onems.models.StudentInformationEntry;
 import onair.onems.network.MySingleton;
+import onair.onems.utils.FileUtils;
+import onair.onems.utils.ImageUtils;
+import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
+import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 public class StudentiCardDetails extends CommonToolbarParentActivity {
 
@@ -79,11 +100,9 @@ public class StudentiCardDetails extends CommonToolbarParentActivity {
     private CropImageView mCropImageView;
     private CheckBox checkBox;
     private Uri mCropImageUri;
-    private ProgressDialog mStudentDataPostDialog, mRotateDialog, mBrightnessDialog, mStudentDataGetDialog;
-
     private StudentInformationEntry studentInformationEntry;
 
-    private JSONObject jsonObjectStudentData;
+    private JsonObject jsonObjectStudentData;
 
     private File file;
 
@@ -104,6 +123,14 @@ public class StudentiCardDetails extends CommonToolbarParentActivity {
     private ProgressBar progressBar;
     private Button rotateLeft, rotateRight;
     private SeekBar brightImageSeekBar;
+    private CompositeDisposable finalDisposer = new CompositeDisposable();
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (!finalDisposer.isDisposed())
+            finalDisposer.dispose();
+    }
 
     @Override
     public void onResume() {
@@ -215,12 +242,7 @@ public class StudentiCardDetails extends CommonToolbarParentActivity {
         rotateLeft.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mRotateDialog = new ProgressDialog(StudentiCardDetails.this);
-                mRotateDialog.setTitle("Loading...");
-                mRotateDialog.setMessage("Please Wait...");
-                mRotateDialog.setCancelable(false);
-                mRotateDialog.setIcon(R.drawable.onair);
-                mRotateDialog.show();
+                progressBar.setVisibility(View.VISIBLE);
                 imageChanged = true;
                 mRotateProcessTask = new RotateProcessTask(originalBitmap, -90);
                 mRotateProcessTask.execute((Void) null);
@@ -230,12 +252,7 @@ public class StudentiCardDetails extends CommonToolbarParentActivity {
         rotateRight.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mRotateDialog = new ProgressDialog(StudentiCardDetails.this);
-                mRotateDialog.setTitle("Loading...");
-                mRotateDialog.setMessage("Please Wait...");
-                mRotateDialog.setCancelable(false);
-                mRotateDialog.setIcon(R.drawable.onair);
-                mRotateDialog.show();
+                progressBar.setVisibility(View.VISIBLE);
                 imageChanged = true;
                 mRotateProcessTask = new RotateProcessTask(originalBitmap, 90);
                 mRotateProcessTask.execute((Void) null);
@@ -255,12 +272,7 @@ public class StudentiCardDetails extends CommonToolbarParentActivity {
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                mBrightnessDialog = new ProgressDialog(StudentiCardDetails.this);
-                mBrightnessDialog.setTitle("Loading...");
-                mBrightnessDialog.setMessage("Please Wait...");
-                mBrightnessDialog.setCancelable(false);
-                mBrightnessDialog.setIcon(R.drawable.onair);
-                mBrightnessDialog.show();
+                progressBar.setVisibility(View.VISIBLE);
                 imageChanged = true;
                 mBrightnessProcessTask = new BrightnessProcessTask(originalBitmap, brightnessValue);
                 mBrightnessProcessTask.execute((Void) null);
@@ -272,12 +284,7 @@ public class StudentiCardDetails extends CommonToolbarParentActivity {
             public void onClick(View view) {
                 if(isNetworkAvailable()) {
                     if(imageChanged) {
-                        mStudentDataPostDialog = new ProgressDialog(StudentiCardDetails.this);
-                        mStudentDataPostDialog.setTitle("Loading...");
-                        mStudentDataPostDialog.setMessage("Please Wait...");
-                        mStudentDataPostDialog.setCancelable(false);
-                        mStudentDataPostDialog.setIcon(R.drawable.onair);
-                        mStudentDataPostDialog.show();
+                        progressBar.setVisibility(View.VISIBLE);
                         if(checkBox.isChecked()) {
                             tempBitmap = mCropImageView.getCroppedImage(500, 500);
                             mCropImageView.setImageBitmap(tempBitmap);
@@ -297,13 +304,24 @@ public class StudentiCardDetails extends CommonToolbarParentActivity {
         });
     }
 
-    public class FileFromBitmap extends AsyncTask<Void, Integer, String> {
+    @NonNull
+    private MultipartBody.Part prepareFilePart(File file) {
+        // create RequestBody instance from file
+        RequestBody requestFile =
+                RequestBody.create(
+                        MediaType.parse("image/jpeg"),
+                        file
+                );
+        // MultipartBody.Part is used to send also the actual file name
+        return MultipartBody.Part.createFormData("iCardPhoto", file.getName(), requestFile);
+    }
+
+    class FileFromBitmap extends AsyncTask<Void, Integer, String> {
 
         Context context;
         Bitmap bitmap;
-//        String path_external = Environment.getExternalStorageDirectory() + File.separator + "temporary_file.jpg";
 
-        public FileFromBitmap(Bitmap bitmap, Context context) {
+        FileFromBitmap(Bitmap bitmap, Context context) {
             this.bitmap = bitmap;
             this.context= context;
         }
@@ -318,18 +336,10 @@ public class StudentiCardDetails extends CommonToolbarParentActivity {
 
         @Override
         protected String doInBackground(Void... params) {
-//            bitmap = getResizedBitmap(bitmap, 500);
-            ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
-//            file = new File(Environment.getExternalStorageDirectory() + File.separator + "temporary_file.jpg");
-            file  = new File(context.getCacheDir(), "temporary_file.jpg");
             try {
-                FileOutputStream fo = new FileOutputStream(file);
-                fo.write(bytes.toByteArray());
-                fo.flush();
-                fo.close();
+                file = ImageUtils.getFileFromBitmap(bitmap, context);
             } catch (IOException e) {
-                mStudentDataPostDialog.dismiss();
+                progressBar.setVisibility(View.INVISIBLE);
                 e.printStackTrace();
             }
             return null;
@@ -341,19 +351,30 @@ public class StudentiCardDetails extends CommonToolbarParentActivity {
             // back to main thread after finishing doInBackground
             // update your UI or take action after
             // exp; make progressbar gone
-            Ion.with(getApplicationContext())
-                    .load(getString(R.string.baseUrl)+"/api/onEms/Mobile/uploads")
-                    .progressDialog(mStudentDataPostDialog)
-                    .setMultipartParameter("name", "source")
-                    .setMultipartFile("file", "image/jpeg", file)
-                    .asString()
-                    .setCallback(new FutureCallback<String>() {
+
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(getString(R.string.baseUrl))
+                    .addConverterFactory(ScalarsConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .build();
+
+            Observable<String> photoObservable = retrofit
+                    .create(RetrofitNetworkService.class)
+                    .uploadSingleImage(prepareFilePart(file))
+                    .subscribeOn(Schedulers.newThread())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io());
+
+            finalDisposer.add(photoObservable
+                    .observeOn(Schedulers.io())
+                    .subscribeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io())
+                    .subscribeWith(new DisposableObserver<String>() {
                         @Override
-                        public void onCompleted(Exception e, String result) {
-                            //do stuff with result
+                        public void onNext(String response) {
                             try {
-                                JSONObject jsonObject = new JSONObject(result);
-//                                Toast.makeText(StudentiCardDetails.this,jsonObject.getString("path"), Toast.LENGTH_LONG).show();
+                                JSONObject jsonObject = new JSONObject(response);
                                 studentInformationEntry.setImageUrl(jsonObject.getString("path"));
                                 studentInformationEntry.setIsImageCaptured(true);
                                 Gson gson = new Gson();
@@ -361,53 +382,102 @@ public class StudentiCardDetails extends CommonToolbarParentActivity {
                                 postUsingVolley(json);
                                 Log.d( "ImageUrl", jsonObject.getString("path"));
                             } catch (JSONException e1) {
-                                mStudentDataPostDialog.dismiss();
+                                progressBar.setVisibility(View.INVISIBLE);
                                 e1.printStackTrace();
                             }
                         }
-                    });
 
+                        @Override
+                        public void onError(Throwable e) {
+                            Log.e("RXANDROID", "onError: " + e.getMessage());
+                        }
+
+                        @Override
+                        public void onComplete() {
+                            Log.e("COMPLETE", "Complete: ");
+                        }
+                    }));
+
+//            Ion.with(getApplicationContext())
+//                    .load(getString(R.string.baseUrl)+"/api/onEms/Mobile/uploads")
+//                    .progressBar(progressBar)
+//                    .setMultipartParameter("name", "source")
+//                    .setMultipartFile("file", "image/jpeg", file)
+//                    .asString()
+//                    .setCallback(new FutureCallback<String>() {
+//                        @Override
+//                        public void onCompleted(Exception e, String result) {
+//                            //do stuff with result
+//                            try {
+//                                JSONObject jsonObject = new JSONObject(result);
+////                                Toast.makeText(StudentiCardDetails.this,jsonObject.getString("path"), Toast.LENGTH_LONG).show();
+//                                studentInformationEntry.setImageUrl(jsonObject.getString("path"));
+//                                studentInformationEntry.setIsImageCaptured(true);
+//                                Gson gson = new Gson();
+//                                String json = gson.toJson(studentInformationEntry);
+//                                postUsingVolley(json);
+//                                Log.d( "ImageUrl", jsonObject.getString("path"));
+//                            } catch (JSONException e1) {
+//                                progressBar.setVisibility(View.INVISIBLE);
+//                                e1.printStackTrace();
+//                            }
+//                        }
+//                    });
         }
     }
 
     public void postUsingVolley(String json) {
-        String studentDataPostUrl = getString(R.string.baseUrl)+"/api/onEms/setStudentBasicInfo";
-        try {
-            jsonObjectStudentData = new JSONObject(json);
-        } catch (JSONException e) {
-            mStudentDataPostDialog.dismiss();
-            e.printStackTrace();
-        }
-        CustomRequest customRequest = new CustomRequest (Request.Method.POST, studentDataPostUrl, jsonObjectStudentData,
-                new Response.Listener<JSONArray>() {
-                    @Override
-                    public void onResponse(JSONArray response) {
-                        mStudentDataPostDialog.dismiss();
-                        try {
+        if(isNetworkAvailable()) {
+            progressBar.setVisibility(View.VISIBLE);
+            try {
+                JsonParser parser = new JsonParser();
+                jsonObjectStudentData = parser.parse(json).getAsJsonObject();
+            } catch (JsonIOException e) {
+                progressBar.setVisibility(View.INVISIBLE);
+                e.printStackTrace();
+            }
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(getString(R.string.baseUrl))
+                    .addConverterFactory(ScalarsConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .build();
+
+            Observable<String> observable = retrofit
+                    .create(RetrofitNetworkService.class)
+                    .setStudentBasicInfo(jsonObjectStudentData)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io());
+
+            finalDisposer.add( observable
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io())
+                    .subscribeWith(new DisposableObserver<String>() {
+
+                        @Override
+                        public void onNext(String response) {
+                            progressBar.setVisibility(View.INVISIBLE);
                             Toast.makeText(StudentiCardDetails.this,"Successfully Updated",Toast.LENGTH_LONG).show();
                             StudentiCardDetails.super.onBackPressed();
                         }
-                        catch (Exception e)
-                        {
-                            mStudentDataPostDialog.dismiss();
+
+                        @Override
+                        public void onError(Throwable e) {
+                            progressBar.setVisibility(View.INVISIBLE);
+                            Toast.makeText(StudentiCardDetails.this,"Error Occurred",Toast.LENGTH_LONG).show();
                         }
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                mStudentDataPostDialog.dismiss();
-                Toast.makeText(StudentiCardDetails.this,"Not Successfully Updated"+error.toString(),Toast.LENGTH_LONG).show();
-            }
-        })
-        {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String>  params = new HashMap<>();
-                params.put("Authorization", "Request_From_onEMS_Android_app");
-                return params;
-            }
-        };
-        MySingleton.getInstance(this).addToRequestQueue(customRequest);
+
+                        @Override
+                        public void onComplete() {
+
+                        }
+                    }));
+        } else {
+            Toast.makeText(StudentiCardDetails.this,"Please check your internet connection!!! ",
+                    Toast.LENGTH_LONG).show();
+        }
     }
 
     void parseStudentJsonData(String jsonString) {
@@ -415,7 +485,7 @@ public class StudentiCardDetails extends CommonToolbarParentActivity {
             JSONArray studentJsonArray = new JSONArray(jsonString);
             JSONObject studentJsonObject = studentJsonArray.getJSONObject(0);
             if(studentJsonObject.getString("ImageUrl").equals("null")){
-                progressBar.setVisibility(View.GONE);
+                progressBar.setVisibility(View.INVISIBLE);
                 Toast.makeText(StudentiCardDetails.this,"No image found!!!",Toast.LENGTH_LONG).show();
             }
             GlideApp.with(this)
@@ -429,7 +499,7 @@ public class StudentiCardDetails extends CommonToolbarParentActivity {
                             mCropImageView.setImageBitmap(resource);
                             originalBitmap = resource;
                             tempBitmap = resource;
-                            progressBar.setVisibility(View.GONE);
+                            progressBar.setVisibility(View.INVISIBLE);
                             if(resource != null) {
                                 checkBox.setEnabled(true);
                                 rotateLeft.setEnabled(true);
@@ -440,7 +510,7 @@ public class StudentiCardDetails extends CommonToolbarParentActivity {
                         @Override
                         public void onLoadFailed(Drawable errorDrawable) {
                             super.onLoadFailed(errorDrawable);
-                            progressBar.setVisibility(View.GONE);
+                            progressBar.setVisibility(View.INVISIBLE);
                             Toast.makeText(StudentiCardDetails.this,"No image found!!!",Toast.LENGTH_LONG).show();
                         }
                     });
@@ -545,10 +615,10 @@ public class StudentiCardDetails extends CommonToolbarParentActivity {
             t_remarks.setText(studentJsonObject.getString("Remarks"));
             t_studentNo.setText(studentJsonObject.getString("StudentNo"));
             t_rfid.setText(studentJsonObject.getString("RFID"));
-            mStudentDataGetDialog.dismiss();
+            progressBar.setVisibility(View.INVISIBLE);
 
         } catch (JSONException e) {
-            mStudentDataGetDialog.dismiss();
+            progressBar.setVisibility(View.INVISIBLE);
             Toast.makeText(this,"WARNING!!! "+e,Toast.LENGTH_LONG).show();
         }
     }
@@ -563,7 +633,7 @@ public class StudentiCardDetails extends CommonToolbarParentActivity {
             boolean requirePermissions = false;
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
                     checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED &&
-                    isUriRequiresPermissions(imageUri)) {
+                    ImageUtils.isUriRequiresPermissions(imageUri, this)) {
 
                 // request permissions and handle the result in onRequestPermissionsResult()
                 requirePermissions = true;
@@ -735,20 +805,20 @@ public class StudentiCardDetails extends CommonToolbarParentActivity {
      * Test if we can open the given Android URI to test if permission required error is thrown.<br>
      */
 
-    public boolean isUriRequiresPermissions(Uri uri) {
-        try {
-            ContentResolver resolver = getContentResolver();
-            InputStream stream = resolver.openInputStream(uri);
-            stream.close();
-            return false;
-        } catch (FileNotFoundException e) {
-            if (e.getCause() instanceof ErrnoException) {
-                return true;
-            }
-        } catch (Exception e) {
-        }
-        return false;
-    }
+//    public boolean isUriRequiresPermissions(Uri uri) {
+//        try {
+//            ContentResolver resolver = getContentResolver();
+//            InputStream stream = resolver.openInputStream(uri);
+//            stream.close();
+//            return false;
+//        } catch (FileNotFoundException e) {
+//            if (e.getCause() instanceof ErrnoException) {
+//                return true;
+//            }
+//        } catch (Exception e) {
+//        }
+//        return false;
+//    }
 
     private boolean isNetworkAvailable() {
         ConnectivityManager connectivityManager = (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -837,7 +907,7 @@ public class StudentiCardDetails extends CommonToolbarParentActivity {
                 Thread.sleep(100);
                 return true;
             } catch (InterruptedException e) {
-                mBrightnessDialog.dismiss();
+                progressBar.setVisibility(View.INVISIBLE);
                 return false;
             }
         }
@@ -845,7 +915,7 @@ public class StudentiCardDetails extends CommonToolbarParentActivity {
         @Override
         protected void onPostExecute(final Boolean success) {
             mBrightnessProcessTask = null;
-            mBrightnessDialog.dismiss();
+            progressBar.setVisibility(View.INVISIBLE);
             if (success) {
                 mCropImageView.setImageBitmap(tempBitmap);
             }
@@ -858,7 +928,7 @@ public class StudentiCardDetails extends CommonToolbarParentActivity {
         @Override
         protected void onCancelled() {
             mBrightnessProcessTask = null;
-            mBrightnessDialog.dismiss();
+            progressBar.setVisibility(View.INVISIBLE);
         }
     }
 
@@ -886,7 +956,7 @@ public class StudentiCardDetails extends CommonToolbarParentActivity {
         @Override
         protected void onPostExecute(final Boolean success) {
             mRotateProcessTask = null;
-            mRotateDialog.dismiss();
+            progressBar.setVisibility(View.INVISIBLE);
             if (success) {
                 mCropImageView.setImageBitmap(tempBitmap);
             }
@@ -899,47 +969,50 @@ public class StudentiCardDetails extends CommonToolbarParentActivity {
         @Override
         protected void onCancelled() {
             mRotateProcessTask = null;
-            mRotateDialog.dismiss();
+            progressBar.setVisibility(View.INVISIBLE);
         }
     }
 
     public void StudentDataGetRequest(){
         if(isNetworkAvailable()) {
+            progressBar.setVisibility(View.VISIBLE);
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(getString(R.string.baseUrl))
+                    .addConverterFactory(ScalarsConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .build();
 
-            String studentDataGetUrl = getString(R.string.baseUrl)+"/api/onEms/getStudent/"+InstituteID+"/"+
-                    selectedClass+"/"+selectedSection+"/"+
-                    selectedDepartment+"/"+selectedMedium+"/"+selectedShift+"/"+UserID;
+            Observable<String> observable = retrofit
+                    .create(RetrofitNetworkService.class)
+                    .getStudent(InstituteID, selectedClass, selectedSection,
+                            selectedDepartment, selectedMedium,
+                            selectedShift, UserID)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io());
 
-            mStudentDataGetDialog = new ProgressDialog(this);
-            mStudentDataGetDialog.setTitle("Loading...");
-            mStudentDataGetDialog.setMessage("Please Wait...");
-            mStudentDataGetDialog.setCancelable(false);
-            mStudentDataGetDialog.setIcon(R.drawable.onair);
-            mStudentDataGetDialog.show();
-            //Preparing Student data from server
-            StringRequest stringStudentRequest = new StringRequest(Request.Method.GET, studentDataGetUrl,
-                    new Response.Listener<String>() {
+            finalDisposer.add( observable
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io())
+                    .subscribeWith(new DisposableObserver<String>() {
+
                         @Override
-                        public void onResponse(String response) {
-
+                        public void onNext(String response) {
                             parseStudentJsonData(response);
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+                            progressBar.setVisibility(View.INVISIBLE);
+                        }
+
+                        @Override
+                        public void onComplete() {
 
                         }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    mStudentDataGetDialog.dismiss();
-                }
-            })
-            {
-                @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
-                    Map<String, String>  params = new HashMap<>();
-                    params.put("Authorization", "Request_From_onEMS_Android_app");
-                    return params;
-                }
-            };
-            MySingleton.getInstance(this).addToRequestQueue(stringStudentRequest);
+                    }));
         } else {
             Toast.makeText(StudentiCardDetails.this,"Please check your internet connection!!! ",
                     Toast.LENGTH_LONG).show();

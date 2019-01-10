@@ -33,19 +33,37 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import io.reactivex.Observable;
+import io.reactivex.Observer;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 import onair.onems.R;
+import onair.onems.Services.RetrofitNetworkService;
 import onair.onems.Services.StaticHelperClass;
 import onair.onems.mainactivities.SideNavigationMenuParentActivity;
 import onair.onems.mainactivities.StudentMainScreen;
 import onair.onems.mainactivities.TeacherMainScreen;
 import onair.onems.network.MySingleton;
+import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
+import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 public class NoticeMainScreen extends SideNavigationMenuParentActivity implements NoticeAdapter.NoticeAdapterListener{
 
     private RecyclerView recyclerView;
     private ArrayList<JSONObject> noticeList;
     private NoticeAdapter mAdapter;
-    private ProgressDialog mNoticeDialog;
+    private Disposable finalDisposer;
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (!finalDisposer.isDisposed())
+            finalDisposer.dispose();
+    }
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -93,10 +111,6 @@ public class NoticeMainScreen extends SideNavigationMenuParentActivity implement
 
     @Override
     public void onNoticeSelected(JSONObject notice) {
-//        CustomNoticeDialog customNoticeDialog = new CustomNoticeDialog(this, notice);
-//        customNoticeDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-//        customNoticeDialog.setCancelable(false);
-//        customNoticeDialog.show();
         Intent intent = new Intent(NoticeMainScreen.this, NoticeDetails.class);
         intent.putExtra("notice", notice.toString());
         startActivity(intent);
@@ -104,38 +118,45 @@ public class NoticeMainScreen extends SideNavigationMenuParentActivity implement
 
     private void NoticeDataGetRequest() {
         if (StaticHelperClass.isNetworkAvailable(this)) {
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(getString(R.string.baseUrl))
+                    .addConverterFactory(ScalarsConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .build();
 
-            String noticeDataGetUrl = getString(R.string.baseUrl)+"/api/onEms/spGetDashNotice/"
-                    +UserTypeID+"/"+InstituteID;
+            Observable<String> observable = retrofit
+                    .create(RetrofitNetworkService.class)
+                    .spGetDashNotice(UserTypeID, InstituteID)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io());
 
-            mNoticeDialog = new ProgressDialog(this);
-            mNoticeDialog.setTitle("Loading session...");
-            mNoticeDialog.setMessage("Please Wait...");
-            mNoticeDialog.setCancelable(false);
-            mNoticeDialog.setIcon(R.drawable.onair);
+            observable.subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io())
+                    .subscribe(new Observer<String>() {
 
-            //Preparing Shift data from server
-            StringRequest stringNoticeRequest = new StringRequest(Request.Method.GET, noticeDataGetUrl,
-                    new Response.Listener<String>() {
                         @Override
-                        public void onResponse(String response) {
+                        public void onSubscribe(Disposable d) {
+                            finalDisposer = d;
+                        }
+
+                        @Override
+                        public void onNext(String response) {
                             prepareNoticeList(response);
                         }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    mNoticeDialog.dismiss();
-                }
-            })
-            {
-                @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
-                    Map<String, String>  params = new HashMap<>();
-                    params.put("Authorization", "Request_From_onEMS_Android_app");
-                    return params;
-                }
-            };
-            MySingleton.getInstance(this).addToRequestQueue(stringNoticeRequest);
+
+                        @Override
+                        public void onComplete() {
+
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+                            Toast.makeText(NoticeMainScreen.this,"No notice found !!!",Toast.LENGTH_LONG).show();
+                        }
+                    });
         } else {
             Toast.makeText(NoticeMainScreen.this,"Please check your internet connection and select again!!! ",
                     Toast.LENGTH_LONG).show();
@@ -157,10 +178,8 @@ public class NoticeMainScreen extends SideNavigationMenuParentActivity implement
             recyclerView.setItemAnimator(new DefaultItemAnimator());
             recyclerView.setAdapter(mAdapter);
             mAdapter.notifyDataSetChanged();
-            mNoticeDialog.dismiss();
         } catch (JSONException e) {
             e.printStackTrace();
-            mNoticeDialog.dismiss();
         }
     }
 }

@@ -1,6 +1,7 @@
 package onair.onems.routine;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -48,8 +49,9 @@ public class RoutineAdapter extends RecyclerView.Adapter<RoutineAdapter.MyViewHo
         }
     }
 
+    @NonNull
     @Override
-    public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.routine_period_row_item, parent, false);
 
@@ -67,7 +69,7 @@ public class RoutineAdapter extends RecyclerView.Adapter<RoutineAdapter.MyViewHo
     }
 
     @Override
-    public void onBindViewHolder(final MyViewHolder holder, final int position) {
+    public void onBindViewHolder(@NonNull final MyViewHolder holder, final int position) {
         holder.periodName.setText(nameArray.get(position));
         try {
             RoutineClassAdapter mAdapter = new RoutineClassAdapter(context, allClassJsonArray.getJSONArray(position).toString(), UserTypeID);
@@ -80,46 +82,43 @@ public class RoutineAdapter extends RecyclerView.Adapter<RoutineAdapter.MyViewHo
             e.printStackTrace();
         }
 
-        holder.periodName.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(holder.recyclerView.isShown()){
-                    Animation slideUp = AnimationUtils.loadAnimation(context, R.anim.slide_up);
-                    slideUp.setAnimationListener(new Animation.AnimationListener() {
-                        @Override
-                        public void onAnimationStart(Animation animation) {
+        holder.periodName.setOnClickListener(v -> {
+            if(holder.recyclerView.isShown()){
+                Animation slideUp = AnimationUtils.loadAnimation(context, R.anim.slide_up);
+                slideUp.setAnimationListener(new Animation.AnimationListener() {
+                    @Override
+                    public void onAnimationStart(Animation animation) {
 
-                        }
-
-                        @Override
-                        public void onAnimationEnd(Animation animation) {
-                            holder.recyclerView.setVisibility(View.GONE);
-                        }
-
-                        @Override
-                        public void onAnimationRepeat(Animation animation) {
-
-                        }
-                    });
-                    if(slideUp != null){
-                        slideUp.reset();
-                        if(holder.recyclerView != null){
-                            holder.recyclerView.clearAnimation();
-                            holder.recyclerView.startAnimation(slideUp);
-                        }
                     }
-                } else {
-                    Animation slideDown = AnimationUtils.loadAnimation(context, R.anim.slide_down);
-                    if(slideDown != null){
-                        slideDown.reset();
-                        if(holder.recyclerView != null){
-                            holder.recyclerView.clearAnimation();
-                            holder.recyclerView.startAnimation(slideDown);
-                        }
+
+                    @Override
+                    public void onAnimationEnd(Animation animation) {
+                        holder.recyclerView.setVisibility(View.GONE);
                     }
-                    holder.recyclerView.setVisibility(View.VISIBLE);
-                    holder.recyclerView.requestFocus();
+
+                    @Override
+                    public void onAnimationRepeat(Animation animation) {
+
+                    }
+                });
+                if(slideUp != null){
+                    slideUp.reset();
+                    if(holder.recyclerView != null){
+                        holder.recyclerView.clearAnimation();
+                        holder.recyclerView.startAnimation(slideUp);
+                    }
                 }
+            } else {
+                Animation slideDown = AnimationUtils.loadAnimation(context, R.anim.slide_down);
+                if(slideDown != null){
+                    slideDown.reset();
+                    if(holder.recyclerView != null){
+                        holder.recyclerView.clearAnimation();
+                        holder.recyclerView.startAnimation(slideDown);
+                    }
+                }
+                holder.recyclerView.setVisibility(View.VISIBLE);
+                holder.recyclerView.requestFocus();
             }
         });
     }

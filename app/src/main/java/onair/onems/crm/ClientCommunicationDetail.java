@@ -505,11 +505,13 @@ public class ClientCommunicationDetail extends CommonToolbarParentActivity imple
                     .create(RetrofitNetworkService.class)
                     .uploadMultipleFilesDynamic(documentParts)
                     .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread());
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io());
 
             finalDisposer.add(documentObservable
                     .observeOn(Schedulers.io())
                     .subscribeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io())
                     .subscribeWith(new DisposableObserver<String>() {
 
                         @Override
@@ -555,11 +557,13 @@ public class ClientCommunicationDetail extends CommonToolbarParentActivity imple
                 .create(RetrofitNetworkService.class)
                 .postCommunicationDetail(communicationDetailModel)
                 .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread());
+                .observeOn(AndroidSchedulers.mainThread())
+                .unsubscribeOn(Schedulers.io());
 
         finalDisposer.add( observable
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
+                .unsubscribeOn(Schedulers.io())
                 .subscribeWith(new DisposableObserver<String>() {
 
                     @Override
@@ -772,11 +776,13 @@ public class ClientCommunicationDetail extends CommonToolbarParentActivity imple
                     .create(RetrofitNetworkService.class)
                     .spGetCRMCommunicationType()
                     .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread());
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io());
 
             finalDisposer.add( observable
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io())
                     .subscribeWith(new DisposableObserver<String>() {
 
                         @Override
@@ -856,11 +862,13 @@ public class ClientCommunicationDetail extends CommonToolbarParentActivity imple
                     .create(RetrofitNetworkService.class)
                     .getCRMPriority()
                     .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread());
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io());
 
             finalDisposer.add( observable
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io())
                     .subscribeWith(new DisposableObserver<String>() {
 
                         @Override
