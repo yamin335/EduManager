@@ -3,7 +3,6 @@ package onair.onems.mainactivities;
 import android.app.AlertDialog;
 import android.app.Notification;
 import android.app.PendingIntent;
-import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -29,19 +28,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
 import com.google.firebase.messaging.FirebaseMessaging;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Random;
 
 import io.reactivex.Observable;
@@ -57,9 +49,7 @@ import onair.onems.fee.FeeMainScreen;
 import onair.onems.R;
 import onair.onems.attendance.StudentAttendanceReport;
 import onair.onems.homework.HomeworkMainScreen;
-import onair.onems.login.ChangePasswordDialog;
 import onair.onems.login.LoginScreen;
-import onair.onems.network.MySingleton;
 import onair.onems.notice.NoticeMainScreen;
 import onair.onems.notification.NotificationDetails;
 import onair.onems.notification.NotificationMainScreen;
