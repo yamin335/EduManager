@@ -49,6 +49,7 @@ import onair.onems.fee.FeeMainScreen;
 import onair.onems.R;
 import onair.onems.attendance.StudentAttendanceReport;
 import onair.onems.homework.HomeworkMainScreen;
+import onair.onems.login.ChangePasswordDialog;
 import onair.onems.login.LoginScreen;
 import onair.onems.notice.NoticeMainScreen;
 import onair.onems.notification.NotificationDetails;

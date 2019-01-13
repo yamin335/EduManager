@@ -64,6 +64,7 @@ import onair.onems.exam.SubjectWiseMarksEntryMain;
 import onair.onems.fees_report.FeeCollectionReportMain;
 import onair.onems.homework.HomeworkMainScreenForAdmin;
 import onair.onems.lesson_plan.LessonPlanMainScreenForAdmin;
+import onair.onems.login.ChangePasswordDialog;
 import onair.onems.notification.NotificationAdapter;
 import onair.onems.notification.NotificationDetails;
 import onair.onems.notification.NotificationMainScreen;

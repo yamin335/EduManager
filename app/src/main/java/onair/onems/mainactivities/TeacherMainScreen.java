@@ -49,6 +49,7 @@ import onair.onems.attendance.AttendanceAdminDashboard;
 import onair.onems.contacts.ContactsMainScreen;
 import onair.onems.exam.SubjectWiseMarksEntryMain;
 import onair.onems.homework.HomeworkMainScreenForAdmin;
+import onair.onems.login.ChangePasswordDialog;
 import onair.onems.login.LoginScreen;
 import onair.onems.notice.NoticeMainScreen;
 import onair.onems.notification.NotificationDetails;
