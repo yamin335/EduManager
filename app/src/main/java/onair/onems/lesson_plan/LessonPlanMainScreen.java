@@ -303,7 +303,6 @@ public class LessonPlanMainScreen extends SideNavigationMenuParentActivity imple
 
     private void digitalContentGetRequest(String SyllabusID) {
         if (StaticHelperClass.isNetworkAvailable(this)) {
-
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
                     .addConverterFactory(ScalarsConverterFactory.create())

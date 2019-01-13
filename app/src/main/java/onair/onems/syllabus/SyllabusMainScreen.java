@@ -54,12 +54,23 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.observers.DisposableObserver;
+import io.reactivex.schedulers.Schedulers;
 import onair.onems.R;
+import onair.onems.Services.RetrofitNetworkService;
 import onair.onems.Services.StaticHelperClass;
+import onair.onems.lesson_plan.LessonPlanMainScreen;
 import onair.onems.mainactivities.SideNavigationMenuParentActivity;
 import onair.onems.mainactivities.StudentMainScreen;
 import onair.onems.mainactivities.TeacherMainScreen;
 import onair.onems.network.MySingleton;
+import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
+import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 import static onair.onems.Services.StaticHelperClass.dpToPx;
 import static onair.onems.Services.StaticHelperClass.isNetworkAvailable;
@@ -67,7 +78,6 @@ import static onair.onems.Services.StaticHelperClass.isNetworkAvailable;
 public class SyllabusMainScreen extends SideNavigationMenuParentActivity implements ExamAdapter.ExamAdapterListener, SubjectAdapter.SubjectAdapterListener,
         FloatingMenuDialog.FloatingMenuListener, DigitalContentAdapter.AddFileToDownloader{
 
-    private ProgressDialog mExamDialog, mSyllabusDialog, mSubjectDialog, mContentDialog, mLessonContentDialog;
     private String selectedSubjectID = "", selectedExamID = "", selectedDate = "";
     private TextView error, lessonError, topicValue, detailValue, syllabusTime;
     private View shadow;
@@ -78,6 +88,15 @@ public class SyllabusMainScreen extends SideNavigationMenuParentActivity impleme
     private DigitalContentAdapter mLessonAdapter;
     private ArrayList<JSONObject> lessonDigitalContentUrls;
     private Intent intent;
+    private CompositeDisposable finalDisposer = new CompositeDisposable();
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(onComplete);
+        if (!finalDisposer.isDisposed())
+            finalDisposer.dispose();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -233,41 +252,41 @@ public class SyllabusMainScreen extends SideNavigationMenuParentActivity impleme
 
     private void examDataGetRequest() {
         if (StaticHelperClass.isNetworkAvailable(this)) {
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(getString(R.string.baseUrl))
+                    .addConverterFactory(ScalarsConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .build();
 
-            String examUrl = getString(R.string.baseUrl)+"/api/onEms/getInsExamforDDL/"+InstituteID+
-                    "/"+LoggedUserMediumID+"/"+LoggedUserClassID;
+            Observable<String> observable = retrofit
+                    .create(RetrofitNetworkService.class)
+                    .getClassWiseInsExame(InstituteID, LoggedUserMediumID, LoggedUserClassID)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io());
 
-            mExamDialog = new ProgressDialog(this);
-            mExamDialog.setTitle("Loading exam...");
-            mExamDialog.setMessage("Please Wait...");
-            mExamDialog.setCancelable(false);
-            mExamDialog.setIcon(R.drawable.onair);
-            mExamDialog.show();
+            finalDisposer.add( observable
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io())
+                    .subscribeWith(new DisposableObserver<String>() {
 
-            //Preparing exam
-            StringRequest request = new StringRequest(Request.Method.GET, examUrl,
-                    new Response.Listener<String>() {
                         @Override
-                        public void onResponse(String response) {
+                        public void onNext(String response) {
                             parseExamData(response);
                         }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    mExamDialog.dismiss();
-                    Toast.makeText(SyllabusMainScreen.this,"Exam data not found!!! ",
-                            Toast.LENGTH_LONG).show();
-                }
-            })
-            {
-                @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
-                    Map<String, String>  params = new HashMap<>();
-                    params.put("Authorization", "Request_From_onEMS_Android_app");
-                    return params;
-                }
-            };
-            MySingleton.getInstance(this).addToRequestQueue(request);
+
+                        @Override
+                        public void onError(Throwable e) {
+
+                        }
+
+                        @Override
+                        public void onComplete() {
+
+                        }
+                    }));
         } else {
             Toast.makeText(SyllabusMainScreen.this,"Please check your internet connection and select again!!! ",
                     Toast.LENGTH_LONG).show();
@@ -290,7 +309,6 @@ public class SyllabusMainScreen extends SideNavigationMenuParentActivity impleme
             Toast.makeText(SyllabusMainScreen.this,"Exam data not found!!! ",
                     Toast.LENGTH_LONG).show();
         }
-        mExamDialog.dismiss();
     }
 
     @Override
@@ -305,42 +323,41 @@ public class SyllabusMainScreen extends SideNavigationMenuParentActivity impleme
 
     private void subjectDataGetRequest() {
         if (StaticHelperClass.isNetworkAvailable(this)) {
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(getString(R.string.baseUrl))
+                    .addConverterFactory(ScalarsConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .build();
 
-            String subjectUrl = getString(R.string.baseUrl)+"/api/onEms/GetClassWiseSubject/"
-                    +InstituteID+"/"+LoggedUserDepartmentID
-                    +"/"+LoggedUserMediumID+"/"+LoggedUserClassID;
+            Observable<String> observable = retrofit
+                    .create(RetrofitNetworkService.class)
+                    .getInsSubject(InstituteID, LoggedUserDepartmentID, LoggedUserMediumID, LoggedUserClassID)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io());
 
-            mSubjectDialog = new ProgressDialog(this);
-            mSubjectDialog.setTitle("Loading subject...");
-            mSubjectDialog.setMessage("Please Wait...");
-            mSubjectDialog.setCancelable(false);
-            mSubjectDialog.setIcon(R.drawable.onair);
-            mSubjectDialog.show();
+            finalDisposer.add( observable
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io())
+                    .subscribeWith(new DisposableObserver<String>() {
 
-            //Preparing subject
-            StringRequest request = new StringRequest(Request.Method.GET, subjectUrl,
-                    new Response.Listener<String>() {
                         @Override
-                        public void onResponse(String response) {
+                        public void onNext(String response) {
                             parseSubjectData(response);
                         }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    mSubjectDialog.dismiss();
-                    Toast.makeText(SyllabusMainScreen.this,"Subject data not found!!! ",
-                            Toast.LENGTH_LONG).show();
-                }
-            })
-            {
-                @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
-                    Map<String, String>  params = new HashMap<>();
-                    params.put("Authorization", "Request_From_onEMS_Android_app");
-                    return params;
-                }
-            };
-            MySingleton.getInstance(this).addToRequestQueue(request);
+
+                        @Override
+                        public void onError(Throwable e) {
+
+                        }
+
+                        @Override
+                        public void onComplete() {
+
+                        }
+                    }));
         } else {
             Toast.makeText(this,"Please check your internet connection and select again!!! ",
                     Toast.LENGTH_LONG).show();
@@ -363,7 +380,6 @@ public class SyllabusMainScreen extends SideNavigationMenuParentActivity impleme
             Toast.makeText(SyllabusMainScreen.this,"Subject data not found!!! ",
                     Toast.LENGTH_LONG).show();
         }
-        mSubjectDialog.dismiss();
     }
 
     @Override
@@ -383,41 +399,43 @@ public class SyllabusMainScreen extends SideNavigationMenuParentActivity impleme
 
     private void syllabusDataGetRequest(String date) {
         if (StaticHelperClass.isNetworkAvailable(this)) {
-            String syllabusUrl = getString(R.string.baseUrl)+"/api/onEms/getAcademicClassDayForMySyllabus/"+
-                    InstituteID+"/"+LoggedUserMediumID+"/"+LoggedUserClassID+"/"+LoggedUserDepartmentID+"/"+
-                    LoggedUserSectionID+"/"+selectedSubjectID+"/"+selectedExamID+"/"+date+"/"+date;
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(getString(R.string.baseUrl))
+                    .addConverterFactory(ScalarsConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .build();
 
-            mSyllabusDialog = new ProgressDialog(this);
-            mSyllabusDialog.setTitle("Loading syllabus...");
-            mSyllabusDialog.setMessage("Please Wait...");
-            mSyllabusDialog.setCancelable(false);
-            mSyllabusDialog.setIcon(R.drawable.onair);
-            mSyllabusDialog.show();
+            Observable<String> observable = retrofit
+                    .create(RetrofitNetworkService.class)
+                    .getAcademicClassDayForMySyllabus(InstituteID, LoggedUserMediumID, LoggedUserClassID, LoggedUserDepartmentID,
+                            LoggedUserSectionID, selectedSubjectID, selectedExamID, date, date)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io());
 
-            //Preparing syllabus
-            StringRequest request = new StringRequest(Request.Method.GET, syllabusUrl,
-                    new Response.Listener<String>() {
+            finalDisposer.add( observable
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io())
+                    .subscribeWith(new DisposableObserver<String>() {
+
                         @Override
-                        public void onResponse(String response) {
+                        public void onNext(String response) {
                             parseSyllabusData(response);
                         }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    mSyllabusDialog.dismiss();
-                    Toast.makeText(SyllabusMainScreen.this,"Syllabus data not found!!! ",
-                            Toast.LENGTH_LONG).show();
-                }
-            })
-            {
-                @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
-                    Map<String, String>  params = new HashMap<>();
-                    params.put("Authorization", "Request_From_onEMS_Android_app");
-                    return params;
-                }
-            };
-            MySingleton.getInstance(this).addToRequestQueue(request);
+
+                        @Override
+                        public void onError(Throwable e) {
+                            Toast.makeText(SyllabusMainScreen.this,"Syllabus data not found!!! ",
+                                    Toast.LENGTH_LONG).show();
+                        }
+
+                        @Override
+                        public void onComplete() {
+
+                        }
+                    }));
         } else {
             Toast.makeText(SyllabusMainScreen.this,"Please check your internet connection and select again!!! ",
                     Toast.LENGTH_LONG).show();
@@ -449,47 +467,48 @@ public class SyllabusMainScreen extends SideNavigationMenuParentActivity impleme
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        mSyllabusDialog.dismiss();
     }
 
     private void syllabusDigitalContentGetRequest(String SyllabusID) {
         if (StaticHelperClass.isNetworkAvailable(this)) {
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(getString(R.string.baseUrl))
+                    .addConverterFactory(ScalarsConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .build();
 
-            String url = getString(R.string.baseUrl)+"/api/onEms/getUrlMasterByID/"+SyllabusID;
+            Observable<String> observable = retrofit
+                    .create(RetrofitNetworkService.class)
+                    .getUrlMasterByID(SyllabusID)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io());
 
-            mContentDialog = new ProgressDialog(this);
-            mContentDialog.setTitle("Loading digital content...");
-            mContentDialog.setMessage("Please Wait...");
-            mContentDialog.setCancelable(false);
-            mContentDialog.setIcon(R.drawable.onair);
-//            mContentDialog.show();
+            finalDisposer.add( observable
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io())
+                    .subscribeWith(new DisposableObserver<String>() {
 
-            //Preparing digital content
-            StringRequest request = new StringRequest(Request.Method.GET, url,
-                    new Response.Listener<String>() {
                         @Override
-                        public void onResponse(String response) {
+                        public void onNext(String response) {
                             if(!response.equalsIgnoreCase("[]")){
                                 parseDigitalContent(response);
                             }
                         }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    mContentDialog.dismiss();
-                    Toast.makeText(SyllabusMainScreen.this,"Digital content not found!!! ",
-                            Toast.LENGTH_LONG).show();
-                }
-            })
-            {
-                @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
-                    Map<String, String>  params = new HashMap<>();
-                    params.put("Authorization", "Request_From_onEMS_Android_app");
-                    return params;
-                }
-            };
-            MySingleton.getInstance(this).addToRequestQueue(request);
+
+                        @Override
+                        public void onError(Throwable e) {
+                            Toast.makeText(SyllabusMainScreen.this,"Digital content not found!!! ",
+                                    Toast.LENGTH_LONG).show();
+                        }
+
+                        @Override
+                        public void onComplete() {
+
+                        }
+                    }));
         } else {
             Toast.makeText(SyllabusMainScreen.this,"Please check your internet connection and select again!!! ",
                     Toast.LENGTH_LONG).show();
@@ -516,47 +535,48 @@ public class SyllabusMainScreen extends SideNavigationMenuParentActivity impleme
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        mContentDialog.dismiss();
     }
 
     private void lessonPlanDigitalContentGetRequest(String SyllabusID, String SyllabusDetailID) {
         if (StaticHelperClass.isNetworkAvailable(this)) {
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(getString(R.string.baseUrl))
+                    .addConverterFactory(ScalarsConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .build();
 
-            String url = getString(R.string.baseUrl)+"/api/onEms/getUrlTopicDetailByID/"+SyllabusID+"/"+SyllabusDetailID;
+            Observable<String> observable = retrofit
+                    .create(RetrofitNetworkService.class)
+                    .getUrlTopicDetailByID(SyllabusID, SyllabusDetailID)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io());
 
-            mLessonContentDialog = new ProgressDialog(this);
-            mLessonContentDialog.setTitle("Loading digital content...");
-            mLessonContentDialog.setMessage("Please Wait...");
-            mLessonContentDialog.setCancelable(false);
-            mLessonContentDialog.setIcon(R.drawable.onair);
-//            mLessonContentDialog.show();
+            finalDisposer.add( observable
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io())
+                    .subscribeWith(new DisposableObserver<String>() {
 
-            //Preparing digital content
-            StringRequest request = new StringRequest(Request.Method.GET, url,
-                    new Response.Listener<String>() {
                         @Override
-                        public void onResponse(String response) {
+                        public void onNext(String response) {
                             if(!response.equalsIgnoreCase("[]")){
                                 parseLessonDigitalContent(response);
                             }
                         }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    mLessonContentDialog.dismiss();
-                    Toast.makeText(SyllabusMainScreen.this,"Lesson plan digital content not found!!! ",
-                            Toast.LENGTH_LONG).show();
-                }
-            })
-            {
-                @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
-                    Map<String, String>  params = new HashMap<>();
-                    params.put("Authorization", "Request_From_onEMS_Android_app");
-                    return params;
-                }
-            };
-            MySingleton.getInstance(this).addToRequestQueue(request);
+
+                        @Override
+                        public void onError(Throwable e) {
+                            Toast.makeText(SyllabusMainScreen.this,"Lesson plan digital content not found!!! ",
+                                    Toast.LENGTH_LONG).show();
+                        }
+
+                        @Override
+                        public void onComplete() {
+
+                        }
+                    }));
         } else {
             Toast.makeText(SyllabusMainScreen.this,"Please check your internet connection and select again!!! ",
                     Toast.LENGTH_LONG).show();
@@ -583,7 +603,6 @@ public class SyllabusMainScreen extends SideNavigationMenuParentActivity impleme
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        mLessonContentDialog.dismiss();
     }
 
     @Override
@@ -732,12 +751,6 @@ public class SyllabusMainScreen extends SideNavigationMenuParentActivity impleme
         } else {
             return "UnknownFileType";
         }
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        unregisterReceiver(onComplete);
     }
 
     private void openFile(String filePath) throws IOException {

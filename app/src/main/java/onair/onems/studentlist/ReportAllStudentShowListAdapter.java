@@ -78,21 +78,15 @@ public class ReportAllStudentShowListAdapter extends RecyclerView.Adapter<Report
         holder.studentName.setText("Name: "+reportAllStudentRowModel.getUserName());
         holder.studentRoll.setText("Roll: "+reportAllStudentRowModel.getRollNo());
         String s = "", d = "";
-        if(reportAllStudentRowModel.getSectionName().equals("null")||reportAllStudentRowModel.getSectionName().isEmpty()||reportAllStudentRowModel.getSectionName().equals(""))
-        {
+        if(reportAllStudentRowModel.getSectionName().equals("null")||reportAllStudentRowModel.getSectionName().isEmpty()||reportAllStudentRowModel.getSectionName().equals("")) {
             s = " ";
-        }
-        else
-        {
+        } else {
             s = " (Sec:"+reportAllStudentRowModel.getSectionName()+")";
         }
 
-        if(reportAllStudentRowModel.getDepartmentName().equals("null")||reportAllStudentRowModel.getDepartmentName().isEmpty()||reportAllStudentRowModel.getDepartmentName().equals(""))
-        {
+        if(reportAllStudentRowModel.getDepartmentName().equals("null")||reportAllStudentRowModel.getDepartmentName().isEmpty()||reportAllStudentRowModel.getDepartmentName().equals("")) {
             d = " ";
-        }
-        else
-        {
+        } else {
             d = " ("+reportAllStudentRowModel.getDepartmentName()+")";
         }
         holder.studentClass.setText("Class: "+reportAllStudentRowModel.getClassName()+s+d);
@@ -133,7 +127,6 @@ public class ReportAllStudentShowListAdapter extends RecyclerView.Adapter<Report
                 } else {
                     List<ReportAllStudentRowModel> filteredList = new ArrayList<>();
                     for (ReportAllStudentRowModel row : studentList) {
-
                         // name match condition. this might differ depending on your requirement
                         // here we are looking for name or phone number match
                         if (row.getUserName().toLowerCase().contains(charString.toLowerCase()) ||
@@ -142,7 +135,6 @@ public class ReportAllStudentShowListAdapter extends RecyclerView.Adapter<Report
                             filteredList.add(row);
                         }
                     }
-
                     studentListFiltered = filteredList;
                 }
 

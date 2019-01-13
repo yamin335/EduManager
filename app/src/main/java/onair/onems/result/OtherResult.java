@@ -893,6 +893,7 @@ public class OtherResult extends Fragment {
 
     private void ExamDataGetRequest() {
         if (StaticHelperClass.isNetworkAvailable(getActivity())) {
+            CheckSelectedData();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
                     .addConverterFactory(ScalarsConverterFactory.create())

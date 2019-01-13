@@ -7,25 +7,27 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
 import com.google.firebase.messaging.FirebaseMessagingService;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.observers.DisposableObserver;
+import io.reactivex.schedulers.Schedulers;
 import onair.onems.R;
+import onair.onems.Services.RetrofitNetworkService;
 import onair.onems.Services.StaticHelperClass;
 import onair.onems.app.Config;
-import onair.onems.customised.CustomRequest;
-import onair.onems.network.MySingleton;
+import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
+import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 public class MyFirebaseInstanceIDService extends FirebaseMessagingService {
     private static final String TAG = MyFirebaseInstanceIDService.class.getSimpleName();
@@ -35,6 +37,14 @@ public class MyFirebaseInstanceIDService extends FirebaseMessagingService {
     private long ID = 0;
     private String previousToken = "";
     private JSONObject tokenJsonObject;
+    private CompositeDisposable finalDisposer = new CompositeDisposable();
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (!finalDisposer.isDisposed())
+            finalDisposer.dispose();
+    }
 
     @Override
     public void onNewToken(String token) {
@@ -64,12 +74,27 @@ public class MyFirebaseInstanceIDService extends FirebaseMessagingService {
 
     private void sendRegistrationToServer(final String token) {
         if(StaticHelperClass.isNetworkAvailable(this)) {
-            String url = getString(R.string.baseUrl)+"/api/onEms/getFcmTokenByUserID/"+LoggedUserID;
-            //Preparing Medium data from server
-            StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
-                    new Response.Listener<String>() {
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(getString(R.string.baseUrl))
+                    .addConverterFactory(ScalarsConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .build();
+
+            Observable<String> observable = retrofit
+                    .create(RetrofitNetworkService.class)
+                    .getFcmTokenByUserID(LoggedUserID)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io());
+
+            finalDisposer.add( observable
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io())
+                    .subscribeWith(new DisposableObserver<String>() {
                         @Override
-                        public void onResponse(String response) {
+                        public void onNext(String response) {
                             returnValue = response;
                             if (returnValue.equals("[]")) {
                                 ID = 0;
@@ -92,61 +117,78 @@ public class MyFirebaseInstanceIDService extends FirebaseMessagingService {
                                     tokenJsonObject.put("Token", token);
                                     tokenJsonObject.put("DeviceID", uuid);
                                     // sending fcm token to server
-                                    tokenPostRequest(tokenJsonObject);
+                                    tokenPostRequest(tokenJsonObject.toString());
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
                             }
                         }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                }
-            })
-            {
-                @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
-                    Map<String, String>  params = new HashMap<>();
-                    params.put("Authorization", "Request_From_onEMS_Android_app");
-                    return params;
-                }
-            };
-            MySingleton.getInstance(this).addToRequestQueue(stringRequest);
+
+                        @Override
+                        public void onError(Throwable e) {
+
+                        }
+
+                        @Override
+                        public void onComplete() {
+
+                        }
+                    }));
         } else {
             Toast.makeText(getApplicationContext(),"Please check your internet connection and select again!!! ",
                     Toast.LENGTH_LONG).show();
         }
     }
 
-    private void tokenPostRequest(JSONObject postDataJsonObject) {
-        String url = getString(R.string.baseUrl)+"/api/onEms/setFcmToken";
-        CustomRequest customRequest = new CustomRequest (Request.Method.POST, url, postDataJsonObject,
-                new Response.Listener<JSONArray>() {
-                    @Override
-                    public void onResponse(JSONArray response) {
-                        Toast.makeText(getApplicationContext(),"Successfully posted token",Toast.LENGTH_LONG).show();
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Toast.makeText(getApplicationContext(),"ERROR posting token",Toast.LENGTH_LONG).show();
-            }
-        })
-        {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String>  params = new HashMap<>();
-                params.put("Authorization", "Request_From_onEMS_Android_app");
-                return params;
-            }
-        };
-        MySingleton.getInstance(this).addToRequestQueue(customRequest);
+    private void tokenPostRequest(String object) {
+        if(StaticHelperClass.isNetworkAvailable(this)) {
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(getString(R.string.baseUrl))
+                    .addConverterFactory(ScalarsConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .build();
+
+            JsonParser parser = new JsonParser();
+            JsonObject postDataJsonObject = parser.parse(object).getAsJsonObject();
+
+            Observable<String> observable = retrofit
+                    .create(RetrofitNetworkService.class)
+                    .setFcmToken(postDataJsonObject)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io());
+
+            finalDisposer.add( observable
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io())
+                    .subscribeWith(new DisposableObserver<String>() {
+                        @Override
+                        public void onNext(String response) {
+                            Toast.makeText(getApplicationContext(),"Successfully posted token",Toast.LENGTH_LONG).show();
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+                            Toast.makeText(getApplicationContext(),"ERROR posting token",Toast.LENGTH_LONG).show();
+                        }
+
+                        @Override
+                        public void onComplete() {
+
+                        }
+                    }));
+        } else {
+            Toast.makeText(getApplicationContext(),"Please check your internet connection and select again!!! ",
+                    Toast.LENGTH_LONG).show();
+        }
     }
 
     private void storeRegIdInPref(String token) {
         getApplicationContext().getSharedPreferences(Config.SHARED_PREF, Context.MODE_PRIVATE)
         .edit()
         .putString("regId", token)
-        .commit();
+        .apply();
     }
 }

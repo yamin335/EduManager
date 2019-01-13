@@ -156,12 +156,28 @@ public interface RetrofitNetworkService {
                                         @Path("SectionID") long SectionID, @Path("date") String date);
 
     @Headers("Authorization: Request_From_onEMS_Android_app")
+    @GET("/api/onEms/getAcademicClassDayForMySyllabus/{InstituteID}/{MediumID}/{ClassID}/{DepartmentID}/{SectionID}/{SubjectID}/{fromDate}/{toDate}/{ExamID}")
+    Observable<String> getAcademicClassDayForMySyllabus(@Path("InstituteID") long InstituteID,
+                                                        @Path("MediumID") long MediumID,
+                                                        @Path("ClassID") long ClassID,
+                                                        @Path("DepartmentID") long DepartmentID,
+                                                        @Path("SectionID") long SectionID,
+                                                        @Path("SubjectID") String SubjectID,
+                                                        @Path("ExamID") String ExamID,
+                                                        @Path("fromDate") String fromDate,
+                                                        @Path("toDate") String toDate);
+
+    @Headers("Authorization: Request_From_onEMS_Android_app")
     @GET("/api/onEms/getUrlMasterByID/{SyllabusID}")
     Observable<String> getUrlMasterByID(@Path("SyllabusID") String SyllabusID);
 
     @Headers("Authorization: Request_From_onEMS_Android_app")
     @GET("/api/onEms/getDateWiseLessonPlanDetail/{SyllabusDetailID}")
     Observable<String> getDateWiseLessonPlanDetail(@Path("SyllabusDetailID") String SyllabusDetailID);
+
+    @Headers("Authorization: Request_From_onEMS_Android_app")
+    @GET("/api/onEms/getUrlTopicDetailByID/{SyllabusID}/{SyllabusDetailID}")
+    Observable<String> getUrlTopicDetailByID(@Path("SyllabusID") String SyllabusID, @Path("SyllabusDetailID") String SyllabusDetailID);
 
     @Headers("Authorization: Request_From_onEMS_Android_app")
     @GET("/api/onEms/resetPassword/{UserID}/{LoginID}/{Password}/{InstituteID}")

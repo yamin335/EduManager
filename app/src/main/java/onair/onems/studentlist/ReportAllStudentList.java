@@ -31,11 +31,21 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import io.reactivex.Observable;
+import io.reactivex.Observer;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 import onair.onems.R;
+import onair.onems.Services.RetrofitNetworkService;
 import onair.onems.Services.StaticHelperClass;
 import onair.onems.mainactivities.CommonToolbarParentActivity;
 import onair.onems.models.ReportAllStudentRowModel;
 import onair.onems.network.MySingleton;
+import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
+import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 /**
  * Created by User on 1/24/2018.
@@ -43,13 +53,20 @@ import onair.onems.network.MySingleton;
 
 public class ReportAllStudentList extends CommonToolbarParentActivity implements ReportAllStudentShowListAdapter.ReportAllStudentShowListAdapterListener{
 
-    private ProgressDialog dialog;
     private RecyclerView recyclerView;
     private ArrayList<ReportAllStudentRowModel> studentList;
     private ReportAllStudentShowListAdapter mAdapter;
-    private static String studentUrl = "";
     private SearchView searchView;
     private SwipeRefreshLayout mSwipeRefreshLayout;
+    private long InstituteID, MediumID, ShiftID, ClassID, SectionID, DepertmentID;
+    private Disposable finalDisposer;
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (!finalDisposer.isDisposed())
+            finalDisposer.dispose();
+    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -66,7 +83,8 @@ public class ReportAllStudentList extends CommonToolbarParentActivity implements
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                RefreshStudentList();
+                ClearStudentList();
+                StudentDataGetRequest();
             }
         });
 
@@ -74,23 +92,13 @@ public class ReportAllStudentList extends CommonToolbarParentActivity implements
         studentList = new ArrayList<>();
         mAdapter = new ReportAllStudentShowListAdapter(this, studentList, this);
 
-        dialog = new ProgressDialog(this);
-        dialog.setTitle("Loading...");
-        dialog.setMessage("Please Wait...");
-        dialog.setCancelable(false);
-        dialog.setIcon(R.drawable.onair);
-        dialog.show();
-
         Bundle StudentSelection = getIntent().getExtras();
-        long InstituteID = StudentSelection.getLong("InstituteID",0);
-        long MediumID = StudentSelection.getLong("MediumID",0);
-        long ShiftID = StudentSelection.getLong("ShiftID",0);
-        long ClassID = StudentSelection.getLong("ClassID",0);
-        long SectionID = StudentSelection.getLong("SectionID",0);
-        long DepertmentID = StudentSelection.getLong("DepertmentID",0);
-
-        studentUrl = getString(R.string.baseUrl)+"/api/onEms/getStudent"+"/"+InstituteID+"/"+
-                ClassID+"/"+SectionID+"/"+DepertmentID+"/"+MediumID+"/"+ShiftID+"/"+"0";
+        InstituteID = StudentSelection.getLong("InstituteID",0);
+        MediumID = StudentSelection.getLong("MediumID",0);
+        ShiftID = StudentSelection.getLong("ShiftID",0);
+        ClassID = StudentSelection.getLong("ClassID",0);
+        SectionID = StudentSelection.getLong("SectionID",0);
+        DepertmentID = StudentSelection.getLong("DepertmentID",0);
 
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(mLayoutManager);
@@ -117,10 +125,8 @@ public class ReportAllStudentList extends CommonToolbarParentActivity implements
             }
             // refreshing recycler view
             mAdapter.notifyDataSetChanged();
-            dialog.dismiss();
         } catch (JSONException e) {
             Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
-            dialog.dismiss();
         }
     }
 
@@ -186,67 +192,51 @@ public class ReportAllStudentList extends CommonToolbarParentActivity implements
         Toast.makeText(getApplicationContext(), "Selected: " + reportAllStudentRowModel.getUserName() + ", " + reportAllStudentRowModel.getRollNo(), Toast.LENGTH_LONG).show();
     }
 
-    public void RefreshStudentList(){
-        if(StaticHelperClass.isNetworkAvailable(this)) {
-            ClearStudentList();
-            //Preparing Student data from server
-            StringRequest stringStudentRequest = new StringRequest(Request.Method.GET, studentUrl,
-                    new Response.Listener<String>() {
-                        @Override
-                        public void onResponse(String response) {
-
-                            parseStudentJsonData(response);
-                            mSwipeRefreshLayout.setRefreshing(false);
-                        }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-
-                    mSwipeRefreshLayout.setRefreshing(false);
-                }
-            })
-            {
-                @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
-                    Map<String, String>  params = new HashMap<>();
-                    params.put("Authorization", "Request_From_onEMS_Android_app");
-                    return params;
-                }
-            };
-            MySingleton.getInstance(this).addToRequestQueue(stringStudentRequest);
-        } else {
-            Toast.makeText(ReportAllStudentList.this,"Please check your internet connection!!! ",
-                    Toast.LENGTH_LONG).show();
-        }
-    }
-
     public void StudentDataGetRequest(){
         if(StaticHelperClass.isNetworkAvailable(this)) {
-            //Preparing Student data from server
-            StringRequest stringStudentRequest = new StringRequest(Request.Method.GET, studentUrl,
-                    new Response.Listener<String>() {
-                        @Override
-                        public void onResponse(String response) {
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(getString(R.string.baseUrl))
+                    .addConverterFactory(ScalarsConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .build();
 
+            Observable<String> observable = retrofit
+                    .create(RetrofitNetworkService.class)
+                    .getStudent(InstituteID,Long.toString(ClassID), Long.toString(SectionID), Long.toString(DepertmentID),
+                            Long.toString(MediumID), Long.toString(ShiftID),"0")
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io());
+
+            observable
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io())
+                    .subscribe(new Observer<String>() {
+
+                        @Override
+                        public void onSubscribe(Disposable d) {
+                            finalDisposer = d;
+                        }
+
+                        @Override
+                        public void onNext(String response) {
+                            mSwipeRefreshLayout.setRefreshing(false);
                             parseStudentJsonData(response);
+                        }
+
+                        @Override
+                        public void onComplete() {
 
                         }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
 
-                    dialog.dismiss();
-                }
-            })
-            {
-                @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
-                    Map<String, String>  params = new HashMap<>();
-                    params.put("Authorization", "Request_From_onEMS_Android_app");
-                    return params;
-                }
-            };
-            MySingleton.getInstance(this).addToRequestQueue(stringStudentRequest);
+                        @Override
+                        public void onError(Throwable e) {
+                            mSwipeRefreshLayout.setRefreshing(false);
+                            Toast.makeText(ReportAllStudentList.this,"Error getting student list !!!",Toast.LENGTH_LONG).show();
+                        }
+                    });
         } else {
             Toast.makeText(ReportAllStudentList.this,"Please check your internet connection!!! ",
                     Toast.LENGTH_LONG).show();
