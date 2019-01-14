@@ -22,7 +22,7 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:padding="5dp"
-            android:text="TOTAL TEACHER"
+            android:text="@string/total_teacher"
             android:textColor="#ffffff"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -74,7 +74,7 @@
             android:layout_marginEnd="8dp"
             android:layout_marginTop="8dp"
             android:padding="5dp"
-            android:text="TOTAL ABSENT"
+            android:text="@string/total_absent"
             android:textColor="#ffffff"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -82,7 +82,8 @@
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="@+id/totalTeacherLabel"
             app:layout_constraintTop_toBottomOf="@+id/totalTeacherIcon"
-            app:layout_constraintVertical_bias="0.0" />
+            app:layout_constraintVertical_bias="0.0"
+            android:layout_marginRight="8dp" />
 
         <ImageView
             android:id="@+id/absentTeacherIcon"
@@ -99,7 +100,8 @@
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="@+id/absentTeacherLabel"
             app:layout_constraintTop_toBottomOf="@+id/absentTeacherLabel"
-            app:layout_constraintVertical_bias="0.0" />
+            app:layout_constraintVertical_bias="0.0"
+            android:layout_marginRight="8dp" />
 
         <TextView
             android:id="@+id/absentTeacher"
@@ -115,7 +117,9 @@
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="@+id/absentTeacherIcon"
             app:layout_constraintStart_toEndOf="@+id/absentTeacherIcon"
-            app:layout_constraintTop_toTopOf="@+id/absentTeacherIcon" />
+            app:layout_constraintTop_toTopOf="@+id/absentTeacherIcon"
+            android:layout_marginLeft="16dp"
+            android:layout_toRightOf="@id/absentTeacherIcon" />
 
         <TextView
             android:id="@+id/totalAttendedTeacherLabel"
@@ -124,13 +128,14 @@
             android:layout_marginBottom="8dp"
             android:layout_marginEnd="55dp"
             android:padding="5dp"
-            android:text="ATTENDED TEACHER"
+            android:text="@string/attended_teacher"
             android:textColor="#ffffff"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@+id/totalTeacherLabel"
-            app:layout_constraintVertical_bias="0.0" />
+            app:layout_constraintVertical_bias="0.0"
+            android:layout_marginRight="55dp" />
 
         <ImageView
             android:id="@+id/attendedTeacherIcon"
@@ -142,7 +147,8 @@
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="@+id/totalAttendedTeacherLabel"
             app:layout_constraintTop_toTopOf="@+id/totalTeacherIcon"
-            app:srcCompat="@drawable/ic_action_tick" />
+            app:srcCompat="@drawable/ic_action_tick"
+            android:layout_marginRight="8dp" />
 
         <TextView
             android:id="@+id/attendedTeacher"
@@ -166,7 +172,7 @@
             android:layout_marginBottom="8dp"
             android:layout_marginEnd="8dp"
             android:padding="5dp"
-            android:text="ATTENDANCE PERCENTAGE"
+            android:text="@string/attendance_percentage"
             android:textColor="#ffffff"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -174,7 +180,8 @@
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="@+id/totalAttendedTeacherLabel"
             app:layout_constraintTop_toTopOf="@+id/absentTeacherLabel"
-            app:layout_constraintVertical_bias="0.0" />
+            app:layout_constraintVertical_bias="0.0"
+            android:layout_marginRight="8dp" />
 
         <ImageView
             android:id="@+id/attendancePercentageIcon"
@@ -188,7 +195,8 @@
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="@+id/attendancePercentage"
             app:layout_constraintTop_toTopOf="@+id/absentTeacherIcon"
-            app:srcCompat="@drawable/ic_action_bars" />
+            app:srcCompat="@drawable/ic_action_bars"
+            android:layout_marginRight="8dp" />
 
         <TextView
             android:id="@+id/attendancePercentageTeacher"
@@ -225,7 +233,7 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:padding="5dp"
-            android:text="TOTAL STUDENT"
+            android:text="@string/total_student"
             android:textColor="#ffffff"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -278,7 +286,7 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:padding="5dp"
-            android:text="TOTAL ABSENT"
+            android:text="@string/total_absent"
             android:textColor="#ffffff"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -302,7 +310,8 @@
             app:layout_constraintEnd_toEndOf="@+id/absentStudentLabel"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="@+id/absentStudentLabel"
-            app:layout_constraintTop_toBottomOf="@+id/absentStudentLabel" />
+            app:layout_constraintTop_toBottomOf="@+id/absentStudentLabel"
+            android:layout_marginRight="8dp" />
 
         <TextView
             android:id="@+id/absentStudent"
@@ -319,7 +328,8 @@
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="@+id/absentStudentIcon"
             app:layout_constraintStart_toEndOf="@+id/absentStudentIcon"
-            app:layout_constraintTop_toTopOf="@+id/absentStudentIcon" />
+            app:layout_constraintTop_toTopOf="@+id/absentStudentIcon"
+            android:layout_marginLeft="16dp" />
 
         <TextView
             android:id="@+id/totalAttendedStudentLabel"
@@ -328,13 +338,14 @@
             android:layout_marginBottom="8dp"
             android:layout_marginEnd="55dp"
             android:padding="5dp"
-            android:text="ATTENDED STUDENT"
+            android:text="@string/attended_student"
             android:textColor="#ffffff"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@+id/totalStudentLabel"
-            app:layout_constraintVertical_bias="0.0" />
+            app:layout_constraintVertical_bias="0.0"
+            android:layout_marginRight="55dp" />
 
         <ImageView
             android:id="@+id/imageView"
@@ -348,7 +359,8 @@
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="@+id/totalAttendedStudentLabel"
             app:layout_constraintTop_toTopOf="@+id/totalStudentIcon"
-            app:srcCompat="@drawable/ic_action_tick" />
+            app:srcCompat="@drawable/ic_action_tick"
+            android:layout_marginRight="8dp" />
 
         <TextView
             android:id="@+id/attendedStudent"
@@ -372,7 +384,7 @@
             android:layout_marginBottom="8dp"
             android:layout_marginEnd="8dp"
             android:padding="5dp"
-            android:text="ATTENDANCE PERCENTAGE"
+            android:text="@string/attendance_percentage"
             android:textColor="#ffffff"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -380,7 +392,8 @@
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="@+id/totalAttendedStudentLabel"
             app:layout_constraintTop_toTopOf="@+id/absentStudentLabel"
-            app:layout_constraintVertical_bias="0.0" />
+            app:layout_constraintVertical_bias="0.0"
+            android:layout_marginRight="8dp" />
 
         <ImageView
             android:id="@+id/imageView3"
@@ -394,7 +407,8 @@
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="@+id/textView3"
             app:layout_constraintTop_toBottomOf="@+id/textView3"
-            app:srcCompat="@drawable/ic_action_bars" />
+            app:srcCompat="@drawable/ic_action_bars"
+            android:layout_marginRight="8dp" />
 
         <TextView
             android:id="@+id/studentPercentage"
@@ -427,10 +441,12 @@
             android:layout_marginStart="2dp"
             android:layout_marginTop="2dp"
             android:background="@drawable/button"
-            android:text="Take Attendance"
+            android:text="@string/take_attendance"
             android:textAllCaps="false"
             android:textColor="#ffffff"
-            android:textSize="16sp"/>
+            android:textSize="16sp"
+            android:layout_marginRight="1dp"
+            android:layout_marginLeft="2dp" />
 
         <Button
             android:id="@+id/showAttendance"
@@ -442,10 +458,12 @@
             android:layout_marginStart="1dp"
             android:layout_marginTop="2dp"
             android:background="@drawable/button"
-            android:text="Show Attendance"
+            android:text="@string/show_attendance"
             android:textAllCaps="false"
             android:textColor="#ffffff"
-            android:textSize="16sp"/>
+            android:textSize="16sp"
+            android:layout_marginRight="2dp"
+            android:layout_marginLeft="1dp" />
     </LinearLayout>
 
 

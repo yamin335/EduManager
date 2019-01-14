@@ -18,18 +18,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-
 import onair.onems.R;
 import onair.onems.customised.MyDividerItemDecoration;
-import onair.onems.routine.RoutineClassAdapter;
 
 public class IncomeStatementAdapter extends RecyclerView.Adapter<IncomeStatementAdapter.MyViewHolder> {
     private Context context;
     private JSONArray allHeadJsonArray;
-    private int headNumber;
-    private JSONArray allCoatJsonArray;
-    private ArrayList<String> nameArray;
 
     class MyViewHolder extends RecyclerView.ViewHolder {
         TextView HeadType, Total;

@@ -582,6 +582,7 @@ public class StudentiCardMain extends SideNavigationMenuParentActivity {
 
     private void ShiftDataGetRequest() {
         if (StaticHelperClass.isNetworkAvailable(this)) {
+            dialog.show();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
                     .addConverterFactory(ScalarsConverterFactory.create())
@@ -604,12 +605,13 @@ public class StudentiCardMain extends SideNavigationMenuParentActivity {
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseShiftJsonData(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
-
+                            dialog.dismiss();
                         }
 
                         @Override
@@ -625,6 +627,7 @@ public class StudentiCardMain extends SideNavigationMenuParentActivity {
 
     private void MediumDataGetRequest() {
         if(StaticHelperClass.isNetworkAvailable(this)) {
+            dialog.show();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
                     .addConverterFactory(ScalarsConverterFactory.create())
@@ -647,12 +650,13 @@ public class StudentiCardMain extends SideNavigationMenuParentActivity {
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseMediumJsonData(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
-
+                            dialog.dismiss();
                         }
 
                         @Override
@@ -668,6 +672,7 @@ public class StudentiCardMain extends SideNavigationMenuParentActivity {
 
     private void ClassDataGetRequest() {
         if(StaticHelperClass.isNetworkAvailable(this)) {
+            dialog.show();
             CheckSelectedData();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
@@ -691,12 +696,13 @@ public class StudentiCardMain extends SideNavigationMenuParentActivity {
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseClassJsonData(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
-
+                            dialog.dismiss();
                         }
 
                         @Override
@@ -712,6 +718,7 @@ public class StudentiCardMain extends SideNavigationMenuParentActivity {
 
     private void DepartmentDataGetRequest() {
         if(StaticHelperClass.isNetworkAvailable(this)) {
+            dialog.show();
             CheckSelectedData();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
@@ -735,12 +742,13 @@ public class StudentiCardMain extends SideNavigationMenuParentActivity {
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseDepartmentJsonData(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
-
+                            dialog.dismiss();
                         }
 
                         @Override
@@ -756,6 +764,7 @@ public class StudentiCardMain extends SideNavigationMenuParentActivity {
 
     private void SectionDataGetRequest() {
         if(StaticHelperClass.isNetworkAvailable(this)) {
+            dialog.show();
             CheckSelectedData();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
@@ -779,12 +788,13 @@ public class StudentiCardMain extends SideNavigationMenuParentActivity {
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseSectionJsonData(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
-
+                            dialog.dismiss();
                         }
 
                         @Override
@@ -800,6 +810,7 @@ public class StudentiCardMain extends SideNavigationMenuParentActivity {
 
     private void StudentDataGetRequest() {
         if(StaticHelperClass.isNetworkAvailable(this)) {
+            dialog.show();
             CheckSelectedData();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
@@ -826,11 +837,13 @@ public class StudentiCardMain extends SideNavigationMenuParentActivity {
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseStudentJsonData(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
+                            dialog.dismiss();
                         }
 
                         @Override

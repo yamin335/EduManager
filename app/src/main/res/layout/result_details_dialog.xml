@@ -10,7 +10,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:layout_gravity="center"
-        android:text="Details Marks"
+        android:text="@string/details_marks"
         android:textColor="#074d72"
         android:textSize="18sp"
         android:textStyle="bold"
@@ -35,7 +35,7 @@
             android:layout_marginLeft="20dp"
             android:layout_marginStart="20dp"
             android:gravity="center_vertical"
-            android:text="MCQ:"
+            android:text="@string/mcq1"
             android:textColor="#074d72"
             android:textSize="18sp" />
         <TextView
@@ -59,7 +59,7 @@
             android:gravity="center_vertical"
             android:layout_marginStart="20dp"
             android:layout_marginLeft="20dp"
-            android:text="Written:"
+            android:text="@string/written1"
             android:textColor="#074d72"
             android:textSize="18sp" />
         <TextView
@@ -84,7 +84,7 @@
             android:gravity="center_vertical"
             android:layout_marginLeft="20dp"
             android:layout_marginStart="20dp"
-            android:text="Attendance:"
+            android:text="@string/attendance2"
             android:textColor="#074d72"
             android:textSize="18sp" />
         <TextView
@@ -109,7 +109,7 @@
             android:gravity="center_vertical"
             android:layout_marginLeft="20dp"
             android:layout_marginStart="20dp"
-            android:text="Practical:"
+            android:text="@string/practical1"
             android:textColor="#074d72"
             android:textSize="18sp"/>
         <TextView
@@ -145,7 +145,7 @@
             android:layout_marginStart="20dp"
             android:layout_marginLeft="20dp"
             android:layout_marginBottom="10dp"
-            android:text="Total:"
+            android:text="@string/total1"
             android:textColor="#074d72"
             android:textSize="18sp"/>
         <TextView
@@ -167,10 +167,11 @@
         android:layout_height="30dp"
         android:background="@drawable/button"
         android:clickable="true"
-        android:text="OK"
+        android:text="@string/ok"
         android:textColor="#ffffff"
         android:textStyle="bold"
         android:layout_margin="10dp"
-        android:layout_gravity="center_horizontal"/>
+        android:layout_gravity="center_horizontal"
+        android:focusable="true" />
 
 </LinearLayout>

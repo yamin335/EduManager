@@ -21,6 +21,7 @@ import org.json.JSONObject;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Objects;
 
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -57,7 +58,7 @@ public class AttendanceAdminDashboard extends SideNavigationMenuParentActivity {
         activityName = AttendanceAdminDashboard.class.getName();
 
         LayoutInflater inflater = (LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        final View childActivityLayout = inflater.inflate(R.layout.attendance_admin_dashboard, null);
+        final View childActivityLayout = Objects.requireNonNull(inflater).inflate(R.layout.attendance_admin_dashboard, null);
         LinearLayout parentActivityLayout = (LinearLayout) findViewById(R.id.contentMain);
         parentActivityLayout.addView(childActivityLayout, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
 

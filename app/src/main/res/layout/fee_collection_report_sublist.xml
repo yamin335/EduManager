@@ -42,7 +42,8 @@
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.0" />
+            app:layout_constraintVertical_bias="0.0"
+            android:layout_marginLeft="8dp" />
 
         <TextView
             android:id="@+id/classs"
@@ -55,7 +56,8 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toEndOf="@+id/medium"
-            app:layout_constraintTop_toTopOf="@+id/medium" />
+            app:layout_constraintTop_toTopOf="@+id/medium"
+            android:layout_marginLeft="16dp" />
 
         <TextView
             android:id="@+id/department"
@@ -68,7 +70,8 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toEndOf="@+id/classs"
-            app:layout_constraintTop_toTopOf="@+id/classs" />
+            app:layout_constraintTop_toTopOf="@+id/classs"
+            android:layout_marginLeft="16dp" />
 
         <TextView
             android:id="@+id/section"
@@ -94,6 +97,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toEndOf="@+id/section"
-            app:layout_constraintTop_toTopOf="@+id/section" />
+            app:layout_constraintTop_toTopOf="@+id/section"
+            android:layout_marginLeft="16dp" />
     </android.support.constraint.ConstraintLayout>
 </android.support.constraint.ConstraintLayout>

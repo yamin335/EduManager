@@ -1,6 +1,7 @@
 package onair.onems.contacts;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,10 +20,6 @@ import java.util.List;
 import onair.onems.R;
 import onair.onems.models.Contact;
 
-/**
- * Created by ravi on 16/11/17.
- */
-
 public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.MyViewHolder>
         implements Filterable {
     private Context context;
@@ -40,26 +37,24 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.MyView
             phone = view.findViewById(R.id.phone);
             thumbnail = view.findViewById(R.id.thumbnail);
 
-            view.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    // send selected contact in callback
-                    listener.onContactSelected(contactListFiltered.get(getAdapterPosition()));
-                }
+            view.setOnClickListener(view1 -> {
+                // send selected contact in callback
+                listener.onContactSelected(contactListFiltered.get(getAdapterPosition()));
             });
         }
     }
 
 
-    public ContactsAdapter(Context context, List<Contact> contactList, ContactsAdapterListener listener) {
+    ContactsAdapter(Context context, List<Contact> contactList, ContactsAdapterListener listener) {
         this.context = context;
         this.listener = listener;
         this.contactList = contactList;
         this.contactListFiltered = contactList;
     }
 
+    @NonNull
     @Override
-    public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.contact_row_item, parent, false);
 
@@ -67,7 +62,7 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.MyView
     }
 
     @Override
-    public void onBindViewHolder(MyViewHolder holder, final int position) {
+    public void onBindViewHolder(@NonNull MyViewHolder holder, final int position) {
         final Contact contact = contactListFiltered.get(position);
         holder.name.setText(contact.getName());
         holder.phone.setText(contact.getPhone());

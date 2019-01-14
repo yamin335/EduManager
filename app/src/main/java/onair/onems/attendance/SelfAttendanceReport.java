@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
@@ -24,6 +25,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Objects;
+
 import de.codecrafters.tableview.TableView;
 import de.codecrafters.tableview.listeners.TableDataClickListener;
 import de.codecrafters.tableview.model.TableColumnWeightModel;
@@ -80,7 +83,7 @@ public class SelfAttendanceReport extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View rootView = inflater.inflate(R.layout.attendance_report_self_attendance, container, false);
         tableView = (TableView)rootView.findViewById(R.id.tableView);
@@ -166,7 +169,7 @@ public class SelfAttendanceReport extends Fragment {
         selectedMonth = new MonthModel();
 
         spinnerMonth = (Spinner)rootView.findViewById(R.id.spinnerMonth);
-        ArrayAdapter<String> month_spinner_adapter = new ArrayAdapter<>(getActivity(), R.layout.spinner_item, tempMonthArray);
+        ArrayAdapter<String> month_spinner_adapter = new ArrayAdapter<>(Objects.requireNonNull(getActivity()), R.layout.spinner_item, tempMonthArray);
         month_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerMonth.setAdapter(month_spinner_adapter);
 
@@ -245,7 +248,7 @@ public class SelfAttendanceReport extends Fragment {
             try {
                 String[] strings = new String[monthArrayList.size()];
                 strings = monthArrayList.toArray(strings);
-                ArrayAdapter<String> month_spinner_adapter = new ArrayAdapter<>(getActivity(),R.layout.spinner_item, strings);
+                ArrayAdapter<String> month_spinner_adapter = new ArrayAdapter<>(Objects.requireNonNull(getActivity()),R.layout.spinner_item, strings);
                 month_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinnerMonth.setAdapter(month_spinner_adapter);
                 Calendar c = Calendar.getInstance();
@@ -299,7 +302,7 @@ public class SelfAttendanceReport extends Fragment {
     }
 
     void MonthDataGetRequest(){
-        if(StaticHelperClass.isNetworkAvailable(getActivity())) {
+        if(StaticHelperClass.isNetworkAvailable(Objects.requireNonNull(getActivity()))) {
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
                     .addConverterFactory(ScalarsConverterFactory.create())
@@ -342,7 +345,7 @@ public class SelfAttendanceReport extends Fragment {
     }
 
     void MonthlyAttendanceDataGetRequest(int MonthID){
-        if(StaticHelperClass.isNetworkAvailable(getActivity())) {
+        if(StaticHelperClass.isNetworkAvailable(Objects.requireNonNull(getActivity()))) {
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
                     .addConverterFactory(ScalarsConverterFactory.create())

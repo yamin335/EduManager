@@ -18,7 +18,8 @@
             android:scaleType="centerCrop"
             android:adjustViewBounds="true"
             android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true"/>
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true" />
         <Button
             android:id="@+id/cross"
             android:layout_width="18dp"
@@ -28,7 +29,10 @@
             android:background="@drawable/cross_button_white"
             android:drawableStart="@drawable/ic_clear_white_18dp"
             android:layout_alignParentEnd="true"
-            android:layout_alignParentTop="true" />
+            android:layout_alignParentTop="true"
+            android:layout_marginRight="4dp"
+            android:layout_alignParentRight="true"
+            android:drawableLeft="@drawable/ic_clear_white_18dp" />
     </RelativeLayout>
 
 </android.support.v7.widget.CardView>

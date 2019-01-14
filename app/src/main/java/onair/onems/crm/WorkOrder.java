@@ -57,12 +57,11 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 import io.reactivex.Observable;
-import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.disposables.Disposable;
 import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
 import okhttp3.MediaType;
@@ -73,9 +72,7 @@ import onair.onems.Services.RetrofitNetworkService;
 import onair.onems.Services.StaticHelperClass;
 import onair.onems.mainactivities.CommonToolbarParentActivity;
 import onair.onems.models.DocumentModel;
-import onair.onems.models.InstituteTypeModel;
 import onair.onems.models.PaymentMethodModel;
-import onair.onems.models.PriorityModel;
 import onair.onems.models.WorkOrderModel;
 import onair.onems.utils.FileUtils;
 import retrofit2.Retrofit;
@@ -90,9 +87,8 @@ public class WorkOrder extends CommonToolbarParentActivity implements FileAdapte
     private WorkOrderModel newWorkOrder;
     private Spinner paymentSpinner;
     private EditText workOrderNo, workOrderValue, noOfInstallment;
-    private TextView workOrderDate, installmentStartDate, salesPerson;
-    private ImageView orderDateIcon, installmentDateIcon, addDocumentIcon;
-    private RecyclerView fileRecycler;
+    private TextView workOrderDate;
+    private TextView installmentStartDate;
     private String[] tempPaymentType = {"Payment Type"};
     private ArrayList<PaymentMethodModel> allPaymentType;
     private PaymentMethodModel selectedPaymentType;
@@ -104,13 +100,10 @@ public class WorkOrder extends CommonToolbarParentActivity implements FileAdapte
     private ArrayList<Uri> fileUriArray;
     private Uri backupFileUri;
     private CoordinatorLayout coordinatorLayout;
-    private ProgressBar progressBar;
-    private View whiteBackground;
     private boolean forUpdate = false;
     private DatePickerDialog datePickerDialog;
     private static final String TAG = "ClientComDetail:";
     private ArrayList<Long> refIdList = new ArrayList<>();
-    private Button proceed;
     private CompositeDisposable finalDisposer = new CompositeDisposable();
 
     @Override
@@ -126,7 +119,7 @@ public class WorkOrder extends CommonToolbarParentActivity implements FileAdapte
         super.onCreate(savedInstanceState);
 
         LayoutInflater inflater = (LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        final View childActivityLayout = inflater.inflate(R.layout.client_work_order, null);
+        final View childActivityLayout = Objects.requireNonNull(inflater).inflate(R.layout.client_work_order, null);
         LinearLayout parentActivityLayout = findViewById(R.id.contentMain);
         parentActivityLayout.addView(childActivityLayout, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
 
@@ -136,15 +129,14 @@ public class WorkOrder extends CommonToolbarParentActivity implements FileAdapte
         noOfInstallment = findViewById(R.id.noOfInstallment);
         workOrderDate = findViewById(R.id.comDate);
         installmentStartDate = findViewById(R.id.comDate1);
-        salesPerson = findViewById(R.id.textView17);
-        orderDateIcon = findViewById(R.id.dateIcon);
-        installmentDateIcon = findViewById(R.id.dateIcon1);
-        addDocumentIcon = findViewById(R.id.addFile);
-        fileRecycler = findViewById(R.id.recycler);
+        TextView salesPerson = findViewById(R.id.textView17);
+        ImageView orderDateIcon = findViewById(R.id.dateIcon);
+        ImageView installmentDateIcon = findViewById(R.id.dateIcon1);
+        RecyclerView fileRecycler = findViewById(R.id.recycler);
         coordinatorLayout = findViewById(R.id.coordinator_layout);
-        proceed = findViewById(R.id.proceed);
-        whiteBackground = findViewById(R.id.whiteBackground);
-        progressBar = findViewById(R.id.progressBar);
+        Button proceed = findViewById(R.id.proceed);
+        View whiteBackground = findViewById(R.id.whiteBackground);
+        ProgressBar progressBar = findViewById(R.id.progressBar);
         progressBar.setVisibility(View.INVISIBLE);
         whiteBackground.setVisibility(View.INVISIBLE);
 
@@ -220,7 +212,7 @@ public class WorkOrder extends CommonToolbarParentActivity implements FileAdapte
         if (forUpdate) {
             addFile.setClickable(false);
             addFile.setVisibility(View.GONE);
-            proceed.setText("Update");
+            proceed.setText(R.string.update);
 
         }
 
@@ -342,7 +334,7 @@ public class WorkOrder extends CommonToolbarParentActivity implements FileAdapte
             DownloadManager downloadManager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
             DownloadManager.Query query = new DownloadManager.Query();
             query.setFilterById(referenceId);
-            Cursor cursor = downloadManager.query(query);
+            Cursor cursor = Objects.requireNonNull(downloadManager).query(query);
             if (cursor.moveToFirst()) {
                 int downloadStatus = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS));
                 String downloadLocalUri = cursor.getString(cursor.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI));
@@ -372,7 +364,7 @@ public class WorkOrder extends CommonToolbarParentActivity implements FileAdapte
 
 
                 NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-                notificationManager.notify(455, mBuilder.build());
+                Objects.requireNonNull(notificationManager).notify(455, mBuilder.build());
             }
         }
     };
@@ -751,7 +743,7 @@ public class WorkOrder extends CommonToolbarParentActivity implements FileAdapte
 
     @Override
     public void onRequestPermissionsResult(int requestCode,
-                                           String[] permissions, int[] grantResults) {
+                                           @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch (requestCode) {
             case MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE:
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
@@ -812,7 +804,7 @@ public class WorkOrder extends CommonToolbarParentActivity implements FileAdapte
                         request.allowScanningByMediaScanner();
                         request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
                     }
-                    long refId = manager.enqueue(request);
+                    long refId = Objects.requireNonNull(manager).enqueue(request);
                     refIdList.add(refId);
 
                 } catch (Exception e){

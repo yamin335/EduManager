@@ -43,5 +43,6 @@
         android:src="@drawable/fab_button_shift"
         android:scaleType="center"
         app:elevation="0dp"
-        app:pressedTranslationZ="0dp"/>
+        app:pressedTranslationZ="0dp"
+        android:layout_alignParentRight="true" />
 </RelativeLayout>

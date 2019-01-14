@@ -188,13 +188,15 @@
         android:background="@drawable/button"
         android:paddingEnd="11dp"
         android:paddingStart="14dp"
-        android:text="Show Report"
+        android:text="@string/show_report"
         android:textAllCaps="false"
         android:textColor="@android:color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/spinnerStatus"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintVertical_bias="0.0"
+        android:paddingRight="11dp"
+        android:paddingLeft="14dp" />
 
 </android.support.constraint.ConstraintLayout>

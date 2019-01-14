@@ -33,14 +33,15 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
             android:layout_marginTop="8dp"
-            android:text="Previous Balance:"
+            android:text="@string/previous_balance"
             android:textColor="#505050"
             android:textSize="12sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="@+id/sectionLabel"
-            app:layout_constraintTop_toBottomOf="@+id/sectionLabel" />
+            app:layout_constraintTop_toBottomOf="@+id/sectionLabel"
+            android:layout_marginRight="8dp" />
 
         <TextView
             android:id="@+id/previousBalance"
@@ -61,14 +62,16 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
             android:layout_marginStart="90dp"
-            android:text="Due Amount:"
+            android:text="@string/due_amount"
             android:textColor="#505050"
             android:textSize="12sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toEndOf="@+id/label1"
-            app:layout_constraintTop_toTopOf="@+id/previousBalance" />
+            app:layout_constraintTop_toTopOf="@+id/previousBalance"
+            android:layout_marginRight="8dp"
+            android:layout_marginLeft="90dp" />
 
         <TextView
             android:id="@+id/dueAmount"
@@ -88,14 +91,15 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
-            android:text="Paid Amount:"
+            android:text="@string/paid_amount"
             android:textColor="#505050"
             android:textSize="12sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="@+id/label1"
-            app:layout_constraintTop_toBottomOf="@+id/label1" />
+            app:layout_constraintTop_toBottomOf="@+id/label1"
+            android:layout_marginRight="8dp" />
 
         <TextView
             android:id="@+id/paidAmount"
@@ -107,21 +111,23 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="@+id/previousBalance"
-            app:layout_constraintTop_toTopOf="@+id/label3" />
+            app:layout_constraintTop_toTopOf="@+id/label3"
+            android:layout_marginRight="8dp" />
 
         <TextView
             android:id="@+id/label4"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
-            android:text="Balance:"
+            android:text="@string/balance"
             android:textColor="#505050"
             android:textSize="12sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="@+id/label2"
-            app:layout_constraintTop_toTopOf="@+id/paidAmount" />
+            app:layout_constraintTop_toTopOf="@+id/paidAmount"
+            android:layout_marginRight="8dp" />
 
         <TextView
             android:id="@+id/balance"
@@ -133,7 +139,8 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="@+id/dueAmount"
-            app:layout_constraintTop_toTopOf="@+id/label4" />
+            app:layout_constraintTop_toTopOf="@+id/label4"
+            android:layout_marginRight="8dp" />
 
         <TextView
             android:id="@+id/mediumLabel"
@@ -141,7 +148,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginTop="2dp"
-            android:text="Medium:"
+            android:text="@string/medium"
             android:textColor="#505050"
             android:textSize="12sp"
             android:textStyle="bold"
@@ -150,7 +157,8 @@
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.0" />
+            app:layout_constraintVertical_bias="0.0"
+            android:layout_marginLeft="8dp" />
 
         <TextView
             android:id="@+id/medium"
@@ -162,21 +170,23 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toEndOf="@+id/mediumLabel"
-            app:layout_constraintTop_toTopOf="@+id/mediumLabel" />
+            app:layout_constraintTop_toTopOf="@+id/mediumLabel"
+            android:layout_marginLeft="8dp" />
 
         <TextView
             android:id="@+id/classLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:text="Class:"
+            android:text="@string/classs"
             android:textColor="#505050"
             android:textSize="12sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toEndOf="@+id/medium"
-            app:layout_constraintTop_toTopOf="@+id/medium" />
+            app:layout_constraintTop_toTopOf="@+id/medium"
+            android:layout_marginLeft="8dp" />
 
         <TextView
             android:id="@+id/classs"
@@ -188,21 +198,23 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toEndOf="@+id/classLabel"
-            app:layout_constraintTop_toTopOf="@+id/classLabel" />
+            app:layout_constraintTop_toTopOf="@+id/classLabel"
+            android:layout_marginLeft="8dp" />
 
         <TextView
             android:id="@+id/deptLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:text="Dept:"
+            android:text="@string/dept"
             android:textColor="#505050"
             android:textSize="12sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toEndOf="@+id/classs"
-            app:layout_constraintTop_toTopOf="@+id/classs" />
+            app:layout_constraintTop_toTopOf="@+id/classs"
+            android:layout_marginLeft="8dp" />
 
         <TextView
             android:id="@+id/dept"
@@ -214,13 +226,14 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toEndOf="@+id/deptLabel"
-            app:layout_constraintTop_toTopOf="@+id/deptLabel" />
+            app:layout_constraintTop_toTopOf="@+id/deptLabel"
+            android:layout_marginLeft="8dp" />
 
         <TextView
             android:id="@+id/sectionLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Section:"
+            android:text="@string/section"
             android:textColor="#505050"
             android:textSize="12sp"
             android:textStyle="bold"
@@ -239,21 +252,23 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toEndOf="@+id/sectionLabel"
-            app:layout_constraintTop_toBottomOf="@+id/mediumLabel" />
+            app:layout_constraintTop_toBottomOf="@+id/mediumLabel"
+            android:layout_marginLeft="8dp" />
 
         <TextView
             android:id="@+id/totalStudentLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:text="Total Student:"
+            android:text="@string/total_student1"
             android:textColor="#505050"
             android:textSize="12sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toEndOf="@+id/section"
-            app:layout_constraintTop_toBottomOf="@+id/mediumLabel" />
+            app:layout_constraintTop_toBottomOf="@+id/mediumLabel"
+            android:layout_marginLeft="8dp" />
 
         <TextView
             android:id="@+id/totalStudent"

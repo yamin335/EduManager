@@ -61,7 +61,7 @@
             android:layout_marginTop="8dp"
             android:background="@drawable/client_edittext"
             android:ems="10"
-            android:hint="Institute"
+            android:hint="@string/institute"
             android:inputType="text"
             android:padding="5dp"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -80,7 +80,7 @@
             android:layout_marginTop="8dp"
             android:background="@drawable/client_edittext"
             android:ems="10"
-            android:hint="Institute contact person"
+            android:hint="@string/institute_contact_person"
             android:inputType="text"
             android:padding="5dp"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -99,7 +99,7 @@
             android:layout_marginTop="8dp"
             android:background="@drawable/client_edittext"
             android:ems="10"
-            android:hint="Institute contact No."
+            android:hint="@string/institute_contact_no"
             android:inputType="number"
             android:padding="5dp"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -131,9 +131,10 @@
                 android:layout_weight="1"
                 android:background="@drawable/client_edittext"
                 android:ems="10"
-                android:hint="No. of students"
+                android:hint="@string/no_of_students"
                 android:inputType="number"
-                android:padding="5dp" />
+                android:padding="5dp"
+                android:layout_marginRight="3dp" />
 
             <EditText
                 android:id="@+id/teacherNo"
@@ -143,9 +144,10 @@
                 android:layout_weight="1"
                 android:background="@drawable/client_edittext"
                 android:ems="10"
-                android:hint="No. of teachers"
+                android:hint="@string/no_of_teachers"
                 android:inputType="number"
-                android:padding="5dp" />
+                android:padding="5dp"
+                android:layout_marginLeft="3dp" />
         </LinearLayout>
 
         <EditText
@@ -158,7 +160,7 @@
             android:layout_marginTop="8dp"
             android:background="@drawable/client_edittext"
             android:ems="10"
-            android:hint="Institute address"
+            android:hint="@string/institute_address"
             android:inputType="text"
             android:padding="5dp"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -177,7 +179,7 @@
             android:layout_marginTop="8dp"
             android:background="@drawable/client_edittext"
             android:ems="10"
-            android:hint="Comment"
+            android:hint="@string/comment"
             android:inputType="text"
             android:padding="5dp"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -194,7 +196,7 @@
             android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="16dp"
-            android:text="Visiting Card"
+            android:text="@string/visiting_card"
             android:textColor="#0550b7"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -233,7 +235,9 @@
                 android:layout_alignParentEnd="true"
                 android:layout_marginBottom="5dp"
                 android:layout_marginEnd="5dp"
-                app:srcCompat="@drawable/add_a_photo_24dp" />
+                app:srcCompat="@drawable/add_a_photo_24dp"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="5dp" />
         </RelativeLayout>
 
         <TextView
@@ -250,7 +254,8 @@
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="@+id/labelVCard"
             app:layout_constraintTop_toBottomOf="@+id/linearVCard"
-            app:layout_constraintVertical_bias="0.0" />
+            app:layout_constraintVertical_bias="0.0"
+            android:layout_marginRight="8dp" />
 
         <RelativeLayout
             android:id="@+id/linearPhoto"
@@ -282,7 +287,9 @@
                 android:layout_alignParentEnd="true"
                 android:layout_marginBottom="5dp"
                 android:layout_marginEnd="5dp"
-                app:srcCompat="@drawable/add_a_photo_24dp" />
+                app:srcCompat="@drawable/add_a_photo_24dp"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="5dp" />
         </RelativeLayout>
 
         <Button
@@ -295,7 +302,7 @@
             android:layout_marginStart="32dp"
             android:layout_marginTop="16dp"
             android:background="@drawable/button"
-            android:text="Proceed"
+            android:text="@string/proceed"
             android:textAllCaps="false"
             android:textColor="@android:color/white"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -320,7 +327,8 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="1.0"
-            app:srcCompat="@drawable/ic_date_range" />
+            app:srcCompat="@drawable/ic_date_range"
+            android:focusable="true" />
 
         <TextView
             android:id="@+id/showDate"
@@ -333,7 +341,8 @@
             android:textSize="11sp"
             app:layout_constraintBottom_toBottomOf="@+id/date"
             app:layout_constraintEnd_toStartOf="@+id/date"
-            app:layout_constraintTop_toTopOf="@+id/date" />
+            app:layout_constraintTop_toTopOf="@+id/date"
+            android:layout_marginRight="5dp" />
 
         <View
             android:id="@+id/whiteBackground"

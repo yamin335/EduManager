@@ -59,6 +59,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -96,16 +97,15 @@ public class ClientCommunicationDetail extends CommonToolbarParentActivity imple
     private static final String TAG = "ClientComDetail:";
     private static final int REQUEST_CODE = 3359;
     private static final int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 3369;
-    private RecyclerView fileRecycler;
     private FileAdapter fileAdapter;
     private ArrayList<Uri> fileUriArray;
     private Uri backupFileUri;
     private CoordinatorLayout coordinatorLayout;
     private ProgressBar progressBar;
     private View whiteBackground;
-    private String clientData = "", selectedDate = "", selectedNextMeetingDate = "";
+    private String selectedDate = "";
+    private String selectedNextMeetingDate = "";
     private CommunicationDetailModel communicationDetailModel;
-    private Button proceed;
     private LinearLayout nextMeetingDate;
     private DatePickerDialog datePickerDialog;
     private boolean forUpdate = false;
@@ -126,7 +126,7 @@ public class ClientCommunicationDetail extends CommonToolbarParentActivity imple
         super.onCreate(savedInstanceState);
 
         LayoutInflater inflater = (LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        final View childActivityLayout = inflater.inflate(R.layout.client_communication_detail, null);
+        final View childActivityLayout = Objects.requireNonNull(inflater).inflate(R.layout.client_communication_detail, null);
         LinearLayout parentActivityLayout = findViewById(R.id.contentMain);
         parentActivityLayout.addView(childActivityLayout, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
 
@@ -136,7 +136,7 @@ public class ClientCommunicationDetail extends CommonToolbarParentActivity imple
         TextView nextComDate = findViewById(R.id.comDate1);
         ImageView nextDateIcon = findViewById(R.id.dateIcon1);
         EditText details = findViewById(R.id.details);
-        proceed = findViewById(R.id.proceed);
+        Button proceed = findViewById(R.id.proceed);
         nextMeetingDate = findViewById(R.id.nextMeetingDate);
 
         Date date = Calendar.getInstance().getTime();
@@ -155,7 +155,7 @@ public class ClientCommunicationDetail extends CommonToolbarParentActivity imple
         communicationDetailModel = new CommunicationDetailModel();
         Intent extraIntent = getIntent();
         if (extraIntent.hasExtra("clientData")) {
-            clientData = extraIntent.getStringExtra("clientData");
+            String clientData = extraIntent.getStringExtra("clientData");
             try {
                 JSONObject jsonObject = new JSONObject(clientData);
                 communicationDetailModel.setNewClientID(Integer.toString(jsonObject.getInt("NewClientID")));
@@ -186,7 +186,7 @@ public class ClientCommunicationDetail extends CommonToolbarParentActivity imple
                 }
                 communicationDetailModel.setCommunicationDetails(jsonObject.getString("CommunicationDetails"));
                 details.setText(jsonObject.getString("CommunicationDetails"));
-                proceed.setText("Update");
+                proceed.setText(R.string.update);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -237,7 +237,7 @@ public class ClientCommunicationDetail extends CommonToolbarParentActivity imple
         progressBar.setVisibility(View.INVISIBLE);
         whiteBackground.setVisibility(View.INVISIBLE);
 
-        fileRecycler = findViewById(R.id.recycler);
+        RecyclerView fileRecycler = findViewById(R.id.recycler);
         fileUriArray = new ArrayList<>();
         fileAdapter = new FileAdapter(this, fileUriArray, this);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
@@ -363,7 +363,7 @@ public class ClientCommunicationDetail extends CommonToolbarParentActivity imple
             DownloadManager downloadManager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
             DownloadManager.Query query = new DownloadManager.Query();
             query.setFilterById(referenceId);
-            Cursor cursor = downloadManager.query(query);
+            Cursor cursor = Objects.requireNonNull(downloadManager).query(query);
             if (cursor.moveToFirst()) {
                 int downloadStatus = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS));
                 String downloadLocalUri = cursor.getString(cursor.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI));
@@ -393,7 +393,7 @@ public class ClientCommunicationDetail extends CommonToolbarParentActivity imple
 
 
                 NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-                notificationManager.notify(455, mBuilder.build());
+                Objects.requireNonNull(notificationManager).notify(455, mBuilder.build());
             }
         }
     };
@@ -725,7 +725,7 @@ public class ClientCommunicationDetail extends CommonToolbarParentActivity imple
 
     @Override
     public void onRequestPermissionsResult(int requestCode,
-                                           String[] permissions, int[] grantResults) {
+                                           @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch (requestCode) {
             case MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE:
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
@@ -957,7 +957,7 @@ public class ClientCommunicationDetail extends CommonToolbarParentActivity imple
                         request.allowScanningByMediaScanner();
                         request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
                     }
-                    long refId = manager.enqueue(request);
+                    long refId = Objects.requireNonNull(manager).enqueue(request);
                     refIdList.add(refId);
 
                 } catch (Exception e){

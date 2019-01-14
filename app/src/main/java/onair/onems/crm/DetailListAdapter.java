@@ -44,7 +44,7 @@ public class DetailListAdapter extends RecyclerView.Adapter<DetailListAdapter.My
     }
 
 
-    public DetailListAdapter(Context context, List<JSONObject> detailList, DetailListAdapterListener listener) {
+    DetailListAdapter(Context context, List<JSONObject> detailList, DetailListAdapterListener listener) {
         this.context = context;
         this.listener = listener;
         this.detailList = detailList;

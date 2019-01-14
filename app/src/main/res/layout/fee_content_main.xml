@@ -10,7 +10,7 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior">
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="vertical"
         >
     <LinearLayout
@@ -20,7 +20,7 @@
         android:orientation="horizontal"
      >
         <android.support.v4.widget.Space
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
             />
@@ -31,7 +31,8 @@
         android:layout_marginRight="10dp"
         android:layout_gravity="center_vertical"
         android:textAlignment="center"
-        android:padding="10dp"/>
+        android:padding="10dp"
+        android:layout_marginEnd="10dp" />
     </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"
@@ -66,7 +67,9 @@
             android:paddingLeft="20dp"
             android:paddingRight="10dp"
             android:background="#80cbc4"
-            android:paddingTop="20dp">
+            android:paddingTop="20dp"
+            android:paddingEnd="10dp"
+            android:paddingStart="20dp">
 
             <TextView
                 android:layout_width="180dp"
@@ -76,7 +79,7 @@
                 android:layout_alignParentTop="true"
                 android:layout_marginLeft="27dp"
                 android:layout_marginStart="27dp"
-                android:text="Total Amount"
+                android:text="@string/total_amount"
                 android:textColor="@android:color/black"
                 android:textStyle="bold">
 
@@ -89,10 +92,11 @@
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentRight="true"
                 android:layout_alignParentTop="true"
-                android:text="50000 TK"
+                android:text="@string/_50000_tk"
                 android:layout_marginRight="27dp"
                 android:textColor="@android:color/black"
-                android:textStyle="bold">
+                android:textStyle="bold"
+                android:layout_marginEnd="27dp">
 
             </TextView>
 
@@ -120,7 +124,7 @@
                 android:layout_alignParentTop="true"
                 android:layout_marginLeft="26dp"
                 android:layout_marginStart="26dp"
-                android:text="Payment Type:"
+                android:text="@string/payment_type"
                 android:gravity="center"
                 android:padding="10dp"
                 android:textColor="@android:color/black"
@@ -130,7 +134,6 @@
                 <Spinner
                     android:id="@+id/payment_type"
                     android:layout_width="180dp"
-                    android:textSize="14dp"
                     android:layout_height="wrap_content"
                     android:layout_alignParentTop="true"
                     android:layout_alignParentRight="true"
@@ -139,10 +142,11 @@
                     android:layout_toEndOf="@+id/fees"
                     android:layout_toRightOf="@+id/fees"
                     android:textAlignment="center"
-                    android:text="Select"
+                    android:text="@string/select"
                     android:textStyle="bold"
                     android:gravity="center"
-                    android:padding="10dp"/>
+                    android:padding="10dp"
+                    android:layout_alignParentEnd="true" />
 
 
         </RelativeLayout>
@@ -170,7 +174,7 @@
                 android:layout_alignParentTop="true"
                 android:layout_marginLeft="26dp"
                 android:layout_marginStart="26dp"
-                android:text="Total Payment:"
+                android:text="@string/total_payment"
                 android:padding="10dp"
                 android:gravity="center"
                 android:textColor="@android:color/black"
@@ -193,7 +197,8 @@
                 android:gravity="center"
                 android:textColor="@android:color/black"
                 android:inputType="numberDecimal"
-                android:textStyle="bold">
+                android:textStyle="bold"
+                android:layout_alignParentEnd="true">
 
             </EditText>
 
@@ -208,7 +213,7 @@
     android:layout_height="48dp"
     android:layout_marginTop="20dp"
     android:layout_centerInParent="true"
-    android:text="Payment"
+    android:text="@string/payment"
     android:background="@drawable/roundedbutton"
     android:textColor="#ffffff"
     android:id="@+id/btn_payment"

@@ -17,7 +17,7 @@
         <TextView
             android:layout_width="50dp"
             android:layout_height="match_parent"
-            android:text="ROLL"
+            android:text="@string/roll"
             android:padding="2dp"
             android:layout_gravity="center_vertical"
             android:gravity="center_vertical"
@@ -27,7 +27,7 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="NAME"
+            android:text="@string/name"
             android:padding="2dp"
             android:layout_gravity="center_vertical"
             android:gravity="center"

@@ -1,6 +1,5 @@
 package onair.onems.attendance;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -21,6 +20,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import java.util.ArrayList;
+import java.util.Objects;
+
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -92,7 +93,7 @@ public class ShowAttendance extends SideNavigationMenuParentActivity {
         activityName = ShowAttendance.class.getName();
 
         LayoutInflater inflater = (LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        final View childActivityLayout = inflater.inflate(R.layout.attendance_report_monthly_student_other, null);
+        final View childActivityLayout = Objects.requireNonNull(inflater).inflate(R.layout.attendance_report_monthly_student_other, null);
         LinearLayout parentActivityLayout = (LinearLayout) findViewById(R.id.contentMain);
         parentActivityLayout.addView(childActivityLayout, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
 
@@ -295,34 +296,31 @@ public class ShowAttendance extends SideNavigationMenuParentActivity {
             }
         });
 
-        student_find_button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(StaticHelperClass.isNetworkAvailable(ShowAttendance.this)) {
-                    if(selectedMedium.getMediumID() == -2) {
-                        Toast.makeText(ShowAttendance.this,"Please select a medium!!!",Toast.LENGTH_LONG).show();
-                    } else if(selectedClass.getClassID() == -2) {
-                        Toast.makeText(ShowAttendance.this,"Please select a class!!!",Toast.LENGTH_LONG).show();
-                    } else if((selectedDepartment.getDepartmentID() == -2)&&(allDepartmentArrayList.size()>0)) {
-                        Toast.makeText(ShowAttendance.this,"Please select a department!!!",Toast.LENGTH_LONG).show();
-                    } else if((selectedSection.getSectionID() == -2)&&(allSectionArrayList.size()>0)) {
-                        Toast.makeText(ShowAttendance.this,"Please select a section!!!",Toast.LENGTH_LONG).show();
-                    } else if(selectedMonth.getMonthID() == 0) {
-                        Toast.makeText(ShowAttendance.this,"Please select a month!!!",Toast.LENGTH_LONG).show();
-                    } else {
-                        Intent intent = new Intent(ShowAttendance.this, StudentAttendanceShow.class);
-                        intent.putExtra("ShiftID", selectedShift.getShiftID());
-                        intent.putExtra("MediumID", selectedMedium.getMediumID());
-                        intent.putExtra("ClassID", selectedClass.getClassID());
-                        intent.putExtra("DepartmentID", selectedDepartment.getDepartmentID());
-                        intent.putExtra("SectionID", selectedSection.getSectionID());
-                        intent.putExtra("MonthID", selectedMonth.getMonthID());
-                        startActivity(intent);
-                    }
+        student_find_button.setOnClickListener(view -> {
+            if(StaticHelperClass.isNetworkAvailable(ShowAttendance.this)) {
+                if(selectedMedium.getMediumID() == -2) {
+                    Toast.makeText(ShowAttendance.this,"Please select a medium!!!",Toast.LENGTH_LONG).show();
+                } else if(selectedClass.getClassID() == -2) {
+                    Toast.makeText(ShowAttendance.this,"Please select a class!!!",Toast.LENGTH_LONG).show();
+                } else if((selectedDepartment.getDepartmentID() == -2)&&(allDepartmentArrayList.size()>0)) {
+                    Toast.makeText(ShowAttendance.this,"Please select a department!!!",Toast.LENGTH_LONG).show();
+                } else if((selectedSection.getSectionID() == -2)&&(allSectionArrayList.size()>0)) {
+                    Toast.makeText(ShowAttendance.this,"Please select a section!!!",Toast.LENGTH_LONG).show();
+                } else if(selectedMonth.getMonthID() == 0) {
+                    Toast.makeText(ShowAttendance.this,"Please select a month!!!",Toast.LENGTH_LONG).show();
                 } else {
-                    Toast.makeText(ShowAttendance.this,"Please check your internet connection and select again!!! ",
-                            Toast.LENGTH_LONG).show();
+                    Intent intent1 = new Intent(ShowAttendance.this, StudentAttendanceShow.class);
+                    intent1.putExtra("ShiftID", selectedShift.getShiftID());
+                    intent1.putExtra("MediumID", selectedMedium.getMediumID());
+                    intent1.putExtra("ClassID", selectedClass.getClassID());
+                    intent1.putExtra("DepartmentID", selectedDepartment.getDepartmentID());
+                    intent1.putExtra("SectionID", selectedSection.getSectionID());
+                    intent1.putExtra("MonthID", selectedMonth.getMonthID());
+                    startActivity(intent1);
                 }
+            } else {
+                Toast.makeText(ShowAttendance.this,"Please check your internet connection and select again!!! ",
+                        Toast.LENGTH_LONG).show();
             }
         });
     }

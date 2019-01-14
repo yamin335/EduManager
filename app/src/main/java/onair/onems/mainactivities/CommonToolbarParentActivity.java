@@ -1,15 +1,20 @@
 package onair.onems.mainactivities;
 
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 
+import java.util.Objects;
+
 import onair.onems.R;
 
 public class CommonToolbarParentActivity extends AppCompatActivity {
     public int UserTypeID;
+    public CommonProgressDialog dialog;
     public long InstituteID, LoggedUserShiftID, LoggedUserMediumID, LoggedUserClassID,
             LoggedUserDepartmentID, LoggedUserSectionID, LoggedUserSessionID;
     public String activityName = "", LoggedUserID, UserName, UserFullName, ImageUrl;
@@ -18,6 +23,9 @@ public class CommonToolbarParentActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.onems_common_toolbar_activity);
 
+        dialog = new CommonProgressDialog(this);
+        Objects.requireNonNull(dialog.getWindow()).setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        dialog.setCancelable(false);
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         UserTypeID = prefs.getInt("UserTypeID",0);
         InstituteID = prefs.getLong("InstituteID",0);

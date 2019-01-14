@@ -57,7 +57,7 @@
             android:paddingRight="2dp"
             android:paddingStart="2dp"
             android:paddingTop="2dp"
-            android:text="Topic:"
+            android:text="@string/topic"
             android:textAllCaps="false"
             android:textColor="#0550b7"
             android:textSize="18sp"
@@ -101,7 +101,7 @@
             android:paddingLeft="2dp"
             android:paddingRight="2dp"
             android:paddingStart="2dp"
-            android:text="Details:"
+            android:text="@string/details"
             android:textColor="#0550b7"
             android:textSize="18sp"
             app:layout_constraintEnd_toEndOf="@+id/topic"
@@ -109,7 +109,7 @@
             app:layout_constraintStart_toStartOf="@+id/topic"
             app:layout_constraintTop_toBottomOf="@+id/topicValue" />
 
-        <ScrollView
+        <android.support.v4.widget.NestedScrollView
             android:id="@+id/scroll"
             android:layout_width="0dp"
             android:layout_height="150dp"
@@ -136,7 +136,7 @@
                 android:paddingTop="2dp"
                 android:textColor="#0550b7"
                 android:textSize="15sp" />
-        </ScrollView>
+        </android.support.v4.widget.NestedScrollView>
 
         <LinearLayout
             android:id="@+id/linear"
@@ -185,7 +185,7 @@
             android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
-            android:text="No syllabus digital content found"
+            android:text="@string/no_syllabus_digital_content_found"
             android:textSize="18sp"
             app:layout_constraintBottom_toBottomOf="@+id/linear"
             app:layout_constraintEnd_toEndOf="@+id/linear"
@@ -200,7 +200,7 @@
             android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
-            android:text="No lesson digital content found"
+            android:text="@string/no_lesson_digital_content_found"
             android:textSize="18sp"
             app:layout_constraintBottom_toBottomOf="@+id/lessonLinear"
             app:layout_constraintEnd_toEndOf="@+id/lessonLinear"
@@ -240,32 +240,35 @@
             app:layout_constraintBottom_toBottomOf="@+id/imageView5"
             app:layout_constraintStart_toEndOf="@+id/imageView5"
             app:layout_constraintTop_toTopOf="@+id/imageView5"
-            app:layout_constraintVertical_bias="0.100000024" />
+            app:layout_constraintVertical_bias="0.100000024"
+            android:layout_marginLeft="4dp" />
 
         <TextView
             android:id="@+id/syllabusDigitalLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
-            android:text="Syllabus digital content:"
+            android:text="@string/syllabus_digital_content"
             android:textColor="#0550b7"
             android:textSize="18sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="@+id/details"
-            app:layout_constraintTop_toBottomOf="@+id/scroll" />
+            app:layout_constraintTop_toBottomOf="@+id/scroll"
+            android:layout_marginRight="8dp" />
 
         <TextView
             android:id="@+id/lessonContentLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
-            android:text="Lesson digital content:"
+            android:text="@string/lesson_digital_content"
             android:textColor="#0550b7"
             android:textSize="18sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="@+id/syllabusDigitalLabel"
-            app:layout_constraintTop_toBottomOf="@+id/linear" />
+            app:layout_constraintTop_toBottomOf="@+id/linear"
+            android:layout_marginRight="8dp" />
     </android.support.constraint.ConstraintLayout>
 </ScrollView>

@@ -1,9 +1,5 @@
 package onair.onems.customised;
 
-/**
- * Created by User on 1/23/2018.
- */
-
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;

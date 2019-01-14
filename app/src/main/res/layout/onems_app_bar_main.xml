@@ -43,7 +43,8 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:baselineAligned="false">
                 <android.support.constraint.ConstraintLayout
                     android:id="@+id/dashboard"
                     android:layout_weight="1"
@@ -66,7 +67,7 @@
                         android:id="@+id/textDashboard"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Dashboard"
+                        android:text="@string/dashboard"
                         android:textAllCaps="false"
                         android:textColor="#757575"
                         android:textSize="10sp"
@@ -98,7 +99,7 @@
                         android:id="@+id/textProfile"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Profile"
+                        android:text="@string/profile"
                         android:textAllCaps="false"
                         android:textColor="#757575"
                         android:textSize="10sp"
@@ -130,7 +131,7 @@
                         android:id="@+id/textNotification"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Notification"
+                        android:text="@string/notification"
                         android:textAllCaps="false"
                         android:textColor="#757575"
                         android:textSize="10sp"
@@ -180,7 +181,7 @@
                         android:id="@+id/textContact"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Contacts"
+                        android:text="@string/contacts"
                         android:textAllCaps="false"
                         android:textColor="#757575"
                         android:textSize="10sp"

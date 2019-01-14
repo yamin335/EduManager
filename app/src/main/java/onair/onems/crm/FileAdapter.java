@@ -18,6 +18,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 import onair.onems.R;
 
@@ -48,13 +49,13 @@ public class FileAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     }
 
 
-    public FileAdapter(Context context, ArrayList<Uri> uriArray, DeleteUri deleteUri) {
+    FileAdapter(Context context, ArrayList<Uri> uriArray, DeleteUri deleteUri) {
         this.context = context;
         this.uriArray = uriArray;
         this.deleteUri = deleteUri;
     }
 
-    public FileAdapter(Context context, JSONArray fileUrls, boolean forUpdate, DownloadFile downloadFileListener) {
+    FileAdapter(Context context, JSONArray fileUrls, boolean forUpdate, DownloadFile downloadFileListener) {
         this.context = context;
         this.fileUrls = fileUrls;
         this.forUpdate = forUpdate;
@@ -116,7 +117,7 @@ public class FileAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         void onFileSelected(JSONObject jsonObject);
     }
 
-    public String getFileInformation(Uri uri) {
+    String getFileInformation(Uri uri) {
         String displayName = "";
         String size = "";
         // The query, since it only applies to a single document, will only return
@@ -152,7 +153,7 @@ public class FileAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 }
             }
         } finally {
-            cursor.close();
+            Objects.requireNonNull(cursor).close();
         }
         return displayName+" Size: "+size;
     }

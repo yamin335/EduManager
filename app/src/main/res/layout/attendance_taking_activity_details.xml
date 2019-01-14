@@ -20,9 +20,10 @@
             android:layout_alignParentStart="true"
             android:background="#123c75"
             android:padding="5dp"
-            android:text="Name and Roll"
+            android:text="@string/name_and_roll"
             android:textColor="#ffffff"
-            android:textSize="16sp" />
+            android:textSize="16sp"
+            android:layout_alignParentLeft="true" />
 
         <TextView
             android:id="@+id/present"
@@ -31,9 +32,10 @@
             android:layout_toStartOf="@id/absent"
             android:background="#123c75"
             android:padding="5dp"
-            android:text="Present"
+            android:text="@string/present"
             android:textColor="#ffffff"
-            android:textSize="16sp" />
+            android:textSize="16sp"
+            android:layout_toLeftOf="@id/absent" />
 
         <TextView
             android:id="@+id/absent"
@@ -43,7 +45,7 @@
             android:layout_toStartOf="@id/late"
             android:background="#123c75"
             android:padding="5dp"
-            android:text="Absent"
+            android:text="@string/absent"
             android:textColor="#ffffff"
             android:textSize="16sp" />
 
@@ -54,9 +56,10 @@
             android:layout_toStartOf="@id/leave"
             android:background="#123c75"
             android:padding="5dp"
-            android:text="Late"
+            android:text="@string/late"
             android:textColor="#ffffff"
-            android:textSize="16sp" />
+            android:textSize="16sp"
+            android:layout_toLeftOf="@id/leave" />
 
         <TextView
             android:id="@+id/leave"
@@ -65,9 +68,10 @@
             android:layout_alignParentEnd="true"
             android:background="#123c75"
             android:padding="5dp"
-            android:text="Leave"
+            android:text="@string/leave"
             android:textColor="#ffffff"
-            android:textSize="16sp" />
+            android:textSize="16sp"
+            android:layout_alignParentRight="true" />
     </RelativeLayout>
 
     <android.support.v7.widget.RecyclerView

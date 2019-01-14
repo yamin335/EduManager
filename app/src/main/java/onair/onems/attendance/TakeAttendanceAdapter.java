@@ -123,89 +123,77 @@ public class TakeAttendanceAdapter extends RecyclerView.Adapter<TakeAttendanceAd
             holder.lateInput.setEnabled(true);
         }
 
-        holder.present.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    attendanceSheetList.get(holder.getAdapterPosition()).setIsPresent("1");
-                    attendanceSheetList.get(holder.getAdapterPosition()).setIsAbsent("0");
-                    attendanceSheetList.get(holder.getAdapterPosition()).setIslate("0");
-                    attendanceSheetList.get(holder.getAdapterPosition()).setIsLeave("0");
-                    attendanceSheetList.get(holder.getAdapterPosition()).setLateTime("0");
+        holder.present.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                attendanceSheetList.get(holder.getAdapterPosition()).setIsPresent("1");
+                attendanceSheetList.get(holder.getAdapterPosition()).setIsAbsent("0");
+                attendanceSheetList.get(holder.getAdapterPosition()).setIslate("0");
+                attendanceSheetList.get(holder.getAdapterPosition()).setIsLeave("0");
+                attendanceSheetList.get(holder.getAdapterPosition()).setLateTime("0");
 
-                    holder.lateInput.setText("");
-                    holder.absent.setChecked(false);
-                    holder.late.setChecked(false);
-                    holder.leave.setChecked(false);
-                }
-
+                holder.lateInput.setText("");
+                holder.absent.setChecked(false);
+                holder.late.setChecked(false);
+                holder.leave.setChecked(false);
             }
+
         });
 
-        holder.absent.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    attendanceSheetList.get(holder.getAdapterPosition()).setIsPresent("0");
-                    attendanceSheetList.get(holder.getAdapterPosition()).setIsAbsent("1");
-                    attendanceSheetList.get(holder.getAdapterPosition()).setIslate("0");
-                    attendanceSheetList.get(holder.getAdapterPosition()).setIsLeave("0");
-                    attendanceSheetList.get(holder.getAdapterPosition()).setLateTime("0");
+        holder.absent.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                attendanceSheetList.get(holder.getAdapterPosition()).setIsPresent("0");
+                attendanceSheetList.get(holder.getAdapterPosition()).setIsAbsent("1");
+                attendanceSheetList.get(holder.getAdapterPosition()).setIslate("0");
+                attendanceSheetList.get(holder.getAdapterPosition()).setIsLeave("0");
+                attendanceSheetList.get(holder.getAdapterPosition()).setLateTime("0");
 
-                    holder.lateInput.setText("");
-                    holder.present.setChecked(false);
-                    holder.late.setChecked(false);
-                    holder.leave.setChecked(false);
-                }
-
+                holder.lateInput.setText("");
+                holder.present.setChecked(false);
+                holder.late.setChecked(false);
+                holder.leave.setChecked(false);
             }
+
         });
 
-        holder.late.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    attendanceSheetList.get(holder.getAdapterPosition()).setIsPresent("0");
-                    attendanceSheetList.get(holder.getAdapterPosition()).setIsAbsent("0");
-                    attendanceSheetList.get(holder.getAdapterPosition()).setIslate("1");
-                    attendanceSheetList.get(holder.getAdapterPosition()).setIsLeave("0");
+        holder.late.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                attendanceSheetList.get(holder.getAdapterPosition()).setIsPresent("0");
+                attendanceSheetList.get(holder.getAdapterPosition()).setIsAbsent("0");
+                attendanceSheetList.get(holder.getAdapterPosition()).setIslate("1");
+                attendanceSheetList.get(holder.getAdapterPosition()).setIsLeave("0");
 
-                    holder.lateInput.setEnabled(false);
+                holder.lateInput.setEnabled(false);
 
-                    if(holder.lateInput.getText().toString().equalsIgnoreCase("")) {
-                        attendanceSheetList.get(holder.getAdapterPosition()).setLateTime("0");
-                        Toast.makeText(mContext,"Please input first !!!",Toast.LENGTH_LONG).show();
-                    } else {
-                        attendanceSheetList.get(holder.getAdapterPosition()).setLateTime(holder.lateInput.getText().toString());
-                    }
-
-                    holder.absent.setChecked(false);
-                    holder.present.setChecked(false);
-                    holder.leave.setChecked(false);
+                if(holder.lateInput.getText().toString().equalsIgnoreCase("")) {
+                    attendanceSheetList.get(holder.getAdapterPosition()).setLateTime("0");
+                    Toast.makeText(mContext,"Please input first !!!",Toast.LENGTH_LONG).show();
                 } else {
-                    holder.lateInput.setEnabled(true);
+                    attendanceSheetList.get(holder.getAdapterPosition()).setLateTime(holder.lateInput.getText().toString());
                 }
 
+                holder.absent.setChecked(false);
+                holder.present.setChecked(false);
+                holder.leave.setChecked(false);
+            } else {
+                holder.lateInput.setEnabled(true);
             }
+
         });
 
-        holder.leave.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    attendanceSheetList.get(holder.getAdapterPosition()).setIsPresent("0");
-                    attendanceSheetList.get(holder.getAdapterPosition()).setIsAbsent("0");
-                    attendanceSheetList.get(holder.getAdapterPosition()).setIslate("0");
-                    attendanceSheetList.get(holder.getAdapterPosition()).setLateTime("0");
-                    attendanceSheetList.get(holder.getAdapterPosition()).setIsLeave("1");
+        holder.leave.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                attendanceSheetList.get(holder.getAdapterPosition()).setIsPresent("0");
+                attendanceSheetList.get(holder.getAdapterPosition()).setIsAbsent("0");
+                attendanceSheetList.get(holder.getAdapterPosition()).setIslate("0");
+                attendanceSheetList.get(holder.getAdapterPosition()).setLateTime("0");
+                attendanceSheetList.get(holder.getAdapterPosition()).setIsLeave("1");
 
-                    holder.lateInput.setText("");
-                    holder.absent.setChecked(false);
-                    holder.late.setChecked(false);
-                    holder.present.setChecked(false);
-                }
-
+                holder.lateInput.setText("");
+                holder.absent.setChecked(false);
+                holder.late.setChecked(false);
+                holder.present.setChecked(false);
             }
+
         });
     }
 

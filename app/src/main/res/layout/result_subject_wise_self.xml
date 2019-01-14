@@ -25,7 +25,7 @@
             android:paddingRight="5dp"
             android:paddingStart="5dp"
             android:paddingTop="3dp"
-            android:text="Subject"
+            android:text="@string/subject"
             android:textColor="#ffffff"
             android:textSize="18sp"
             android:layout_weight="1"
@@ -41,7 +41,7 @@
             android:paddingRight="5dp"
             android:paddingStart="5dp"
             android:paddingTop="3dp"
-            android:text="Mark"
+            android:text="@string/mark"
             android:textColor="#ffffff"
             android:textSize="18sp"
             android:gravity="center"/>
@@ -56,7 +56,7 @@
             android:paddingRight="5dp"
             android:paddingStart="5dp"
             android:paddingTop="3dp"
-            android:text="Grade"
+            android:text="@string/grade"
             android:textColor="#ffffff"
             android:textSize="18sp"
             android:gravity="center"/>
@@ -71,7 +71,7 @@
             android:paddingRight="5dp"
             android:paddingStart="5dp"
             android:paddingTop="3dp"
-            android:text="Grade Point"
+            android:text="@string/grade_point"
             android:textColor="#ffffff"
             android:textSize="18sp"
             android:gravity="center"/>
@@ -94,6 +94,8 @@
         android:layout_marginBottom="8dp"
         app:srcCompat="@drawable/ic_arrow_up"
         android:tint="#ffffff"
-        android:scaleType="center"/>
+        android:scaleType="center"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="8dp" />
 
 </RelativeLayout>

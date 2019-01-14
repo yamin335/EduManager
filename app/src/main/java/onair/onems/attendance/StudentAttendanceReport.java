@@ -16,6 +16,8 @@ import android.view.View;
 import android.widget.LinearLayout;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+
 import onair.onems.R;
 import onair.onems.mainactivities.SideNavigationMenuParentActivity;
 import onair.onems.mainactivities.StudentMainScreen;
@@ -29,7 +31,7 @@ public class StudentAttendanceReport extends SideNavigationMenuParentActivity {
         activityName = StudentAttendanceReport.class.getName();
 
         LayoutInflater inflater = (LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        final View childActivityLayout = inflater.inflate(R.layout.attendance_report_content_main, null);
+        final View childActivityLayout = Objects.requireNonNull(inflater).inflate(R.layout.attendance_report_content_main, null);
         LinearLayout parentActivityLayout = (LinearLayout) findViewById(R.id.contentMain);
         parentActivityLayout.addView(childActivityLayout, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
 

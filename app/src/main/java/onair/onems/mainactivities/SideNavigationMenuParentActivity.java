@@ -42,6 +42,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
 
 import io.reactivex.Observable;
@@ -101,6 +102,7 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
     private static final String MyPREFERENCES = "LogInKey";
     private ExpandableListAdapter mMenuAdapter;
     private ExpandableListView expandableList;
+    public CommonProgressDialog dialog;
     public int UserTypeID;
     public long InstituteID, LoggedUserShiftID, LoggedUserMediumID, LoggedUserClassID,
             LoggedUserDepartmentID, LoggedUserSectionID, LoggedUserSessionID;
@@ -174,6 +176,9 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
         super.onCreate(savedInstanceState);
         setContentView(R.layout.onems_activity_main);
 
+        dialog = new CommonProgressDialog(this);
+        Objects.requireNonNull(dialog.getWindow()).setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        dialog.setCancelable(false);
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         UserTypeID = prefs.getInt("UserTypeID",0);
         InstituteID = prefs.getLong("InstituteID",0);

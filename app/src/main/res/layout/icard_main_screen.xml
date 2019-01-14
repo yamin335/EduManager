@@ -130,7 +130,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:background="@drawable/red_button"
-        android:text="Edit"
+        android:text="@string/edit"
         android:textAllCaps="false"
         android:textColor="@android:color/white"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -168,7 +168,7 @@
                 android:layout_height="30dp"
                 android:layout_margin="10dp"
                 android:background="@drawable/button"
-                android:text="New Entry"
+                android:text="@string/new_entry"
                 android:textAllCaps="false"
                 android:textColor="@android:color/white"
                 />
@@ -187,7 +187,7 @@
                 android:layout_height="30dp"
                 android:layout_margin="10dp"
                 android:background="@drawable/button"
-                android:text="Show Details"
+                android:text="@string/show_details"
                 android:textAllCaps="false"
                 android:textColor="@android:color/white"/>
         </LinearLayout>

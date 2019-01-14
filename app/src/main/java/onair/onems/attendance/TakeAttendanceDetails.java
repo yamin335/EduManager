@@ -24,6 +24,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import java.util.ArrayList;
+import java.util.Objects;
 
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -47,7 +48,6 @@ public class TakeAttendanceDetails extends CommonToolbarParentActivity {
     private ArrayList<AttendanceStudentModel> attendanceSheetArrayList;
     private long InstituteID, MediumID, ShiftID, ClassID, SectionID, SubjectID, DepertmentID;
     private String date, UserID, SubAtdID;
-    private JSONArray StudentJsonArray;
     private JsonObject postDataJsonObject;
     private CompositeDisposable finalDisposer = new CompositeDisposable();
 
@@ -75,7 +75,7 @@ public class TakeAttendanceDetails extends CommonToolbarParentActivity {
         super.onCreate(savedInstanceState);
 
         LayoutInflater inflater = (LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        final View childActivityLayout = inflater.inflate(R.layout.attendance_taking_activity_details, null);
+        final View childActivityLayout = Objects.requireNonNull(inflater).inflate(R.layout.attendance_taking_activity_details, null);
         LinearLayout parentActivityLayout = findViewById(R.id.contentMain);
         parentActivityLayout.addView(childActivityLayout, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
 
@@ -110,9 +110,9 @@ public class TakeAttendanceDetails extends CommonToolbarParentActivity {
     private void prepareAlbums(String jsonString) {
 
         try {
-            StudentJsonArray = new JSONArray(jsonString);
-            for(int i = 0; i < StudentJsonArray.length(); ++i) {
-                JSONObject studentJsonObject = StudentJsonArray.getJSONObject(i);
+            JSONArray studentJsonArray = new JSONArray(jsonString);
+            for(int i = 0; i < studentJsonArray.length(); ++i) {
+                JSONObject studentJsonObject = studentJsonArray.getJSONObject(i);
                 AttendanceStudentModel attendanceStudentModel = new AttendanceStudentModel(
                         studentJsonObject.getString("SubAtdDetailID"),
                         studentJsonObject.getString("SubAtdID"),

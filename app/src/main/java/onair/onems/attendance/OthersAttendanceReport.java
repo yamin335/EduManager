@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,6 +18,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import java.util.ArrayList;
+import java.util.Objects;
 
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -79,7 +81,7 @@ public class OthersAttendanceReport extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.attendance_report_monthly_student_other, container, false);
 
@@ -101,7 +103,7 @@ public class OthersAttendanceReport extends Fragment {
         spinnerMonth = (Spinner)rootView.findViewById(R.id.spinnerMonth);
         Button student_find_button=(Button) rootView.findViewById(R.id.show_button);
 
-        ArrayAdapter<String> class_spinner_adapter = new ArrayAdapter<>(getActivity(), R.layout.spinner_item, tempClassArray);
+        ArrayAdapter<String> class_spinner_adapter = new ArrayAdapter<>(Objects.requireNonNull(getActivity()), R.layout.spinner_item, tempClassArray);
         class_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerClass.setAdapter(class_spinner_adapter);
 
@@ -325,7 +327,7 @@ public class OthersAttendanceReport extends Fragment {
             try {
                 String[] strings = new String[shiftArrayList.size()];
                 strings = shiftArrayList.toArray(strings);
-                ArrayAdapter<String> shift_spinner_adapter = new ArrayAdapter<>(getActivity(),R.layout.spinner_item, strings);
+                ArrayAdapter<String> shift_spinner_adapter = new ArrayAdapter<>(Objects.requireNonNull(getActivity()),R.layout.spinner_item, strings);
                 shift_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinnerShift.setAdapter(shift_spinner_adapter);
             } catch (IndexOutOfBoundsException e) {
@@ -356,7 +358,7 @@ public class OthersAttendanceReport extends Fragment {
             try {
                 String[] strings = new String[mediumnArrayList.size()];
                 strings = mediumnArrayList.toArray(strings);
-                ArrayAdapter<String> medium_spinner_adapter = new ArrayAdapter<>(getActivity(),R.layout.spinner_item, strings);
+                ArrayAdapter<String> medium_spinner_adapter = new ArrayAdapter<>(Objects.requireNonNull(getActivity()),R.layout.spinner_item, strings);
                 medium_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinnerMedium.setAdapter(medium_spinner_adapter);
             } catch (IndexOutOfBoundsException e) {
@@ -386,7 +388,7 @@ public class OthersAttendanceReport extends Fragment {
             try {
                 String[] strings = new String[classArrayList.size()];
                 strings = classArrayList.toArray(strings);
-                ArrayAdapter<String> class_spinner_adapter = new ArrayAdapter<>(getActivity(),R.layout.spinner_item, strings);
+                ArrayAdapter<String> class_spinner_adapter = new ArrayAdapter<>(Objects.requireNonNull(getActivity()),R.layout.spinner_item, strings);
                 class_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinnerClass.setAdapter(class_spinner_adapter);
             } catch (IndexOutOfBoundsException e) {
@@ -419,7 +421,7 @@ public class OthersAttendanceReport extends Fragment {
             try {
                 String[] strings = new String[departmentArrayList.size()];
                 strings = departmentArrayList.toArray(strings);
-                ArrayAdapter<String> department_spinner_adapter = new ArrayAdapter<>(getActivity(),R.layout.spinner_item, strings);
+                ArrayAdapter<String> department_spinner_adapter = new ArrayAdapter<>(Objects.requireNonNull(getActivity()),R.layout.spinner_item, strings);
                 department_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinnerDepartment.setAdapter(department_spinner_adapter);
             } catch (IndexOutOfBoundsException e) {
@@ -448,7 +450,7 @@ public class OthersAttendanceReport extends Fragment {
             try {
                 String[] strings = new String[sectionArrayList.size()];
                 strings = sectionArrayList.toArray(strings);
-                ArrayAdapter<String> section_spinner_adapter = new ArrayAdapter<>(getActivity(),R.layout.spinner_item, strings);
+                ArrayAdapter<String> section_spinner_adapter = new ArrayAdapter<>(Objects.requireNonNull(getActivity()),R.layout.spinner_item, strings);
                 section_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinnerSection.setAdapter(section_spinner_adapter);
             } catch (IndexOutOfBoundsException e) {
@@ -478,7 +480,7 @@ public class OthersAttendanceReport extends Fragment {
             try {
                 String[] strings = new String[monthArrayList.size()];
                 strings = monthArrayList.toArray(strings);
-                ArrayAdapter<String> month_spinner_adapter = new ArrayAdapter<>(getActivity(),R.layout.spinner_item, strings);
+                ArrayAdapter<String> month_spinner_adapter = new ArrayAdapter<>(Objects.requireNonNull(getActivity()),R.layout.spinner_item, strings);
                 month_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinnerMonth.setAdapter(month_spinner_adapter);
             } catch (IndexOutOfBoundsException e) {
@@ -492,7 +494,7 @@ public class OthersAttendanceReport extends Fragment {
     }
 
     private void ShiftDataGetRequest() {
-        if (StaticHelperClass.isNetworkAvailable(getActivity())) {
+        if (StaticHelperClass.isNetworkAvailable(Objects.requireNonNull(getActivity()))) {
 
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
@@ -537,7 +539,7 @@ public class OthersAttendanceReport extends Fragment {
     }
 
     private void MediumDataGetRequest() {
-        if(StaticHelperClass.isNetworkAvailable(getActivity())) {
+        if(StaticHelperClass.isNetworkAvailable(Objects.requireNonNull(getActivity()))) {
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
                     .addConverterFactory(ScalarsConverterFactory.create())
@@ -580,7 +582,7 @@ public class OthersAttendanceReport extends Fragment {
     }
 
     private void ClassDataGetRequest() {
-        if(StaticHelperClass.isNetworkAvailable(getActivity())) {
+        if(StaticHelperClass.isNetworkAvailable(Objects.requireNonNull(getActivity()))) {
             CheckSelectedData();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
@@ -624,7 +626,7 @@ public class OthersAttendanceReport extends Fragment {
     }
 
     private void DepartmentDataGetRequest() {
-        if(StaticHelperClass.isNetworkAvailable(getActivity())) {
+        if(StaticHelperClass.isNetworkAvailable(Objects.requireNonNull(getActivity()))) {
 
             CheckSelectedData();
 
@@ -670,7 +672,7 @@ public class OthersAttendanceReport extends Fragment {
     }
 
     private void SectionDataGetRequest() {
-        if(StaticHelperClass.isNetworkAvailable(getActivity())) {
+        if(StaticHelperClass.isNetworkAvailable(Objects.requireNonNull(getActivity()))) {
 
             CheckSelectedData();
 
@@ -716,7 +718,7 @@ public class OthersAttendanceReport extends Fragment {
     }
 
     void MonthDataGetRequest(){
-        if(StaticHelperClass.isNetworkAvailable(getActivity())) {
+        if(StaticHelperClass.isNetworkAvailable(Objects.requireNonNull(getActivity()))) {
 
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))

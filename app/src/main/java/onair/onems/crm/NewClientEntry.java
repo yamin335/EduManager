@@ -36,9 +36,6 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.toolbox.StringRequest;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonObject;
@@ -47,7 +44,6 @@ import com.google.gson.JsonParser;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.reactivestreams.Subscriber;
 
 import java.io.File;
 import java.io.IOException;
@@ -55,38 +51,26 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.Callable;
+import java.util.Objects;
 
 import io.reactivex.Observable;
-import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Consumer;
-import io.reactivex.observers.DefaultObserver;
 import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
-import io.reactivex.functions.Action;
-import io.reactivex.functions.BiFunction;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import onair.onems.R;
 import onair.onems.Services.RetrofitNetworkService;
 import onair.onems.Services.StaticHelperClass;
-import onair.onems.models.CombinedReturnValue;
 import onair.onems.models.InstituteTypeModel;
 import onair.onems.models.PriorityModel;
-import onair.onems.network.MySingleton;
 import onair.onems.utils.ImageUtils;
 import onair.onems.mainactivities.SideNavigationMenuParentActivity;
 import onair.onems.mainactivities.StudentMainScreen;
 import onair.onems.mainactivities.TeacherMainScreen;
-import retrofit2.Call;
-import retrofit2.Callback;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -101,7 +85,6 @@ public class NewClientEntry extends SideNavigationMenuParentActivity implements 
     private PriorityModel selectedPriority;
     private String[] tempInsType = {"Institute Type"};
     private String[] tempPriorityType = {"Priority"};
-    private RecyclerView recyclerCard, recyclerPhoto;
     private ArrayList<Bitmap> vCardBitmapArray;
     private ArrayList<Bitmap> photoBitmapArray;
     private ArrayList<File> vCardFileArray;
@@ -139,7 +122,7 @@ public class NewClientEntry extends SideNavigationMenuParentActivity implements 
         activityName = NewClientEntry.class.getName();
 
         LayoutInflater inflater = (LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        final View childActivityLayout = inflater.inflate(R.layout.client_entry_new, null);
+        final View childActivityLayout = Objects.requireNonNull(inflater).inflate(R.layout.client_entry_new, null);
         LinearLayout parentActivityLayout = (LinearLayout) findViewById(R.id.contentMain);
         parentActivityLayout.addView(childActivityLayout, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
 
@@ -242,7 +225,7 @@ public class NewClientEntry extends SideNavigationMenuParentActivity implements 
                     noOfTeacher.setText(jsonObject.getString("NoOfTeacher"));
                     instituteAddress.setText(jsonObject.getString("InstituteAddress"));
                     comment.setText(jsonObject.getString("Comments"));
-                    proceed.setText("Update");
+                    proceed.setText(R.string.update);
                     toolbar.setTitle("Update Client");
                 }
             } catch (JSONException e) {
@@ -267,8 +250,8 @@ public class NewClientEntry extends SideNavigationMenuParentActivity implements 
         vCardFileArray = new ArrayList<>();
         photoFileArray = new ArrayList<>();
 
-        recyclerCard = findViewById(R.id.recyclerVCard);
-        recyclerPhoto = findViewById(R.id.recyclerPhoto);
+        RecyclerView recyclerCard = findViewById(R.id.recyclerVCard);
+        RecyclerView recyclerPhoto = findViewById(R.id.recyclerPhoto);
 
 
         vCardAdapter = new ImageAdapter(this, vCardBitmapArray, vCardFileArray, VCARD, this, this);

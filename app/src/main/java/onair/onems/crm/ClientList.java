@@ -21,6 +21,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 import io.reactivex.Observable;
 import io.reactivex.Observer;
@@ -60,7 +61,7 @@ public class ClientList extends SideNavigationMenuParentActivity implements Clie
         super.onCreate(savedInstanceState);
 
         LayoutInflater inflater = (LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        final View childActivityLayout = inflater.inflate(R.layout.client_list, null);
+        final View childActivityLayout = Objects.requireNonNull(inflater).inflate(R.layout.client_list, null);
         LinearLayout parentActivityLayout = (LinearLayout) findViewById(R.id.contentMain);
         parentActivityLayout.addView(childActivityLayout, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
 

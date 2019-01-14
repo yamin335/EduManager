@@ -48,7 +48,7 @@ public class ClientListAdapter extends RecyclerView.Adapter<ClientListAdapter.My
     }
 
 
-    public ClientListAdapter(Context context, List<JsonObject> clientList, ClientListAdapterListener listener) {
+    ClientListAdapter(Context context, List<JsonObject> clientList, ClientListAdapterListener listener) {
         this.context = context;
         this.listener = listener;
         this.clientList = clientList;

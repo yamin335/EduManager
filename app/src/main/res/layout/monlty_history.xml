@@ -48,7 +48,7 @@
                     android:layout_alignParentTop="true"
                     android:layout_marginLeft="27dp"
                     android:layout_marginStart="27dp"
-                    android:text="Total Amount"
+                    android:text="@string/total_amount"
                     android:textColor="@android:color/black"
                     android:textStyle="bold">
 
@@ -61,10 +61,11 @@
                     android:layout_alignParentEnd="true"
                     android:layout_alignParentRight="true"
                     android:layout_alignParentTop="true"
-                    android:text="0 TK"
+                    android:text="@string/_0_tk"
                     android:layout_marginRight="27dp"
                     android:textColor="@android:color/black"
-                    android:textStyle="bold">
+                    android:textStyle="bold"
+                    android:layout_marginEnd="27dp">
 
                 </TextView>
 
@@ -94,7 +95,7 @@
                     android:layout_alignParentTop="true"
                     android:layout_marginLeft="27dp"
                     android:layout_marginStart="27dp"
-                    android:text="Total Payment"
+                    android:text="@string/total_payment1"
                     android:textColor="@android:color/black"
                     android:textStyle="bold">
 
@@ -107,10 +108,11 @@
                     android:layout_alignParentEnd="true"
                     android:layout_alignParentRight="true"
                     android:layout_alignParentTop="true"
-                    android:text="0 TK"
+                    android:text="@string/_0_tk"
                     android:layout_marginRight="27dp"
                     android:textColor="@android:color/black"
-                    android:textStyle="bold">
+                    android:textStyle="bold"
+                    android:layout_marginEnd="27dp">
 
                 </TextView>
 
@@ -140,7 +142,7 @@
                     android:layout_alignParentTop="true"
                     android:layout_marginLeft="27dp"
                     android:layout_marginStart="27dp"
-                    android:text="Balance"
+                    android:text="@string/balance1"
                     android:textColor="@android:color/black"
                     android:textStyle="bold">
 
@@ -153,10 +155,11 @@
                     android:layout_alignParentEnd="true"
                     android:layout_alignParentRight="true"
                     android:layout_alignParentTop="true"
-                    android:text="0 TK"
+                    android:text="@string/_0_tk"
                     android:layout_marginRight="27dp"
                     android:textColor="@android:color/black"
-                    android:textStyle="bold">
+                    android:textStyle="bold"
+                    android:layout_marginEnd="27dp">
 
                 </TextView>
 

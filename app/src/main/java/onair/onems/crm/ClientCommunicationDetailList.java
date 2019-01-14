@@ -23,6 +23,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -41,9 +42,7 @@ import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 public class ClientCommunicationDetailList extends SideNavigationMenuParentActivity implements DetailListAdapter.DetailListAdapterListener {
 
-    private FloatingActionButton addDetails;
     private String clientData = "";
-    private RecyclerView recyclerView;
     private TextView empty;
     private DetailListAdapter mAdapter;
     private ArrayList<JSONObject> detailList;
@@ -78,12 +77,12 @@ public class ClientCommunicationDetailList extends SideNavigationMenuParentActiv
         }
 
         LayoutInflater inflater = (LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        final View childActivityLayout = inflater.inflate(R.layout.client_communication_detail_list, null);
+        final View childActivityLayout = Objects.requireNonNull(inflater).inflate(R.layout.client_communication_detail_list, null);
         LinearLayout parentActivityLayout = (LinearLayout) findViewById(R.id.contentMain);
         parentActivityLayout.addView(childActivityLayout, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
 
         detailList = new ArrayList<>();
-        recyclerView = findViewById(R.id.recyclerView);
+        RecyclerView recyclerView = findViewById(R.id.recyclerView);
         mAdapter = new DetailListAdapter(this, detailList, this);
         empty = findViewById(R.id.empty);
 
@@ -98,7 +97,7 @@ public class ClientCommunicationDetailList extends SideNavigationMenuParentActiv
         recyclerView.addItemDecoration(new MyDividerItemDecoration(this, DividerItemDecoration.VERTICAL, 8));
         recyclerView.setAdapter(mAdapter);
 
-        addDetails = findViewById(R.id.addDetails);
+        FloatingActionButton addDetails = findViewById(R.id.addDetails);
         addDetails.setOnClickListener(view->{
             Intent intent = new Intent(ClientCommunicationDetailList.this, ClientCommunicationDetail.class);
             intent.putExtra("clientData", clientData);

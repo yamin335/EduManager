@@ -7,9 +7,8 @@
 
     <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:paddingBottom="8dp">
 
         <Button
@@ -27,7 +26,7 @@
             android:paddingLeft="14dp"
             android:paddingRight="11dp"
             android:paddingStart="14dp"
-            android:text="Pick Date"
+            android:text="@string/pick_date"
             android:textAllCaps="false"
             android:textColor="@android:color/white"
             app:layout_constraintBottom_toBottomOf="@+id/imageView5"
@@ -49,7 +48,7 @@
             android:paddingRight="2dp"
             android:paddingStart="2dp"
             android:paddingTop="2dp"
-            android:text="Topic:"
+            android:text="@string/topic"
             android:textAllCaps="false"
             android:textColor="#0550b7"
             android:textSize="18sp"
@@ -93,7 +92,7 @@
             android:paddingLeft="2dp"
             android:paddingRight="2dp"
             android:paddingStart="2dp"
-            android:text="Details:"
+            android:text="@string/details"
             android:textColor="#0550b7"
             android:textSize="18sp"
             app:layout_constraintEnd_toEndOf="@+id/topic"
@@ -161,7 +160,8 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="@+id/lessonContentLabel"
-            app:layout_constraintTop_toBottomOf="@+id/lessonContentLabel">
+            app:layout_constraintTop_toBottomOf="@+id/lessonContentLabel"
+            android:layout_marginRight="8dp">
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/lessonRecycler"
@@ -178,7 +178,7 @@
             android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
-            android:text="Digital content not found"
+            android:text="@string/digital_content_not_found"
             android:textSize="18sp"
             app:layout_constraintBottom_toBottomOf="@+id/linear"
             app:layout_constraintEnd_toEndOf="@+id/linear"
@@ -193,7 +193,7 @@
             android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
-            android:text="Lesson plan not found"
+            android:text="@string/lesson_plan_not_found"
             android:textSize="18sp"
             app:layout_constraintBottom_toBottomOf="@+id/lessonLinear"
             app:layout_constraintEnd_toEndOf="@+id/lessonLinear"
@@ -215,7 +215,8 @@
             app:layout_constraintStart_toStartOf="@+id/lessonLinear"
             app:layout_constraintTop_toBottomOf="@+id/lessonLinear"
             app:layout_constraintVertical_bias="0.0"
-            app:srcCompat="@drawable/ic_date_range" />
+            app:srcCompat="@drawable/ic_date_range"
+            android:layout_marginRight="8dp" />
 
         <TextView
             android:id="@+id/date"
@@ -232,7 +233,8 @@
             app:layout_constraintBottom_toBottomOf="@+id/imageView5"
             app:layout_constraintStart_toEndOf="@+id/imageView5"
             app:layout_constraintTop_toTopOf="@+id/imageView5"
-            app:layout_constraintVertical_bias="0.0" />
+            app:layout_constraintVertical_bias="0.0"
+            android:layout_marginLeft="4dp" />
 
         <TextView
             android:id="@+id/syllabusDigitalLabel"
@@ -240,13 +242,14 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
             android:layout_marginTop="8dp"
-            android:text="Lesson plan digital content:"
+            android:text="@string/lesson_plan_digital_content"
             android:textColor="#0550b7"
             android:textSize="18sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="@+id/details"
-            app:layout_constraintTop_toBottomOf="@+id/scroll" />
+            app:layout_constraintTop_toBottomOf="@+id/scroll"
+            android:layout_marginRight="8dp" />
 
         <TextView
             android:id="@+id/lessonContentLabel"
@@ -254,13 +257,14 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
             android:layout_marginTop="8dp"
-            android:text="Select lesson plan:"
+            android:text="@string/select_lesson_plan"
             android:textColor="#0550b7"
             android:textSize="18sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="@+id/lessonLinearDigital"
-            app:layout_constraintTop_toBottomOf="@+id/lessonLinearDigital" />
+            app:layout_constraintTop_toBottomOf="@+id/lessonLinearDigital"
+            android:layout_marginRight="8dp" />
 
         <TextView
             android:id="@+id/lessonPlanLabel"
@@ -269,7 +273,7 @@
             android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
-            android:text="Digital content:"
+            android:text="@string/digital_content"
             android:textColor="#0550b7"
             android:textSize="18sp"
             app:layout_constraintEnd_toEndOf="parent"
@@ -288,7 +292,8 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="@+id/lessonPlanLabel"
-            app:layout_constraintTop_toBottomOf="@+id/lessonPlanLabel">
+            app:layout_constraintTop_toBottomOf="@+id/lessonPlanLabel"
+            android:layout_marginRight="8dp">
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/digitalContentRecycler"
@@ -305,7 +310,7 @@
             android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
-            android:text="Digital content not found"
+            android:text="@string/digital_content_not_found"
             android:textSize="18sp"
             app:layout_constraintBottom_toBottomOf="@+id/lessonLinearDigital"
             app:layout_constraintEnd_toEndOf="@+id/lessonLinearDigital"

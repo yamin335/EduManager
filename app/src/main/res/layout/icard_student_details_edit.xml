@@ -57,7 +57,7 @@
                 android:background="@drawable/button"
                 android:drawableTop="@drawable/ic_camera_alt"
                 android:paddingTop="5dp"
-                android:text="Open Camera"
+                android:text="@string/open_camera"
                 android:textAllCaps="false"
                 android:textColor="#ffffff"
                 android:layout_margin="4dp"/>
@@ -70,7 +70,7 @@
                 android:layout_margin="4dp"
                 android:layout_weight="1"
                 android:background="@drawable/inputtext"
-                android:text="Crop Image"
+                android:text="@string/crop_image"
                 android:textColor="#000000"
                 android:padding="4dp"
                 android:textStyle="bold" />
@@ -83,7 +83,7 @@
                 android:layout_gravity="center"
                 android:background="@drawable/button"
                 android:drawableTop="@drawable/ic_action_search"
-                android:text="Open Gallery"
+                android:text="@string/open_gallery"
                 android:textAllCaps="false"
                 android:textColor="#ffffff"
                 android:layout_margin="4dp"/>
@@ -104,7 +104,7 @@
                 android:background="@drawable/button"
                 android:drawableTop="@drawable/ic_rotate_left"
                 android:paddingTop="5dp"
-                android:text="Rotate Left"
+                android:text="@string/rotate_left"
                 android:textAllCaps="false"
                 android:textColor="#ffffff"
                 android:layout_margin="4dp"/>
@@ -118,7 +118,7 @@
                 android:layout_gravity="center"
                 android:background="@drawable/button"
                 android:drawableTop="@drawable/ic_rotate_right"
-                android:text="Rotate Right"
+                android:text="@string/rotate_right"
                 android:textAllCaps="false"
                 android:textColor="#ffffff"
                 android:layout_margin="4dp"/>
@@ -128,7 +128,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Control Brightness:"
+            android:text="@string/control_brightness"
             android:layout_marginRight="3dp"
             android:layout_marginLeft="3dp"
             android:layout_marginBottom="2dp"/>
@@ -156,7 +156,7 @@
             <TextView
                 android:layout_width="90dp"
                 android:layout_height="match_parent"
-                android:text="Name:"
+                android:text="@string/name1"
                 android:textSize="16sp"
                 android:layout_margin="5dp"
                 android:textColor="#000000"
@@ -185,7 +185,7 @@
             <TextView
                 android:layout_width="90dp"
                 android:layout_height="match_parent"
-                android:text="Roll No:"
+                android:text="@string/roll_no"
                 android:textSize="16sp"
                 android:layout_margin="5dp"
                 android:textColor="#000000"
@@ -214,7 +214,7 @@
             <TextView
                 android:layout_width="90dp"
                 android:layout_height="match_parent"
-                android:text="RFID:"
+                android:text="@string/rfid"
                 android:textSize="16sp"
                 android:layout_margin="5dp"
                 android:textColor="#000000"
@@ -242,7 +242,7 @@
             <TextView
                 android:layout_width="90dp"
                 android:layout_height="match_parent"
-                android:text="Student No:"
+                android:text="@string/student_no"
                 android:textSize="16sp"
                 android:layout_margin="5dp"
                 android:textColor="#000000"
@@ -269,7 +269,7 @@
             <TextView
                 android:layout_width="90dp"
                 android:layout_height="match_parent"
-                android:text="Shift:"
+                android:text="@string/shift"
                 android:textSize="16sp"
                 android:layout_margin="5dp"
                 android:textColor="#000000"
@@ -317,7 +317,7 @@
                 android:layout_weight="0"
                 android:layout_width="90dp"
                 android:layout_height="match_parent"
-                android:text="Medium:"
+                android:text="@string/medium"
                 android:textSize="16sp"
                 android:layout_margin="5dp"
                 android:textColor="#000000"
@@ -364,7 +364,7 @@
             <TextView
                 android:layout_width="90dp"
                 android:layout_height="match_parent"
-                android:text="Class:"
+                android:text="@string/classs"
                 android:textSize="16sp"
                 android:layout_margin="5dp"
                 android:textColor="#000000"
@@ -411,7 +411,7 @@
             <TextView
                 android:layout_width="90dp"
                 android:layout_height="match_parent"
-                android:text="Department:"
+                android:text="@string/department"
                 android:textSize="16sp"
                 android:layout_margin="5dp"
                 android:textColor="#000000"
@@ -459,7 +459,7 @@
             <TextView
                 android:layout_width="90dp"
                 android:layout_height="match_parent"
-                android:text="Section:"
+                android:text="@string/section"
                 android:textSize="16sp"
                 android:layout_margin="5dp"
                 android:textColor="#000000"
@@ -506,7 +506,7 @@
             <TextView
                 android:layout_width="90dp"
                 android:layout_height="match_parent"
-                android:text="Gender:"
+                android:text="@string/gender"
                 android:textSize="16sp"
                 android:layout_margin="5dp"
                 android:textColor="#000000"
@@ -553,7 +553,7 @@
             <TextView
                 android:layout_width="90dp"
                 android:layout_height="match_parent"
-                android:text="Religion:"
+                android:text="@string/religion"
                 android:textSize="16sp"
                 android:layout_margin="5dp"
                 android:textColor="#000000"
@@ -600,7 +600,7 @@
             <TextView
                 android:layout_width="90dp"
                 android:layout_height="wrap_content"
-                android:text="Blood Group:"
+                android:text="@string/blood_group"
                 android:textSize="16sp"
                 android:layout_margin="5dp"
                 android:textColor="#000000"
@@ -649,7 +649,7 @@
             <TextView
                 android:layout_width="90dp"
                 android:layout_height="match_parent"
-                android:text="Birthday:"
+                android:text="@string/birthday"
                 android:textSize="16sp"
                 android:layout_margin="5dp"
                 android:textColor="#000000"
@@ -678,7 +678,7 @@
                 android:drawableEnd="@drawable/ic_date_range"
                 android:paddingStart="10dp"
                 android:paddingEnd="12dp"
-                android:text="Date"
+                android:text="@string/date"
                 android:textAllCaps="false"
                 android:textColor="@android:color/white"
                 android:layout_marginRight="5dp"
@@ -698,7 +698,7 @@
             <TextView
                 android:layout_width="90dp"
                 android:layout_height="match_parent"
-                android:text="Branch:"
+                android:text="@string/branch"
                 android:textSize="16sp"
                 android:layout_margin="5dp"
                 android:textColor="#000000"
@@ -725,7 +725,7 @@
             <TextView
                 android:layout_width="90dp"
                 android:layout_height="match_parent"
-                android:text="Session:"
+                android:text="@string/session"
                 android:textSize="16sp"
                 android:layout_margin="5dp"
                 android:textColor="#000000"
@@ -752,7 +752,7 @@
             <TextView
                 android:layout_width="90dp"
                 android:layout_height="match_parent"
-                android:text="Board:"
+                android:text="@string/board"
                 android:textSize="16sp"
                 android:layout_margin="5dp"
                 android:textColor="#000000"
@@ -779,7 +779,7 @@
             <TextView
                 android:layout_width="90dp"
                 android:layout_height="match_parent"
-                android:text="Email:"
+                android:text="@string/email"
                 android:textSize="16sp"
                 android:layout_margin="5dp"
                 android:textColor="#000000"
@@ -794,7 +794,7 @@
                 android:layout_height="wrap_content"
                 android:textColor="#000000"
                 android:background="@drawable/inputtext"
-                android:inputType="text"
+                android:inputType="textEmailAddress"
                 />
         </LinearLayout>
 
@@ -808,7 +808,7 @@
             <TextView
                 android:layout_width="90dp"
                 android:layout_height="match_parent"
-                android:text="Phone:"
+                android:text="@string/phone"
                 android:textSize="16sp"
                 android:layout_margin="5dp"
                 android:textColor="#000000"
@@ -823,7 +823,7 @@
                 android:layout_height="wrap_content"
                 android:textColor="#000000"
                 android:background="@drawable/inputtext"
-                android:inputType="text"
+                android:inputType="phone"
                 />
         </LinearLayout>
 
@@ -835,7 +835,7 @@
             <TextView
                 android:layout_width="90dp"
                 android:layout_height="wrap_content"
-                android:text="Guardian Name:"
+                android:text="@string/guardian_name"
                 android:textSize="16sp"
                 android:layout_margin="5dp"
                 android:textColor="#000000"
@@ -865,7 +865,7 @@
             <TextView
                 android:layout_width="90dp"
                 android:layout_height="wrap_content"
-                android:text="Guardian phone:"
+                android:text="@string/guardian_phone"
                 android:textSize="16sp"
                 android:layout_margin="5dp"
                 android:textColor="#000000"
@@ -894,7 +894,7 @@
             <TextView
                 android:layout_width="90dp"
                 android:layout_height="wrap_content"
-                android:text="Guardian Email:"
+                android:text="@string/guardian_email"
                 android:textSize="16sp"
                 android:layout_margin="5dp"
                 android:textColor="#000000"
@@ -909,7 +909,7 @@
                 android:layout_height="wrap_content"
                 android:textColor="#000000"
                 android:background="@drawable/inputtext"
-                android:inputType="text"
+                android:inputType="textEmailAddress"
                 android:layout_gravity="center_vertical"/>
         </LinearLayout>
 
@@ -921,7 +921,7 @@
             <TextView
                 android:layout_width="90dp"
                 android:layout_height="match_parent"
-                android:text="Address:"
+                android:text="@string/address"
                 android:textSize="16sp"
                 android:layout_margin="5dp"
                 android:textColor="#000000"
@@ -950,7 +950,7 @@
             <TextView
                 android:layout_width="90dp"
                 android:layout_height="match_parent"
-                android:text="Remarks:"
+                android:text="@string/remarks"
                 android:textSize="16sp"
                 android:layout_margin="5dp"
                 android:textColor="#000000"
@@ -975,7 +975,7 @@
             android:layout_height="30dp"
             android:layout_margin="15dp"
             android:background="@drawable/button"
-            android:text="Update Information"
+            android:text="@string/update_information"
             android:layout_gravity="center"
             android:textAllCaps="false"
             android:textColor="#FFFFFF"

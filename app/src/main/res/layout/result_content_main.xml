@@ -170,7 +170,7 @@
         android:background="@drawable/button"
         android:paddingEnd="16dp"
         android:paddingStart="16dp"
-        android:text="Show Result"
+        android:text="@string/show_result"
         android:textAllCaps="false"
         android:textColor="@android:color/white"
         app:layout_constraintBottom_toBottomOf="parent"

@@ -30,7 +30,8 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:baselineAligned="false">
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -99,7 +100,7 @@
                             android:layout_marginTop="8dp"
                             android:orientation="vertical"
                             android:fontFamily="sans-serif-condensed"
-                            android:text="Notice"
+                            android:text="@string/notice"
                             android:textAllCaps="false"
                             android:textColor="#ffffff"
                             android:textSize="20sp"
@@ -142,7 +143,7 @@
                             android:layout_marginTop="8dp"
                             android:orientation="vertical"
                             android:fontFamily="sans-serif-condensed"
-                            android:text="Routine"
+                            android:text="@string/routine"
                             android:textAllCaps="false"
                             android:textColor="#ffffff"
                             android:textSize="20sp"
@@ -191,7 +192,7 @@
                             android:layout_marginTop="8dp"
                             android:orientation="vertical"
                             android:fontFamily="sans-serif-condensed"
-                            android:text="Attendance"
+                            android:text="@string/attendance"
                             android:textAllCaps="false"
                             android:textColor="#ffffff"
                             android:textSize="20sp"
@@ -234,7 +235,7 @@
                             android:layout_marginTop="8dp"
                             android:orientation="vertical"
                             android:fontFamily="sans-serif-condensed"
-                            android:text="Syllabus"
+                            android:text="@string/syllabus"
                             android:textAllCaps="false"
                             android:textColor="#ffffff"
                             android:textSize="20sp"
@@ -283,7 +284,7 @@
                             android:layout_marginTop="8dp"
                             android:orientation="vertical"
                             android:fontFamily="sans-serif-condensed"
-                            android:text="Homework"
+                            android:text="@string/homework"
                             android:textAllCaps="false"
                             android:textColor="#ffffff"
                             android:textSize="20sp"
@@ -326,7 +327,7 @@
                             android:layout_marginTop="8dp"
                             android:orientation="vertical"
                             android:fontFamily="sans-serif-condensed"
-                            android:text="Result"
+                            android:text="@string/result"
                             android:textAllCaps="false"
                             android:textColor="#ffffff"
                             android:textSize="20sp"
@@ -375,7 +376,7 @@
                             android:layout_marginTop="8dp"
                             android:orientation="vertical"
                             android:fontFamily="sans-serif-condensed"
-                            android:text="Exam"
+                            android:text="@string/exam"
                             android:textAllCaps="false"
                             android:textColor="#ffffff"
                             android:textSize="20sp"
@@ -385,8 +386,7 @@
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent"
-                            android:drawableTop="@drawable/exam"
-                            android:drawableTint="#ffffff"/>
+                            android:drawableTop="@drawable/exam"/>
                     </android.support.constraint.ConstraintLayout>
                 </android.support.v7.widget.CardView>
                 <android.support.v7.widget.CardView
@@ -419,7 +419,7 @@
                             android:layout_marginTop="8dp"
                             android:orientation="vertical"
                             android:fontFamily="sans-serif-condensed"
-                            android:text="Fees"
+                            android:text="@string/fees"
                             android:textAllCaps="false"
                             android:textColor="#ffffff"
                             android:textSize="20sp"
@@ -442,7 +442,8 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:baselineAligned="false">
                 <android.support.constraint.ConstraintLayout
                     android:id="@+id/dashboard"
                     android:layout_weight="1"
@@ -466,7 +467,7 @@
                         android:id="@+id/textDashboard"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Dashboard"
+                        android:text="@string/dashboard"
                         android:textAllCaps="false"
                         android:textColor="#0550b7"
                         android:textSize="10sp"
@@ -498,7 +499,7 @@
                         android:id="@+id/textProfile"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Profile"
+                        android:text="@string/profile"
                         android:textAllCaps="false"
                         android:textColor="#757575"
                         android:textSize="10sp"
@@ -530,7 +531,7 @@
                         android:id="@+id/textNotification"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Notification"
+                        android:text="@string/notification"
                         android:textAllCaps="false"
                         android:textColor="#757575"
                         android:textSize="10sp"
@@ -580,7 +581,7 @@
                         android:id="@+id/textContact"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Contacts"
+                        android:text="@string/contacts"
                         android:textAllCaps="false"
                         android:textColor="#757575"
                         android:textSize="10sp"
@@ -626,7 +627,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:padding="5dp"
-                android:text="Logout"
+                android:text="@string/logout"
                 android:textColor="#3D4852" />
 
         </android.support.v7.widget.CardView>
@@ -667,7 +668,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:padding="5dp"
-                android:text="Change Password"
+                android:text="@string/change_password"
                 android:textColor="#3D4852" />
 
         </android.support.v7.widget.CardView>
@@ -707,7 +708,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:padding="5dp"
-                android:text="Change User Type"
+                android:text="@string/change_user_type"
                 android:textColor="#3D4852" />
 
         </android.support.v7.widget.CardView>
@@ -753,5 +754,6 @@
         android:background="@android:color/black"
         android:visibility="gone"
         android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"/>
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true" />
 </RelativeLayout>

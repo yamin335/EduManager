@@ -6,9 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.ActivityCompat;
@@ -27,6 +25,7 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 import onair.onems.R;
 import onair.onems.Services.StaticHelperClass;
@@ -37,16 +36,10 @@ import onair.onems.mainactivities.TeacherMainScreen;
 import onair.onems.models.Contact;
 
 public class ContactsMainScreen extends SideNavigationMenuParentActivity implements ContactsAdapter.ContactsAdapterListener {
-    private long InstituteID;
     private int UserTypeID;
-    private static final String TAG = ContactsMainScreen.class.getSimpleName();
-    private RecyclerView recyclerView;
     private ArrayList<Contact> contactList;
     private ContactsAdapter mAdapter;
     private SearchView searchView;
-
-    // url to fetch contacts json
-    private static final String URL = "https://api.androidhive.info/json/contacts.json";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,7 +49,7 @@ public class ContactsMainScreen extends SideNavigationMenuParentActivity impleme
         super.onCreate(savedInstanceState);
 
         LayoutInflater inflater = (LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        final View childActivityLayout = inflater.inflate(R.layout.contacts_content_main, null);
+        final View childActivityLayout = Objects.requireNonNull(inflater).inflate(R.layout.contacts_content_main, null);
         LinearLayout parentActivityLayout = (LinearLayout) findViewById(R.id.contentMain);
         parentActivityLayout.addView(childActivityLayout, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
 
@@ -69,7 +62,7 @@ public class ContactsMainScreen extends SideNavigationMenuParentActivity impleme
             Toast.makeText(ContactsMainScreen.this,"Please check your internet connection and open app again!!! ",Toast.LENGTH_LONG).show();
         }
 
-        recyclerView = findViewById(R.id.recycler_view);
+        RecyclerView recyclerView = findViewById(R.id.recycler_view);
         contactList = new ArrayList<>();
         mAdapter = new ContactsAdapter(this, contactList, this);
 

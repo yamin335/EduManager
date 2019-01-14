@@ -28,7 +28,6 @@ import onair.onems.Services.GlideApp;
 public class ImageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private Context context;
     private ArrayList<Bitmap> bitmapArray;
-    private ArrayList<File> fileArray;
     private static final int VCARD = 1;
     private static final int PHOTO = 2;
     private int imageType;
@@ -53,16 +52,16 @@ public class ImageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     }
 
 
-    public ImageAdapter(Context context, ArrayList<Bitmap> bitmapArray, ArrayList<File> fileArray, int imageType, DeleteImage deleteImage, ViewImage viewImage) {
+    ImageAdapter(Context context, ArrayList<Bitmap> bitmapArray, ArrayList<File> fileArray, int imageType, DeleteImage deleteImage, ViewImage viewImage) {
         this.context = context;
         this.bitmapArray = bitmapArray;
-        this.fileArray = fileArray;
+        ArrayList<File> fileArray1 = fileArray;
         this.imageType = imageType;
         this.deleteImage = deleteImage;
         this.viewImage = viewImage;
     }
 
-    public ImageAdapter(Context context, ArrayList <JSONObject> imageUrls, int imageType, boolean forUpdate, ViewImage viewImage) {
+    ImageAdapter(Context context, ArrayList <JSONObject> imageUrls, int imageType, boolean forUpdate, ViewImage viewImage) {
         this.context = context;
         this.imageUrls = imageUrls;
         this.forUpdate = forUpdate;

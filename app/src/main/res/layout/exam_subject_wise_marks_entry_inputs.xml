@@ -3,10 +3,9 @@
     android:layout_height="match_parent"
     xmlns:android="http://schemas.android.com/apk/res/android">
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         tools:context="onair.onems.exam.SubjectWiseMarksEntryInputs"
         android:orientation="vertical">
         <LinearLayout
@@ -18,7 +17,7 @@
             <TextView
                 android:layout_width="120dp"
                 android:layout_height="match_parent"
-                android:text="MCQ"
+                android:text="@string/mcq"
                 android:textSize="17sp"
                 android:textColor="#505458"
                 android:gravity="center_vertical"
@@ -52,7 +51,7 @@
             <TextView
                 android:layout_width="120dp"
                 android:layout_height="match_parent"
-                android:text="WRITTEN"
+                android:text="@string/written"
                 android:textSize="17sp"
                 android:textColor="#505458"
                 android:gravity="center_vertical"
@@ -86,7 +85,7 @@
             <TextView
                 android:layout_width="120dp"
                 android:layout_height="match_parent"
-                android:text="PRACTICAL"
+                android:text="@string/practical"
                 android:textSize="17sp"
                 android:textColor="#505458"
                 android:gravity="center_vertical"
@@ -120,7 +119,7 @@
             <TextView
                 android:layout_width="120dp"
                 android:layout_height="match_parent"
-                android:text="ATTENDANCE"
+                android:text="@string/attendance1"
                 android:textSize="17sp"
                 android:textColor="#505458"
                 android:gravity="center_vertical"
@@ -154,7 +153,7 @@
             <TextView
                 android:layout_width="120dp"
                 android:layout_height="match_parent"
-                android:text="TOTAL"
+                android:text="@string/total"
                 android:textSize="17sp"
                 android:textColor="#505458"
                 android:gravity="center_vertical"
@@ -189,7 +188,7 @@
             <TextView
                 android:layout_width="120dp"
                 android:layout_height="match_parent"
-                android:text="ABSENT"
+                android:text="@string/absent1"
                 android:textSize="17sp"
                 android:textColor="#505458"
                 android:gravity="center_vertical"
@@ -219,7 +218,7 @@
                 android:layout_width="150dp"
                 android:layout_height="40dp"
                 android:background="@drawable/button"
-                android:text="Save"
+                android:text="@string/save"
                 android:textAllCaps="false"
                 android:textColor="@android:color/white"
                 android:textSize="18sp"

@@ -57,6 +57,7 @@
                 android:padding="3dp"
                 android:src="@drawable/nav_routine"
                 android:tint="#0050b7"/>
+
             <TextView
                 android:id="@+id/noticeDate"
                 android:layout_width="wrap_content"

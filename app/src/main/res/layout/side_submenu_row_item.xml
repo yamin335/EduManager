@@ -12,5 +12,6 @@
         android:layout_marginLeft="60dp"
         android:padding="10dp"
         android:textColor="#000000"
-        android:textSize="13sp"/>
+        android:textSize="13sp"
+        android:layout_marginStart="60dp" />
 </LinearLayout>
