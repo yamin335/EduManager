@@ -50,15 +50,14 @@ public class ContactsMainScreen extends SideNavigationMenuParentActivity impleme
 
         LayoutInflater inflater = (LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         final View childActivityLayout = Objects.requireNonNull(inflater).inflate(R.layout.contacts_content_main, null);
-        LinearLayout parentActivityLayout = (LinearLayout) findViewById(R.id.contentMain);
+        LinearLayout parentActivityLayout = findViewById(R.id.contentMain);
         parentActivityLayout.addView(childActivityLayout, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         InstituteID = prefs.getLong("InstituteID",0);
         UserTypeID = prefs.getInt("UserTypeID",0);
 
-        if(!StaticHelperClass.isNetworkAvailable(this))
-        {
+        if(!StaticHelperClass.isNetworkAvailable(this)) {
             Toast.makeText(ContactsMainScreen.this,"Please check your internet connection and open app again!!! ",Toast.LENGTH_LONG).show();
         }
 
@@ -144,7 +143,7 @@ public class ContactsMainScreen extends SideNavigationMenuParentActivity impleme
             searchView.setIconified(true);
             return;
         }
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else if(UserTypeID == 1) {

@@ -6,16 +6,10 @@ import android.support.v7.app.AppCompatActivity;
 
 import onair.onems.R;
 
-/**
- * Created by hp on 1/22/2018.
- */
-
-public class StudentList extends AppCompatActivity
-{
+public class StudentList extends AppCompatActivity {
 
 
-    protected void onCreate(@Nullable Bundle savedInstanceState)
-    {
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.fees);
     }

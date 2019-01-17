@@ -34,8 +34,8 @@ public class ClassSelectionDialog extends Dialog implements View.OnClickListener
         setContentView(R.layout.selection_dialog);
         RecyclerView recyclerView = findViewById(R.id.recycler);
         TextView header = findViewById(R.id.header);
-        header.setText("Select Class");
-        Button cross = (Button) findViewById(R.id.cross);
+        header.setText(R.string.select_class);
+        Button cross = findViewById(R.id.cross);
         cross.setOnClickListener(this);
 
         ClassAdapter mAdapter = new ClassAdapter(currentActivity, classes, this);

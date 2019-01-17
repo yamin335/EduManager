@@ -34,8 +34,8 @@ public class ExamSelectionDialog extends Dialog implements View.OnClickListener,
         setContentView(R.layout.selection_dialog);
         RecyclerView recyclerView = findViewById(R.id.recycler);
         TextView header = findViewById(R.id.header);
-        header.setText("Select Exam");
-        Button cross = (Button) findViewById(R.id.cross);
+        header.setText(R.string.select_exam);
+        Button cross = findViewById(R.id.cross);
         cross.setOnClickListener(this);
 
         ExamAdapter mAdapter = new ExamAdapter(currentActivity, exams, this);

@@ -94,9 +94,9 @@ public class TakeAttendanceDetails extends CommonToolbarParentActivity {
         DepertmentID = StudentSelection.getLong("DepertmentID",0);
         date = StudentSelection.getString("Date", "");
 
-        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+        RecyclerView recyclerView = findViewById(R.id.recycler_view);
 
-        attendanceSheetArrayList = new ArrayList<AttendanceStudentModel>();
+        attendanceSheetArrayList = new ArrayList<>();
         adapter = new TakeAttendanceAdapter(this, attendanceSheetArrayList);
 
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this);
@@ -191,9 +191,7 @@ public class TakeAttendanceDetails extends CommonToolbarParentActivity {
                 String json = gson.toJson(attendanceSheetModel);
                 postUsingVolley(json);
                 return true;
-            }
-            else
-            {
+            } else {
                 Toast.makeText(TakeAttendanceDetails.this,"Please check your internet connection!!!",Toast.LENGTH_LONG).show();
             }
         }
@@ -212,6 +210,7 @@ public class TakeAttendanceDetails extends CommonToolbarParentActivity {
         }
 
         if(StaticHelperClass.isNetworkAvailable(this)) {
+            dialog.show();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
                     .addConverterFactory(ScalarsConverterFactory.create())
@@ -234,13 +233,14 @@ public class TakeAttendanceDetails extends CommonToolbarParentActivity {
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             Toast.makeText(TakeAttendanceDetails.this,"Attendance successfully taken",Toast.LENGTH_LONG).show();
                             finish();
                         }
 
                         @Override
                         public void onError(Throwable e) {
-
+                            dialog.dismiss();
                         }
 
                         @Override
@@ -260,6 +260,7 @@ public class TakeAttendanceDetails extends CommonToolbarParentActivity {
 
     public void StudentDataGetRequest(){
         if(StaticHelperClass.isNetworkAvailable(this)) {
+            dialog.show();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
                     .addConverterFactory(ScalarsConverterFactory.create())
@@ -282,12 +283,13 @@ public class TakeAttendanceDetails extends CommonToolbarParentActivity {
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             prepareAlbums(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
-
+                            dialog.dismiss();
                         }
 
                         @Override

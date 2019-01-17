@@ -1,31 +1,19 @@
 package onair.onems.syllabus;
 
-import android.Manifest;
-import android.app.Activity;
-import android.app.DownloadManager;
 import android.content.Context;
-import android.content.pm.PackageManager;
-import android.net.Uri;
-import android.os.Build;
-import android.os.Environment;
 import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 
 import onair.onems.R;
-
-import static onair.onems.Services.StaticHelperClass.isNetworkAvailable;
 
 public class DigitalContentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private Context context;
@@ -116,73 +104,49 @@ public class DigitalContentAdapter extends RecyclerView.Adapter<RecyclerView.Vie
         if(holder.getItemViewType() == IMAGE_TYPE) {
             MyViewHolder viewHolder = (MyViewHolder)holder;
             viewHolder.contentName.setText(title);
-            viewHolder.play.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
+            viewHolder.play.setOnClickListener(v -> {
 
-                }
             });
             final String finalUrl = url;
-            viewHolder.download.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if(!finalUrl.equalsIgnoreCase("null")){
-                        downloader.downloadFile(finalUrl);
-                    }
+            viewHolder.download.setOnClickListener(v -> {
+                if(!finalUrl.equalsIgnoreCase("null")){
+                    downloader.downloadFile(finalUrl);
                 }
             });
         } else if(holder.getItemViewType() == AUDIO_TYPE) {
             MyViewHolder viewHolder = (MyViewHolder)holder;
             viewHolder.contentName.setText(title);
-            viewHolder.play.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
+            viewHolder.play.setOnClickListener(v -> {
 
-                }
             });
             final String finalUrl = url;
-            viewHolder.download.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if(!finalUrl.equalsIgnoreCase("null")){
-                        downloader.downloadFile(finalUrl);
-                    }
+            viewHolder.download.setOnClickListener(v -> {
+                if(!finalUrl.equalsIgnoreCase("null")){
+                    downloader.downloadFile(finalUrl);
                 }
             });
         } else if(holder.getItemViewType() == VIDEO_TYPE) {
             MyViewHolder viewHolder = (MyViewHolder)holder;
             viewHolder.contentName.setText(title);
-            viewHolder.play.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
+            viewHolder.play.setOnClickListener(v -> {
 
-                }
             });
             final String finalUrl = url;
-            viewHolder.download.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if(!finalUrl.equalsIgnoreCase("null")){
-                        downloader.downloadFile(finalUrl);
-                    }
+            viewHolder.download.setOnClickListener(v -> {
+                if(!finalUrl.equalsIgnoreCase("null")){
+                    downloader.downloadFile(finalUrl);
                 }
             });
         } else if(holder.getItemViewType() == FILE_TYPE) {
             MyViewHolder viewHolder = (MyViewHolder)holder;
             viewHolder.contentName.setText(title);
-            viewHolder.play.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
+            viewHolder.play.setOnClickListener(v -> {
 
-                }
             });
             final String finalUrl = url;
-            viewHolder.download.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if(!finalUrl.equalsIgnoreCase("null")){
-                        downloader.downloadFile(finalUrl);
-                    }
+            viewHolder.download.setOnClickListener(v -> {
+                if(!finalUrl.equalsIgnoreCase("null")){
+                    downloader.downloadFile(finalUrl);
                 }
             });
         }

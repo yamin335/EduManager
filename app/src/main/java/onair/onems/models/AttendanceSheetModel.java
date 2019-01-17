@@ -2,10 +2,6 @@ package onair.onems.models;
 
 import java.util.ArrayList;
 
-/**
- * Created by User on 12/30/2017.
- */
-
 public class AttendanceSheetModel {
 
     private long SubAtdID;

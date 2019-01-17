@@ -12,8 +12,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-
 import onair.onems.R;
 
 public class ChangeUserTypeAdapter extends RecyclerView.Adapter<ChangeUserTypeAdapter.MyViewHolder> {
@@ -28,15 +26,12 @@ public class ChangeUserTypeAdapter extends RecyclerView.Adapter<ChangeUserTypeAd
             super(view);
             UserTypeName = view.findViewById(R.id.name);
 
-            view.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    // send selected contact in callback
-                    try {
-                        listener.onUserTypeSelected(UserTypes.getJSONObject(getAdapterPosition()));
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
+            view.setOnClickListener(view1 -> {
+                // send selected contact in callback
+                try {
+                    listener.onUserTypeSelected(UserTypes.getJSONObject(getAdapterPosition()));
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
             });
         }

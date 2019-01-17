@@ -1,6 +1,5 @@
 package onair.onems.result;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -16,16 +15,9 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
-
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -34,9 +26,8 @@ import org.json.JSONObject;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Objects;
 
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -47,7 +38,7 @@ import onair.onems.R;
 import onair.onems.Services.RetrofitNetworkService;
 import onair.onems.Services.StaticHelperClass;
 import onair.onems.customised.MyDividerItemDecoration;
-import onair.onems.network.MySingleton;
+import onair.onems.mainactivities.CommonProgressDialog;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -70,6 +61,7 @@ public class SelfResult extends Fragment implements
     private JSONArray resultGradingSystem;
     private String ExamID = "";
     private CompositeDisposable finalDisposer = new CompositeDisposable();
+    public CommonProgressDialog dialog;
 
     @Override
     public void onDestroy() {
@@ -97,6 +89,9 @@ public class SelfResult extends Fragment implements
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.result_subject_wise_self, container, false);
+        dialog = new CommonProgressDialog(getActivity());
+        Objects.requireNonNull(dialog.getWindow()).setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        dialog.setCancelable(false);
         FloatingActionButton floatingActionButton = rootView.findViewById(R.id.selectExam);
         floatingActionButton.setOnClickListener(view -> {
             if(UserTypeID == 3){
@@ -157,7 +152,7 @@ public class SelfResult extends Fragment implements
                 ResultGradeDataGetRequest(InstituteID, Long.toString(UserMediumID), Long.toString(UserClassID));
             } else if(UserTypeID == 5) {
                 try {
-                    JSONObject selectedStudent = new JSONObject(getActivity().getSharedPreferences("CURRENT_STUDENT", Context.MODE_PRIVATE)
+                    JSONObject selectedStudent = new JSONObject(Objects.requireNonNull(getActivity()).getSharedPreferences("CURRENT_STUDENT", Context.MODE_PRIVATE)
                             .getString("guardianSelectedStudent", "{}"));
                     ResultGradeDataGetRequest(InstituteID, selectedStudent.getString("MediumID"), selectedStudent.getString("ClassID"));
                 } catch (JSONException e) {
@@ -201,7 +196,7 @@ public class SelfResult extends Fragment implements
         try {
             if(!subjectWiseResult.getString("SubjectName").equalsIgnoreCase("Total")) {
                 ResultDetailsDialog customDialog = new ResultDetailsDialog(getActivity(), subjectWiseResult);
-                customDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                Objects.requireNonNull(customDialog.getWindow()).setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                 customDialog.setCancelable(false);
                 customDialog.show();
             }
@@ -212,6 +207,7 @@ public class SelfResult extends Fragment implements
 
     private void examDataGetRequest(Context context, long InstituteID, long MediumID, long ClassID) {
         if (StaticHelperClass.isNetworkAvailable(context)) {
+            dialog.show();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
                     .addConverterFactory(ScalarsConverterFactory.create())
@@ -234,12 +230,13 @@ public class SelfResult extends Fragment implements
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseExamData(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
-
+                            dialog.dismiss();
                         }
 
                         @Override
@@ -256,7 +253,7 @@ public class SelfResult extends Fragment implements
     private void parseExamData(String examData) {
         if(!examData.equalsIgnoreCase("[]")) {
             ResultExamSelectionDialog resultExamSelectionDialog = new ResultExamSelectionDialog(getActivity(), this, examData, getActivity());
-            resultExamSelectionDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            Objects.requireNonNull(resultExamSelectionDialog.getWindow()).setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
             resultExamSelectionDialog.setCancelable(false);
             resultExamSelectionDialog.show();
         } else {
@@ -268,7 +265,8 @@ public class SelfResult extends Fragment implements
     private void ResultDataGetRequest(String ExamID, String UserID, String InstituteID,String ClassID,
                                       String SectionID, String DepartmentID, String MediumID,
                                       String ShiftID, String SessionID) {
-        if (StaticHelperClass.isNetworkAvailable(getActivity())) {
+        if (StaticHelperClass.isNetworkAvailable(Objects.requireNonNull(getActivity()))) {
+            dialog.show();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
                     .addConverterFactory(ScalarsConverterFactory.create())
@@ -292,11 +290,13 @@ public class SelfResult extends Fragment implements
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             prepareResult(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
+                            dialog.dismiss();
                             Toast.makeText(getActivity(),"Result not found!!! ",
                                     Toast.LENGTH_LONG).show();
                         }
@@ -390,7 +390,8 @@ public class SelfResult extends Fragment implements
     }
 
     private void ResultGradeDataGetRequest(long InstituteID, String MediumID, String ClassID){
-        if (StaticHelperClass.isNetworkAvailable(getActivity())) {
+        if (StaticHelperClass.isNetworkAvailable(Objects.requireNonNull(getActivity()))) {
+            dialog.show();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
                     .addConverterFactory(ScalarsConverterFactory.create())
@@ -413,11 +414,13 @@ public class SelfResult extends Fragment implements
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             prepareResultGradeSheet(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
+                            dialog.dismiss();
                             Toast.makeText(getActivity(),"Grade sheet not found!!! ",
                                     Toast.LENGTH_LONG).show();
                         }
@@ -442,7 +445,7 @@ public class SelfResult extends Fragment implements
                         Long.toString(UserShiftID), Long.toString(UserSessionID));
             } else if(UserTypeID == 5) {
                 try {
-                    JSONObject selectedStudent = new JSONObject(getActivity().getSharedPreferences("CURRENT_STUDENT", Context.MODE_PRIVATE)
+                    JSONObject selectedStudent = new JSONObject(Objects.requireNonNull(getActivity()).getSharedPreferences("CURRENT_STUDENT", Context.MODE_PRIVATE)
                             .getString("guardianSelectedStudent", "{}"));
                     ResultDataGetRequest(ExamID, selectedStudent.getString("UserID"), Long.toString(InstituteID),
                             selectedStudent.getString("ClassID"), selectedStudent.getString("SectionID"),

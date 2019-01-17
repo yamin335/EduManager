@@ -1,6 +1,7 @@
 package onair.onems.customised;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,29 +26,27 @@ public class GuardianStudentSelectionAdapter extends RecyclerView.Adapter<Guardi
             super(view);
             studentName = view.findViewById(R.id.studentName);
 
-            view.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    // send selected contact in callback
-                    try {
-                        listener.onStudentSelected(students.getJSONObject(getAdapterPosition()));
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
+            view.setOnClickListener(view1 -> {
+                // send selected contact in callback
+                try {
+                    listener.onStudentSelected(students.getJSONObject(getAdapterPosition()));
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
             });
         }
     }
 
 
-    public GuardianStudentSelectionAdapter(Context context, JSONArray students, GuardianStudentSelectionListener listener) {
+    GuardianStudentSelectionAdapter(Context context, JSONArray students, GuardianStudentSelectionListener listener) {
         this.context = context;
         this.listener = listener;
         this.students = students;
     }
 
+    @NonNull
     @Override
-    public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.guardian_student_selection_row_item, parent, false);
 
@@ -55,7 +54,7 @@ public class GuardianStudentSelectionAdapter extends RecyclerView.Adapter<Guardi
     }
 
     @Override
-    public void onBindViewHolder(MyViewHolder holder, final int position) {
+    public void onBindViewHolder(@NonNull MyViewHolder holder, final int position) {
         try {
             final JSONObject student = students.getJSONObject(position);
             holder.studentName.setText(student.getString("UserFullName"));

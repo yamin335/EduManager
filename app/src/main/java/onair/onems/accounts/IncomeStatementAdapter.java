@@ -84,46 +84,43 @@ public class IncomeStatementAdapter extends RecyclerView.Adapter<IncomeStatement
             e.printStackTrace();
         }
 
-        holder.linearLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(holder.recyclerView.isShown()){
-                    Animation slideUp = AnimationUtils.loadAnimation(context, R.anim.slide_up);
-                    slideUp.setAnimationListener(new Animation.AnimationListener() {
-                        @Override
-                        public void onAnimationStart(Animation animation) {
+        holder.linearLayout.setOnClickListener(v -> {
+            if(holder.recyclerView.isShown()){
+                Animation slideUp = AnimationUtils.loadAnimation(context, R.anim.slide_up);
+                slideUp.setAnimationListener(new Animation.AnimationListener() {
+                    @Override
+                    public void onAnimationStart(Animation animation) {
 
-                        }
-
-                        @Override
-                        public void onAnimationEnd(Animation animation) {
-                            holder.recyclerView.setVisibility(View.GONE);
-                        }
-
-                        @Override
-                        public void onAnimationRepeat(Animation animation) {
-
-                        }
-                    });
-                    if(slideUp != null){
-                        slideUp.reset();
-                        if(holder.recyclerView != null){
-                            holder.recyclerView.clearAnimation();
-                            holder.recyclerView.startAnimation(slideUp);
-                        }
                     }
-                } else {
-                    Animation slideDown = AnimationUtils.loadAnimation(context, R.anim.slide_down);
-                    if(slideDown != null){
-                        slideDown.reset();
-                        if(holder.recyclerView != null){
-                            holder.recyclerView.clearAnimation();
-                            holder.recyclerView.startAnimation(slideDown);
-                        }
+
+                    @Override
+                    public void onAnimationEnd(Animation animation) {
+                        holder.recyclerView.setVisibility(View.GONE);
                     }
-                    holder.recyclerView.setVisibility(View.VISIBLE);
-                    holder.recyclerView.requestFocus();
+
+                    @Override
+                    public void onAnimationRepeat(Animation animation) {
+
+                    }
+                });
+                if(slideUp != null){
+                    slideUp.reset();
+                    if(holder.recyclerView != null){
+                        holder.recyclerView.clearAnimation();
+                        holder.recyclerView.startAnimation(slideUp);
+                    }
                 }
+            } else {
+                Animation slideDown = AnimationUtils.loadAnimation(context, R.anim.slide_down);
+                if(slideDown != null){
+                    slideDown.reset();
+                    if(holder.recyclerView != null){
+                        holder.recyclerView.clearAnimation();
+                        holder.recyclerView.startAnimation(slideDown);
+                    }
+                }
+                holder.recyclerView.setVisibility(View.VISIBLE);
+                holder.recyclerView.requestFocus();
             }
         });
     }

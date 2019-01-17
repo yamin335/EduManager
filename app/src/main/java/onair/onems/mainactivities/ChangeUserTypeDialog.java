@@ -14,21 +14,16 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.TextView;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-
 import onair.onems.R;
-import onair.onems.customised.GuardianStudentSelectionAdapter;
-import onair.onems.notice.NoticeMainScreen;
 
 public class ChangeUserTypeDialog extends Dialog implements
         ChangeUserTypeAdapter.ChangeUserTypeListener, View.OnClickListener {
     private Context context;
     private Activity currentActivity;
-    public ChangeUserTypeDialog(Activity activity, Context context) {
+    ChangeUserTypeDialog(Activity activity, Context context) {
         super(activity);
         this.context = context;
         this.currentActivity = activity;
@@ -41,8 +36,8 @@ public class ChangeUserTypeDialog extends Dialog implements
         setContentView(R.layout.selection_dialog);
 
         TextView header = findViewById(R.id.header);
-        header.setText("Select User Type");
-        Button cross = (Button) findViewById(R.id.cross);
+        header.setText(R.string.select_user_type);
+        Button cross = findViewById(R.id.cross);
         cross.setOnClickListener(this);
 
         String UserTypes = context.getSharedPreferences("USER_TYPES", Context.MODE_PRIVATE)

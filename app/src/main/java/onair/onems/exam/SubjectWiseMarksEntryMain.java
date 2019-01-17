@@ -1,11 +1,9 @@
 package onair.onems.exam;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,19 +14,11 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Objects;
 
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -38,7 +28,6 @@ import io.reactivex.schedulers.Schedulers;
 import onair.onems.R;
 import onair.onems.Services.RetrofitNetworkService;
 import onair.onems.Services.StaticHelperClass;
-import onair.onems.attendance.TakeAttendance;
 import onair.onems.mainactivities.SideNavigationMenuParentActivity;
 import onair.onems.mainactivities.TeacherMainScreen;
 import onair.onems.models.ClassModel;
@@ -97,8 +86,8 @@ public class SubjectWiseMarksEntryMain extends SideNavigationMenuParentActivity 
         activityName = SubjectWiseMarksEntryMain.class.getName();
 
         LayoutInflater inflater = (LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        final View childActivityLayout = inflater.inflate(R.layout.exam_subject_wise_marks_entry_main, null);
-        LinearLayout parentActivityLayout = (LinearLayout) findViewById(R.id.contentMain);
+        final View childActivityLayout = Objects.requireNonNull(inflater).inflate(R.layout.exam_subject_wise_marks_entry_main, null);
+        LinearLayout parentActivityLayout = findViewById(R.id.contentMain);
         parentActivityLayout.addView(childActivityLayout, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
 
         selectedShift = new ShiftModel();
@@ -107,37 +96,34 @@ public class SubjectWiseMarksEntryMain extends SideNavigationMenuParentActivity 
         selectedDepartment = new DepartmentModel();
         selectedSection = new SectionModel();
 
-        spinnerShift = (Spinner)findViewById(R.id.spinnerShift);
-        spinnerMedium =(Spinner)findViewById(R.id.spinnerMedium);
-        spinnerClass = (Spinner)findViewById(R.id.spinnerClass);
-        spinnerDepartment =(Spinner)findViewById(R.id.spinnerDepartment);
-        spinnerSection = (Spinner)findViewById(R.id.spinnerSection);
-        spinnerSubject = (Spinner)findViewById(R.id.spinnerSubject);
-        spinnerExam = (Spinner)findViewById(R.id.spinnerExam);
+        spinnerShift = findViewById(R.id.spinnerShift);
+        spinnerMedium = findViewById(R.id.spinnerMedium);
+        spinnerClass = findViewById(R.id.spinnerClass);
+        spinnerDepartment = findViewById(R.id.spinnerDepartment);
+        spinnerSection = findViewById(R.id.spinnerSection);
+        spinnerSubject = findViewById(R.id.spinnerSubject);
+        spinnerExam = findViewById(R.id.spinnerExam);
 
-        Button entryMarks = (Button)findViewById(R.id.entryMarks);
-        entryMarks.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(selectedClass.getClassID()==0||selectedClass.getClassID()==-2) {
-                    Toast.makeText(SubjectWiseMarksEntryMain.this,"Select a class !!!",Toast.LENGTH_LONG).show();
-                } else if(selectedSubject == null) {
-                    Toast.makeText(SubjectWiseMarksEntryMain.this,"Select a subject !!!",Toast.LENGTH_LONG).show();
-                }else if(selectedExam == null){
-                    Toast.makeText(SubjectWiseMarksEntryMain.this,"Select an exam !!!",Toast.LENGTH_LONG).show();
-                } else {
-                    CheckSelectedData();
-                    Intent intent = new Intent(SubjectWiseMarksEntryMain.this, SubjectWiseMarksEntryStudentList.class);
-                    intent.putExtra("InstituteID", InstituteID);
-                    intent.putExtra("ClassID", selectedClass.getClassID());
-                    intent.putExtra("SectionID", selectedSection.getSectionID());
-                    intent.putExtra("DepartmentID", selectedDepartment.getDepartmentID());
-                    intent.putExtra("MediumID", selectedMedium.getMediumID());
-                    intent.putExtra("ShiftID", selectedShift.getShiftID());
-                    intent.putExtra("SubjectID", selectedSubject.getSubjectID());
-                    intent.putExtra("ExamID", selectedExam.getExamID());
-                    startActivity(intent);
-                }
+        Button entryMarks = findViewById(R.id.entryMarks);
+        entryMarks.setOnClickListener(v -> {
+            if(selectedClass.getClassID()==0||selectedClass.getClassID()==-2) {
+                Toast.makeText(SubjectWiseMarksEntryMain.this,"Select a class !!!",Toast.LENGTH_LONG).show();
+            } else if(selectedSubject == null) {
+                Toast.makeText(SubjectWiseMarksEntryMain.this,"Select a subject !!!",Toast.LENGTH_LONG).show();
+            }else if(selectedExam == null){
+                Toast.makeText(SubjectWiseMarksEntryMain.this,"Select an exam !!!",Toast.LENGTH_LONG).show();
+            } else {
+                CheckSelectedData();
+                Intent intent = new Intent(SubjectWiseMarksEntryMain.this, SubjectWiseMarksEntryStudentList.class);
+                intent.putExtra("InstituteID", InstituteID);
+                intent.putExtra("ClassID", selectedClass.getClassID());
+                intent.putExtra("SectionID", selectedSection.getSectionID());
+                intent.putExtra("DepartmentID", selectedDepartment.getDepartmentID());
+                intent.putExtra("MediumID", selectedMedium.getMediumID());
+                intent.putExtra("ShiftID", selectedShift.getShiftID());
+                intent.putExtra("SubjectID", selectedSubject.getSubjectID());
+                intent.putExtra("ExamID", selectedExam.getExamID());
+                startActivity(intent);
             }
         });
 
@@ -366,6 +352,7 @@ public class SubjectWiseMarksEntryMain extends SideNavigationMenuParentActivity 
 
     private void ShiftDataGetRequest() {
         if (StaticHelperClass.isNetworkAvailable(this)) {
+            dialog.show();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
                     .addConverterFactory(ScalarsConverterFactory.create())
@@ -388,12 +375,13 @@ public class SubjectWiseMarksEntryMain extends SideNavigationMenuParentActivity 
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseShiftJsonData(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
-
+                            dialog.dismiss();
                         }
 
                         @Override
@@ -435,6 +423,7 @@ public class SubjectWiseMarksEntryMain extends SideNavigationMenuParentActivity 
 
     private void MediumDataGetRequest() {
         if(StaticHelperClass.isNetworkAvailable(this)) {
+            dialog.show();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
                     .addConverterFactory(ScalarsConverterFactory.create())
@@ -457,12 +446,13 @@ public class SubjectWiseMarksEntryMain extends SideNavigationMenuParentActivity 
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseMediumJsonData(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
-
+                            dialog.dismiss();
                         }
 
                         @Override
@@ -506,6 +496,7 @@ public class SubjectWiseMarksEntryMain extends SideNavigationMenuParentActivity 
 
     private void ClassDataGetRequest() {
         if(StaticHelperClass.isNetworkAvailable(this)) {
+            dialog.show();
             CheckSelectedData();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
@@ -529,12 +520,13 @@ public class SubjectWiseMarksEntryMain extends SideNavigationMenuParentActivity 
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseClassJsonData(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
-
+                            dialog.dismiss();
                         }
 
                         @Override
@@ -577,6 +569,7 @@ public class SubjectWiseMarksEntryMain extends SideNavigationMenuParentActivity 
 
     private void DepartmentDataGetRequest() {
         if(StaticHelperClass.isNetworkAvailable(this)) {
+            dialog.show();
             CheckSelectedData();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
@@ -600,12 +593,13 @@ public class SubjectWiseMarksEntryMain extends SideNavigationMenuParentActivity 
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseDepartmentJsonData(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
-
+                            dialog.dismiss();
                         }
 
                         @Override
@@ -650,6 +644,7 @@ public class SubjectWiseMarksEntryMain extends SideNavigationMenuParentActivity 
 
     private void SectionDataGetRequest() {
         if(StaticHelperClass.isNetworkAvailable(this)) {
+            dialog.show();
             CheckSelectedData();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
@@ -673,12 +668,13 @@ public class SubjectWiseMarksEntryMain extends SideNavigationMenuParentActivity 
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseSectionJsonData(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
-
+                            dialog.dismiss();
                         }
 
                         @Override
@@ -720,6 +716,7 @@ public class SubjectWiseMarksEntryMain extends SideNavigationMenuParentActivity 
 
     private void SubjectDataGetRequest() {
         if(StaticHelperClass.isNetworkAvailable(this)) {
+            dialog.show();
             CheckSelectedData();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
@@ -743,12 +740,13 @@ public class SubjectWiseMarksEntryMain extends SideNavigationMenuParentActivity 
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseSubjectJsonData(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
-
+                            dialog.dismiss();
                         }
 
                         @Override
@@ -793,6 +791,7 @@ public class SubjectWiseMarksEntryMain extends SideNavigationMenuParentActivity 
 
     private void ExamDataGetRequest() {
         if (StaticHelperClass.isNetworkAvailable(this)) {
+            dialog.show();
             CheckSelectedData();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
@@ -816,12 +815,13 @@ public class SubjectWiseMarksEntryMain extends SideNavigationMenuParentActivity 
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseExamJsonData(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
-
+                            dialog.dismiss();
                         }
 
                         @Override
@@ -868,7 +868,7 @@ public class SubjectWiseMarksEntryMain extends SideNavigationMenuParentActivity 
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {

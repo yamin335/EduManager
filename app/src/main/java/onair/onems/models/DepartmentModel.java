@@ -1,9 +1,5 @@
 package onair.onems.models;
 
-/**
- * Created by User on 1/18/2018.DepartmentModel
- */
-
 public class DepartmentModel {
 
     private long DepartmentID = -2;

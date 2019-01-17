@@ -2,32 +2,21 @@ package onair.onems.login;
 
 import android.app.Activity;
 import android.app.Dialog;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.util.Patterns;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Objects;
 import java.util.Random;
 
 import io.reactivex.Observable;
@@ -38,7 +27,7 @@ import io.reactivex.schedulers.Schedulers;
 import onair.onems.R;
 import onair.onems.Services.RetrofitNetworkService;
 import onair.onems.Services.StaticHelperClass;
-import onair.onems.network.MySingleton;
+import onair.onems.mainactivities.CommonProgressDialog;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -50,6 +39,7 @@ public class ForgotPassVerCodeInputDialog extends Dialog implements View.OnClick
     private String returnValue, selectedWay, sentVerificationCode;
     private EditText input;
     private CompositeDisposable finalDisposer = new CompositeDisposable();
+    public CommonProgressDialog dialog;
 
     @Override
     public void dismiss() {
@@ -72,6 +62,9 @@ public class ForgotPassVerCodeInputDialog extends Dialog implements View.OnClick
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.forgot_pass_verification);
+        dialog = new CommonProgressDialog(parentActivity);
+        Objects.requireNonNull(dialog.getWindow()).setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        dialog.setCancelable(false);
         input = findViewById(R.id.input);
         TextView resendTextView = findViewById(R.id.resend);
         Button next = findViewById(R.id.next);
@@ -111,6 +104,7 @@ public class ForgotPassVerCodeInputDialog extends Dialog implements View.OnClick
 
     private void resendVerifyCode() {
         if(StaticHelperClass.isNetworkAvailable(context)) {
+            dialog.show();
             int verificationCode = new Random().nextInt(900000)+100000;
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(context.getString(R.string.baseUrl))
@@ -134,11 +128,13 @@ public class ForgotPassVerCodeInputDialog extends Dialog implements View.OnClick
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseReturnData(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
+                            dialog.dismiss();
                             dismiss();
                             Toast.makeText(context,"SERVER Error !!!",Toast.LENGTH_LONG).show();
                         }

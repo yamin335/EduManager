@@ -1,6 +1,7 @@
 package onair.onems.syllabus;
 
 import android.app.Activity;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,16 +26,13 @@ public class ExamAdapter extends RecyclerView.Adapter<ExamAdapter.MyViewHolder> 
             super(view);
             examName = view.findViewById(R.id.name);
 
-            view.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    // send selected exam in callback
-                    try {
-                        selectedListener.onExamSelected(exams.getJSONObject(getAdapterPosition()));
-                        dismissListener.onExamSelected(exams.getJSONObject(getAdapterPosition()));
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
+            view.setOnClickListener(view1 -> {
+                // send selected exam in callback
+                try {
+                    selectedListener.onExamSelected(exams.getJSONObject(getAdapterPosition()));
+                    dismissListener.onExamSelected(exams.getJSONObject(getAdapterPosition()));
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
             });
         }
@@ -51,8 +49,9 @@ public class ExamAdapter extends RecyclerView.Adapter<ExamAdapter.MyViewHolder> 
         }
     }
 
+    @NonNull
     @Override
-    public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.selection_row_item, parent, false);
 
@@ -60,7 +59,7 @@ public class ExamAdapter extends RecyclerView.Adapter<ExamAdapter.MyViewHolder> 
     }
 
     @Override
-    public void onBindViewHolder(MyViewHolder holder, final int position) {
+    public void onBindViewHolder(@NonNull MyViewHolder holder, final int position) {
         try {
             JSONObject exam = exams.getJSONObject(position);
             holder.examName.setText(exam.getString("CustomName"));

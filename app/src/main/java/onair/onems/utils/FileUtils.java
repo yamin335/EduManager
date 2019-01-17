@@ -29,16 +29,16 @@ public class FileUtils {
 
     public static final String MIME_TYPE_AUDIO = "audio/*";
     public static final String MIME_TYPE_TEXT = "text/*";
-    public static final String MIME_TYPE_IMAGE = "image/*";
+    private static final String MIME_TYPE_IMAGE = "image/*";
     public static final String MIME_TYPE_VIDEO = "video/*";
     public static final String MIME_TYPE_APP = "application/*";
 
-    public static final String HIDDEN_PREFIX = ".";
+    private static final String HIDDEN_PREFIX = ".";
 
     /**
      * Gets the extension of a file name, like ".png" or ".jpg".
      */
-    public static String getExtension(String uri) {
+    private static String getExtension(String uri) {
         if (uri == null) {
             return null;
         }

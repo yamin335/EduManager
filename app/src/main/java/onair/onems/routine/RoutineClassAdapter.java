@@ -14,6 +14,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Objects;
+
 import onair.onems.R;
 
 public class RoutineClassAdapter extends RecyclerView.Adapter<RoutineClassAdapter.MyViewHolder> {
@@ -78,7 +80,7 @@ public class RoutineClassAdapter extends RecyclerView.Adapter<RoutineClassAdapte
         if(UserTypeID == 1){
             holder.teacherName.setVisibility(View.GONE);
             try {
-                if(!object.getBoolean("IsBreak")){
+                if(!Objects.requireNonNull(object).getBoolean("IsBreak")){
                     String value = object.getString("CSTName").split(":")[1];
                     String[] s = value.split("_");
                     holder.className.setText("Class: "+s[0]);
@@ -90,7 +92,7 @@ public class RoutineClassAdapter extends RecyclerView.Adapter<RoutineClassAdapte
                     }
                     holder.subjectName.setText(sbjctName);
                 } else {
-                    holder.className.setText("Break");
+                    holder.className.setText(R.string.breakk);
                 }
                 holder.classTime.setText(object.getString("StartTime")+" - "+object.getString("EndTime"));
             } catch (JSONException e) {
@@ -99,7 +101,7 @@ public class RoutineClassAdapter extends RecyclerView.Adapter<RoutineClassAdapte
         } else if(UserTypeID == 2){
             holder.teacherName.setVisibility(View.GONE);
             try {
-                if(!object.getBoolean("IsBreak")){
+                if(!Objects.requireNonNull(object).getBoolean("IsBreak")){
                     String value = object.getString("CSTName").split(":")[1];
                     String[] s = value.split("_");
                     holder.className.setText("Class: "+s[0]);
@@ -111,7 +113,7 @@ public class RoutineClassAdapter extends RecyclerView.Adapter<RoutineClassAdapte
                     }
                     holder.subjectName.setText(sbjctName);
                 } else {
-                    holder.className.setText("Break");
+                    holder.className.setText(R.string.breakk);
                 }
                 holder.classTime.setText(object.getString("StartTime")+" - "+object.getString("EndTime"));
             } catch (JSONException e) {
@@ -130,7 +132,7 @@ public class RoutineClassAdapter extends RecyclerView.Adapter<RoutineClassAdapte
                 if(object.getString("SubjectName").equals("")&&object.getString("TeacherName").equals(""))
                 {
                   //  holder.subjectName.setText("Break");
-                    holder.subjectName.setText("Break");
+                    holder.subjectName.setText(R.string.breakk);
                     holder.subjectName.setTextSize(16);
                     holder.subjectName.setTextColor(Color.BLACK);
 
@@ -150,7 +152,7 @@ public class RoutineClassAdapter extends RecyclerView.Adapter<RoutineClassAdapte
 //            }
             holder.teacherName.setVisibility(View.GONE);
             try {
-                if(!object.getBoolean("IsBreak")){
+                if(!Objects.requireNonNull(object).getBoolean("IsBreak")){
                     String value = object.getString("CSTName").split(":")[1];
                     String[] s = value.split("_");
                     holder.className.setText("Class: "+s[0]);
@@ -162,7 +164,7 @@ public class RoutineClassAdapter extends RecyclerView.Adapter<RoutineClassAdapte
                     }
                     holder.subjectName.setText(sbjctName);
                 } else {
-                    holder.className.setText("Break");
+                    holder.className.setText(R.string.breakk);
                 }
                 holder.classTime.setText(object.getString("StartTime")+" - "+object.getString("EndTime"));
             } catch (JSONException e) {

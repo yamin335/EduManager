@@ -16,7 +16,7 @@ import onair.onems.R;
 public class ResultDetailsDialog extends Dialog implements View.OnClickListener {
     private JSONObject result;
 
-    public ResultDetailsDialog(Activity a, JSONObject result) {
+    ResultDetailsDialog(Activity a, JSONObject result) {
         super(a);
         this.result = result;
     }
@@ -26,11 +26,11 @@ public class ResultDetailsDialog extends Dialog implements View.OnClickListener 
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.result_details_dialog);
-        TextView mcqMark = (TextView)findViewById(R.id.mcq);
-        TextView writtenMark = (TextView)findViewById(R.id.written);
-        TextView attendanceMark = (TextView)findViewById(R.id.attendance);
-        TextView practicalMark = (TextView)findViewById(R.id.practical);
-        TextView totalMark = (TextView)findViewById(R.id.total);
+        TextView mcqMark = findViewById(R.id.mcq);
+        TextView writtenMark = findViewById(R.id.written);
+        TextView attendanceMark = findViewById(R.id.attendance);
+        TextView practicalMark = findViewById(R.id.practical);
+        TextView totalMark = findViewById(R.id.total);
         try {
             mcqMark.setText(result.getString("MCQ"));
             writtenMark.setText(result.getString("Written"));
@@ -40,7 +40,7 @@ public class ResultDetailsDialog extends Dialog implements View.OnClickListener 
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        Button ok = (Button) findViewById(R.id.btn_ok);
+        Button ok = findViewById(R.id.btn_ok);
         ok.setOnClickListener(this);
 
     }

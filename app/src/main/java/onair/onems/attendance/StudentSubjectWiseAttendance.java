@@ -63,7 +63,7 @@ public class StudentSubjectWiseAttendance extends CommonToolbarParentActivity {
         SharedPreferences sharedPre = PreferenceManager.getDefaultSharedPreferences(this);
         InstituteID = sharedPre.getLong("InstituteID", 0);
 
-        tableView = (TableView) findViewById(R.id.tableView);
+        tableView = findViewById(R.id.tableView);
 
         simpleTableHeaderAdapter = new SimpleTableHeaderAdapter(this, "Subject Name", "Code ", "Status", "Teacher");
         simpleTableHeaderAdapter.setTextColor(ContextCompat.getColor(this, R.color.table_header_text));
@@ -157,6 +157,7 @@ public class StudentSubjectWiseAttendance extends CommonToolbarParentActivity {
 
     public void AttendanceDataGetRequest(){
         if(StaticHelperClass.isNetworkAvailable(this)) {
+            dialog.show();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
                     .addConverterFactory(ScalarsConverterFactory.create())
@@ -184,12 +185,13 @@ public class StudentSubjectWiseAttendance extends CommonToolbarParentActivity {
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseSubjectWiseAttendanceJsonData(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
-
+                            dialog.dismiss();
                         }
 
                         @Override

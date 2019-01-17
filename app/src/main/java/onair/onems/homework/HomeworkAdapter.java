@@ -1,6 +1,5 @@
 package onair.onems.homework;
 
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.support.annotation.NonNull;
@@ -11,7 +10,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -66,14 +64,11 @@ public class HomeworkAdapter extends RecyclerView.Adapter<HomeworkAdapter.MyView
         try {
             holder.homeworkName.setText(homeworkList.get(position).getString("SubjectName"));
 
-            holder.card.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    // send selected homework in callback
-                    listener.onHomeworkSelected(homeworkList.get(holder.getAdapterPosition()));
-                    rowIndex = holder.getAdapterPosition();
-                    notifyDataSetChanged();
-                }
+            holder.card.setOnClickListener(view -> {
+                // send selected homework in callback
+                listener.onHomeworkSelected(homeworkList.get(holder.getAdapterPosition()));
+                rowIndex = holder.getAdapterPosition();
+                notifyDataSetChanged();
             });
             if (rowIndex == position) {
                 holder.card.setCardBackgroundColor(Color.parseColor("#dff9fb"));

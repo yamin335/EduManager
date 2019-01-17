@@ -1,9 +1,5 @@
 package onair.onems.fee;
 
-/**
- * Created by hp on 1/23/2018.
- */
-
 public class CardModel {
     // Name of the Android version (e.g. Gingerbread, Honeycomb, Ice Cream Sandwich)
     private String title;
@@ -20,8 +16,7 @@ public class CardModel {
         return amount;
     }
 
-    public CardModel(String vName, String vNumber)
-    {
+    public CardModel(String vName, String vNumber) {
         title = vName;
         amount = vNumber;
 

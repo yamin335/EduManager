@@ -15,7 +15,6 @@ import android.widget.TextView;
 import org.json.JSONObject;
 
 import onair.onems.R;
-import onair.onems.syllabus.ExamAdapter;
 
 public class ShiftSelectionDialog extends Dialog implements View.OnClickListener, ShiftSelectionAdapter.ShiftSelectionListener{
     private Context context;
@@ -35,8 +34,8 @@ public class ShiftSelectionDialog extends Dialog implements View.OnClickListener
         setContentView(R.layout.selection_dialog);
         RecyclerView recyclerView = findViewById(R.id.recycler);
         TextView header = findViewById(R.id.header);
-        header.setText("Select Shift");
-        Button cross = (Button) findViewById(R.id.cross);
+        header.setText(R.string.select_shift);
+        Button cross = findViewById(R.id.cross);
         cross.setOnClickListener(this);
 
         ShiftSelectionAdapter mAdapter = new ShiftSelectionAdapter(currentActivity, shifts, this);

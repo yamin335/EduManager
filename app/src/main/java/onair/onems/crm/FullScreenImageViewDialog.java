@@ -38,7 +38,6 @@ public class FullScreenImageViewDialog extends Dialog implements View.OnClickLis
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.image:
-//                dismiss();
                 break;
             case R.id.back:
                 dismiss();
@@ -46,7 +45,6 @@ public class FullScreenImageViewDialog extends Dialog implements View.OnClickLis
             default:
                 break;
         }
-//        dismiss();
     }
 }
 

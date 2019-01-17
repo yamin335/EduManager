@@ -44,11 +44,11 @@ public class CommonToolbarParentActivity extends AppCompatActivity {
         LoggedUserSectionID = prefs.getLong("SectionID",0);
         LoggedUserSessionID = prefs.getLong("SessionID",0);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         toolbar.setNavigationIcon(R.drawable.ic_keyboard_arrow_left);
         setSupportActionBar(toolbar);
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
     }

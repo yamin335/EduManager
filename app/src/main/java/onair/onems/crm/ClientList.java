@@ -14,6 +14,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonIOException;
@@ -31,6 +32,7 @@ import io.reactivex.schedulers.Schedulers;
 import onair.onems.R;
 import onair.onems.Services.RetrofitNetworkService;
 
+import onair.onems.Services.StaticHelperClass;
 import onair.onems.customised.MyDividerItemDecoration;
 
 import onair.onems.mainactivities.SideNavigationMenuParentActivity;
@@ -62,7 +64,7 @@ public class ClientList extends SideNavigationMenuParentActivity implements Clie
 
         LayoutInflater inflater = (LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         final View childActivityLayout = Objects.requireNonNull(inflater).inflate(R.layout.client_list, null);
-        LinearLayout parentActivityLayout = (LinearLayout) findViewById(R.id.contentMain);
+        LinearLayout parentActivityLayout = findViewById(R.id.contentMain);
         parentActivityLayout.addView(childActivityLayout, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
 
         clientList = new ArrayList<>();
@@ -75,59 +77,65 @@ public class ClientList extends SideNavigationMenuParentActivity implements Clie
         recyclerView.addItemDecoration(new MyDividerItemDecoration(this, DividerItemDecoration.VERTICAL, 10));
         recyclerView.setAdapter(mAdapter);
 
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(getString(R.string.baseUrl))
-                .addConverterFactory(ScalarsConverterFactory.create())
-                .addConverterFactory(GsonConverterFactory.create())
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                .build();
+        if (StaticHelperClass.isNetworkAvailable(this)) {
+            dialog.show();
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(getString(R.string.baseUrl))
+                    .addConverterFactory(ScalarsConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .build();
 
-        Observable<String> detailListObservable = retrofit
-                .create(RetrofitNetworkService.class)
-                .getClientList(LoggedUserID)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .unsubscribeOn(Schedulers.io());
+            Observable<String> detailListObservable = retrofit
+                    .create(RetrofitNetworkService.class)
+                    .getClientList(LoggedUserID)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io());
 
-        detailListObservable
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .unsubscribeOn(Schedulers.io())
-                .subscribe(new Observer<String>() {
+            detailListObservable
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io())
+                    .subscribe(new Observer<String>() {
 
-                    @Override
-                    public void onSubscribe(Disposable d) {
-                        finalDisposer = d;
-                    }
+                        @Override
+                        public void onSubscribe(Disposable d) {
+                            finalDisposer = d;
+                        }
 
-                    @Override
-                    public void onNext(String response) {
-                        if (response!= null) {
-                            if (!response.equals("")&&!response.equals("[]")) {
-                                try {
-                                    JsonParser parser = new JsonParser();
-                                    JsonArray dataJsonArray = parser.parse(response).getAsJsonArray();
-                                    for (int i = 0; i<dataJsonArray.size(); i++) {
-                                        clientList.add(i, dataJsonArray.get(i).getAsJsonObject());
+                        @Override
+                        public void onNext(String response) {
+                            dialog.dismiss();
+                            if (response!= null) {
+                                if (!response.equals("")&&!response.equals("[]")) {
+                                    try {
+                                        JsonParser parser = new JsonParser();
+                                        JsonArray dataJsonArray = parser.parse(response).getAsJsonArray();
+                                        for (int i = 0; i<dataJsonArray.size(); i++) {
+                                            clientList.add(i, dataJsonArray.get(i).getAsJsonObject());
+                                        }
+                                        mAdapter.notifyDataSetChanged();
+                                    } catch (JsonIOException e) {
+                                        e.printStackTrace();
                                     }
-                                    mAdapter.notifyDataSetChanged();
-                                } catch (JsonIOException e) {
-                                    e.printStackTrace();
                                 }
                             }
                         }
-                    }
 
-                    @Override
-                    public void onError(Throwable e) {
+                        @Override
+                        public void onError(Throwable e) {
+                            dialog.dismiss();
+                        }
 
-                    }
-
-                    @Override
-                    public void onComplete() {
-                    }
-                });
-
+                        @Override
+                        public void onComplete() {
+                        }
+                    });
+        } else {
+            Toast.makeText(this,"Please check your internet connection and select again!!! ",
+                    Toast.LENGTH_LONG).show();
+        }
     }
 
     @Override
@@ -140,7 +148,7 @@ public class ClientList extends SideNavigationMenuParentActivity implements Clie
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {

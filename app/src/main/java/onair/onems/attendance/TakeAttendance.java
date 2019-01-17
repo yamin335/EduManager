@@ -97,7 +97,7 @@ public class TakeAttendance extends SideNavigationMenuParentActivity {
 
         LayoutInflater inflater = (LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         final View childActivityLayout = Objects.requireNonNull(inflater).inflate(R.layout.attendance_taking_activity, null);
-        LinearLayout parentActivityLayout = (LinearLayout) findViewById(R.id.contentMain);
+        LinearLayout parentActivityLayout = findViewById(R.id.contentMain);
         parentActivityLayout.addView(childActivityLayout, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
 
         selectedClass = new ClassModel();
@@ -106,16 +106,16 @@ public class TakeAttendance extends SideNavigationMenuParentActivity {
         selectedMedium = new MediumModel();
         selectedDepartment = new DepartmentModel();
 
-        spinnerClass = (Spinner)findViewById(R.id.spinnerClass);
-        spinnerShift = (Spinner)findViewById(R.id.spinnerShift);
-        spinnerSection = (Spinner)findViewById(R.id.spinnerSection);
-        spinnerMedium =(Spinner)findViewById(R.id.spinnerMedium);
-        spinnerDepartment =(Spinner)findViewById(R.id.spinnerDepartment);
-        spinnerSubject = (Spinner)findViewById(R.id.spinnerSubject);
+        spinnerClass = findViewById(R.id.spinnerClass);
+        spinnerShift = findViewById(R.id.spinnerShift);
+        spinnerSection = findViewById(R.id.spinnerSection);
+        spinnerMedium = findViewById(R.id.spinnerMedium);
+        spinnerDepartment = findViewById(R.id.spinnerDepartment);
+        spinnerSubject = findViewById(R.id.spinnerSubject);
 
-        Button takeAttendance = (Button)findViewById(R.id.takeAttendance);
+        Button takeAttendance = findViewById(R.id.takeAttendance);
 
-        datePicker = (Button)findViewById(R.id.pickDate);
+        datePicker = findViewById(R.id.pickDate);
 
         ArrayAdapter<String> class_spinner_adapter = new ArrayAdapter<>(this, R.layout.spinner_item, tempClassArray);
         class_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -340,18 +340,14 @@ public class TakeAttendance extends SideNavigationMenuParentActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
-                if(position != 0)
-                {
+                if(position != 0) {
                     try {
                         selectedSubject = allSubjectArrayList.get(position-1);
                     }
-                    catch (IndexOutOfBoundsException e)
-                    {
+                    catch (IndexOutOfBoundsException e) {
                         Toast.makeText(TakeAttendance.this,"No subject found !!!",Toast.LENGTH_LONG).show();
                     }
-                }
-                else
-                {
+                } else {
                     selectedSubject = null;
                 }
             }
@@ -547,7 +543,7 @@ public class TakeAttendance extends SideNavigationMenuParentActivity {
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
@@ -566,6 +562,7 @@ public class TakeAttendance extends SideNavigationMenuParentActivity {
 
     private void ShiftDataGetRequest() {
         if (StaticHelperClass.isNetworkAvailable(this)) {
+            dialog.show();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
                     .addConverterFactory(ScalarsConverterFactory.create())
@@ -588,12 +585,13 @@ public class TakeAttendance extends SideNavigationMenuParentActivity {
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseShiftJsonData(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
-
+                            dialog.dismiss();
                         }
 
                         @Override
@@ -609,6 +607,7 @@ public class TakeAttendance extends SideNavigationMenuParentActivity {
 
     private void MediumDataGetRequest() {
         if(StaticHelperClass.isNetworkAvailable(this)) {
+            dialog.show();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
                     .addConverterFactory(ScalarsConverterFactory.create())
@@ -631,12 +630,13 @@ public class TakeAttendance extends SideNavigationMenuParentActivity {
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseMediumJsonData(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
-
+                            dialog.dismiss();
                         }
 
                         @Override
@@ -652,6 +652,7 @@ public class TakeAttendance extends SideNavigationMenuParentActivity {
 
     private void ClassDataGetRequest() {
         if(StaticHelperClass.isNetworkAvailable(this)) {
+            dialog.show();
             CheckSelectedData();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
@@ -675,12 +676,13 @@ public class TakeAttendance extends SideNavigationMenuParentActivity {
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseClassJsonData(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
-
+                            dialog.dismiss();
                         }
 
                         @Override
@@ -696,6 +698,7 @@ public class TakeAttendance extends SideNavigationMenuParentActivity {
 
     private void DepartmentDataGetRequest() {
         if(StaticHelperClass.isNetworkAvailable(this)) {
+            dialog.show();
             CheckSelectedData();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
@@ -719,12 +722,13 @@ public class TakeAttendance extends SideNavigationMenuParentActivity {
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseDepartmentJsonData(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
-
+                            dialog.dismiss();
                         }
 
                         @Override
@@ -740,6 +744,7 @@ public class TakeAttendance extends SideNavigationMenuParentActivity {
 
     private void SectionDataGetRequest() {
         if(StaticHelperClass.isNetworkAvailable(this)) {
+            dialog.show();
             CheckSelectedData();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
@@ -763,12 +768,13 @@ public class TakeAttendance extends SideNavigationMenuParentActivity {
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseSectionJsonData(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
-
+                            dialog.dismiss();
                         }
 
                         @Override
@@ -784,6 +790,7 @@ public class TakeAttendance extends SideNavigationMenuParentActivity {
 
     private void SubjectDataGetRequest() {
         if(StaticHelperClass.isNetworkAvailable(this)) {
+            dialog.show();
             CheckSelectedData();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
@@ -807,12 +814,13 @@ public class TakeAttendance extends SideNavigationMenuParentActivity {
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseSubjectJsonData(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
-
+                            dialog.dismiss();
                         }
 
                         @Override

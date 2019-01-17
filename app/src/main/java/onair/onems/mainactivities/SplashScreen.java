@@ -1,29 +1,17 @@
 package onair.onems.mainactivities;
 
-import android.Manifest;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Handler;
-import android.preference.PreferenceManager;
-import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.telephony.TelephonyManager;
 import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.util.UUID;
-
 import onair.onems.R;
-import onair.onems.app.Config;
 import onair.onems.login.LoginScreen;
 
 public class SplashScreen extends AppCompatActivity {
@@ -32,8 +20,6 @@ public class SplashScreen extends AppCompatActivity {
     private TextView AppName, CopyRight;
     private ImageView Logo;
     private Animation animation;
-    public static final String MyPREFERENCES = "LogInKey";
-    public static SharedPreferences sharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,9 +31,9 @@ public class SplashScreen extends AppCompatActivity {
                     WindowManager.LayoutParams.FLAG_FULLSCREEN);
         }
         setContentView(R.layout.splash_activity);
-        AppName = (TextView)findViewById(R.id.splashText);
-        CopyRight = (TextView)findViewById(R.id.copyright);
-        Logo = (ImageView)findViewById(R.id.splashImage);
+        AppName = findViewById(R.id.splashText);
+        CopyRight = findViewById(R.id.copyright);
+        Logo = findViewById(R.id.splashImage);
         if (savedInstanceState == null){
             flyIn();
         }

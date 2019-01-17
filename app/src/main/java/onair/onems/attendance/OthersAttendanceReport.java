@@ -2,6 +2,8 @@ package onair.onems.attendance;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
@@ -28,6 +30,7 @@ import io.reactivex.schedulers.Schedulers;
 import onair.onems.R;
 import onair.onems.Services.RetrofitNetworkService;
 import onair.onems.Services.StaticHelperClass;
+import onair.onems.mainactivities.CommonProgressDialog;
 import onair.onems.models.ClassModel;
 import onair.onems.models.DepartmentModel;
 import onair.onems.models.MediumModel;
@@ -62,8 +65,9 @@ public class OthersAttendanceReport extends Fragment {
     private long InstituteID;
     private int firstClass = 0, firstShift = 0, firstSection = 0, firstMedium = 0,
             firstDepartment = 0;
-
     private CompositeDisposable finalDisposer = new CompositeDisposable();
+    public CommonProgressDialog dialog;
+
     public OthersAttendanceReport() {
 
     }
@@ -85,6 +89,10 @@ public class OthersAttendanceReport extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.attendance_report_monthly_student_other, container, false);
 
+        dialog = new CommonProgressDialog(getActivity());
+        Objects.requireNonNull(dialog.getWindow()).setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        dialog.setCancelable(false);
+
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         InstituteID = prefs.getLong("InstituteID",0);
 
@@ -95,13 +103,13 @@ public class OthersAttendanceReport extends Fragment {
         selectedDepartment = new DepartmentModel();
         selectedMonth = new MonthModel();
 
-        spinnerClass = (Spinner)rootView.findViewById(R.id.spinnerClass);
-        spinnerShift = (Spinner)rootView.findViewById(R.id.spinnerShift);
-        spinnerSection = (Spinner)rootView.findViewById(R.id.spinnerSection);
-        spinnerMedium =(Spinner)rootView.findViewById(R.id.spinnerMedium);
-        spinnerDepartment =(Spinner)rootView.findViewById(R.id.spinnerDepartment);
-        spinnerMonth = (Spinner)rootView.findViewById(R.id.spinnerMonth);
-        Button student_find_button=(Button) rootView.findViewById(R.id.show_button);
+        spinnerClass = rootView.findViewById(R.id.spinnerClass);
+        spinnerShift = rootView.findViewById(R.id.spinnerShift);
+        spinnerSection = rootView.findViewById(R.id.spinnerSection);
+        spinnerMedium = rootView.findViewById(R.id.spinnerMedium);
+        spinnerDepartment = rootView.findViewById(R.id.spinnerDepartment);
+        spinnerMonth = rootView.findViewById(R.id.spinnerMonth);
+        Button student_find_button= rootView.findViewById(R.id.show_button);
 
         ArrayAdapter<String> class_spinner_adapter = new ArrayAdapter<>(Objects.requireNonNull(getActivity()), R.layout.spinner_item, tempClassArray);
         class_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -495,7 +503,7 @@ public class OthersAttendanceReport extends Fragment {
 
     private void ShiftDataGetRequest() {
         if (StaticHelperClass.isNetworkAvailable(Objects.requireNonNull(getActivity()))) {
-
+            dialog.show();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
                     .addConverterFactory(ScalarsConverterFactory.create())
@@ -518,12 +526,13 @@ public class OthersAttendanceReport extends Fragment {
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseShiftJsonData(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
-
+                            dialog.dismiss();
                         }
 
                         @Override
@@ -540,6 +549,7 @@ public class OthersAttendanceReport extends Fragment {
 
     private void MediumDataGetRequest() {
         if(StaticHelperClass.isNetworkAvailable(Objects.requireNonNull(getActivity()))) {
+            dialog.show();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
                     .addConverterFactory(ScalarsConverterFactory.create())
@@ -562,12 +572,13 @@ public class OthersAttendanceReport extends Fragment {
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseMediumJsonData(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
-
+                            dialog.dismiss();
                         }
 
                         @Override
@@ -583,6 +594,7 @@ public class OthersAttendanceReport extends Fragment {
 
     private void ClassDataGetRequest() {
         if(StaticHelperClass.isNetworkAvailable(Objects.requireNonNull(getActivity()))) {
+            dialog.show();
             CheckSelectedData();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
@@ -606,12 +618,13 @@ public class OthersAttendanceReport extends Fragment {
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseClassJsonData(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
-
+                            dialog.dismiss();
                         }
 
                         @Override
@@ -627,7 +640,7 @@ public class OthersAttendanceReport extends Fragment {
 
     private void DepartmentDataGetRequest() {
         if(StaticHelperClass.isNetworkAvailable(Objects.requireNonNull(getActivity()))) {
-
+            dialog.show();
             CheckSelectedData();
 
             Retrofit retrofit = new Retrofit.Builder()
@@ -652,12 +665,13 @@ public class OthersAttendanceReport extends Fragment {
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseDepartmentJsonData(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
-
+                            dialog.dismiss();
                         }
 
                         @Override
@@ -673,7 +687,7 @@ public class OthersAttendanceReport extends Fragment {
 
     private void SectionDataGetRequest() {
         if(StaticHelperClass.isNetworkAvailable(Objects.requireNonNull(getActivity()))) {
-
+            dialog.show();
             CheckSelectedData();
 
             Retrofit retrofit = new Retrofit.Builder()
@@ -698,12 +712,13 @@ public class OthersAttendanceReport extends Fragment {
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseSectionJsonData(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
-
+                            dialog.dismiss();
                         }
 
                         @Override
@@ -719,7 +734,7 @@ public class OthersAttendanceReport extends Fragment {
 
     void MonthDataGetRequest(){
         if(StaticHelperClass.isNetworkAvailable(Objects.requireNonNull(getActivity()))) {
-
+            dialog.show();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
                     .addConverterFactory(ScalarsConverterFactory.create())
@@ -742,12 +757,13 @@ public class OthersAttendanceReport extends Fragment {
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseMonthJsonData(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
-
+                            dialog.dismiss();
                         }
 
                         @Override

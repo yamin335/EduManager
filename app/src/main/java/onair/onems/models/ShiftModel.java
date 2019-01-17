@@ -1,9 +1,5 @@
 package onair.onems.models;
 
-/**
- * Created by User on 12/21/2017.
- */
-
 public class ShiftModel {
 
     private long ShiftID = -2;

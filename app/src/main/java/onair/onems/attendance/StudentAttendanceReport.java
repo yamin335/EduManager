@@ -32,18 +32,18 @@ public class StudentAttendanceReport extends SideNavigationMenuParentActivity {
 
         LayoutInflater inflater = (LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         final View childActivityLayout = Objects.requireNonNull(inflater).inflate(R.layout.attendance_report_content_main, null);
-        LinearLayout parentActivityLayout = (LinearLayout) findViewById(R.id.contentMain);
+        LinearLayout parentActivityLayout = findViewById(R.id.contentMain);
         parentActivityLayout.addView(childActivityLayout, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
 
-        ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
+        ViewPager viewPager = findViewById(R.id.pager);
         setupViewPager(viewPager);
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabLayout);
+        TabLayout tabLayout = findViewById(R.id.tabLayout);
         tabLayout.setupWithViewPager(viewPager);
     }
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {

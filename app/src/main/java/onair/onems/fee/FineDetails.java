@@ -29,12 +29,7 @@ import de.codecrafters.tableview.toolkit.SimpleTableHeaderAdapter;
 import de.codecrafters.tableview.toolkit.TableDataRowBackgroundProviders;
 import onair.onems.R;
 
-/**
- * Created by hp on 1/23/2018.
- */
-
-public class FineDetails extends AppCompatActivity
-{
+public class FineDetails extends AppCompatActivity {
     TableView tableView;
     SimpleTableHeaderAdapter simpleTableHeaderAdapter;
     SimpleTableDataAdapter simpleTabledataAdapter;

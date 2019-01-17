@@ -28,12 +28,9 @@ public class LessonPlanAdapter extends RecyclerView.Adapter<LessonPlanAdapter.My
             super(view);
             LessonPlanName = view.findViewById(R.id.name);
 
-            view.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    // send selected homework in callback
-                    listener.onLessonPlanSelected(lessonPlanList.get(getAdapterPosition()));
-                }
+            view.setOnClickListener(view1 -> {
+                // send selected homework in callback
+                listener.onLessonPlanSelected(lessonPlanList.get(getAdapterPosition()));
             });
         }
     }

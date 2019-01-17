@@ -1,7 +1,8 @@
 package onair.onems.result;
 
-import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -15,11 +16,6 @@ import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
 import com.google.gson.JsonObject;
 
 import org.json.JSONArray;
@@ -27,8 +23,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Objects;
 
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -38,6 +33,7 @@ import io.reactivex.schedulers.Schedulers;
 import onair.onems.R;
 import onair.onems.Services.RetrofitNetworkService;
 import onair.onems.Services.StaticHelperClass;
+import onair.onems.mainactivities.CommonProgressDialog;
 import onair.onems.models.ClassModel;
 import onair.onems.models.DepartmentModel;
 import onair.onems.models.ExamModel;
@@ -45,7 +41,6 @@ import onair.onems.models.MediumModel;
 import onair.onems.models.SectionModel;
 import onair.onems.models.SessionModel;
 import onair.onems.models.ShiftModel;
-import onair.onems.network.MySingleton;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -90,6 +85,7 @@ public class OtherResult extends Fragment {
     private long InstituteID;
     private String LoggedUserID = "";
     private CompositeDisposable finalDisposer = new CompositeDisposable();
+    public CommonProgressDialog dialog;
 
     @Override
     public void onDestroy() {
@@ -102,7 +98,7 @@ public class OtherResult extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Bundle bundle = getArguments();
-        InstituteID = bundle.getLong("InstituteID");
+        InstituteID = Objects.requireNonNull(bundle).getLong("InstituteID");
         LoggedUserID = bundle.getString("LoggedUserID");
     }
 
@@ -111,6 +107,9 @@ public class OtherResult extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.result_content_main, container, false);
 
+        dialog = new CommonProgressDialog(getActivity());
+        Objects.requireNonNull(dialog.getWindow()).setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        dialog.setCancelable(false);
         allSessionArrayList = new ArrayList<>();
         allShiftArrayList = new ArrayList<>();
         allMediumArrayList = new ArrayList<>();
@@ -128,18 +127,18 @@ public class OtherResult extends Fragment {
         selectedExam = new ExamModel();
         selectedStudent = null;
 
-        spinnerClass = (Spinner)rootView.findViewById(R.id.spinnerClass);
-        spinnerShift = (Spinner)rootView.findViewById(R.id.spinnerShift);
-        spinnerSection = (Spinner)rootView.findViewById(R.id.spinnerSection);
-        spinnerMedium =(Spinner)rootView.findViewById(R.id.spinnerMedium);
-        spinnerDepartment =(Spinner)rootView.findViewById(R.id.spinnerDepartment);
-        spinnerStudent = (Spinner)rootView.findViewById(R.id.spinnerStudent);
-        spinnerSession = (Spinner)rootView.findViewById(R.id.spinnerSession);
-        spinnerExam = (Spinner)rootView.findViewById(R.id.spinnerExam);
+        spinnerClass = rootView.findViewById(R.id.spinnerClass);
+        spinnerShift = rootView.findViewById(R.id.spinnerShift);
+        spinnerSection = rootView.findViewById(R.id.spinnerSection);
+        spinnerMedium = rootView.findViewById(R.id.spinnerMedium);
+        spinnerDepartment = rootView.findViewById(R.id.spinnerDepartment);
+        spinnerStudent = rootView.findViewById(R.id.spinnerStudent);
+        spinnerSession = rootView.findViewById(R.id.spinnerSession);
+        spinnerExam = rootView.findViewById(R.id.spinnerExam);
 
-        Button showResult = (Button)rootView.findViewById(R.id.showResult);
+        Button showResult = rootView.findViewById(R.id.showResult);
 
-        ArrayAdapter<String> class_spinner_adapter = new ArrayAdapter<>(getActivity(), R.layout.spinner_item, tempClassArray);
+        ArrayAdapter<String> class_spinner_adapter = new ArrayAdapter<>(Objects.requireNonNull(getActivity()), R.layout.spinner_item, tempClassArray);
         class_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerClass.setAdapter(class_spinner_adapter);
 
@@ -393,52 +392,49 @@ public class OtherResult extends Fragment {
             }
         });
 
-        showResult.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(StaticHelperClass.isNetworkAvailable(getActivity())) {
-                    if(allSessionArrayList.size()>0 && selectedSession.getSessionID() == 0){
-                        Toast.makeText(getActivity(),"Please select session!!! ",
-                                Toast.LENGTH_LONG).show();
-                    } else if(allMediumArrayList.size()>0 && (selectedMedium.getMediumID() == -2 || selectedMedium.getMediumID() == 0)) {
-                        Toast.makeText(getActivity(),"Please select medium!!! ",
-                                Toast.LENGTH_LONG).show();
-                    } else if(allClassArrayList.size()>0 && (selectedClass.getClassID() == -2 || selectedClass.getClassID() == 0)) {
-                        Toast.makeText(getActivity(),"Please select class!!! ",
-                                Toast.LENGTH_LONG).show();
-                    } else if(allDepartmentArrayList.size()>0 && (selectedDepartment.getDepartmentID() == -2 || selectedDepartment.getDepartmentID() == 0)) {
-                        Toast.makeText(getActivity(),"Please select department!!! ",
-                                Toast.LENGTH_LONG).show();
-                    } else if(allSectionArrayList.size()>0 && (selectedSection.getSectionID() == -2 || selectedSection.getSectionID() == 0)) {
-                        Toast.makeText(getActivity(),"Please select section!!! ",
-                                Toast.LENGTH_LONG).show();
-                    } else if(allExamArrayList.size()>0 && selectedExam.getExamID() == 0) {
-                        Toast.makeText(getActivity(),"Please select exam!!! ",
-                                Toast.LENGTH_LONG).show();
-                    } else if(selectedStudent == null){
-                        Toast.makeText(getActivity(),"Please select a student!!! ",
-                                Toast.LENGTH_LONG).show();
-                    } else {
-                        try {
-                            Intent intent = new Intent(getActivity(), SubjectWiseResult.class);
-                            intent.putExtra("UserID", selectedStudent.getString("UserID").equalsIgnoreCase("null")? "0":selectedStudent.getString("UserID"));
-                            intent.putExtra("ShiftID", selectedStudent.getString("ShiftID").equalsIgnoreCase("null")? "0":selectedStudent.getString("ShiftID"));
-                            intent.putExtra("MediumID", selectedStudent.getString("MediumID").equalsIgnoreCase("null")? "0":selectedStudent.getString("MediumID"));
-                            intent.putExtra("ClassID", selectedStudent.getString("ClassID").equalsIgnoreCase("null")? "0":selectedStudent.getString("ClassID"));
-                            intent.putExtra("DepartmentID", selectedStudent.getString("DepartmentID").equalsIgnoreCase("null")? "0":selectedStudent.getString("DepartmentID"));
-                            intent.putExtra("SectionID", selectedStudent.getString("SectionID").equalsIgnoreCase("null")? "0":selectedStudent.getString("SectionID"));
-                            intent.putExtra("SessionID", selectedStudent.getString("SessionID").equalsIgnoreCase("null")? "0":selectedStudent.getString("SessionID"));
-                            intent.putExtra("ExamID", Long.toString(selectedExam.getExamID()));
-                            intent.putExtra("InstituteID", selectedStudent.getString("InstituteID").equalsIgnoreCase("null")? "0":selectedStudent.getString("InstituteID"));
-                            startActivity(intent);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                } else {
-                    Toast.makeText(getActivity(),"Please check your internet connection and select again!!! ",
+        showResult.setOnClickListener(v -> {
+            if(StaticHelperClass.isNetworkAvailable(getActivity())) {
+                if(allSessionArrayList.size()>0 && selectedSession.getSessionID() == 0){
+                    Toast.makeText(getActivity(),"Please select session!!! ",
                             Toast.LENGTH_LONG).show();
+                } else if(allMediumArrayList.size()>0 && (selectedMedium.getMediumID() == -2 || selectedMedium.getMediumID() == 0)) {
+                    Toast.makeText(getActivity(),"Please select medium!!! ",
+                            Toast.LENGTH_LONG).show();
+                } else if(allClassArrayList.size()>0 && (selectedClass.getClassID() == -2 || selectedClass.getClassID() == 0)) {
+                    Toast.makeText(getActivity(),"Please select class!!! ",
+                            Toast.LENGTH_LONG).show();
+                } else if(allDepartmentArrayList.size()>0 && (selectedDepartment.getDepartmentID() == -2 || selectedDepartment.getDepartmentID() == 0)) {
+                    Toast.makeText(getActivity(),"Please select department!!! ",
+                            Toast.LENGTH_LONG).show();
+                } else if(allSectionArrayList.size()>0 && (selectedSection.getSectionID() == -2 || selectedSection.getSectionID() == 0)) {
+                    Toast.makeText(getActivity(),"Please select section!!! ",
+                            Toast.LENGTH_LONG).show();
+                } else if(allExamArrayList.size()>0 && selectedExam.getExamID() == 0) {
+                    Toast.makeText(getActivity(),"Please select exam!!! ",
+                            Toast.LENGTH_LONG).show();
+                } else if(selectedStudent == null){
+                    Toast.makeText(getActivity(),"Please select a student!!! ",
+                            Toast.LENGTH_LONG).show();
+                } else {
+                    try {
+                        Intent intent = new Intent(getActivity(), SubjectWiseResult.class);
+                        intent.putExtra("UserID", selectedStudent.getString("UserID").equalsIgnoreCase("null")? "0":selectedStudent.getString("UserID"));
+                        intent.putExtra("ShiftID", selectedStudent.getString("ShiftID").equalsIgnoreCase("null")? "0":selectedStudent.getString("ShiftID"));
+                        intent.putExtra("MediumID", selectedStudent.getString("MediumID").equalsIgnoreCase("null")? "0":selectedStudent.getString("MediumID"));
+                        intent.putExtra("ClassID", selectedStudent.getString("ClassID").equalsIgnoreCase("null")? "0":selectedStudent.getString("ClassID"));
+                        intent.putExtra("DepartmentID", selectedStudent.getString("DepartmentID").equalsIgnoreCase("null")? "0":selectedStudent.getString("DepartmentID"));
+                        intent.putExtra("SectionID", selectedStudent.getString("SectionID").equalsIgnoreCase("null")? "0":selectedStudent.getString("SectionID"));
+                        intent.putExtra("SessionID", selectedStudent.getString("SessionID").equalsIgnoreCase("null")? "0":selectedStudent.getString("SessionID"));
+                        intent.putExtra("ExamID", Long.toString(selectedExam.getExamID()));
+                        intent.putExtra("InstituteID", selectedStudent.getString("InstituteID").equalsIgnoreCase("null")? "0":selectedStudent.getString("InstituteID"));
+                        startActivity(intent);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                 }
+            } else {
+                Toast.makeText(getActivity(),"Please check your internet connection and select again!!! ",
+                        Toast.LENGTH_LONG).show();
             }
         });
 
@@ -449,7 +445,8 @@ public class OtherResult extends Fragment {
     }
 
     private void SessionDataGetRequest() {
-        if (StaticHelperClass.isNetworkAvailable(getActivity())) {
+        if (StaticHelperClass.isNetworkAvailable(Objects.requireNonNull(getActivity()))) {
+            dialog.show();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
                     .addConverterFactory(ScalarsConverterFactory.create())
@@ -472,11 +469,13 @@ public class OtherResult extends Fragment {
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseSessionJsonData(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
+                            dialog.dismiss();
                             Toast.makeText(getActivity(),"Session not found!!! ",
                                     Toast.LENGTH_LONG).show();
                         }
@@ -510,7 +509,7 @@ public class OtherResult extends Fragment {
             try {
                 String[] strings = new String[sessionArrayList.size()];
                 strings = sessionArrayList.toArray(strings);
-                ArrayAdapter<String> session_spinner_adapter = new ArrayAdapter<>(getActivity(),R.layout.spinner_item, strings);
+                ArrayAdapter<String> session_spinner_adapter = new ArrayAdapter<>(Objects.requireNonNull(getActivity()),R.layout.spinner_item, strings);
                 session_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinnerSession.setAdapter(session_spinner_adapter);
             } catch (IndexOutOfBoundsException e) {
@@ -522,7 +521,8 @@ public class OtherResult extends Fragment {
     }
 
     private void ShiftDataGetRequest() {
-        if (StaticHelperClass.isNetworkAvailable(getActivity())) {
+        if (StaticHelperClass.isNetworkAvailable(Objects.requireNonNull(getActivity()))) {
+            dialog.show();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
                     .addConverterFactory(ScalarsConverterFactory.create())
@@ -545,12 +545,13 @@ public class OtherResult extends Fragment {
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseShiftJsonData(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
-
+                            dialog.dismiss();
                         }
 
                         @Override
@@ -582,7 +583,7 @@ public class OtherResult extends Fragment {
             try {
                 String[] strings = new String[shiftArrayList.size()];
                 strings = shiftArrayList.toArray(strings);
-                ArrayAdapter<String> shift_spinner_adapter = new ArrayAdapter<>(getActivity(),R.layout.spinner_item, strings);
+                ArrayAdapter<String> shift_spinner_adapter = new ArrayAdapter<>(Objects.requireNonNull(getActivity()),R.layout.spinner_item, strings);
                 shift_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinnerShift.setAdapter(shift_spinner_adapter);
             } catch (IndexOutOfBoundsException e) {
@@ -594,7 +595,8 @@ public class OtherResult extends Fragment {
     }
 
     private void MediumDataGetRequest() {
-        if(StaticHelperClass.isNetworkAvailable(getActivity())) {
+        if(StaticHelperClass.isNetworkAvailable(Objects.requireNonNull(getActivity()))) {
+            dialog.dismiss();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
                     .addConverterFactory(ScalarsConverterFactory.create())
@@ -617,12 +619,13 @@ public class OtherResult extends Fragment {
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseMediumJsonData(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
-
+                            dialog.dismiss();
                         }
 
                         @Override
@@ -656,7 +659,7 @@ public class OtherResult extends Fragment {
             try {
                 String[] strings = new String[mediumnArrayList.size()];
                 strings = mediumnArrayList.toArray(strings);
-                ArrayAdapter<String> medium_spinner_adapter = new ArrayAdapter<>(getActivity(),R.layout.spinner_item, strings);
+                ArrayAdapter<String> medium_spinner_adapter = new ArrayAdapter<>(Objects.requireNonNull(getActivity()),R.layout.spinner_item, strings);
                 medium_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinnerMedium.setAdapter(medium_spinner_adapter);
             } catch (IndexOutOfBoundsException e) {
@@ -668,7 +671,8 @@ public class OtherResult extends Fragment {
     }
 
     private void ClassDataGetRequest() {
-        if(StaticHelperClass.isNetworkAvailable(getActivity())) {
+        if(StaticHelperClass.isNetworkAvailable(Objects.requireNonNull(getActivity()))) {
+            dialog.show();
             CheckSelectedData();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
@@ -692,12 +696,13 @@ public class OtherResult extends Fragment {
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseClassJsonData(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
-
+                            dialog.dismiss();
                         }
 
                         @Override
@@ -730,7 +735,7 @@ public class OtherResult extends Fragment {
             try {
                 String[] strings = new String[classArrayList.size()];
                 strings = classArrayList.toArray(strings);
-                ArrayAdapter<String> class_spinner_adapter = new ArrayAdapter<>(getActivity(),R.layout.spinner_item, strings);
+                ArrayAdapter<String> class_spinner_adapter = new ArrayAdapter<>(Objects.requireNonNull(getActivity()),R.layout.spinner_item, strings);
                 class_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinnerClass.setAdapter(class_spinner_adapter);
             } catch (IndexOutOfBoundsException e) {
@@ -742,7 +747,8 @@ public class OtherResult extends Fragment {
     }
 
     private void DepartmentDataGetRequest() {
-        if(StaticHelperClass.isNetworkAvailable(getActivity())) {
+        if(StaticHelperClass.isNetworkAvailable(Objects.requireNonNull(getActivity()))) {
+            dialog.show();
             CheckSelectedData();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
@@ -766,12 +772,13 @@ public class OtherResult extends Fragment {
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseDepartmentJsonData(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
-
+                            dialog.dismiss();
                         }
 
                         @Override
@@ -807,7 +814,7 @@ public class OtherResult extends Fragment {
             try {
                 String[] strings = new String[departmentArrayList.size()];
                 strings = departmentArrayList.toArray(strings);
-                ArrayAdapter<String> department_spinner_adapter = new ArrayAdapter<>(getActivity(),R.layout.spinner_item, strings);
+                ArrayAdapter<String> department_spinner_adapter = new ArrayAdapter<>(Objects.requireNonNull(getActivity()),R.layout.spinner_item, strings);
                 department_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinnerDepartment.setAdapter(department_spinner_adapter);
             } catch (IndexOutOfBoundsException e) {
@@ -819,7 +826,8 @@ public class OtherResult extends Fragment {
     }
 
     private void SectionDataGetRequest() {
-        if(StaticHelperClass.isNetworkAvailable(getActivity())) {
+        if(StaticHelperClass.isNetworkAvailable(Objects.requireNonNull(getActivity()))) {
+            dialog.show();
             CheckSelectedData();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
@@ -843,12 +851,13 @@ public class OtherResult extends Fragment {
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseSectionJsonData(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
-
+                            dialog.dismiss();
                         }
 
                         @Override
@@ -880,7 +889,7 @@ public class OtherResult extends Fragment {
             try {
                 String[] strings = new String[sectionArrayList.size()];
                 strings = sectionArrayList.toArray(strings);
-                ArrayAdapter<String> section_spinner_adapter = new ArrayAdapter<>(getActivity(),R.layout.spinner_item, strings);
+                ArrayAdapter<String> section_spinner_adapter = new ArrayAdapter<>(Objects.requireNonNull(getActivity()),R.layout.spinner_item, strings);
                 section_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinnerSection.setAdapter(section_spinner_adapter);
             } catch (IndexOutOfBoundsException e) {
@@ -892,7 +901,8 @@ public class OtherResult extends Fragment {
     }
 
     private void ExamDataGetRequest() {
-        if (StaticHelperClass.isNetworkAvailable(getActivity())) {
+        if (StaticHelperClass.isNetworkAvailable(Objects.requireNonNull(getActivity()))) {
+            dialog.show();
             CheckSelectedData();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
@@ -916,12 +926,13 @@ public class OtherResult extends Fragment {
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseExamJsonData(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
-
+                            dialog.dismiss();
                         }
 
                         @Override
@@ -957,7 +968,7 @@ public class OtherResult extends Fragment {
             try {
                 String[] strings = new String[examArrayList.size()];
                 strings = examArrayList.toArray(strings);
-                ArrayAdapter<String> exam_spinner_adapter = new ArrayAdapter<>(getActivity(),R.layout.spinner_item, strings);
+                ArrayAdapter<String> exam_spinner_adapter = new ArrayAdapter<>(Objects.requireNonNull(getActivity()),R.layout.spinner_item, strings);
                 exam_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinnerExam.setAdapter(exam_spinner_adapter);
             } catch (IndexOutOfBoundsException e) {
@@ -969,7 +980,7 @@ public class OtherResult extends Fragment {
     }
 
     private void GetStudentListPostRequest() {
-        if(StaticHelperClass.isNetworkAvailable(getActivity())) {
+        if(StaticHelperClass.isNetworkAvailable(Objects.requireNonNull(getActivity()))) {
             CheckSelectedData();
             JsonObject jsonObject = new JsonObject();
             jsonObject.addProperty("pageNumber", "0");
@@ -984,7 +995,7 @@ public class OtherResult extends Fragment {
             jsonObject.addProperty("DepartmentID", Long.toString(selectedDepartment.getDepartmentID()));
             jsonObject.addProperty("MediumID", Long.toString(selectedMedium.getMediumID()));
             jsonObject.addProperty("ShiftID", Long.toString(selectedShift.getShiftID()));
-
+            dialog.show();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
                     .addConverterFactory(ScalarsConverterFactory.create())
@@ -1007,11 +1018,13 @@ public class OtherResult extends Fragment {
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseStudentJsonData(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
+                            dialog.dismiss();
                             Toast.makeText(getActivity(),"Student not found!!! ",
                                     Toast.LENGTH_LONG).show();
                         }
@@ -1041,7 +1054,7 @@ public class OtherResult extends Fragment {
             try {
                 String[] strings = new String[studentArrayList.size()];
                 strings = studentArrayList.toArray(strings);
-                ArrayAdapter<String> student_spinner_adapter = new ArrayAdapter<>(getActivity(),R.layout.spinner_item, strings);
+                ArrayAdapter<String> student_spinner_adapter = new ArrayAdapter<>(Objects.requireNonNull(getActivity()),R.layout.spinner_item, strings);
                 student_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinnerStudent.setAdapter(student_spinner_adapter);
             } catch (IndexOutOfBoundsException e) {

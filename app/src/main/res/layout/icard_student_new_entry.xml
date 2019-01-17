@@ -10,30 +10,12 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:padding="10dp">
-        <RelativeLayout
+        <com.theartofdev.edmodo.cropper.CropImageView
+            android:id="@+id/CropImageView"
             android:layout_width="2in"
             android:layout_height="2.5in"
-            android:gravity="center_horizontal"
-            android:layout_gravity="center_horizontal">
-            <com.theartofdev.edmodo.cropper.CropImageView
-                android:id="@+id/CropImageView"
-                android:layout_width="2in"
-                android:layout_height="2.5in"
-                android:layout_gravity="center"
-                android:background="@drawable/inputtext"/>
-            <com.github.ybq.android.spinkit.SpinKitView
-                xmlns:app="http://schemas.android.com/apk/res-auto"
-                android:id="@+id/spin_kit"
-                style="@style/SpinKitView.Large.Circle"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_centerVertical="true"
-                android:layout_centerHorizontal="true"
-                android:layout_gravity="center"
-                app:SpinKit_Color="@color/colorAccent"
-                android:visibility="visible"/>
-
-        </RelativeLayout>
+            android:layout_gravity="center"
+            android:background="@drawable/inputtext"/>
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

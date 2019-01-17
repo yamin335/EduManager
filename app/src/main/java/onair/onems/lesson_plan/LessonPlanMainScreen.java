@@ -4,7 +4,6 @@ import android.Manifest;
 import android.app.DatePickerDialog;
 import android.app.DownloadManager;
 import android.app.NotificationManager;
-import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -19,7 +18,6 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -27,16 +25,9 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
-import android.widget.DatePicker;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -46,8 +37,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Objects;
 
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -57,14 +47,9 @@ import io.reactivex.schedulers.Schedulers;
 import onair.onems.R;
 import onair.onems.Services.RetrofitNetworkService;
 import onair.onems.Services.StaticHelperClass;
-import onair.onems.homework.HomeworkAdapter;
-import onair.onems.homework.HomeworkMainScreen;
 import onair.onems.mainactivities.SideNavigationMenuParentActivity;
 import onair.onems.mainactivities.StudentMainScreen;
-import onair.onems.mainactivities.TeacherMainScreen;
-import onair.onems.network.MySingleton;
 import onair.onems.syllabus.DigitalContentAdapter;
-import onair.onems.syllabus.SyllabusMainScreen;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -77,13 +62,11 @@ public class LessonPlanMainScreen extends SideNavigationMenuParentActivity imple
 
     private Button datePicker;
     private TextView topicTitle, topicDetails, lessonDigitalEmpty, lessonPlanEmpty, digitalContentEmpty, homeworkDate;
-    private RecyclerView lessonPlanDigitalContentRecycler, lessonPlanRecycler, digitalContentRecycler;
     private ArrayList<Long> refIdList = new ArrayList<>();
     private ArrayList<JSONObject> digitalContentList, lessonPlanList, lessonPlanDigitalContentList;
     private DigitalContentAdapter mDigitalAdapter, mLessonPlanDigitalAdapter;
     private LessonPlanAdapter mAdapter;
     private DatePickerDialog datePickerDialog;
-    private String selectedDate = "";
     private CompositeDisposable finalDisposer = new CompositeDisposable();
 
     @Override
@@ -101,8 +84,8 @@ public class LessonPlanMainScreen extends SideNavigationMenuParentActivity imple
         activityName = LessonPlanMainScreen.class.getName();
 
         LayoutInflater inflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        final View rowView = inflater.inflate(R.layout.lesson_plan_main_screen, null);
-        LinearLayout parent = (LinearLayout) findViewById(R.id.contentMain);
+        final View rowView = Objects.requireNonNull(inflater).inflate(R.layout.lesson_plan_main_screen, null);
+        LinearLayout parent = findViewById(R.id.contentMain);
         parent.addView(rowView, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
 
         homeworkDate = findViewById(R.id.date);
@@ -119,55 +102,47 @@ public class LessonPlanMainScreen extends SideNavigationMenuParentActivity imple
 
         Date date = Calendar.getInstance().getTime();
         SimpleDateFormat df = new SimpleDateFormat("MM-dd-yyyy");
-        selectedDate = df.format(date);
+        String selectedDate = df.format(date);
 
         mAdapter = new LessonPlanAdapter(this, lessonPlanList, this);
-        lessonPlanRecycler = findViewById(R.id.lessonRecycler);
+        RecyclerView lessonPlanRecycler = findViewById(R.id.lessonRecycler);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         lessonPlanRecycler.setLayoutManager(mLayoutManager);
         lessonPlanRecycler.setItemAnimator(new DefaultItemAnimator());
         lessonPlanRecycler.setAdapter(mAdapter);
 
         mDigitalAdapter = new DigitalContentAdapter(this, this, digitalContentList, DigitalContentAdapter.ContentType.SYLLABUS);
-        digitalContentRecycler = findViewById(R.id.digitalContentRecycler);
+        RecyclerView digitalContentRecycler = findViewById(R.id.digitalContentRecycler);
         RecyclerView.LayoutManager mDigitalLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
         digitalContentRecycler.setLayoutManager(mDigitalLayoutManager);
         digitalContentRecycler.setItemAnimator(new DefaultItemAnimator());
         digitalContentRecycler.setAdapter(mDigitalAdapter);
 
         mLessonPlanDigitalAdapter = new DigitalContentAdapter(this, this, lessonPlanDigitalContentList, DigitalContentAdapter.ContentType.LESSON);
-        lessonPlanDigitalContentRecycler = findViewById(R.id.lessonDigitalRecycler);
+        RecyclerView lessonPlanDigitalContentRecycler = findViewById(R.id.lessonDigitalRecycler);
         RecyclerView.LayoutManager mLessonDigitalLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
         lessonPlanDigitalContentRecycler.setLayoutManager(mLessonDigitalLayoutManager);
         lessonPlanDigitalContentRecycler.setItemAnimator(new DefaultItemAnimator());
         lessonPlanDigitalContentRecycler.setAdapter(mLessonPlanDigitalAdapter);
 
-        datePicker.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // calender class's instance and get current date , month and year from calender
-                final Calendar c = Calendar.getInstance();
-                int mYear = c.get(Calendar.YEAR); // current year
-                int mMonth = c.get(Calendar.MONTH); // current month
-                int mDay = c.get(Calendar.DAY_OF_MONTH); // current day
-                // date picker dialog
-                datePickerDialog = new DatePickerDialog(LessonPlanMainScreen.this,
-                        new DatePickerDialog.OnDateSetListener() {
-
-                            @Override
-                            public void onDateSet(DatePicker view, int year,
-                                                  int monthOfYear, int dayOfMonth) {
-                                // set day of month , month and year value in the edit text
+        datePicker.setOnClickListener(v -> {
+            // calender class's instance and get current date , month and year from calender
+            final Calendar c = Calendar.getInstance();
+            int mYear = c.get(Calendar.YEAR); // current year
+            int mMonth = c.get(Calendar.MONTH); // current month
+            int mDay = c.get(Calendar.DAY_OF_MONTH); // current day
+            // date picker dialog
+            datePickerDialog = new DatePickerDialog(LessonPlanMainScreen.this,
+                    (view, year, monthOfYear, dayOfMonth) -> {
+                        // set day of month , month and year value in the edit text
 //                                selectedDate = dayOfMonth + "/" + (monthOfYear + 1) + "/" + year;
 //                                selectedDate = year + "-" + (monthOfYear + 1) + "-" + dayOfMonth;
-                                String date = (monthOfYear + 1)+"-"+dayOfMonth+"-"+year;
-                                datePicker.setText(date);
-                                homeworkDate.setText(date);
-                                lessonPlanGetRequest(date);
-                            }
-                        }, mYear, mMonth, mDay);
-                datePickerDialog.show();
-            }
+                        String date1 = (monthOfYear + 1) + "-" + dayOfMonth + "-" + year;
+                        datePicker.setText(date1);
+                        homeworkDate.setText(date1);
+                        lessonPlanGetRequest(date1);
+                    }, mYear, mMonth, mDay);
+            datePickerDialog.show();
         });
 
         if (UserTypeID == 1 || UserTypeID == 2 || UserTypeID == 4){
@@ -195,6 +170,7 @@ public class LessonPlanMainScreen extends SideNavigationMenuParentActivity imple
 
     private void lessonPlanGetRequest(String date) {
         if (StaticHelperClass.isNetworkAvailable(this)) {
+            dialog.show();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
                     .addConverterFactory(ScalarsConverterFactory.create())
@@ -218,11 +194,13 @@ public class LessonPlanMainScreen extends SideNavigationMenuParentActivity imple
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseLessonPlan(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
+                            dialog.dismiss();
                             digitalContentList.clear();
                             mDigitalAdapter.notifyDataSetChanged();
                             digitalContentEmpty.setVisibility(View.VISIBLE);
@@ -303,6 +281,7 @@ public class LessonPlanMainScreen extends SideNavigationMenuParentActivity imple
 
     private void digitalContentGetRequest(String SyllabusID) {
         if (StaticHelperClass.isNetworkAvailable(this)) {
+            dialog.show();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
                     .addConverterFactory(ScalarsConverterFactory.create())
@@ -325,11 +304,13 @@ public class LessonPlanMainScreen extends SideNavigationMenuParentActivity imple
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseDigitalContent(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
+                            dialog.dismiss();
                             digitalContentList.clear();
                             mDigitalAdapter.notifyDataSetChanged();
                             digitalContentEmpty.setVisibility(View.VISIBLE);
@@ -371,7 +352,7 @@ public class LessonPlanMainScreen extends SideNavigationMenuParentActivity imple
 
     private void lessonDigitalContentGetRequest(String SyllabusDetailID) {
         if (StaticHelperClass.isNetworkAvailable(this)) {
-
+            dialog.show();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
                     .addConverterFactory(ScalarsConverterFactory.create())
@@ -394,11 +375,13 @@ public class LessonPlanMainScreen extends SideNavigationMenuParentActivity imple
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseLessonDigitalContent(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
+                            dialog.dismiss();
                             lessonPlanDigitalContentList.clear();
                             mLessonPlanDigitalAdapter.notifyDataSetChanged();
                             lessonDigitalEmpty.setVisibility(View.VISIBLE);
@@ -441,7 +424,7 @@ public class LessonPlanMainScreen extends SideNavigationMenuParentActivity imple
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else if(UserTypeID == 1) {
@@ -478,7 +461,7 @@ public class LessonPlanMainScreen extends SideNavigationMenuParentActivity imple
             DownloadManager downloadManager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
             DownloadManager.Query query = new DownloadManager.Query();
             query.setFilterById(referenceId);
-            Cursor cursor = downloadManager.query(query);
+            Cursor cursor = Objects.requireNonNull(downloadManager).query(query);
             if (cursor.moveToFirst()) {
                 int downloadStatus = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS));
                 String downloadLocalUri = cursor.getString(cursor.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI));
@@ -508,7 +491,7 @@ public class LessonPlanMainScreen extends SideNavigationMenuParentActivity imple
 
 
                 NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-                notificationManager.notify(455, mBuilder.build());
+                Objects.requireNonNull(notificationManager).notify(455, mBuilder.build());
             }
         }
     };
@@ -551,7 +534,7 @@ public class LessonPlanMainScreen extends SideNavigationMenuParentActivity imple
                         request.allowScanningByMediaScanner();
                         request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
                     }
-                    long refId = manager.enqueue(request);
+                    long refId = Objects.requireNonNull(manager).enqueue(request);
                     refIdList.add(refId);
 
                 } catch (Exception e){

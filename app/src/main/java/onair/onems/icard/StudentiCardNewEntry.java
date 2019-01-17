@@ -22,7 +22,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,7 +32,6 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.Toast;
@@ -46,11 +44,11 @@ import com.theartofdev.edmodo.cropper.CropImageView;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -82,7 +80,7 @@ public class StudentiCardNewEntry extends SideNavigationMenuParentActivity {
 
     private Button rotateRight, rotateLeft;
     private int PICK_IMAGE_REQUEST = 1;
-    private EditText editname,editroll,editaddress,editparent,editparentnumber;
+    private EditText editname, editroll, editaddress, editparent, editparentnumber;
     private String name,roll,address,parentName,parentNumber;
     private CropImageView mCropImageView;
     private CheckBox checkBox;
@@ -123,7 +121,6 @@ public class StudentiCardNewEntry extends SideNavigationMenuParentActivity {
     private StudentInformationEntry studentInformationEntry;
     private int firstClass = 0, firstShift = 0, firstSection = 0, firstMedium = 0,
             firstDepartment = 0;
-    private ProgressBar progressBar;
     private CompositeDisposable finalDisposer = new CompositeDisposable();
 
     @Override
@@ -152,8 +149,8 @@ public class StudentiCardNewEntry extends SideNavigationMenuParentActivity {
         activityName = StudentiCardNewEntry.class.getName();
 
         LayoutInflater inflater = (LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        final View childActivityLayout = inflater.inflate(R.layout.icard_student_new_entry, null);
-        LinearLayout parentActivityLayout = (LinearLayout) findViewById(R.id.contentMain);
+        final View childActivityLayout = Objects.requireNonNull(inflater).inflate(R.layout.icard_student_new_entry, null);
+        LinearLayout parentActivityLayout = findViewById(R.id.contentMain);
         parentActivityLayout.addView(childActivityLayout, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
 
         studentInformationEntry = new StudentInformationEntry();
@@ -168,35 +165,34 @@ public class StudentiCardNewEntry extends SideNavigationMenuParentActivity {
 
 //        this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
-        rotateLeft = (Button)findViewById(R.id.rotateLeft);
-        rotateRight = (Button)findViewById(R.id.rotateRight);
-        Button cameraButton=(Button)findViewById(R.id.camera);
-        Button searchButton=(Button) findViewById(R.id.browse);
-        Button doneButton=(Button) findViewById(R.id.done);
-        progressBar = (ProgressBar)findViewById(R.id.spin_kit);
+        rotateLeft = findViewById(R.id.rotateLeft);
+        rotateRight = findViewById(R.id.rotateRight);
+        Button cameraButton = findViewById(R.id.camera);
+        Button searchButton = findViewById(R.id.browse);
+        Button doneButton = findViewById(R.id.done);
 
-        brightImageSeekBar = (SeekBar)findViewById(R.id.brightness);
+        brightImageSeekBar = findViewById(R.id.brightness);
         brightImageSeekBar.setProgress(100);
         brightImageSeekBar.setEnabled(false);
 
-        mCropImageView = (CropImageView)findViewById(R.id.CropImageView);
+        mCropImageView = findViewById(R.id.CropImageView);
         mCropImageView.setAspectRatio(1,1);
         mCropImageView.setAutoZoomEnabled(true);
         mCropImageView.setFixedAspectRatio(true);
 
-        checkBox = (CheckBox)findViewById(R.id.checkbox);
+        checkBox = findViewById(R.id.checkbox);
 
-        spinnerClass = (Spinner)findViewById(R.id.spinnerClass);
-        spinnerShift = (Spinner)findViewById(R.id.spinnerShift);
-        spinnerSection = (Spinner)findViewById(R.id.spinnerSection);
-        spinnerMedium =(Spinner)findViewById(R.id.spinnerMedium);
-        spinnerDepartment =(Spinner)findViewById(R.id.spinnerDepartment);
+        spinnerClass = findViewById(R.id.spinnerClass);
+        spinnerShift = findViewById(R.id.spinnerShift);
+        spinnerSection = findViewById(R.id.spinnerSection);
+        spinnerMedium = findViewById(R.id.spinnerMedium);
+        spinnerDepartment = findViewById(R.id.spinnerDepartment);
 
-        editname=(EditText)findViewById(R.id.edited_name);
-        editroll=(EditText)findViewById(R.id.edited_roll);
-        editaddress=(EditText)findViewById(R.id.edited_address);
-        editparent=(EditText)findViewById(R.id.edited_parent);
-        editparentnumber=(EditText)findViewById(R.id.edited_parentPhone);
+        editname = findViewById(R.id.edited_name);
+        editroll = findViewById(R.id.edited_roll);
+        editaddress = findViewById(R.id.edited_address);
+        editparent = findViewById(R.id.edited_parent);
+        editparentnumber = findViewById(R.id.edited_parentPhone);
 
         ArrayAdapter<String> class_spinner_adapter = new ArrayAdapter<>(this, R.layout.spinner_item, tempClassArray);
         class_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -218,22 +214,14 @@ public class StudentiCardNewEntry extends SideNavigationMenuParentActivity {
         medium_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerMedium.setAdapter(medium_spinner_adapter);
 
-        rotateLeft.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                progressBar.setVisibility(View.VISIBLE);
-                mRotateProcessTask = new RotateProcessTask(originalBitmap, -90);
-                mRotateProcessTask.execute((Void) null);
-            }
+        rotateLeft.setOnClickListener(v -> {
+            mRotateProcessTask = new RotateProcessTask(originalBitmap, -90);
+            mRotateProcessTask.execute((Void) null);
         });
 
-        rotateRight.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                progressBar.setVisibility(View.VISIBLE);
-                mRotateProcessTask = new RotateProcessTask(originalBitmap, 90);
-                mRotateProcessTask.execute((Void) null);
-            }
+        rotateRight.setOnClickListener(v -> {
+            mRotateProcessTask = new RotateProcessTask(originalBitmap, 90);
+            mRotateProcessTask.execute((Void) null);
         });
 
         brightImageSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -248,7 +236,6 @@ public class StudentiCardNewEntry extends SideNavigationMenuParentActivity {
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                progressBar.setVisibility(View.VISIBLE);
                 mBrightnessProcessTask = new BrightnessProcessTask(originalBitmap, brightnessValue);
                 mBrightnessProcessTask.execute((Void) null);
             }
@@ -408,76 +395,63 @@ public class StudentiCardNewEntry extends SideNavigationMenuParentActivity {
             }
         });
 
-        cameraButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivityForResult(getPickImageChooserIntent(), 200);
-            }
+        cameraButton.setOnClickListener(v -> startActivityForResult(getPickImageChooserIntent(), 200));
+
+        searchButton.setOnClickListener(v -> {
+            Intent intent = new Intent();
+            // Show only images, no videos or anything else
+            intent.setType("image/*");
+            intent.setAction(Intent.ACTION_GET_CONTENT);
+            // Always show the chooser (if there are multiple options available)
+            startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE_REQUEST);
         });
 
-        searchButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent();
-                // Show only images, no videos or anything else
-                intent.setType("image/*");
-                intent.setAction(Intent.ACTION_GET_CONTENT);
-                // Always show the chooser (if there are multiple options available)
-                startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE_REQUEST);
-            }
-        });
-
-        doneButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(StaticHelperClass.isNetworkAvailable(StudentiCardNewEntry.this)) {
-                    StudentiCardNewEntry.this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
-                    if(editname.getText().toString().equals("")) {
-                        Toast.makeText(StudentiCardNewEntry.this,"Please enter student name!!!",Toast.LENGTH_LONG).show();
-                    } else if(editroll.getText().toString().equals("")) {
-                        Toast.makeText(StudentiCardNewEntry.this,"Please enter student roll!!!",Toast.LENGTH_LONG).show();
-                    } else if(editparent.getText().toString().equals("")) {
-                        Toast.makeText(StudentiCardNewEntry.this,"Please enter guardian name!!!",Toast.LENGTH_LONG).show();
-                    } else if(editparentnumber.getText().toString().equals("")) {
-                        Toast.makeText(StudentiCardNewEntry.this,"Please enter guardian's phone number!!!",Toast.LENGTH_LONG).show();
-                    } else if(editaddress.getText().toString().equals("")) {
-                        Toast.makeText(StudentiCardNewEntry.this,"Please enter student address!!!",Toast.LENGTH_LONG).show();
-                    } else if((studentInformationEntry.getClassID() == -2)) {
-                        Toast.makeText(StudentiCardNewEntry.this,"Please select class!!!",Toast.LENGTH_LONG).show();
-                    } else if((!(editname.getText().toString().equals(""))) && (!(editroll.getText().toString().equals("")))
-                            && (!(editparent.getText().toString().equals(""))) && (!(editparentnumber.getText().toString().equals("")))
-                            && (!(editaddress.getText().toString().equals(""))) && (!(studentInformationEntry.getClassID() == -2))) {
-                        if(tempBitmap == null) {
-                            progressBar.setVisibility(View.VISIBLE);
-                            name = editname.getText().toString();
-                            roll = editroll.getText().toString();
-                            parentName = editparent.getText().toString();
-                            parentNumber = editparentnumber.getText().toString();
-                            address = editaddress.getText().toString();
-                            studentInformationEntry.setUserName(name);
-                            studentInformationEntry.setRollNo(roll);
-                            studentInformationEntry.setGuardian(parentName);
-                            studentInformationEntry.setGuardianPhone(parentNumber);
-                            studentInformationEntry.setPreAddress(address);
-                            studentInformationEntry.setInstituteID(Long.toString(InstituteID));
-                            Gson gson = new Gson();
-                            String json = gson.toJson(studentInformationEntry);
-                            postUsingVolley(json);
+        doneButton.setOnClickListener(view -> {
+            if(StaticHelperClass.isNetworkAvailable(StudentiCardNewEntry.this)) {
+                StudentiCardNewEntry.this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+                if(editname.getText().toString().equals("")) {
+                    Toast.makeText(StudentiCardNewEntry.this,"Please enter student name!!!",Toast.LENGTH_LONG).show();
+                } else if(editroll.getText().toString().equals("")) {
+                    Toast.makeText(StudentiCardNewEntry.this,"Please enter student roll!!!",Toast.LENGTH_LONG).show();
+                } else if(editparent.getText().toString().equals("")) {
+                    Toast.makeText(StudentiCardNewEntry.this,"Please enter guardian name!!!",Toast.LENGTH_LONG).show();
+                } else if(editparentnumber.getText().toString().equals("")) {
+                    Toast.makeText(StudentiCardNewEntry.this,"Please enter guardian's phone number!!!",Toast.LENGTH_LONG).show();
+                } else if(editaddress.getText().toString().equals("")) {
+                    Toast.makeText(StudentiCardNewEntry.this,"Please enter student address!!!",Toast.LENGTH_LONG).show();
+                } else if((studentInformationEntry.getClassID() == -2)) {
+                    Toast.makeText(StudentiCardNewEntry.this,"Please select class!!!",Toast.LENGTH_LONG).show();
+                } else if((!(editname.getText().toString().equals(""))) && (!(editroll.getText().toString().equals("")))
+                        && (!(editparent.getText().toString().equals(""))) && (!(editparentnumber.getText().toString().equals("")))
+                        && (!(editaddress.getText().toString().equals(""))) && (!(studentInformationEntry.getClassID() == -2))) {
+                    if(tempBitmap == null) {
+                        name = editname.getText().toString();
+                        roll = editroll.getText().toString();
+                        parentName = editparent.getText().toString();
+                        parentNumber = editparentnumber.getText().toString();
+                        address = editaddress.getText().toString();
+                        studentInformationEntry.setUserName(name);
+                        studentInformationEntry.setRollNo(roll);
+                        studentInformationEntry.setGuardian(parentName);
+                        studentInformationEntry.setGuardianPhone(parentNumber);
+                        studentInformationEntry.setPreAddress(address);
+                        studentInformationEntry.setInstituteID(Long.toString(InstituteID));
+                        Gson gson = new Gson();
+                        String json = gson.toJson(studentInformationEntry);
+                        postUsingVolley(json);
+                    } else {
+                        if(checkBox.isChecked()) {
+                            tempBitmap = mCropImageView.getCroppedImage(500, 500);
+                            fileFromBitmap = new FileFromBitmap(tempBitmap, StudentiCardNewEntry.this);
+                            fileFromBitmap.execute();
                         } else {
-                            progressBar.setVisibility(View.VISIBLE);
-                            if(checkBox.isChecked()) {
-                                tempBitmap = mCropImageView.getCroppedImage(500, 500);
-                                fileFromBitmap = new FileFromBitmap(tempBitmap, StudentiCardNewEntry.this);
-                                fileFromBitmap.execute();
-                            } else {
-                                fileFromBitmap = new FileFromBitmap(tempBitmap, StudentiCardNewEntry.this);
-                                fileFromBitmap.execute();
-                            }
+                            fileFromBitmap = new FileFromBitmap(tempBitmap, StudentiCardNewEntry.this);
+                            fileFromBitmap.execute();
                         }
                     }
-                } else {
-                    Toast.makeText(StudentiCardNewEntry.this,"Please check your INTERNET connection!!!",Toast.LENGTH_LONG).show();
                 }
+            } else {
+                Toast.makeText(StudentiCardNewEntry.this,"Please check your INTERNET connection!!!",Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -498,6 +472,7 @@ public class StudentiCardNewEntry extends SideNavigationMenuParentActivity {
             // before executing doInBackground
             // update your UI
             // exp; make progressbar visible
+            dialog.show();
         }
 
         @Override
@@ -505,6 +480,7 @@ public class StudentiCardNewEntry extends SideNavigationMenuParentActivity {
             try {
                 file = ImageUtils.getFileFromBitmap(bitmap, context);
             } catch (IOException e) {
+                dialog.dismiss();
                 e.printStackTrace();
             }
             return null;
@@ -517,7 +493,14 @@ public class StudentiCardNewEntry extends SideNavigationMenuParentActivity {
             // back to main thread after finishing doInBackground
             // update your UI or take action after
             // exp; make progressbar gone
+            dialog.dismiss();
             uploadImageWithRetrofit2(file);
+        }
+
+        @Override
+        protected void onCancelled() {
+            super.onCancelled();
+            dialog.dismiss();
         }
     }
 
@@ -538,44 +521,52 @@ public class StudentiCardNewEntry extends SideNavigationMenuParentActivity {
     }
 
     private void uploadImageWithRetrofit2(File file) {
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(getString(R.string.baseUrl))
-                .addConverterFactory(ScalarsConverterFactory.create())
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-        // create upload service client
-        RetrofitNetworkService service = retrofit.create(RetrofitNetworkService.class);
+        if (StaticHelperClass.isNetworkAvailable(this)) {
+            dialog.show();
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(getString(R.string.baseUrl))
+                    .addConverterFactory(ScalarsConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build();
+            // create upload service client
+            RetrofitNetworkService service = retrofit.create(RetrofitNetworkService.class);
 
-        // create RequestBody instance from file
-        RequestBody requestFile = RequestBody.create(
-                MediaType.parse("image/jpeg"),
-                        file
-                );
+            // create RequestBody instance from file
+            RequestBody requestFile = RequestBody.create(
+                    MediaType.parse("image/jpeg"),
+                    file
+            );
 
-        // MultipartBody.Part is used to send also the actual file name
-        MultipartBody.Part body = MultipartBody.Part.createFormData("file", file.getName(), requestFile);
+            // MultipartBody.Part is used to send also the actual file name
+            MultipartBody.Part body = MultipartBody.Part.createFormData("file", file.getName(), requestFile);
 
-        // add another part within the multipart request
+            // add another part within the multipart request
 //        String descriptionString = "hello, this is description speaking";
 //        RequestBody description =
 //                RequestBody.create(
 //                        okhttp3.MultipartBody.FORM, descriptionString);
 
-        // finally, execute the request
-        Call<String> call = service.upload(body);
-        call.enqueue(new Callback<String>() {
-            @Override
-            public void onResponse(@NonNull Call<String> call, @NonNull retrofit2.Response<String> response) {
-                String responseData = response.body();
-                postStudentData(responseData);
-                Log.v("Upload", "success");
-            }
+            // finally, execute the request
+            Call<String> call = service.upload(body);
+            call.enqueue(new Callback<String>() {
+                @Override
+                public void onResponse(@NonNull Call<String> call, @NonNull retrofit2.Response<String> response) {
+                    dialog.dismiss();
+                    String responseData = response.body();
+                    postStudentData(responseData);
+                    Log.v("Upload", "success");
+                }
 
-            @Override
-            public void onFailure(@NonNull Call<String> call, @NonNull Throwable t) {
-                Log.e("Upload error:", t.getMessage());
-            }
-        });
+                @Override
+                public void onFailure(@NonNull Call<String> call, @NonNull Throwable t) {
+                    dialog.dismiss();
+                    Log.e("Upload error:", t.getMessage());
+                }
+            });
+        } else {
+            Toast.makeText(this,"Please check your internet connection and select again!!! ",
+                    Toast.LENGTH_LONG).show();
+        }
     }
 
     private void postStudentData(String result) {
@@ -600,74 +591,79 @@ public class StudentiCardNewEntry extends SideNavigationMenuParentActivity {
             postUsingVolley(json);
             Log.d( "ImageUrl", jsonObject.getString("path"));
         } catch (JSONException e1) {
-            progressBar.setVisibility(View.INVISIBLE);
             e1.printStackTrace();
         }
     }
 
     public void postUsingVolley(String json) {
-        try {
-            JsonParser parser = new JsonParser();
-            jsonObjectStudentData = parser.parse(json).getAsJsonObject();
-        } catch (JsonIOException e) {
-            e.printStackTrace();
+        if (StaticHelperClass.isNetworkAvailable(this)) {
+            try {
+                JsonParser parser = new JsonParser();
+                jsonObjectStudentData = parser.parse(json).getAsJsonObject();
+            } catch (JsonIOException e) {
+                e.printStackTrace();
+            }
+            dialog.show();
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(getString(R.string.baseUrl))
+                    .addConverterFactory(ScalarsConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .build();
+
+            Observable<String> observable = retrofit
+                    .create(RetrofitNetworkService.class)
+                    .setStudentBasicInfo(jsonObjectStudentData)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io());
+
+            finalDisposer.add( observable
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io())
+                    .subscribeWith(new DisposableObserver<String>() {
+
+                        @Override
+                        public void onNext(String response) {
+                            dialog.dismiss();
+                            try {
+                                editname.setText("");
+                                editroll.setText("");
+                                editparent.setText("");
+                                editparentnumber.setText("");
+                                editaddress.setText("");
+                                IsImageCaptured = false;
+                                checkBox.setEnabled(false);
+                                rotateLeft.setEnabled(false);
+                                rotateRight.setEnabled(false);
+                                brightImageSeekBar.setProgress(100);
+                                brightImageSeekBar.setEnabled(false);
+                                tempBitmap = null;
+                                originalBitmap = null;
+                                mCropImageView.clearImage();
+                                checkBox.setChecked(false);
+                                Toast.makeText(StudentiCardNewEntry.this,"Successful",Toast.LENGTH_LONG).show();
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+                            dialog.dismiss();
+                            Toast.makeText(StudentiCardNewEntry.this,"Error Occurred",Toast.LENGTH_LONG).show();
+                        }
+
+                        @Override
+                        public void onComplete() {
+
+                        }
+                    }));
+        } else {
+            Toast.makeText(this,"Please check your internet connection and select again!!! ",
+                    Toast.LENGTH_LONG).show();
         }
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(getString(R.string.baseUrl))
-                .addConverterFactory(ScalarsConverterFactory.create())
-                .addConverterFactory(GsonConverterFactory.create())
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                .build();
-
-        Observable<String> observable = retrofit
-                .create(RetrofitNetworkService.class)
-                .setStudentBasicInfo(jsonObjectStudentData)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .unsubscribeOn(Schedulers.io());
-
-        finalDisposer.add( observable
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .unsubscribeOn(Schedulers.io())
-                .subscribeWith(new DisposableObserver<String>() {
-
-                    @Override
-                    public void onNext(String response) {
-                        try {
-                            editname.setText("");
-                            editroll.setText("");
-                            editparent.setText("");
-                            editparentnumber.setText("");
-                            editaddress.setText("");
-                            IsImageCaptured = false;
-                            checkBox.setEnabled(false);
-                            rotateLeft.setEnabled(false);
-                            rotateRight.setEnabled(false);
-                            brightImageSeekBar.setProgress(100);
-                            brightImageSeekBar.setEnabled(false);
-                            tempBitmap = null;
-                            originalBitmap = null;
-                            mCropImageView.clearImage();
-                            checkBox.setChecked(false);
-                            progressBar.setVisibility(View.INVISIBLE);
-                            Toast.makeText(StudentiCardNewEntry.this,"Successful",Toast.LENGTH_LONG).show();
-                        }
-                        catch (Exception e) {
-                            progressBar.setVisibility(View.INVISIBLE);
-                        }
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        Toast.makeText(StudentiCardNewEntry.this,"Error Occurred",Toast.LENGTH_LONG).show();
-                    }
-
-                    @Override
-                    public void onComplete() {
-
-                    }
-                }));
     }
 
     void parseShiftJsonData(String jsonString) {
@@ -691,13 +687,10 @@ public class StudentiCardNewEntry extends SideNavigationMenuParentActivity {
                 ArrayAdapter<String> shift_spinner_adapter = new ArrayAdapter<>(this,R.layout.spinner_item, strings);
                 shift_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinnerShift.setAdapter(shift_spinner_adapter);
-                progressBar.setVisibility(View.INVISIBLE);
             } catch (IndexOutOfBoundsException e) {
-                progressBar.setVisibility(View.INVISIBLE);
                 Toast.makeText(this,"No shift found !!!",Toast.LENGTH_LONG).show();
             }
         } catch (JSONException e) {
-            progressBar.setVisibility(View.INVISIBLE);
             Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
         }
     }
@@ -725,13 +718,10 @@ public class StudentiCardNewEntry extends SideNavigationMenuParentActivity {
                 ArrayAdapter<String> medium_spinner_adapter = new ArrayAdapter<>(this,R.layout.spinner_item, strings);
                 medium_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinnerMedium.setAdapter(medium_spinner_adapter);
-                progressBar.setVisibility(View.INVISIBLE);
             } catch (IndexOutOfBoundsException e) {
-                progressBar.setVisibility(View.INVISIBLE);
                 Toast.makeText(this,"No medium found !!!",Toast.LENGTH_LONG).show();
             }
         } catch (JSONException e) {
-            progressBar.setVisibility(View.INVISIBLE);
             Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
         }
     }
@@ -758,13 +748,10 @@ public class StudentiCardNewEntry extends SideNavigationMenuParentActivity {
                 ArrayAdapter<String> class_spinner_adapter = new ArrayAdapter<>(this,R.layout.spinner_item, strings);
                 class_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinnerClass.setAdapter(class_spinner_adapter);
-                progressBar.setVisibility(View.INVISIBLE);
             } catch (IndexOutOfBoundsException e) {
-                progressBar.setVisibility(View.INVISIBLE);
                 Toast.makeText(this,"No class found !!!",Toast.LENGTH_LONG).show();
             }
         } catch (JSONException e) {
-            progressBar.setVisibility(View.INVISIBLE);
             Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
         }
     }
@@ -794,13 +781,10 @@ public class StudentiCardNewEntry extends SideNavigationMenuParentActivity {
                 ArrayAdapter<String> department_spinner_adapter = new ArrayAdapter<>(this,R.layout.spinner_item, strings);
                 department_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinnerDepartment.setAdapter(department_spinner_adapter);
-                progressBar.setVisibility(View.INVISIBLE);
             } catch (IndexOutOfBoundsException e) {
-                progressBar.setVisibility(View.INVISIBLE);
                 Toast.makeText(this,"No department found !!!",Toast.LENGTH_LONG).show();
             }
         } catch (JSONException e) {
-            progressBar.setVisibility(View.INVISIBLE);
             Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
         }
     }
@@ -826,13 +810,10 @@ public class StudentiCardNewEntry extends SideNavigationMenuParentActivity {
                 ArrayAdapter<String> section_spinner_adapter = new ArrayAdapter<>(this,R.layout.spinner_item, strings);
                 section_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinnerSection.setAdapter(section_spinner_adapter);
-                progressBar.setVisibility(View.INVISIBLE);
             } catch (IndexOutOfBoundsException e) {
-                progressBar.setVisibility(View.INVISIBLE);
                 Toast.makeText(this,"No section found !!!",Toast.LENGTH_LONG).show();
             }
         } catch (JSONException e) {
-            progressBar.setVisibility(View.INVISIBLE);
             Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
         }
     }
@@ -920,7 +901,7 @@ public class StudentiCardNewEntry extends SideNavigationMenuParentActivity {
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
         if (mCropImageUri != null && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             mCropImageView.setImageUriAsync(mCropImageUri);
             checkBox.setEnabled(true);
@@ -970,7 +951,7 @@ public class StudentiCardNewEntry extends SideNavigationMenuParentActivity {
         // the main intent is the last in the list (fucking android) so pickup the useless one
         Intent mainIntent = allIntents.get(allIntents.size() - 1);
         for (Intent intent : allIntents) {
-            if (intent.getComponent().getClassName().equals("com.android.documentsui.DocumentsActivity")) {
+            if (Objects.requireNonNull(intent.getComponent()).getClassName().equals("com.android.documentsui.DocumentsActivity")) {
                 mainIntent = intent;
                 break;
             }
@@ -1013,16 +994,6 @@ public class StudentiCardNewEntry extends SideNavigationMenuParentActivity {
             isCamera = action != null && action.equals(MediaStore.ACTION_IMAGE_CAPTURE);
         }
         return isCamera ? getCaptureImageOutputUri() : data.getData();
-    }
-
-    private String encodeImage(Bitmap bm) {
-        bm = getResizedBitmap(bm, 500);
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        bm.compress(Bitmap.CompressFormat.JPEG,100,baos);
-        byte[] b = baos.toByteArray();
-        String encImage = Base64.encodeToString(b, Base64.DEFAULT);
-
-        return encImage;
     }
 
     public Bitmap getResizedBitmap(Bitmap image, int maxSize) {
@@ -1113,21 +1084,27 @@ public class StudentiCardNewEntry extends SideNavigationMenuParentActivity {
         }
 
         @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            dialog.show();
+        }
+
+        @Override
         protected Boolean doInBackground(Void... params) {
             try {
                 tempBitmap = doBrightness(image, progressValue);
                 Thread.sleep(100);
                 return true;
             } catch (InterruptedException e) {
-                progressBar.setVisibility(View.INVISIBLE);
+                dialog.dismiss();
                 return false;
             }
         }
 
         @Override
         protected void onPostExecute(final Boolean success) {
+            dialog.dismiss();
             mBrightnessProcessTask = null;
-            progressBar.setVisibility(View.INVISIBLE);
             if (success) {
                 mCropImageView.setImageBitmap(tempBitmap);
             }
@@ -1140,7 +1117,7 @@ public class StudentiCardNewEntry extends SideNavigationMenuParentActivity {
         @Override
         protected void onCancelled() {
             mBrightnessProcessTask = null;
-            progressBar.setVisibility(View.INVISIBLE);
+            dialog.dismiss();
             Toast.makeText(StudentiCardNewEntry.this,"One ERROR occurred!!!",Toast.LENGTH_LONG).show();
         }
     }
@@ -1156,6 +1133,12 @@ public class StudentiCardNewEntry extends SideNavigationMenuParentActivity {
         }
 
         @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            dialog.show();
+        }
+
+        @Override
         protected Boolean doInBackground(Void... params) {
             try {
                 originalBitmap = rotateImage(image, angle);
@@ -1163,7 +1146,7 @@ public class StudentiCardNewEntry extends SideNavigationMenuParentActivity {
                 Thread.sleep(100);
                 return true;
             } catch (InterruptedException e) {
-                progressBar.setVisibility(View.INVISIBLE);
+                dialog.dismiss();
                 Toast.makeText(StudentiCardNewEntry.this,"ERROR occurred while rotating image!!!",Toast.LENGTH_LONG).show();
                 return false;
             }
@@ -1171,8 +1154,8 @@ public class StudentiCardNewEntry extends SideNavigationMenuParentActivity {
 
         @Override
         protected void onPostExecute(final Boolean success) {
+            dialog.dismiss();
             mRotateProcessTask = null;
-            progressBar.setVisibility(View.INVISIBLE);
             if (success) {
                 mCropImageView.setImageBitmap(tempBitmap);
             }
@@ -1185,14 +1168,14 @@ public class StudentiCardNewEntry extends SideNavigationMenuParentActivity {
         @Override
         protected void onCancelled() {
             mRotateProcessTask = null;
-            progressBar.setVisibility(View.INVISIBLE);
+            dialog.dismiss();
             Toast.makeText(StudentiCardNewEntry.this,"ERROR occurred while rotating image!!!",Toast.LENGTH_LONG).show();
         }
     }
 
     private void ShiftDataGetRequest() {
         if (StaticHelperClass.isNetworkAvailable(this)) {
-            progressBar.setVisibility(View.VISIBLE);
+            dialog.show();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
                     .addConverterFactory(ScalarsConverterFactory.create())
@@ -1215,12 +1198,13 @@ public class StudentiCardNewEntry extends SideNavigationMenuParentActivity {
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseShiftJsonData(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
-
+                            dialog.dismiss();
                         }
 
                         @Override
@@ -1236,7 +1220,7 @@ public class StudentiCardNewEntry extends SideNavigationMenuParentActivity {
 
     private void MediumDataGetRequest() {
         if(StaticHelperClass.isNetworkAvailable(this)) {
-            progressBar.setVisibility(View.VISIBLE);
+            dialog.show();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
                     .addConverterFactory(ScalarsConverterFactory.create())
@@ -1259,12 +1243,13 @@ public class StudentiCardNewEntry extends SideNavigationMenuParentActivity {
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseMediumJsonData(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
-
+                            dialog.dismiss();
                         }
 
                         @Override
@@ -1280,7 +1265,7 @@ public class StudentiCardNewEntry extends SideNavigationMenuParentActivity {
 
     private void ClassDataGetRequest() {
         if(StaticHelperClass.isNetworkAvailable(this)) {
-            progressBar.setVisibility(View.VISIBLE);
+            dialog.show();
             CheckSelectedData();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
@@ -1304,12 +1289,13 @@ public class StudentiCardNewEntry extends SideNavigationMenuParentActivity {
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseClassJsonData(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
-
+                            dialog.dismiss();
                         }
 
                         @Override
@@ -1325,7 +1311,7 @@ public class StudentiCardNewEntry extends SideNavigationMenuParentActivity {
 
     private void DepartmentDataGetRequest() {
         if(StaticHelperClass.isNetworkAvailable(this)) {
-            progressBar.setVisibility(View.VISIBLE);
+            dialog.show();
             CheckSelectedData();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
@@ -1349,12 +1335,13 @@ public class StudentiCardNewEntry extends SideNavigationMenuParentActivity {
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseDepartmentJsonData(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
-
+                            dialog.dismiss();
                         }
 
                         @Override
@@ -1370,7 +1357,7 @@ public class StudentiCardNewEntry extends SideNavigationMenuParentActivity {
 
     private void SectionDataGetRequest() {
         if(StaticHelperClass.isNetworkAvailable(this)) {
-            progressBar.setVisibility(View.VISIBLE);
+            dialog.show();
             CheckSelectedData();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
@@ -1394,12 +1381,13 @@ public class StudentiCardNewEntry extends SideNavigationMenuParentActivity {
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseSectionJsonData(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
-
+                            dialog.dismiss();
                         }
 
                         @Override

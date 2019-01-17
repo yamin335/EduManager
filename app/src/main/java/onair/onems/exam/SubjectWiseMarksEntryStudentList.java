@@ -15,6 +15,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Objects;
+
 import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -53,7 +55,7 @@ public class SubjectWiseMarksEntryStudentList extends CommonToolbarParentActivit
         super.onCreate(savedInstanceState);
 
         LayoutInflater inflater = (LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        final View childActivityLayout = inflater.inflate(R.layout.exam_subject_wise_marks_entry_student_list, null);
+        final View childActivityLayout = Objects.requireNonNull(inflater).inflate(R.layout.exam_subject_wise_marks_entry_student_list, null);
         LinearLayout parentActivityLayout = findViewById(R.id.contentMain);
         parentActivityLayout.addView(childActivityLayout, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
 
@@ -64,6 +66,7 @@ public class SubjectWiseMarksEntryStudentList extends CommonToolbarParentActivit
 
     private void StudentDataGetRequest() {
         if (StaticHelperClass.isNetworkAvailable(this)) {
+            dialog.show();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
                     .addConverterFactory(ScalarsConverterFactory.create())
@@ -94,6 +97,7 @@ public class SubjectWiseMarksEntryStudentList extends CommonToolbarParentActivit
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseStudentData(response);
                         }
 
@@ -104,6 +108,7 @@ public class SubjectWiseMarksEntryStudentList extends CommonToolbarParentActivit
 
                         @Override
                         public void onError(Throwable e) {
+                            dialog.dismiss();
                             Toast.makeText(getApplicationContext(),"ERROR posting token",Toast.LENGTH_LONG).show();
                         }
                     });

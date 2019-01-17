@@ -13,8 +13,6 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.drawable.Drawable;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -31,8 +29,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
-import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -58,6 +54,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Objects;
 
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -70,6 +67,7 @@ import okhttp3.RequestBody;
 import onair.onems.R;
 import onair.onems.Services.GlideApp;
 import onair.onems.Services.RetrofitNetworkService;
+import onair.onems.Services.StaticHelperClass;
 import onair.onems.mainactivities.CommonToolbarParentActivity;
 import onair.onems.models.BloodGroupModel;
 import onair.onems.models.ClassModel;
@@ -177,7 +175,7 @@ public class StudentiCardDetailsEdit extends CommonToolbarParentActivity {
         super.onCreate(savedInstanceState);
 
         LayoutInflater inflater = (LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        final View childActivityLayout = inflater.inflate(R.layout.icard_student_details_edit, null);
+        final View childActivityLayout = Objects.requireNonNull(inflater).inflate(R.layout.icard_student_details_edit, null);
         LinearLayout parentActivityLayout = findViewById(R.id.contentMain);
         parentActivityLayout.addView(childActivityLayout, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
 
@@ -204,9 +202,9 @@ public class StudentiCardDetailsEdit extends CommonToolbarParentActivity {
         selected_Department = bundle.getString("DepartmentID");
         UserID = bundle.getString("UserID");
 
-        rotateLeft = (Button)findViewById(R.id.rotateLeft);
-        rotateRight = (Button)findViewById(R.id.rotateRight);
-        brightImageSeekBar = (SeekBar)findViewById(R.id.brightness);
+        rotateLeft = findViewById(R.id.rotateLeft);
+        rotateRight = findViewById(R.id.rotateRight);
+        brightImageSeekBar = findViewById(R.id.brightness);
         brightImageSeekBar.setProgress(100);
         progressBar = (ProgressBar)findViewById(R.id.spin_kit);
 
@@ -214,51 +212,51 @@ public class StudentiCardDetailsEdit extends CommonToolbarParentActivity {
 
 //        originalBitmap = BitmapFactory.decodeResource(getResources(),R.drawable.image1);
 
-        mCropImageView = (CropImageView)findViewById(R.id.CropImageView);
+        mCropImageView = findViewById(R.id.CropImageView);
         mCropImageView.setAspectRatio(1,1);
         mCropImageView.setAutoZoomEnabled(true);
         mCropImageView.setFixedAspectRatio(true);
 
-        Button updateStudentPhoto = (Button)findViewById(R.id.updatephoto);
+        Button updateStudentPhoto = findViewById(R.id.updatephoto);
 
-        checkBox = (CheckBox)findViewById(R.id.checkbox);
+        checkBox = findViewById(R.id.checkbox);
 
-        Button cameraButton=(Button)findViewById(R.id.camera);
-        Button searchButton=(Button) findViewById(R.id.browse);
+        Button cameraButton= findViewById(R.id.camera);
+        Button searchButton= findViewById(R.id.browse);
 
-        t_roll = (EditText) findViewById(R.id.stuRoll);
-        t_name = (EditText)findViewById(R.id.stuName);
-        t_class = (TextView) findViewById(R.id.classs);
-        t_section = (TextView)findViewById(R.id.section);
-        t_birthDay = (TextView)findViewById(R.id.birthday);
-        t_email = (EditText)findViewById(R.id.guardianEmail);
-        t_address = (EditText)findViewById(R.id.presentAddress);
-        t_parent = (EditText)findViewById(R.id.guardianName);
-        t_parentsPhone = (EditText)findViewById(R.id.guardianPhoneNo);
-        t_department = (TextView)findViewById(R.id.department);
-        t_sex = (TextView)findViewById(R.id.sex);
-        t_religion = (TextView)findViewById(R.id.religion);
-        t_medium = (TextView)findViewById(R.id.medium);
-        t_session = (TextView)findViewById(R.id.session);
-        t_board = (TextView)findViewById(R.id.board);
-        t_shift = (TextView)findViewById(R.id.shift);
-        t_stuEmail = (EditText)findViewById(R.id.stuEmail);
-        t_stuPhone = (EditText)findViewById(R.id.stuPhone);
-        t_branch = (TextView)findViewById(R.id.branch);
-        t_remarks = (EditText)findViewById(R.id.remarks);
-        t_studentNo = (TextView)findViewById(R.id.studentNo);
-        t_rfid = (TextView)findViewById(R.id.rfid);
-        t_bloodGroup = (TextView)findViewById(R.id.bloodGroup);
-        Button datePicker = (Button)findViewById(R.id.pickDate);
+        t_roll = findViewById(R.id.stuRoll);
+        t_name = findViewById(R.id.stuName);
+        t_class = findViewById(R.id.classs);
+        t_section = findViewById(R.id.section);
+        t_birthDay = findViewById(R.id.birthday);
+        t_email = findViewById(R.id.guardianEmail);
+        t_address = findViewById(R.id.presentAddress);
+        t_parent = findViewById(R.id.guardianName);
+        t_parentsPhone = findViewById(R.id.guardianPhoneNo);
+        t_department = findViewById(R.id.department);
+        t_sex = findViewById(R.id.sex);
+        t_religion = findViewById(R.id.religion);
+        t_medium = findViewById(R.id.medium);
+        t_session = findViewById(R.id.session);
+        t_board = findViewById(R.id.board);
+        t_shift = findViewById(R.id.shift);
+        t_stuEmail = findViewById(R.id.stuEmail);
+        t_stuPhone = findViewById(R.id.stuPhone);
+        t_branch = findViewById(R.id.branch);
+        t_remarks = findViewById(R.id.remarks);
+        t_studentNo = findViewById(R.id.studentNo);
+        t_rfid = findViewById(R.id.rfid);
+        t_bloodGroup = findViewById(R.id.bloodGroup);
+        Button datePicker = findViewById(R.id.pickDate);
 
-        spinnerClass = (Spinner)findViewById(R.id.spinnerClass);
-        spinnerShift = (Spinner)findViewById(R.id.spinnerShift);
-        spinnerSection = (Spinner)findViewById(R.id.spinnerSection);
-        spinnerMedium =(Spinner)findViewById(R.id.spinnerMedium);
-        spinnerDepartment =(Spinner)findViewById(R.id.spinnerDepartment);
-        spinnerGender =(Spinner)findViewById(R.id.spinnerGender);
-        spinnerReligion =(Spinner)findViewById(R.id.spinnerReligion);
-        spinnerBloodGroup =(Spinner)findViewById(R.id.spinnerBloodGroup);
+        spinnerClass = findViewById(R.id.spinnerClass);
+        spinnerShift = findViewById(R.id.spinnerShift);
+        spinnerSection = findViewById(R.id.spinnerSection);
+        spinnerMedium = findViewById(R.id.spinnerMedium);
+        spinnerDepartment = findViewById(R.id.spinnerDepartment);
+        spinnerGender = findViewById(R.id.spinnerGender);
+        spinnerReligion = findViewById(R.id.spinnerReligion);
+        spinnerBloodGroup = findViewById(R.id.spinnerBloodGroup);
 
         checkBox.setEnabled(false);
         rotateLeft.setEnabled(false);
@@ -299,83 +297,55 @@ public class StudentiCardDetailsEdit extends CommonToolbarParentActivity {
 
         StudentDataGetRequest();
 
-        datePicker.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // calender class's instance and get current date , month and year from calender
-                final Calendar c = Calendar.getInstance();
-                int mYear = c.get(Calendar.YEAR); // current year
-                int mMonth = c.get(Calendar.MONTH); // current month
-                int mDay = c.get(Calendar.DAY_OF_MONTH); // current day
-                // date picker dialog
-                datePickerDialog = new DatePickerDialog(StudentiCardDetailsEdit.this,
-                        new DatePickerDialog.OnDateSetListener() {
-
-                            @Override
-                            public void onDateSet(DatePicker view, int year,
-                                                  int monthOfYear, int dayOfMonth) {
-                                // set day of month , month and year value in the edit text
+        datePicker.setOnClickListener(v -> {
+            // calender class's instance and get current date , month and year from calender
+            final Calendar c = Calendar.getInstance();
+            int mYear = c.get(Calendar.YEAR); // current year
+            int mMonth = c.get(Calendar.MONTH); // current month
+            int mDay = c.get(Calendar.DAY_OF_MONTH); // current day
+            // date picker dialog
+            datePickerDialog = new DatePickerDialog(StudentiCardDetailsEdit.this,
+                    (view, year, monthOfYear, dayOfMonth) -> {
+                        // set day of month , month and year value in the edit text
 //                                selectedDate = dayOfMonth + "/" + (monthOfYear + 1) + "/" + year;
-                                selectedDate = year + "-" + (monthOfYear + 1) + "-" + dayOfMonth;
-                                studentInformationEntry.setDOB(selectedDate);
-                                t_birthDay.setText(selectedDate);
+                        selectedDate = year + "-" + (monthOfYear + 1) + "-" + dayOfMonth;
+                        studentInformationEntry.setDOB(selectedDate);
+                        t_birthDay.setText(selectedDate);
 //                                datePicker.setText(selectedDate);
 
-                            }
-                        }, mYear, mMonth, mDay);
-                datePickerDialog.show();
-            }
+                    }, mYear, mMonth, mDay);
+            datePickerDialog.show();
         });
 
-        cameraButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivityForResult(getPickImageChooserIntent(), 200);
-            }
+        cameraButton.setOnClickListener(v -> startActivityForResult(getPickImageChooserIntent(), 200));
+
+        searchButton.setOnClickListener(v -> {
+            Intent intent1 = new Intent();
+            // Show only images, no videos or anything else
+            intent1.setType("image/*");
+            intent1.setAction(Intent.ACTION_GET_CONTENT);
+            // Always show the chooser (if there are multiple options available)
+            startActivityForResult(Intent.createChooser(intent1, "Select Picture"), PICK_IMAGE_REQUEST);
         });
 
-        searchButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent();
-                // Show only images, no videos or anything else
-                intent.setType("image/*");
-                intent.setAction(Intent.ACTION_GET_CONTENT);
-                // Always show the chooser (if there are multiple options available)
-                startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE_REQUEST);
-            }
-        });
-
-        checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
+        checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (originalBitmap != null)
             {
-                if (originalBitmap != null)
-                {
-                    imageChanged = true;
-                }
-
+                imageChanged = true;
             }
+
         });
 
-        rotateLeft.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                progressBar.setVisibility(View.VISIBLE);
-                imageChanged = true;
-                mRotateProcessTask = new RotateProcessTask(originalBitmap, -90);
-                mRotateProcessTask.execute((Void) null);
-            }
+        rotateLeft.setOnClickListener(v -> {
+            imageChanged = true;
+            mRotateProcessTask = new RotateProcessTask(originalBitmap, -90);
+            mRotateProcessTask.execute((Void) null);
         });
 
-        rotateRight.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                progressBar.setVisibility(View.VISIBLE);
-                imageChanged = true;
-                mRotateProcessTask = new RotateProcessTask(originalBitmap, 90);
-                mRotateProcessTask.execute((Void) null);
-            }
+        rotateRight.setOnClickListener(v -> {
+            imageChanged = true;
+            mRotateProcessTask = new RotateProcessTask(originalBitmap, 90);
+            mRotateProcessTask.execute((Void) null);
         });
 
         brightImageSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -391,52 +361,46 @@ public class StudentiCardDetailsEdit extends CommonToolbarParentActivity {
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                progressBar.setVisibility(View.VISIBLE);
                 imageChanged = true;
                 mBrightnessProcessTask = new BrightnessProcessTask(originalBitmap, brightnessValue);
                 mBrightnessProcessTask.execute((Void) null);
             }
         });
 
-        updateStudentPhoto.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(isNetworkAvailable()) {
-                    studentInformationEntry.setUserName(t_name.getText().toString());
-                    studentInformationEntry.setRollNo(t_roll.getText().toString());
-                    studentInformationEntry.setRFID(t_rfid.getText().toString());
-                    studentInformationEntry.setStudentNo(t_studentNo.getText().toString());
-                    studentInformationEntry.setEmailID(t_stuEmail.getText().toString());
-                    studentInformationEntry.setPhoneNo(t_stuPhone.getText().toString());
-                    studentInformationEntry.setGuardian(t_parent.getText().toString());
-                    studentInformationEntry.setGuardianPhone(t_parentsPhone.getText().toString());
-                    studentInformationEntry.setGuardianEmailID(t_email.getText().toString());
-                    studentInformationEntry.setPreAddress(t_address.getText().toString());
-                    studentInformationEntry.setRemarks(t_remarks.getText().toString());
-                    if(imageChanged) {
-                        if(originalBitmap != null) {
-                            progressBar.setVisibility(View.VISIBLE);
-                            if(checkBox.isChecked()) {
-                                tempBitmap = mCropImageView.getCroppedImage(500, 500);
-                                mCropImageView.setImageBitmap(tempBitmap);
-                                fileFromBitmap = new FileFromBitmap(tempBitmap, StudentiCardDetailsEdit.this);
-                                fileFromBitmap.execute();
-                            } else {
-                                fileFromBitmap = new FileFromBitmap(tempBitmap, StudentiCardDetailsEdit.this);
-                                fileFromBitmap.execute();
-                            }
+        updateStudentPhoto.setOnClickListener(view -> {
+            if(StaticHelperClass.isNetworkAvailable(StudentiCardDetailsEdit.this)) {
+                studentInformationEntry.setUserName(t_name.getText().toString());
+                studentInformationEntry.setRollNo(t_roll.getText().toString());
+                studentInformationEntry.setRFID(t_rfid.getText().toString());
+                studentInformationEntry.setStudentNo(t_studentNo.getText().toString());
+                studentInformationEntry.setEmailID(t_stuEmail.getText().toString());
+                studentInformationEntry.setPhoneNo(t_stuPhone.getText().toString());
+                studentInformationEntry.setGuardian(t_parent.getText().toString());
+                studentInformationEntry.setGuardianPhone(t_parentsPhone.getText().toString());
+                studentInformationEntry.setGuardianEmailID(t_email.getText().toString());
+                studentInformationEntry.setPreAddress(t_address.getText().toString());
+                studentInformationEntry.setRemarks(t_remarks.getText().toString());
+                if(imageChanged) {
+                    if(originalBitmap != null) {
+                        if(checkBox.isChecked()) {
+                            tempBitmap = mCropImageView.getCroppedImage(500, 500);
+                            mCropImageView.setImageBitmap(tempBitmap);
+                            fileFromBitmap = new FileFromBitmap(tempBitmap, StudentiCardDetailsEdit.this);
+                            fileFromBitmap.execute();
                         } else {
-                            Toast.makeText(StudentiCardDetailsEdit.this,"Take or choose a photo to update!!!",Toast.LENGTH_LONG).show();
+                            fileFromBitmap = new FileFromBitmap(tempBitmap, StudentiCardDetailsEdit.this);
+                            fileFromBitmap.execute();
                         }
                     } else {
-                        progressBar.setVisibility(View.VISIBLE);
-                        Gson gson = new Gson();
-                        String json = gson.toJson(studentInformationEntry);
-                        postUsingVolley(json);
+                        Toast.makeText(StudentiCardDetailsEdit.this,"Take or choose a photo to update!!!",Toast.LENGTH_LONG).show();
                     }
                 } else {
-                    Toast.makeText(StudentiCardDetailsEdit.this,"Please check your INTERNET connection!!!",Toast.LENGTH_LONG).show();
+                    Gson gson = new Gson();
+                    String json = gson.toJson(studentInformationEntry);
+                    postUsingVolley(json);
                 }
+            } else {
+                Toast.makeText(StudentiCardDetailsEdit.this,"Please check your INTERNET connection!!!",Toast.LENGTH_LONG).show();
             }
         });
 
@@ -463,7 +427,7 @@ public class StudentiCardDetailsEdit extends CommonToolbarParentActivity {
                     if(firstShift++>1) {
                         selectedShift = new ShiftModel();
                         studentInformationEntry.setShiftID(Long.toString(selectedShift.getShiftID()));
-                        t_shift.setText("NONE");
+                        t_shift.setText(R.string.none);
                     }
                 }
             }
@@ -489,9 +453,9 @@ public class StudentiCardDetailsEdit extends CommonToolbarParentActivity {
                         studentInformationEntry.setDepartmentID(Long.toString(selectedDepartment.getDepartmentID()));
                         studentInformationEntry.setSectionID(Long.toString(selectedSection.getSectionID()));
                         t_medium.setText(selectedMedium.getMameName());
-                        t_class.setText("NONE");
-                        t_department.setText("NONE");
-                        t_section.setText("NONE");
+                        t_class.setText(R.string.none);
+                        t_department.setText(R.string.none);
+                        t_section.setText(R.string.none);
                         ClassDataGetRequest();
                     } catch (IndexOutOfBoundsException e) {
                         Toast.makeText(StudentiCardDetailsEdit.this,"No medium found !!!",Toast.LENGTH_LONG).show();
@@ -506,10 +470,10 @@ public class StudentiCardDetailsEdit extends CommonToolbarParentActivity {
                         studentInformationEntry.setClassID(Long.toString(selectedClass.getClassID()));
                         studentInformationEntry.setDepartmentID(Long.toString(selectedDepartment.getDepartmentID()));
                         studentInformationEntry.setSectionID(Long.toString(selectedSection.getSectionID()));
-                        t_medium.setText("NONE");
-                        t_class.setText("NONE");
-                        t_department.setText("NONE");
-                        t_section.setText("NONE");
+                        t_medium.setText(R.string.none);
+                        t_class.setText(R.string.none);
+                        t_department.setText(R.string.none);
+                        t_section.setText(R.string.none);
                     }
                 }
             }
@@ -534,8 +498,8 @@ public class StudentiCardDetailsEdit extends CommonToolbarParentActivity {
                         studentInformationEntry.setDepartmentID(Long.toString(selectedDepartment.getDepartmentID()));
                         studentInformationEntry.setSectionID(Long.toString(selectedSection.getSectionID()));
                         t_class.setText(selectedClass.getClassName());
-                        t_department.setText("NONE");
-                        t_section.setText("NONE");
+                        t_department.setText(R.string.none);
+                        t_section.setText(R.string.none);
                         DepartmentDataGetRequest();
                     } catch (IndexOutOfBoundsException e) {
                         Toast.makeText(StudentiCardDetailsEdit.this,"No class found !!!",Toast.LENGTH_LONG).show();
@@ -548,9 +512,9 @@ public class StudentiCardDetailsEdit extends CommonToolbarParentActivity {
                         studentInformationEntry.setClassID(Long.toString(selectedClass.getClassID()));
                         studentInformationEntry.setDepartmentID(Long.toString(selectedDepartment.getDepartmentID()));
                         studentInformationEntry.setSectionID(Long.toString(selectedSection.getSectionID()));
-                        t_class.setText("NONE");
-                        t_department.setText("NONE");
-                        t_section.setText("NONE");
+                        t_class.setText(R.string.none);
+                        t_department.setText(R.string.none);
+                        t_section.setText(R.string.none);
                     }
                 }
             }
@@ -572,7 +536,7 @@ public class StudentiCardDetailsEdit extends CommonToolbarParentActivity {
                         studentInformationEntry.setDepartmentID(Long.toString(selectedDepartment.getDepartmentID()));
                         studentInformationEntry.setSectionID(Long.toString(selectedSection.getSectionID()));
                         t_department.setText(selectedDepartment.getDepartmentName());
-                        t_section.setText("NONE");
+                        t_section.setText(R.string.none);
                         SectionDataGetRequest();
                     } catch (IndexOutOfBoundsException e) {
                         Toast.makeText(StudentiCardDetailsEdit.this,"No department found !!!",Toast.LENGTH_LONG).show();
@@ -583,8 +547,8 @@ public class StudentiCardDetailsEdit extends CommonToolbarParentActivity {
                         selectedSection = new SectionModel();
                         studentInformationEntry.setDepartmentID(Long.toString(selectedDepartment.getDepartmentID()));
                         studentInformationEntry.setSectionID(Long.toString(selectedSection.getSectionID()));
-                        t_department.setText("NONE");
-                        t_section.setText("NONE");
+                        t_department.setText(R.string.none);
+                        t_section.setText(R.string.none);
                     }
                 }
             }
@@ -611,7 +575,7 @@ public class StudentiCardDetailsEdit extends CommonToolbarParentActivity {
                     if(firstSection++>1) {
                         selectedSection = new SectionModel();
                         studentInformationEntry.setSectionID(Long.toString(selectedSection.getSectionID()));
-                        t_section.setText("NONE");
+                        t_section.setText(R.string.none);
                     }
                 }
             }
@@ -638,7 +602,7 @@ public class StudentiCardDetailsEdit extends CommonToolbarParentActivity {
                     if(firstGender++>1) {
                         selectedGender = new GenderModel();
                         studentInformationEntry.setGenderID(Long.toString(selectedGender.getGenderID()));
-                        t_sex.setText("NONE");
+                        t_sex.setText(R.string.none);
                     }
                 }
             }
@@ -665,7 +629,7 @@ public class StudentiCardDetailsEdit extends CommonToolbarParentActivity {
                     if(firstReligion++>1) {
                         selectedReligion = new ReligionModel();
                         studentInformationEntry.setReligionID(Long.toString(selectedReligion.getReligionID()));
-                        t_religion.setText("NONE");
+                        t_religion.setText(R.string.none);
                     }
                 }
             }
@@ -692,7 +656,7 @@ public class StudentiCardDetailsEdit extends CommonToolbarParentActivity {
                     if(firstBloodGroup++>1) {
                         selectedBloodGroup = new BloodGroupModel();
                         studentInformationEntry.setBloodGroupID(Long.toString(selectedBloodGroup.getBloodGroupID()));
-                        t_bloodGroup.setText("NONE");
+                        t_bloodGroup.setText(R.string.none);
                     }
                 }
             }
@@ -705,8 +669,8 @@ public class StudentiCardDetailsEdit extends CommonToolbarParentActivity {
     }
 
     public void StudentDataGetRequest(){
-        if(isNetworkAvailable()) {
-            progressBar.setVisibility(View.VISIBLE);
+        if(StaticHelperClass.isNetworkAvailable(StudentiCardDetailsEdit.this)) {
+            dialog.show();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
                     .addConverterFactory(ScalarsConverterFactory.create())
@@ -731,12 +695,13 @@ public class StudentiCardDetailsEdit extends CommonToolbarParentActivity {
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseStudentJsonData(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
-                            progressBar.setVisibility(View.INVISIBLE);
+                            dialog.dismiss();
                         }
 
                         @Override
@@ -751,12 +716,10 @@ public class StudentiCardDetailsEdit extends CommonToolbarParentActivity {
     }
 
     private void parseStudentJsonData(String jsonString) {
-        progressBar.setVisibility(View.INVISIBLE);
         try {
             JSONArray studentJsonArray = new JSONArray(jsonString);
             JSONObject studentJsonObject = studentJsonArray.getJSONObject(0);
             if(studentJsonObject.getString("ImageUrl").equals("null")){
-                progressBar.setVisibility(View.INVISIBLE);
                 Toast.makeText(StudentiCardDetailsEdit.this,"No image found!!!",Toast.LENGTH_LONG).show();
             }
             GlideApp.with(this)
@@ -766,7 +729,7 @@ public class StudentiCardDetailsEdit extends CommonToolbarParentActivity {
                     .skipMemoryCache(true)
                     .into(new SimpleTarget<Bitmap>() {
                         @Override
-                        public void onResourceReady(Bitmap resource, Transition<? super Bitmap> transition) {
+                        public void onResourceReady(@NonNull Bitmap resource, Transition<? super Bitmap> transition) {
                             mCropImageView.setImageBitmap(resource);
                             originalBitmap = resource;
                             tempBitmap = resource;
@@ -890,10 +853,8 @@ public class StudentiCardDetailsEdit extends CommonToolbarParentActivity {
             t_remarks.setText(studentJsonObject.getString("Remarks"));
             t_bloodGroup.setText(studentJsonObject.getString("BloodGroup"));
 
-            progressBar.setVisibility(View.INVISIBLE);
         } catch (JSONException e) {
             Toast.makeText(this,"WARNING!!! "+e,Toast.LENGTH_LONG).show();
-            progressBar.setVisibility(View.INVISIBLE);
         }
     }
 
@@ -926,6 +887,7 @@ public class StudentiCardDetailsEdit extends CommonToolbarParentActivity {
             // before executing doInBackground
             // update your UI
             // exp; make progressbar visible
+            dialog.show();
         }
 
         @Override
@@ -933,12 +895,17 @@ public class StudentiCardDetailsEdit extends CommonToolbarParentActivity {
             try {
                 file = ImageUtils.getFileFromBitmap(bitmap, context);
             } catch (IOException e) {
-                progressBar.setVisibility(View.INVISIBLE);
+                dialog.dismiss();
                 e.printStackTrace();
             }
             return null;
         }
 
+        @Override
+        protected void onCancelled() {
+            super.onCancelled();
+            dialog.dismiss();
+        }
 
         @Override
         protected void onPostExecute(String s) {
@@ -946,52 +913,59 @@ public class StudentiCardDetailsEdit extends CommonToolbarParentActivity {
             // back to main thread after finishing doInBackground
             // update your UI or take action after
             // exp; make progressbar gone
+            dialog.dismiss();
+            if (StaticHelperClass.isNetworkAvailable(StudentiCardDetailsEdit.this)) {
+                dialog.show();
+                Retrofit retrofit = new Retrofit.Builder()
+                        .baseUrl(getString(R.string.baseUrl))
+                        .addConverterFactory(ScalarsConverterFactory.create())
+                        .addConverterFactory(GsonConverterFactory.create())
+                        .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                        .build();
 
-            Retrofit retrofit = new Retrofit.Builder()
-                    .baseUrl(getString(R.string.baseUrl))
-                    .addConverterFactory(ScalarsConverterFactory.create())
-                    .addConverterFactory(GsonConverterFactory.create())
-                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                    .build();
+                Observable<String> photoObservable = retrofit
+                        .create(RetrofitNetworkService.class)
+                        .uploadSingleImage(prepareFilePart(file))
+                        .subscribeOn(Schedulers.newThread())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .unsubscribeOn(Schedulers.io());
 
-            Observable<String> photoObservable = retrofit
-                    .create(RetrofitNetworkService.class)
-                    .uploadSingleImage(prepareFilePart(file))
-                    .subscribeOn(Schedulers.newThread())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .unsubscribeOn(Schedulers.io());
-
-            finalDisposer.add(photoObservable
-                    .observeOn(Schedulers.io())
-                    .subscribeOn(AndroidSchedulers.mainThread())
-                    .unsubscribeOn(Schedulers.io())
-                    .subscribeWith(new DisposableObserver<String>() {
-                        @Override
-                        public void onNext(String response) {
-                            try {
-                                JSONObject jsonObject = new JSONObject(response);
-                                studentInformationEntry.setImageUrl(jsonObject.getString("path"));
-                                studentInformationEntry.setIsImageCaptured(true);
-                                Gson gson = new Gson();
-                                String json = gson.toJson(studentInformationEntry);
-                                postUsingVolley(json);
-                                Log.d( "ImageUrl", jsonObject.getString("path"));
-                            } catch (JSONException e1) {
-                                progressBar.setVisibility(View.INVISIBLE);
-                                e1.printStackTrace();
+                finalDisposer.add(photoObservable
+                        .observeOn(Schedulers.io())
+                        .subscribeOn(AndroidSchedulers.mainThread())
+                        .unsubscribeOn(Schedulers.io())
+                        .subscribeWith(new DisposableObserver<String>() {
+                            @Override
+                            public void onNext(String response) {
+                                dialog.dismiss();
+                                try {
+                                    JSONObject jsonObject = new JSONObject(response);
+                                    studentInformationEntry.setImageUrl(jsonObject.getString("path"));
+                                    studentInformationEntry.setIsImageCaptured(true);
+                                    Gson gson = new Gson();
+                                    String json = gson.toJson(studentInformationEntry);
+                                    postUsingVolley(json);
+                                    Log.d( "ImageUrl", jsonObject.getString("path"));
+                                } catch (JSONException e1) {
+                                    e1.printStackTrace();
+                                }
                             }
-                        }
 
-                        @Override
-                        public void onError(Throwable e) {
-                            Log.e("RXANDROID", "onError: " + e.getMessage());
-                        }
+                            @Override
+                            public void onError(Throwable e) {
+                                dialog.dismiss();
+                                Log.e("RXANDROID", "onError: " + e.getMessage());
+                            }
 
-                        @Override
-                        public void onComplete() {
-                            Log.e("COMPLETE", "Complete: ");
-                        }
-                    }));
+                            @Override
+                            public void onComplete() {
+                                Log.e("COMPLETE", "Complete: ");
+                            }
+                        }));
+            } else {
+                Toast.makeText(StudentiCardDetailsEdit.this,"Please check your internet connection and select again!!! ",
+                        Toast.LENGTH_LONG).show();
+            }
 
 //            Ion.with(getApplicationContext())
 //                    .load(getString(R.string.baseUrl)+"/api/onEms/Mobile/uploads")
@@ -1024,52 +998,56 @@ public class StudentiCardDetailsEdit extends CommonToolbarParentActivity {
 
 
     public void postUsingVolley(String json) {
-        progressBar.setVisibility(View.VISIBLE);
-        try {
-            JsonParser parser = new JsonParser();
-            jsonObjectStudentData = parser.parse(json).getAsJsonObject();
-        } catch (JsonIOException e) {
-            progressBar.setVisibility(View.INVISIBLE);
-            e.printStackTrace();
+        if (StaticHelperClass.isNetworkAvailable(this)) {
+            try {
+                JsonParser parser = new JsonParser();
+                jsonObjectStudentData = parser.parse(json).getAsJsonObject();
+            } catch (JsonIOException e) {
+                e.printStackTrace();
+            }
+            dialog.show();
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(getString(R.string.baseUrl))
+                    .addConverterFactory(ScalarsConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .build();
+
+            Observable<String> observable = retrofit
+                    .create(RetrofitNetworkService.class)
+                    .setStudentBasicInfo(jsonObjectStudentData)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io());
+
+            finalDisposer.add( observable
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io())
+                    .subscribeWith(new DisposableObserver<String>() {
+
+                        @Override
+                        public void onNext(String response) {
+                            dialog.dismiss();
+                            Toast.makeText(StudentiCardDetailsEdit.this,"Successfully Updated",Toast.LENGTH_LONG).show();
+                            StudentiCardDetailsEdit.super.onBackPressed();
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+                            dialog.dismiss();
+                            Toast.makeText(StudentiCardDetailsEdit.this,"Error Occurred",Toast.LENGTH_LONG).show();
+                        }
+
+                        @Override
+                        public void onComplete() {
+
+                        }
+                    }));
+        } else {
+            Toast.makeText(this,"Please check your internet connection and select again!!! ",
+                    Toast.LENGTH_LONG).show();
         }
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(getString(R.string.baseUrl))
-                .addConverterFactory(ScalarsConverterFactory.create())
-                .addConverterFactory(GsonConverterFactory.create())
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                .build();
-
-        Observable<String> observable = retrofit
-                .create(RetrofitNetworkService.class)
-                .setStudentBasicInfo(jsonObjectStudentData)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .unsubscribeOn(Schedulers.io());
-
-        finalDisposer.add( observable
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .unsubscribeOn(Schedulers.io())
-                .subscribeWith(new DisposableObserver<String>() {
-
-                    @Override
-                    public void onNext(String response) {
-                        progressBar.setVisibility(View.INVISIBLE);
-                        Toast.makeText(StudentiCardDetailsEdit.this,"Successfully Updated",Toast.LENGTH_LONG).show();
-                        StudentiCardDetailsEdit.super.onBackPressed();
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        progressBar.setVisibility(View.INVISIBLE);
-                        Toast.makeText(StudentiCardDetailsEdit.this,"Error Occurred",Toast.LENGTH_LONG).show();
-                    }
-
-                    @Override
-                    public void onComplete() {
-
-                    }
-                }));
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -1150,7 +1128,7 @@ public class StudentiCardDetailsEdit extends CommonToolbarParentActivity {
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
         if (mCropImageUri != null && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             mCropImageView.setImageUriAsync(mCropImageUri);
         } else {
@@ -1199,7 +1177,7 @@ public class StudentiCardDetailsEdit extends CommonToolbarParentActivity {
         // the main intent is the last in the list (fucking android) so pickup the useless one
         Intent mainIntent = allIntents.get(allIntents.size() - 1);
         for (Intent intent : allIntents) {
-            if (intent.getComponent().getClassName().equals("com.android.documentsui.DocumentsActivity")) {
+            if (Objects.requireNonNull(intent.getComponent()).getClassName().equals("com.android.documentsui.DocumentsActivity")) {
                 mainIntent = intent;
                 break;
             }
@@ -1250,16 +1228,6 @@ public class StudentiCardDetailsEdit extends CommonToolbarParentActivity {
             isCamera = action != null && action.equals(MediaStore.ACTION_IMAGE_CAPTURE);
         }
         return isCamera ? getCaptureImageOutputUri() : data.getData();
-    }
-
-    /**
-     * Test if we can open the given Android URI to test if permission required error is thrown.<br>
-     */
-
-    private boolean isNetworkAvailable() {
-        ConnectivityManager connectivityManager = (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
     public Bitmap getResizedBitmap(Bitmap image, int maxSize) {
@@ -1337,13 +1305,19 @@ public class StudentiCardDetailsEdit extends CommonToolbarParentActivity {
         }
 
         @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            dialog.show();
+        }
+
+        @Override
         protected Boolean doInBackground(Void... params) {
             try {
                 tempBitmap = doBrightness(image, progressValue);
                 Thread.sleep(100);
                 return true;
             } catch (InterruptedException e) {
-                progressBar.setVisibility(View.INVISIBLE);
+                dialog.dismiss();
                 return false;
             }
         }
@@ -1351,7 +1325,7 @@ public class StudentiCardDetailsEdit extends CommonToolbarParentActivity {
         @Override
         protected void onPostExecute(final Boolean success) {
 //            mBrightnessProcessTask = null;
-            progressBar.setVisibility(View.INVISIBLE);
+            dialog.dismiss();
             if (success) {
                 mCropImageView.setImageBitmap(tempBitmap);
             }
@@ -1364,7 +1338,7 @@ public class StudentiCardDetailsEdit extends CommonToolbarParentActivity {
         @Override
         protected void onCancelled() {
 //            mBrightnessProcessTask = null;
-            progressBar.setVisibility(View.INVISIBLE);
+            dialog.dismiss();
         }
     }
 
@@ -1379,6 +1353,12 @@ public class StudentiCardDetailsEdit extends CommonToolbarParentActivity {
         }
 
         @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            dialog.show();
+        }
+
+        @Override
         protected Boolean doInBackground(Void... params) {
             try {
                 originalBitmap = rotateImage(image, angle);
@@ -1386,7 +1366,7 @@ public class StudentiCardDetailsEdit extends CommonToolbarParentActivity {
                 Thread.sleep(100);
                 return true;
             } catch (InterruptedException e) {
-                progressBar.setVisibility(View.INVISIBLE);
+                dialog.dismiss();
                 return false;
             }
         }
@@ -1394,7 +1374,7 @@ public class StudentiCardDetailsEdit extends CommonToolbarParentActivity {
         @Override
         protected void onPostExecute(final Boolean success) {
             mRotateProcessTask = null;
-            progressBar.setVisibility(View.INVISIBLE);
+            dialog.dismiss();
             if (success) {
                 mCropImageView.setImageBitmap(tempBitmap);
             }
@@ -1407,12 +1387,13 @@ public class StudentiCardDetailsEdit extends CommonToolbarParentActivity {
         @Override
         protected void onCancelled() {
             mRotateProcessTask = null;
-            progressBar.setVisibility(View.INVISIBLE);
+            dialog.dismiss();
         }
     }
 
     private void ShiftDataGetRequest() {
-        if (isNetworkAvailable()) {
+        if (StaticHelperClass.isNetworkAvailable(StudentiCardDetailsEdit.this)) {
+            dialog.show();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
                     .addConverterFactory(ScalarsConverterFactory.create())
@@ -1435,12 +1416,13 @@ public class StudentiCardDetailsEdit extends CommonToolbarParentActivity {
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseShiftJsonData(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
-
+                            dialog.dismiss();
                         }
 
                         @Override
@@ -1476,22 +1458,18 @@ public class StudentiCardDetailsEdit extends CommonToolbarParentActivity {
                 ArrayAdapter<String> shift_spinner_adapter = new ArrayAdapter<>(this,R.layout.spinner_item, strings);
                 shift_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinnerShift.setAdapter(shift_spinner_adapter);
-                progressBar.setVisibility(View.INVISIBLE);
-            }
-            catch (IndexOutOfBoundsException e)
-            {
-                progressBar.setVisibility(View.INVISIBLE);
+            } catch (IndexOutOfBoundsException e) {
                 Toast.makeText(this,"No shift found !!!",Toast.LENGTH_LONG).show();
             }
             //spinner.setSelectedIndex(1);
         } catch (JSONException e) {
-            progressBar.setVisibility(View.INVISIBLE);
             Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
         }
     }
 
     private void MediumDataGetRequest() {
-        if(isNetworkAvailable()) {
+        if(StaticHelperClass.isNetworkAvailable(StudentiCardDetailsEdit.this)) {
+            dialog.show();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
                     .addConverterFactory(ScalarsConverterFactory.create())
@@ -1514,12 +1492,13 @@ public class StudentiCardDetailsEdit extends CommonToolbarParentActivity {
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseMediumJsonData(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
-
+                            dialog.dismiss();
                         }
 
                         @Override
@@ -1557,22 +1536,18 @@ public class StudentiCardDetailsEdit extends CommonToolbarParentActivity {
                 ArrayAdapter<String> medium_spinner_adapter = new ArrayAdapter<>(this,R.layout.spinner_item, strings);
                 medium_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinnerMedium.setAdapter(medium_spinner_adapter);
-                progressBar.setVisibility(View.INVISIBLE);
-            }
-            catch (IndexOutOfBoundsException e)
-            {
-                progressBar.setVisibility(View.INVISIBLE);
+            } catch (IndexOutOfBoundsException e) {
                 Toast.makeText(this,"No medium found !!!",Toast.LENGTH_LONG).show();
             }
             //spinner.setSelectedIndex(1);
         } catch (JSONException e) {
-            progressBar.setVisibility(View.INVISIBLE);
             Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
         }
     }
 
     private void ClassDataGetRequest() {
-        if(isNetworkAvailable()) {
+        if(StaticHelperClass.isNetworkAvailable(StudentiCardDetailsEdit.this)) {
+            dialog.show();
             CheckSelectedData();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
@@ -1596,12 +1571,13 @@ public class StudentiCardDetailsEdit extends CommonToolbarParentActivity {
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseClassJsonData(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
-
+                            dialog.dismiss();
                         }
 
                         @Override
@@ -1638,22 +1614,18 @@ public class StudentiCardDetailsEdit extends CommonToolbarParentActivity {
                 ArrayAdapter<String> class_spinner_adapter = new ArrayAdapter<>(this,R.layout.spinner_item, strings);
                 class_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinnerClass.setAdapter(class_spinner_adapter);
-                progressBar.setVisibility(View.INVISIBLE);
-            }
-            catch (IndexOutOfBoundsException e)
-            {
-                progressBar.setVisibility(View.INVISIBLE);
+            } catch (IndexOutOfBoundsException e) {
                 Toast.makeText(this,"No class found !!!",Toast.LENGTH_LONG).show();
             }
             //spinner.setSelectedIndex(1);
         } catch (JSONException e) {
-            progressBar.setVisibility(View.INVISIBLE);
             Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
         }
     }
 
     private void DepartmentDataGetRequest() {
-        if(isNetworkAvailable()) {
+        if(StaticHelperClass.isNetworkAvailable(StudentiCardDetailsEdit.this)) {
+            dialog.show();
             CheckSelectedData();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
@@ -1677,12 +1649,13 @@ public class StudentiCardDetailsEdit extends CommonToolbarParentActivity {
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseDepartmentJsonData(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
-
+                            dialog.dismiss();
                         }
 
                         @Override
@@ -1722,22 +1695,18 @@ public class StudentiCardDetailsEdit extends CommonToolbarParentActivity {
                 ArrayAdapter<String> department_spinner_adapter = new ArrayAdapter<>(this,R.layout.spinner_item, strings);
                 department_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinnerDepartment.setAdapter(department_spinner_adapter);
-                progressBar.setVisibility(View.INVISIBLE);
-            }
-            catch (IndexOutOfBoundsException e)
-            {
-                progressBar.setVisibility(View.INVISIBLE);
+            } catch (IndexOutOfBoundsException e) {
                 Toast.makeText(this,"No department found !!!",Toast.LENGTH_LONG).show();
             }
             //spinner.setSelectedIndex(1);
         } catch (JSONException e) {
-            progressBar.setVisibility(View.INVISIBLE);
             Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
         }
     }
 
     private void SectionDataGetRequest() {
-        if(isNetworkAvailable()) {
+        if(StaticHelperClass.isNetworkAvailable(StudentiCardDetailsEdit.this)) {
+            dialog.show();
             CheckSelectedData();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
@@ -1761,12 +1730,13 @@ public class StudentiCardDetailsEdit extends CommonToolbarParentActivity {
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseSectionJsonData(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
-
+                            dialog.dismiss();
                         }
 
                         @Override
@@ -1802,20 +1772,18 @@ public class StudentiCardDetailsEdit extends CommonToolbarParentActivity {
                 ArrayAdapter<String> section_spinner_adapter = new ArrayAdapter<>(this,R.layout.spinner_item, strings);
                 section_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinnerSection.setAdapter(section_spinner_adapter);
-                progressBar.setVisibility(View.INVISIBLE);
             } catch (IndexOutOfBoundsException e) {
-                progressBar.setVisibility(View.INVISIBLE);
                 Toast.makeText(this,"No section found !!!",Toast.LENGTH_LONG).show();
             }
             //spinner.setSelectedIndex(1);
         } catch (JSONException e) {
-            progressBar.setVisibility(View.INVISIBLE);
             Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
         }
     }
 
     public void GenderDataGetRequest(){
-        if(isNetworkAvailable()) {
+        if(StaticHelperClass.isNetworkAvailable(StudentiCardDetailsEdit.this)) {
+            dialog.show();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
                     .addConverterFactory(ScalarsConverterFactory.create())
@@ -1838,12 +1806,13 @@ public class StudentiCardDetailsEdit extends CommonToolbarParentActivity {
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseGenderJsonData(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
-
+                            dialog.dismiss();
                         }
 
                         @Override
@@ -1876,20 +1845,18 @@ public class StudentiCardDetailsEdit extends CommonToolbarParentActivity {
                 ArrayAdapter<String> gender_spinner_adapter = new ArrayAdapter<>(this,R.layout.spinner_item, strings);
                 gender_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinnerGender.setAdapter(gender_spinner_adapter);
-                progressBar.setVisibility(View.INVISIBLE);
             } catch (IndexOutOfBoundsException e) {
-                progressBar.setVisibility(View.INVISIBLE);
                 Toast.makeText(this,"No gender found !!!",Toast.LENGTH_LONG).show();
             }
             //spinner.setSelectedIndex(1);
         } catch (JSONException e) {
-            progressBar.setVisibility(View.INVISIBLE);
             Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
         }
     }
 
     public void ReligionDataGetRequest(){
-        if(isNetworkAvailable()) {
+        if(StaticHelperClass.isNetworkAvailable(StudentiCardDetailsEdit.this)) {
+            dialog.show();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
                     .addConverterFactory(ScalarsConverterFactory.create())
@@ -1912,12 +1879,13 @@ public class StudentiCardDetailsEdit extends CommonToolbarParentActivity {
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseReligionJsonData(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
-
+                            dialog.dismiss();
                         }
 
                         @Override
@@ -1950,21 +1918,19 @@ public class StudentiCardDetailsEdit extends CommonToolbarParentActivity {
                 ArrayAdapter<String> religion_spinner_adapter = new ArrayAdapter<>(this,R.layout.spinner_item, strings);
                 religion_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinnerReligion.setAdapter(religion_spinner_adapter);
-                progressBar.setVisibility(View.INVISIBLE);
             } catch (IndexOutOfBoundsException e) {
-                progressBar.setVisibility(View.INVISIBLE);
                 Toast.makeText(this,"No religion found !!!",Toast.LENGTH_LONG).show();
             }
             //spinner.setSelectedIndex(1);
         } catch (JSONException e) {
-            progressBar.setVisibility(View.INVISIBLE);
             Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
         }
     }
 
 
     public void BloodGroupDataGetRequest(){
-        if(isNetworkAvailable()) {
+        if(StaticHelperClass.isNetworkAvailable(StudentiCardDetailsEdit.this)) {
+            dialog.show();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
                     .addConverterFactory(ScalarsConverterFactory.create())
@@ -1987,12 +1953,13 @@ public class StudentiCardDetailsEdit extends CommonToolbarParentActivity {
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseBloodGroupJsonData(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
-
+                            dialog.dismiss();
                         }
 
                         @Override
@@ -2025,14 +1992,11 @@ public class StudentiCardDetailsEdit extends CommonToolbarParentActivity {
                 ArrayAdapter<String> bloodGroup_spinner_adapter = new ArrayAdapter<>(this,R.layout.spinner_item, strings);
                 bloodGroup_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinnerBloodGroup.setAdapter(bloodGroup_spinner_adapter);
-                progressBar.setVisibility(View.INVISIBLE);
             } catch (IndexOutOfBoundsException e) {
-                progressBar.setVisibility(View.INVISIBLE);
                 Toast.makeText(this,"No blood group found !!!",Toast.LENGTH_LONG).show();
             }
             //spinner.setSelectedIndex(1);
         } catch (JSONException e) {
-            progressBar.setVisibility(View.INVISIBLE);
             Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
         }
     }

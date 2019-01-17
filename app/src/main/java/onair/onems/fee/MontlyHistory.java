@@ -17,12 +17,7 @@ import java.util.ArrayList;
 
 import onair.onems.R;
 
-/**
- * Created by hp on 1/24/2018.
- */
-
-public class MontlyHistory extends AppCompatActivity
-{
+public class MontlyHistory extends AppCompatActivity {
     String monthUrl = "", monthFeesDetailsUrl="",monthFineDetailsUrl="",monthDueDetailsUrl="",monthScholarshipUrl="";
     ProgressDialog dialog;
     int MonthID[];

@@ -22,6 +22,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Objects;
+
 import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -29,6 +31,7 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import onair.onems.R;
 import onair.onems.Services.RetrofitNetworkService;
+import onair.onems.Services.StaticHelperClass;
 import onair.onems.mainactivities.CommonToolbarParentActivity;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
@@ -54,7 +57,7 @@ public class SubjectWiseMarksEntryInputs extends CommonToolbarParentActivity {
         super.onCreate(savedInstanceState);
 
         LayoutInflater inflater = (LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        final View childActivityLayout = inflater.inflate(R.layout.exam_subject_wise_marks_entry_inputs, null);
+        final View childActivityLayout = Objects.requireNonNull(inflater).inflate(R.layout.exam_subject_wise_marks_entry_inputs, null);
         LinearLayout parentActivityLayout = findViewById(R.id.contentMain);
         parentActivityLayout.addView(childActivityLayout, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
 
@@ -246,50 +249,56 @@ public class SubjectWiseMarksEntryInputs extends CommonToolbarParentActivity {
     }
 
     public void postMarks(String stringObject) {
-        JsonParser parser = new JsonParser();
-        JsonObject jsonObject = parser.parse(stringObject).getAsJsonObject();
+        if (StaticHelperClass.isNetworkAvailable(this)) {
+            dialog.show();
+            JsonParser parser = new JsonParser();
+            JsonObject jsonObject = parser.parse(stringObject).getAsJsonObject();
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(getString(R.string.baseUrl))
+                    .addConverterFactory(ScalarsConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .build();
 
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(getString(R.string.baseUrl))
-                .addConverterFactory(ScalarsConverterFactory.create())
-                .addConverterFactory(GsonConverterFactory.create())
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                .build();
+            Observable<String> observable = retrofit
+                    .create(RetrofitNetworkService.class)
+                    .setMarks(jsonObject)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io());
 
-        Observable<String> observable = retrofit
-                .create(RetrofitNetworkService.class)
-                .setMarks(jsonObject)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .unsubscribeOn(Schedulers.io());
+            observable
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io())
+                    .subscribe(new Observer<String>() {
 
-        observable
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .unsubscribeOn(Schedulers.io())
-                .subscribe(new Observer<String>() {
+                        @Override
+                        public void onSubscribe(Disposable d) {
+                            finalDisposer = d;
+                        }
 
-                    @Override
-                    public void onSubscribe(Disposable d) {
-                        finalDisposer = d;
-                    }
+                        @Override
+                        public void onNext(String returnData) {
+                            dialog.dismiss();
+                            Toast.makeText(getApplicationContext(),"Successful!!!",Toast.LENGTH_LONG).show();
+                            finish();
+                        }
 
-                    @Override
-                    public void onNext(String returnData) {
-                        Toast.makeText(getApplicationContext(),"Successful!!!",Toast.LENGTH_LONG).show();
-                        finish();
-                    }
+                        @Override
+                        public void onComplete() {
 
-                    @Override
-                    public void onComplete() {
+                        }
 
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        Toast.makeText(getApplicationContext(),"ERROR posting token",Toast.LENGTH_LONG).show();
-                    }
-                });
-
+                        @Override
+                        public void onError(Throwable e) {
+                            dialog.dismiss();
+                            Toast.makeText(getApplicationContext(),"ERROR posting token",Toast.LENGTH_LONG).show();
+                        }
+                    });
+        } else {
+            Toast.makeText(this,"Please check your internet connection and select again!!! ",
+                    Toast.LENGTH_LONG).show();
+        }
     }
 }

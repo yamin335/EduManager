@@ -29,12 +29,7 @@ import de.codecrafters.tableview.toolkit.SimpleTableHeaderAdapter;
 import de.codecrafters.tableview.toolkit.TableDataRowBackgroundProviders;
 import onair.onems.R;
 
-/**
- * Created by hp on 1/23/2018.
- */
-
-public class FeesDetails  extends AppCompatActivity
-{
+public class FeesDetails  extends AppCompatActivity {
     TableView tableView;
     SimpleTableHeaderAdapter simpleTableHeaderAdapter;
     SimpleTableDataAdapter simpleTabledataAdapter;
@@ -46,8 +41,7 @@ public class FeesDetails  extends AppCompatActivity
     SharedPreferences prefs;
     int monthselectindex, UserTypeID;
     ProgressDialog dialog;
-    protected void onCreate(Bundle savedInstanceState)
-    {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.fees_details);
         tableView = (TableView) findViewById(R.id.tableView);
@@ -104,10 +98,8 @@ public class FeesDetails  extends AppCompatActivity
 
 
     }
-    void  parseMonthlyFeesDetailsJsonData(String jsonString)
-    {
-        try
-        {
+    void  parseMonthlyFeesDetailsJsonData(String jsonString) {
+        try {
             JSONArray jsonArray = new JSONArray(jsonString);
             ArrayList al = new ArrayList();
             DATA_TO_SHOW = new String[jsonArray.length()][3];
@@ -135,17 +127,14 @@ public class FeesDetails  extends AppCompatActivity
             }
 
             dialog.dismiss();
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             Toast.makeText(getApplicationContext(),""+e,Toast.LENGTH_LONG).show();
         }
 
         dialog.dismiss();
     }
     // Back parent Page code
-    public boolean onOptionsItemSelected(MenuItem item)
-    {
+    public boolean onOptionsItemSelected(MenuItem item) {
         super.onBackPressed();
         NavUtils.navigateUpFromSameTask(this);
         super.onBackPressed();
@@ -153,8 +142,7 @@ public class FeesDetails  extends AppCompatActivity
 
     }
     @Override
-    public void onBackPressed()
-    {
+    public void onBackPressed() {
         super.onBackPressed();
         NavUtils.navigateUpFromSameTask(this);
         super.onBackPressed();

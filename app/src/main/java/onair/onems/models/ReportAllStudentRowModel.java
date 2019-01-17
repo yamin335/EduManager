@@ -1,9 +1,5 @@
 package onair.onems.models;
 
-/**
- * Created by User on 1/25/2018.
- */
-
 public class ReportAllStudentRowModel {
     private String UserName = "";
     private String RollNo = "";

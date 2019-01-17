@@ -1,6 +1,7 @@
 package onair.onems.result;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,13 +31,14 @@ public class ResultStructureAdapter extends RecyclerView.Adapter<ResultStructure
     }
 
 
-    public ResultStructureAdapter(Context context, List<JSONObject> resultList) {
+    ResultStructureAdapter(Context context, List<JSONObject> resultList) {
         this.context = context;
         this.resultList = resultList;
     }
 
+    @NonNull
     @Override
-    public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.result_grade_structure_row_item, parent, false);
 
@@ -44,7 +46,7 @@ public class ResultStructureAdapter extends RecyclerView.Adapter<ResultStructure
     }
 
     @Override
-    public void onBindViewHolder(MyViewHolder holder, final int position) {
+    public void onBindViewHolder(@NonNull MyViewHolder holder, final int position) {
         JSONObject data = resultList.get(position);
         try {
             holder.grade.setText(data.getString("GradeName"));

@@ -1,44 +1,26 @@
 package onair.onems.fee;
 
 import android.app.ProgressDialog;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v4.app.NavUtils;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
-import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.Toast;
-
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
-
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 
 import de.codecrafters.tableview.TableView;
-import de.codecrafters.tableview.listeners.TableDataClickListener;
 import de.codecrafters.tableview.toolkit.SimpleTableDataAdapter;
 import de.codecrafters.tableview.toolkit.SimpleTableHeaderAdapter;
-import de.codecrafters.tableview.toolkit.TableDataRowBackgroundProviders;
 import onair.onems.R;
 
-/**
- * Created by hp on 1/24/2018.
- */
-
-public class FeesHistory extends AppCompatActivity
-{
+public class FeesHistory extends AppCompatActivity {
     TableView tableView,tableView1;
     SimpleTableHeaderAdapter simpleTableHeaderAdapter, simpleTableHeaderAdapter1;
     SimpleTableDataAdapter simpleTabledataAdapter;

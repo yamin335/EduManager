@@ -1,6 +1,5 @@
 package onair.onems.studentlist;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -17,17 +16,12 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.Toast;
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Objects;
 
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -44,7 +38,6 @@ import onair.onems.models.DepartmentModel;
 import onair.onems.models.MediumModel;
 import onair.onems.models.SectionModel;
 import onair.onems.models.ShiftModel;
-import onair.onems.network.MySingleton;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -88,8 +81,8 @@ public class ReportAllStudentMain extends SideNavigationMenuParentActivity {
         activityName = ReportAllStudentMain.class.getName();
 
         LayoutInflater inflater = (LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        final View childActivityLayout = inflater.inflate(R.layout.report_all_student_content_main, null);
-        LinearLayout parentActivityLayout = (LinearLayout) findViewById(R.id.contentMain);
+        final View childActivityLayout = Objects.requireNonNull(inflater).inflate(R.layout.report_all_student_content_main, null);
+        LinearLayout parentActivityLayout = findViewById(R.id.contentMain);
         parentActivityLayout.addView(childActivityLayout, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
@@ -101,13 +94,13 @@ public class ReportAllStudentMain extends SideNavigationMenuParentActivity {
         selectedMedium = new MediumModel();
         selectedDepartment = new DepartmentModel();
 
-        spinnerClass = (Spinner)findViewById(R.id.spinnerClass);
-        spinnerShift = (Spinner)findViewById(R.id.spinnerShift);
-        spinnerSection = (Spinner)findViewById(R.id.spinnerSection);
-        spinnerMedium =(Spinner)findViewById(R.id.spinnerMedium);
-        spinnerDepartment =(Spinner)findViewById(R.id.spinnerDepartment);
+        spinnerClass = findViewById(R.id.spinnerClass);
+        spinnerShift = findViewById(R.id.spinnerShift);
+        spinnerSection = findViewById(R.id.spinnerSection);
+        spinnerMedium = findViewById(R.id.spinnerMedium);
+        spinnerDepartment = findViewById(R.id.spinnerDepartment);
 
-        Button showAll = (Button)findViewById(R.id.takeAttendance);
+        Button showAll = findViewById(R.id.takeAttendance);
 
         ArrayAdapter<String> class_spinner_adapter = new ArrayAdapter<>(this, R.layout.spinner_item, tempClassArray);
         class_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -132,28 +125,25 @@ public class ReportAllStudentMain extends SideNavigationMenuParentActivity {
         ShiftDataGetRequest();
         MediumDataGetRequest();
 
-        showAll.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(StaticHelperClass.isNetworkAvailable(ReportAllStudentMain.this)) {
-                    if(selectedClass.getClassID() != -2) {
-                        CheckSelectedData();
-                        Bundle bundle = new Bundle();
-                        bundle.putLong("InstituteID", InstituteID);
-                        bundle.putLong("MediumID",selectedMedium.getMediumID());
-                        bundle.putLong("ShiftID",selectedShift.getShiftID());
-                        bundle.putLong("ClassID",selectedClass.getClassID());
-                        bundle.putLong("SectionID",selectedSection.getSectionID());
-                        bundle.putLong("DepertmentID",selectedDepartment.getDepartmentID());
-                        Intent intent = new Intent(ReportAllStudentMain.this, ReportAllStudentList.class);
-                        intent.putExtras(bundle);
-                        startActivity(intent);
-                    } else if(selectedClass.getClassID() == -2) {
-                        Toast.makeText(ReportAllStudentMain.this,"Please select a class !!! ",Toast.LENGTH_LONG).show();
-                    }
-                } else {
-                    Toast.makeText(ReportAllStudentMain.this,"Please check your internet connection!!!",Toast.LENGTH_LONG).show();
+        showAll.setOnClickListener(v -> {
+            if(StaticHelperClass.isNetworkAvailable(ReportAllStudentMain.this)) {
+                if(selectedClass.getClassID() != -2) {
+                    CheckSelectedData();
+                    Bundle bundle = new Bundle();
+                    bundle.putLong("InstituteID", InstituteID);
+                    bundle.putLong("MediumID",selectedMedium.getMediumID());
+                    bundle.putLong("ShiftID",selectedShift.getShiftID());
+                    bundle.putLong("ClassID",selectedClass.getClassID());
+                    bundle.putLong("SectionID",selectedSection.getSectionID());
+                    bundle.putLong("DepertmentID",selectedDepartment.getDepartmentID());
+                    Intent intent = new Intent(ReportAllStudentMain.this, ReportAllStudentList.class);
+                    intent.putExtras(bundle);
+                    startActivity(intent);
+                } else if(selectedClass.getClassID() == -2) {
+                    Toast.makeText(ReportAllStudentMain.this,"Please select a class !!! ",Toast.LENGTH_LONG).show();
                 }
+            } else {
+                Toast.makeText(ReportAllStudentMain.this,"Please check your internet connection!!!",Toast.LENGTH_LONG).show();
             }
         });
 
@@ -443,7 +433,7 @@ public class ReportAllStudentMain extends SideNavigationMenuParentActivity {
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
@@ -455,6 +445,7 @@ public class ReportAllStudentMain extends SideNavigationMenuParentActivity {
 
     private void ShiftDataGetRequest() {
         if (StaticHelperClass.isNetworkAvailable(this)) {
+            dialog.show();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
                     .addConverterFactory(ScalarsConverterFactory.create())
@@ -477,12 +468,13 @@ public class ReportAllStudentMain extends SideNavigationMenuParentActivity {
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseShiftJsonData(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
-
+                            dialog.dismiss();
                         }
 
                         @Override
@@ -498,6 +490,7 @@ public class ReportAllStudentMain extends SideNavigationMenuParentActivity {
 
     private void MediumDataGetRequest() {
         if(StaticHelperClass.isNetworkAvailable(this)) {
+            dialog.show();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
                     .addConverterFactory(ScalarsConverterFactory.create())
@@ -520,12 +513,13 @@ public class ReportAllStudentMain extends SideNavigationMenuParentActivity {
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseMediumJsonData(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
-
+                            dialog.dismiss();
                         }
 
                         @Override
@@ -541,6 +535,7 @@ public class ReportAllStudentMain extends SideNavigationMenuParentActivity {
 
     private void ClassDataGetRequest() {
         if(StaticHelperClass.isNetworkAvailable(this)) {
+            dialog.show();
             CheckSelectedData();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
@@ -564,12 +559,13 @@ public class ReportAllStudentMain extends SideNavigationMenuParentActivity {
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseClassJsonData(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
-
+                            dialog.dismiss();
                         }
 
                         @Override
@@ -585,6 +581,7 @@ public class ReportAllStudentMain extends SideNavigationMenuParentActivity {
 
     private void DepartmentDataGetRequest() {
         if(StaticHelperClass.isNetworkAvailable(this)) {
+            dialog.show();
             CheckSelectedData();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
@@ -608,12 +605,13 @@ public class ReportAllStudentMain extends SideNavigationMenuParentActivity {
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseDepartmentJsonData(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
-
+                            dialog.dismiss();
                         }
 
                         @Override
@@ -629,6 +627,7 @@ public class ReportAllStudentMain extends SideNavigationMenuParentActivity {
 
     private void SectionDataGetRequest() {
         if(StaticHelperClass.isNetworkAvailable(this)) {
+            dialog.show();
             CheckSelectedData();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
@@ -652,12 +651,13 @@ public class ReportAllStudentMain extends SideNavigationMenuParentActivity {
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseSectionJsonData(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
-
+                            dialog.dismiss();
                         }
 
                         @Override

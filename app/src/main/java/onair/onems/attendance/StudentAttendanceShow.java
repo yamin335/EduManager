@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 import de.codecrafters.tableview.TableView;
-import de.codecrafters.tableview.listeners.TableDataClickListener;
 import de.codecrafters.tableview.model.TableColumnWeightModel;
 import de.codecrafters.tableview.toolkit.SimpleTableDataAdapter;
 import de.codecrafters.tableview.toolkit.SimpleTableHeaderAdapter;
@@ -65,7 +64,7 @@ public class StudentAttendanceShow extends CommonToolbarParentActivity {
         LinearLayout parentActivityLayout = findViewById(R.id.contentMain);
         parentActivityLayout.addView(childActivityLayout, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
 
-        tableView = (TableView) findViewById(R.id.tableView);
+        tableView = findViewById(R.id.tableView);
         SharedPreferences sharedPre = PreferenceManager.getDefaultSharedPreferences(this);
         instituteID = sharedPre.getLong("InstituteID", 0);
         Intent intent = getIntent();
@@ -90,24 +89,21 @@ public class StudentAttendanceShow extends CommonToolbarParentActivity {
 
         AttendanceDataGetRequest();
 
-        tableView.addDataClickListener(new TableDataClickListener() {
-            @Override
-            public void onDataClicked(int rowIndex, Object clickedData) {
-                selectedStudent = studentList.get(rowIndex);
-                Intent intent = new Intent(StudentAttendanceShow.this, StudentAttendanceAllDays.class);
-                intent.putExtra("UserID", selectedStudent.getUserID());
-                intent.putExtra("UserFullName", selectedStudent.getUserFullName());
-                intent.putExtra("RollNo", selectedStudent.getRollNo());
-                intent.putExtra("RFID", selectedStudent.getRFID());
-                intent.putExtra("ShiftID", selectedStudent.getShiftID());
-                intent.putExtra("MediumID", selectedStudent.getMediumID());
-                intent.putExtra("ClassID", selectedStudent.getClassID());
-                intent.putExtra("DepartmentID", selectedStudent.getDepartmentID());
-                intent.putExtra("SectionID", selectedStudent.getSectionID());
-                intent.putExtra("MonthID", MonthID);
-                intent.putExtra("ImageUrl", selectedStudent.getImageUrl());
-                startActivity(intent);
-            }
+        tableView.addDataClickListener((rowIndex, clickedData) -> {
+            selectedStudent = studentList.get(rowIndex);
+            Intent intent1 = new Intent(StudentAttendanceShow.this, StudentAttendanceAllDays.class);
+            intent1.putExtra("UserID", selectedStudent.getUserID());
+            intent1.putExtra("UserFullName", selectedStudent.getUserFullName());
+            intent1.putExtra("RollNo", selectedStudent.getRollNo());
+            intent1.putExtra("RFID", selectedStudent.getRFID());
+            intent1.putExtra("ShiftID", selectedStudent.getShiftID());
+            intent1.putExtra("MediumID", selectedStudent.getMediumID());
+            intent1.putExtra("ClassID", selectedStudent.getClassID());
+            intent1.putExtra("DepartmentID", selectedStudent.getDepartmentID());
+            intent1.putExtra("SectionID", selectedStudent.getSectionID());
+            intent1.putExtra("MonthID", MonthID);
+            intent1.putExtra("ImageUrl", selectedStudent.getImageUrl());
+            startActivity(intent1);
         });
 
     }
@@ -152,6 +148,7 @@ public class StudentAttendanceShow extends CommonToolbarParentActivity {
 
     public void AttendanceDataGetRequest(){
         if(StaticHelperClass.isNetworkAvailable(this)) {
+            dialog.show();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
                     .addConverterFactory(ScalarsConverterFactory.create())
@@ -178,12 +175,13 @@ public class StudentAttendanceShow extends CommonToolbarParentActivity {
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseAllStudentShowJsonData(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
-
+                            dialog.dismiss();
                         }
 
                         @Override

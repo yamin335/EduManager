@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public final class ImageUtils {
 
@@ -67,7 +68,7 @@ public final class ImageUtils {
         // The main intent is the last in the list, so pickup the useless one
         Intent mainIntent = allIntents.get(allIntents.size() - 1);
         for (Intent intent : allIntents) {
-            if (intent.getComponent().getClassName().equals("com.android.documentsui.DocumentsActivity")) {
+            if (Objects.requireNonNull(intent.getComponent()).getClassName().equals("com.android.documentsui.DocumentsActivity")) {
                 mainIntent = intent;
                 break;
             }
@@ -118,13 +119,14 @@ public final class ImageUtils {
         try {
             ContentResolver resolver = context.getContentResolver();
             InputStream stream = resolver.openInputStream(uri);
-            stream.close();
+            Objects.requireNonNull(stream).close();
             return false;
         } catch (FileNotFoundException e) {
             if (e.getCause() instanceof ErrnoException) {
                 return true;
             }
         } catch (Exception e) {
+            e.printStackTrace();
         }
         return false;
     }

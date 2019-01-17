@@ -11,15 +11,9 @@ import java.util.ArrayList;
 
 import onair.onems.R;
 
-/**
- * Created by Sojib on 31-Jul-17.
- */
-
-public class CardAdapter extends ArrayAdapter<CardModel>
-{
+public class CardAdapter extends ArrayAdapter<CardModel> {
    Context context;
-    public CardAdapter(Context context, ArrayList<CardModel> objects)
-    {
+    public CardAdapter(Context context, ArrayList<CardModel> objects) {
         super(context,0, objects);
         this.context=context;
     }

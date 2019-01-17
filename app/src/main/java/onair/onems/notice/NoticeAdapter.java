@@ -34,12 +34,9 @@ public class NoticeAdapter extends RecyclerView.Adapter<NoticeAdapter.MyViewHold
             subtitle = view.findViewById(R.id.noticeSubtitle);
             date = view.findViewById(R.id.noticeDate);
 
-            view.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    // send selected contact in callback
-                    listener.onNoticeSelected(noticeListFiltered.get(getAdapterPosition()));
-                }
+            view.setOnClickListener(view1 -> {
+                // send selected contact in callback
+                listener.onNoticeSelected(noticeListFiltered.get(getAdapterPosition()));
             });
         }
     }

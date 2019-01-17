@@ -284,6 +284,7 @@ public class ExamRoutineMainScreen extends SideNavigationMenuParentActivity {
 
     private void SessionDataGetRequest() {
         if (StaticHelperClass.isNetworkAvailable(this)) {
+            dialog.show();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
                     .addConverterFactory(ScalarsConverterFactory.create())
@@ -306,11 +307,13 @@ public class ExamRoutineMainScreen extends SideNavigationMenuParentActivity {
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseSessionJsonData(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
+                            dialog.dismiss();
                             Toast.makeText(ExamRoutineMainScreen.this,"Session not found!!! ",
                                     Toast.LENGTH_LONG).show();
                         }
@@ -354,6 +357,7 @@ public class ExamRoutineMainScreen extends SideNavigationMenuParentActivity {
 
     private void MediumDataGetRequest() {
         if(StaticHelperClass.isNetworkAvailable(this)) {
+            dialog.show();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
                     .addConverterFactory(ScalarsConverterFactory.create())
@@ -376,11 +380,13 @@ public class ExamRoutineMainScreen extends SideNavigationMenuParentActivity {
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseMediumJsonData(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
+                            dialog.dismiss();
                             Toast.makeText(ExamRoutineMainScreen.this,"Medium not found!!! ",
                                     Toast.LENGTH_LONG).show();
                         }
@@ -425,6 +431,7 @@ public class ExamRoutineMainScreen extends SideNavigationMenuParentActivity {
 
     private void ClassDataGetRequest() {
         if(StaticHelperClass.isNetworkAvailable(this)) {
+            dialog.show();
             CheckSelectedData();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
@@ -448,11 +455,13 @@ public class ExamRoutineMainScreen extends SideNavigationMenuParentActivity {
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseClassJsonData(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
+                            dialog.dismiss();
                             Toast.makeText(ExamRoutineMainScreen.this,"Class not found!!! ",
                                     Toast.LENGTH_LONG).show();
                         }
@@ -496,6 +505,7 @@ public class ExamRoutineMainScreen extends SideNavigationMenuParentActivity {
 
     private void ExamDataGetRequest() {
         if (StaticHelperClass.isNetworkAvailable(this)) {
+            dialog.show();
             CheckSelectedData();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
@@ -519,11 +529,13 @@ public class ExamRoutineMainScreen extends SideNavigationMenuParentActivity {
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseExamJsonData(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
+                            dialog.dismiss();
                             Toast.makeText(ExamRoutineMainScreen.this,"Exam not found!!! ",
                                     Toast.LENGTH_LONG).show();
                         }
@@ -571,6 +583,7 @@ public class ExamRoutineMainScreen extends SideNavigationMenuParentActivity {
 
     private void ExamRoutineDataGetRequest() {
         if (StaticHelperClass.isNetworkAvailable(this)) {
+            dialog.show();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
                     .addConverterFactory(ScalarsConverterFactory.create())
@@ -593,11 +606,13 @@ public class ExamRoutineMainScreen extends SideNavigationMenuParentActivity {
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseExamRoutineJsonData(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
+                            dialog.dismiss();
                             Toast.makeText(ExamRoutineMainScreen.this,"Routine not found!!! ",
                                     Toast.LENGTH_LONG).show();
                         }
@@ -630,7 +645,7 @@ public class ExamRoutineMainScreen extends SideNavigationMenuParentActivity {
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else if(UserTypeID == 1) {

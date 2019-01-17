@@ -2,6 +2,8 @@ package onair.onems.routine;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
@@ -27,6 +29,7 @@ import io.reactivex.schedulers.Schedulers;
 import onair.onems.R;
 import onair.onems.Services.RetrofitNetworkService;
 import onair.onems.Services.StaticHelperClass;
+import onair.onems.mainactivities.CommonProgressDialog;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -37,6 +40,7 @@ public class Monday extends Fragment {
     private RoutineAdapter mAdapter;
     private RecyclerView recyclerView;
     private Disposable finalDisposer;
+    public CommonProgressDialog dialog;
 
     @Override
     public void onDestroy() {
@@ -59,6 +63,9 @@ public class Monday extends Fragment {
         View rootView = inflater.inflate(R.layout.routine_day_pager_item, container, false);
         recyclerView = rootView.findViewById(R.id.routinePeriods);
 
+        dialog = new CommonProgressDialog(getActivity());
+        Objects.requireNonNull(dialog.getWindow()).setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        dialog.setCancelable(false);
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         long instituteID = prefs.getLong("InstituteID", 0);
         long shiftID = prefs.getLong("ShiftID", 0);
@@ -107,6 +114,7 @@ public class Monday extends Fragment {
     void mondayRoutineDataGetRequest(String ShiftID, String MediumID, String ClassID, String SectionID,
                                      String DepartmentID, String DayID, String InstituteID) {
         if(StaticHelperClass.isNetworkAvailable(Objects.requireNonNull(getActivity()))) {
+            dialog.show();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
                     .addConverterFactory(ScalarsConverterFactory.create())
@@ -134,6 +142,7 @@ public class Monday extends Fragment {
 
                         @Override
                         public void onNext(String response) {
+                            dialog.show();
                             mAdapter = new RoutineAdapter(getActivity(), response, UserTypeID);
                             RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity());
                             recyclerView.setLayoutManager(mLayoutManager);
@@ -148,6 +157,7 @@ public class Monday extends Fragment {
 
                         @Override
                         public void onError(Throwable e) {
+                            dialog.dismiss();
                             Toast.makeText(getActivity() ,"Error getting routine !!!",Toast.LENGTH_LONG).show();
                         }
                     });

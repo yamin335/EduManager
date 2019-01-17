@@ -14,7 +14,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -47,8 +46,6 @@ public class ClientCommunicationDetailList extends SideNavigationMenuParentActiv
     private DetailListAdapter mAdapter;
     private ArrayList<JSONObject> detailList;
     private int NewClientID = 0;
-    private ProgressBar progressBar;
-    private View whiteBackground;
     private CompositeDisposable finalDisposer = new CompositeDisposable();
 
     @Override
@@ -78,18 +75,13 @@ public class ClientCommunicationDetailList extends SideNavigationMenuParentActiv
 
         LayoutInflater inflater = (LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         final View childActivityLayout = Objects.requireNonNull(inflater).inflate(R.layout.client_communication_detail_list, null);
-        LinearLayout parentActivityLayout = (LinearLayout) findViewById(R.id.contentMain);
+        LinearLayout parentActivityLayout = findViewById(R.id.contentMain);
         parentActivityLayout.addView(childActivityLayout, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
 
         detailList = new ArrayList<>();
         RecyclerView recyclerView = findViewById(R.id.recyclerView);
         mAdapter = new DetailListAdapter(this, detailList, this);
         empty = findViewById(R.id.empty);
-
-        whiteBackground = findViewById(R.id.whiteBackground);
-        progressBar = findViewById(R.id.progressBar);
-        progressBar.setVisibility(View.INVISIBLE);
-        whiteBackground.setVisibility(View.INVISIBLE);
 
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(mLayoutManager);
@@ -119,59 +111,66 @@ public class ClientCommunicationDetailList extends SideNavigationMenuParentActiv
     }
 
     private void getDetailListData(int NewClientID) {
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(getString(R.string.baseUrl))
-                .addConverterFactory(ScalarsConverterFactory.create())
-                .addConverterFactory(GsonConverterFactory.create())
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                .build();
+        if (StaticHelperClass.isNetworkAvailable(this)) {
+            dialog.show();
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(getString(R.string.baseUrl))
+                    .addConverterFactory(ScalarsConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .build();
 
-        Observable<String> detailListObservable = retrofit
-                .create(RetrofitNetworkService.class)
-                .getDetailList(NewClientID)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .unsubscribeOn(Schedulers.io());
+            Observable<String> detailListObservable = retrofit
+                    .create(RetrofitNetworkService.class)
+                    .getDetailList(NewClientID)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io());
 
-        finalDisposer.add( detailListObservable
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .unsubscribeOn(Schedulers.io())
-                .subscribeWith(new DisposableObserver<String>() {
+            finalDisposer.add( detailListObservable
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io())
+                    .subscribeWith(new DisposableObserver<String>() {
 
-                    @Override
-                    public void onNext(String detailListData) {
-                        if (detailListData!= null) {
-                            if (!detailListData.equals("")&&!detailListData.equals("[]")) {
-                                empty.setVisibility(View.GONE);
-                                detailList.clear();
-                                try {
-                                    JSONArray jsonArray = new JSONArray(detailListData);
-                                    for (int i = 0; i<jsonArray.length(); i++) {
-                                        detailList.add(i, jsonArray.getJSONObject(i));
+                        @Override
+                        public void onNext(String detailListData) {
+                            dialog.dismiss();
+                            if (detailListData!= null) {
+                                if (!detailListData.equals("")&&!detailListData.equals("[]")) {
+                                    empty.setVisibility(View.GONE);
+                                    detailList.clear();
+                                    try {
+                                        JSONArray jsonArray = new JSONArray(detailListData);
+                                        for (int i = 0; i<jsonArray.length(); i++) {
+                                            detailList.add(i, jsonArray.getJSONObject(i));
+                                        }
+                                        mAdapter.notifyDataSetChanged();
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
                                     }
-                                    mAdapter.notifyDataSetChanged();
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
                                 }
                             }
                         }
-                    }
 
-                    @Override
-                    public void onError(Throwable e) {
+                        @Override
+                        public void onError(Throwable e) {
+                            dialog.dismiss();
+                        }
 
-                    }
-
-                    @Override
-                    public void onComplete() {
-                    }
-                }));
+                        @Override
+                        public void onComplete() {
+                        }
+                    }));
+        } else {
+            Toast.makeText(this,"Please check your internet connection and select again!!! ",
+                    Toast.LENGTH_LONG).show();
+        }
     }
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else if(UserTypeID == 1) {
@@ -191,10 +190,7 @@ public class ClientCommunicationDetailList extends SideNavigationMenuParentActiv
 
     private void WorkOrderGetRequest() {
         if(StaticHelperClass.isNetworkAvailable(this)) {
-
-            progressBar.setVisibility(View.VISIBLE);
-            whiteBackground.setVisibility(View.VISIBLE);
-
+            dialog.show();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
                     .addConverterFactory(ScalarsConverterFactory.create())
@@ -217,8 +213,7 @@ public class ClientCommunicationDetailList extends SideNavigationMenuParentActiv
 
                         @Override
                         public void onNext(String workOrderReturnValue) {
-                            progressBar.setVisibility(View.INVISIBLE);
-                            whiteBackground.setVisibility(View.INVISIBLE);
+                            dialog.dismiss();
                             Intent workOrderIntent = new Intent(ClientCommunicationDetailList.this, WorkOrder.class);
                             if (!workOrderReturnValue.equalsIgnoreCase("") && !workOrderReturnValue.equalsIgnoreCase("null")
                                     && !workOrderReturnValue.equalsIgnoreCase("[]")) {
@@ -235,8 +230,7 @@ public class ClientCommunicationDetailList extends SideNavigationMenuParentActiv
 
                         @Override
                         public void onError(Throwable e) {
-                            progressBar.setVisibility(View.INVISIBLE);
-                            whiteBackground.setVisibility(View.INVISIBLE);
+                            dialog.dismiss();
                             Intent workOrderIntent = new Intent(ClientCommunicationDetailList.this, WorkOrder.class);
                             workOrderIntent.putExtra("clientData", clientData);
                             startActivity(workOrderIntent);

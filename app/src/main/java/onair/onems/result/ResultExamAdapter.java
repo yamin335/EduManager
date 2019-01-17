@@ -1,7 +1,6 @@
 package onair.onems.result;
 
 import android.app.Activity;
-import android.app.Fragment;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -14,7 +13,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import onair.onems.R;
-import onair.onems.syllabus.SyllabusMainScreen;
 
 public class ResultExamAdapter extends RecyclerView.Adapter<ResultExamAdapter.MyViewHolder> {
     private JSONArray exams;
@@ -28,16 +26,13 @@ public class ResultExamAdapter extends RecyclerView.Adapter<ResultExamAdapter.My
             super(view);
             examName = view.findViewById(R.id.name);
 
-            view.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    // send selected exam in callback
-                    try {
-                        selectedListener.onExamSelected(exams.getJSONObject(getAdapterPosition()));
-                        dismissListener.onExamSelected(exams.getJSONObject(getAdapterPosition()));
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
+            view.setOnClickListener(view1 -> {
+                // send selected exam in callback
+                try {
+                    selectedListener.onExamSelected(exams.getJSONObject(getAdapterPosition()));
+                    dismissListener.onExamSelected(exams.getJSONObject(getAdapterPosition()));
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
             });
         }

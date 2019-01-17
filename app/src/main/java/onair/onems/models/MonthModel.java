@@ -1,9 +1,5 @@
 package onair.onems.models;
 
-/**
- * Created by onAir on 12-Mar-18.
- */
-
 public class MonthModel {
     private int MonthID = 0;
     private String MonthName = "";

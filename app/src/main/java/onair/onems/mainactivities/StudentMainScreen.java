@@ -5,7 +5,6 @@ import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -34,6 +33,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Objects;
 import java.util.Random;
 
 import io.reactivex.Observable;
@@ -81,6 +81,7 @@ public class StudentMainScreen extends AppCompatActivity {
     private BroadcastReceiver mRegistrationBroadcastReceiver;
     private boolean returnValue = false;
     private CompositeDisposable finalDisposer = new CompositeDisposable();
+    public CommonProgressDialog dialog;
 
     @Override
     protected void onDestroy() {
@@ -140,117 +141,92 @@ public class StudentMainScreen extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.dashboard_student);
 
+        dialog = new CommonProgressDialog(this);
+        Objects.requireNonNull(dialog.getWindow()).setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        dialog.setCancelable(false);
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         InstituteID = prefs.getLong("InstituteID",0);
         LoggedUserID = prefs.getString("UserID", "0");
         UserName = prefs.getString("UserName", "0");
         dimView = findViewById(R.id.dim);
-        dimView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(isFabOpen){
-                    animateFAB();
-                }
+        dimView.setOnClickListener(v -> {
+            if(isFabOpen){
+                animateFAB();
             }
         });
         initializeFabAnimations();
         fabMenu = findViewById(R.id.floatingMenu);
 //        fabMenu.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#5f27cd")));
         fabMenu.setRippleColor(Color.parseColor("#341f97"));
-        fabMenu.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                animateFAB();
-            }
-        });
+        fabMenu.setOnClickListener(v -> animateFAB());
 
         fabLogout = findViewById(R.id.log_out);
 //        fabLogout.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#5f27cd")));
         fabLogout.setRippleColor(Color.parseColor("#341f97"));
-        fabLogout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                logOut();
-            }
-        });
+        fabLogout.setOnClickListener(v -> logOut());
 
         fabChangePassword = findViewById(R.id.change_password);
 //        fabChangePassword.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#5f27cd")));
         fabChangePassword.setRippleColor(Color.parseColor("#341f97"));
-        fabChangePassword.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ChangePasswordDialog changePasswordDialog = new ChangePasswordDialog(StudentMainScreen.this,
-                        StudentMainScreen.this, LoggedUserID, UserName, InstituteID);
-                changePasswordDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-                changePasswordDialog.setCancelable(false);
-                changePasswordDialog.show();
-            }
+        fabChangePassword.setOnClickListener(v -> {
+            ChangePasswordDialog changePasswordDialog = new ChangePasswordDialog(StudentMainScreen.this,
+                    StudentMainScreen.this, LoggedUserID, UserName, InstituteID);
+            Objects.requireNonNull(changePasswordDialog.getWindow()).setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            changePasswordDialog.setCancelable(false);
+            changePasswordDialog.show();
         });
 
         fabChangeUserType = findViewById(R.id.change_user_type);
 //        fabChangeUserType.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#5f27cd")));
         fabChangeUserType.setRippleColor(Color.parseColor("#341f97"));
-        fabChangeUserType.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ChangeUserTypeDialog changeUserTypeDialog = new ChangeUserTypeDialog(StudentMainScreen.this,
-                        StudentMainScreen.this);
-                changeUserTypeDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-                changeUserTypeDialog.setCancelable(false);
-                changeUserTypeDialog.show();
-            }
+        fabChangeUserType.setOnClickListener(v -> {
+            ChangeUserTypeDialog changeUserTypeDialog = new ChangeUserTypeDialog(StudentMainScreen.this,
+                    StudentMainScreen.this);
+            Objects.requireNonNull(changeUserTypeDialog.getWindow()).setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            changeUserTypeDialog.setCancelable(false);
+            changeUserTypeDialog.show();
         });
 
         cardLogout = findViewById(R.id.card_log_out);
-        cardLogout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                SharedPreferences sharedPreferences  = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
-                SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.putBoolean("LogInState", false);
-                editor.apply();
-                Intent intent = new Intent(getApplicationContext(), LoginScreen.class);
-                startActivity(intent);
-                finish();
-            }
+        cardLogout.setOnClickListener(v -> {
+            SharedPreferences sharedPreferences  = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putBoolean("LogInState", false);
+            editor.apply();
+            Intent intent = new Intent(getApplicationContext(), LoginScreen.class);
+            startActivity(intent);
+            finish();
         });
 
         cardChangePassword = findViewById(R.id.card_change_password);
-        cardChangePassword.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ChangePasswordDialog changePasswordDialog = new ChangePasswordDialog(StudentMainScreen.this,
-                        StudentMainScreen.this, LoggedUserID, UserName, InstituteID);
-                changePasswordDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-                changePasswordDialog.setCancelable(false);
-                changePasswordDialog.show();
-            }
+        cardChangePassword.setOnClickListener(v -> {
+            ChangePasswordDialog changePasswordDialog = new ChangePasswordDialog(StudentMainScreen.this,
+                    StudentMainScreen.this, LoggedUserID, UserName, InstituteID);
+            Objects.requireNonNull(changePasswordDialog.getWindow()).setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            changePasswordDialog.setCancelable(false);
+            changePasswordDialog.show();
         });
 
         cardChangeUserType = findViewById(R.id.card_change_user_type);
-        cardChangeUserType.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ChangeUserTypeDialog changeUserTypeDialog = new ChangeUserTypeDialog(StudentMainScreen.this,
-                        StudentMainScreen.this);
-                changeUserTypeDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-                changeUserTypeDialog.setCancelable(false);
-                changeUserTypeDialog.show();
-            }
+        cardChangeUserType.setOnClickListener(v -> {
+            ChangeUserTypeDialog changeUserTypeDialog = new ChangeUserTypeDialog(StudentMainScreen.this,
+                    StudentMainScreen.this);
+            Objects.requireNonNull(changeUserTypeDialog.getWindow()).setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            changeUserTypeDialog.setCancelable(false);
+            changeUserTypeDialog.show();
         });
 
-        TextView InstituteName =(TextView) findViewById(R.id.InstituteName);
-        TextView userType = (TextView) findViewById(R.id.userType);
+        TextView InstituteName = findViewById(R.id.InstituteName);
+        TextView userType = findViewById(R.id.userType);
 
         SharedPreferences sharedPre = PreferenceManager.getDefaultSharedPreferences(this);
         String name = sharedPre.getString("InstituteName","School Name");
         final int user = sharedPre.getInt("UserTypeID",0);
 
         if(user == 3) {
-            userType.setText("Student");
+            userType.setText(R.string.student1);
         } else if(user == 5){
-            userType.setText("Guardian");
+            userType.setText(R.string.guardian1);
         }
         InstituteName.setText(name);
         CardView notice = findViewById(R.id.notice);
@@ -263,92 +239,67 @@ public class StudentMainScreen extends AppCompatActivity {
         CardView exam = findViewById(R.id.exam);
 
         // Notice module start point
-        notice.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent mainIntent = new Intent(StudentMainScreen.this, NoticeMainScreen.class);
-                StudentMainScreen.this.startActivity(mainIntent);
-                finish();
-            }
+        notice.setOnClickListener(v -> {
+            Intent mainIntent = new Intent(StudentMainScreen.this, NoticeMainScreen.class);
+            StudentMainScreen.this.startActivity(mainIntent);
+            finish();
         });
 
         // Routine module start point
-        routine.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent mainIntent = new Intent(StudentMainScreen.this, RoutineMainScreen.class);
-                startActivity(mainIntent);
-                finish();
-            }
+        routine.setOnClickListener(v -> {
+            Intent mainIntent = new Intent(StudentMainScreen.this, RoutineMainScreen.class);
+            startActivity(mainIntent);
+            finish();
         });
 
         // Attendance module start point
-        Attendance.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent mainIntent = new Intent(StudentMainScreen.this, StudentAttendanceReport.class);
-                startActivity(mainIntent);
-                finish();
-            }
+        Attendance.setOnClickListener(v -> {
+            Intent mainIntent = new Intent(StudentMainScreen.this, StudentAttendanceReport.class);
+            startActivity(mainIntent);
+            finish();
         });
 
         // Syllabus module start point
-        syllabus.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent mainIntent = new Intent(StudentMainScreen.this, SyllabusMainScreen.class);
-                startActivity(mainIntent);
-                finish();
-            }
+        syllabus.setOnClickListener(v -> {
+            Intent mainIntent = new Intent(StudentMainScreen.this, SyllabusMainScreen.class);
+            startActivity(mainIntent);
+            finish();
         });
 
         // Exam module start point
-        homework.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent mainIntent = new Intent(StudentMainScreen.this, HomeworkMainScreen.class);
-                StudentMainScreen.this.startActivity(mainIntent);
-                finish();
-            }
+        homework.setOnClickListener(v -> {
+            Intent mainIntent = new Intent(StudentMainScreen.this, HomeworkMainScreen.class);
+            StudentMainScreen.this.startActivity(mainIntent);
+            finish();
         });
 
         // Result module start point
-        result.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent mainIntent = new Intent(StudentMainScreen.this, ResultMainScreen.class);
-                StudentMainScreen.this.startActivity(mainIntent);
-                finish();
-            }
+        result.setOnClickListener(v -> {
+            Intent mainIntent = new Intent(StudentMainScreen.this, ResultMainScreen.class);
+            StudentMainScreen.this.startActivity(mainIntent);
+            finish();
         });
 
         // Fees module start point
-        Fees.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(user == 3)
-                {
-                    Intent mainIntent = new Intent(StudentMainScreen.this, FeeMainScreen.class);
-                    StudentMainScreen.this.startActivity(mainIntent);
-                    finish();
-                }
+        Fees.setOnClickListener(v -> {
+            if(user == 3) {
+                Intent mainIntent = new Intent(StudentMainScreen.this, FeeMainScreen.class);
+                StudentMainScreen.this.startActivity(mainIntent);
+                finish();
+            }
 //                else
 //                {
 //                    Intent mainIntent = new Intent(StudentMainScreen.this,StudentList.class);
 //                    StudentMainScreen.this.startActivity(mainIntent);
 //                    finish();
 //                }
-            }
         });
 
         // Contact module start point
-        exam.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        exam.setOnClickListener(v -> {
 //                Intent mainIntent = new Intent(StudentMainScreen.this, NotificationMainScreen.class);
 //                startActivity(mainIntent);
 //                finish();
-            }
         });
 
         notificationCounter = findViewById(R.id.notificationCounter);
@@ -372,53 +323,41 @@ public class StudentMainScreen extends AppCompatActivity {
         textNotification = findViewById(R.id.textNotification);
         textContacts = findViewById(R.id.textContact);
 
-        dashboard.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                refreshBottomNavBar();
-                dashboard.setBackgroundColor(Color.parseColor("#f9f7f7"));
-                iconDashboard.setColorFilter(Color.parseColor("#0550b7"));
-                textDashboard.setTextColor(Color.parseColor("#0550b7"));
-            }
+        dashboard.setOnClickListener(v -> {
+            refreshBottomNavBar();
+            dashboard.setBackgroundColor(Color.parseColor("#f9f7f7"));
+            iconDashboard.setColorFilter(Color.parseColor("#0550b7"));
+            textDashboard.setTextColor(Color.parseColor("#0550b7"));
         });
 
-        profile.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                refreshBottomNavBar();
-                profile.setBackgroundColor(Color.parseColor("#f9f7f7"));
-                iconProfile.setColorFilter(Color.parseColor("#0550b7"));
-                textProfile.setTextColor(Color.parseColor("#0550b7"));
-                Intent mainIntent = new Intent(StudentMainScreen.this, Profile.class);
-                startActivity(mainIntent);
-                finish();
-            }
+        profile.setOnClickListener(v -> {
+            refreshBottomNavBar();
+            profile.setBackgroundColor(Color.parseColor("#f9f7f7"));
+            iconProfile.setColorFilter(Color.parseColor("#0550b7"));
+            textProfile.setTextColor(Color.parseColor("#0550b7"));
+            Intent mainIntent = new Intent(StudentMainScreen.this, Profile.class);
+            startActivity(mainIntent);
+            finish();
         });
 
-        notification.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                refreshBottomNavBar();
-                notification.setBackgroundColor(Color.parseColor("#f9f7f7"));
-                iconNotification.setColorFilter(Color.parseColor("#0550b7"));
-                textNotification.setTextColor(Color.parseColor("#0550b7"));
-                Intent mainIntent = new Intent(StudentMainScreen.this,NotificationMainScreen.class);
-                startActivity(mainIntent);
-                finish();
-            }
+        notification.setOnClickListener(v -> {
+            refreshBottomNavBar();
+            notification.setBackgroundColor(Color.parseColor("#f9f7f7"));
+            iconNotification.setColorFilter(Color.parseColor("#0550b7"));
+            textNotification.setTextColor(Color.parseColor("#0550b7"));
+            Intent mainIntent = new Intent(StudentMainScreen.this,NotificationMainScreen.class);
+            startActivity(mainIntent);
+            finish();
         });
 
-        contacts.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                refreshBottomNavBar();
-                contacts.setBackgroundColor(Color.parseColor("#f9f7f7"));
-                iconContacts.setColorFilter(Color.parseColor("#0550b7"));
-                textContacts.setTextColor(Color.parseColor("#0550b7"));
-                Intent mainIntent = new Intent(StudentMainScreen.this,ContactsMainScreen.class);
-                startActivity(mainIntent);
-                finish();
-            }
+        contacts.setOnClickListener(v -> {
+            refreshBottomNavBar();
+            contacts.setBackgroundColor(Color.parseColor("#f9f7f7"));
+            iconContacts.setColorFilter(Color.parseColor("#0550b7"));
+            textContacts.setTextColor(Color.parseColor("#0550b7"));
+            Intent mainIntent = new Intent(StudentMainScreen.this,ContactsMainScreen.class);
+            startActivity(mainIntent);
+            finish();
         });
 
         mRegistrationBroadcastReceiver = new BroadcastReceiver() {
@@ -426,7 +365,7 @@ public class StudentMainScreen extends AppCompatActivity {
             public void onReceive(Context context, Intent intent) {
 
                 // checking for type intent filter
-                if (intent.getAction().equals(Config.REGISTRATION_COMPLETE)) {
+                if (Objects.requireNonNull(intent.getAction()).equals(Config.REGISTRATION_COMPLETE)) {
                     // gcm successfully registered
                     // now subscribe to `global` topic to receive app wide notifications
                     FirebaseMessaging.getInstance().subscribeToTopic(Config.TOPIC_GLOBAL);
@@ -603,16 +542,8 @@ public class StudentMainScreen extends AppCompatActivity {
             builder.setIcon(R.drawable.onair);
             builder.setMessage("Do you want to exit?")
                     .setCancelable(false)
-                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            finish();
-                        }
-                    })
-                    .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            dialog.cancel();
-                        }
-                    });
+                    .setPositiveButton("Yes", (dialog, id) -> finish())
+                    .setNegativeButton("No", (dialog, id) -> dialog.cancel());
             AlertDialog alert = builder.create();
             alert.show();
         }
@@ -620,6 +551,7 @@ public class StudentMainScreen extends AppCompatActivity {
 
     private boolean logOut() {
         if (StaticHelperClass.isNetworkAvailable(this)) {
+            dialog.show();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
                     .addConverterFactory(ScalarsConverterFactory.create())
@@ -642,11 +574,13 @@ public class StudentMainScreen extends AppCompatActivity {
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             doLogOut(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
+                            dialog.dismiss();
                             returnValue = false;
                             Toast.makeText(StudentMainScreen.this,"Server error while logging out!!! ",
                                     Toast.LENGTH_LONG).show();

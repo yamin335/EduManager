@@ -1,9 +1,5 @@
 package onair.onems.fee;
 
-/**
- * Created by hp on 1/24/2018.
- */
-
 import android.app.ProgressDialog;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
@@ -32,10 +28,6 @@ import de.codecrafters.tableview.toolkit.SimpleTableDataAdapter;
 import de.codecrafters.tableview.toolkit.SimpleTableHeaderAdapter;
 import de.codecrafters.tableview.toolkit.TableDataRowBackgroundProviders;
 import onair.onems.R;
-
-/**
- * Created by hp on 1/23/2018.
- */
 
 public class TotalFees  extends AppCompatActivity
 {

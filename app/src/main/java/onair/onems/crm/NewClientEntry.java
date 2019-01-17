@@ -31,7 +31,6 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -98,8 +97,6 @@ public class NewClientEntry extends SideNavigationMenuParentActivity implements 
     private static final int PHOTO = 2;
     private CoordinatorLayout coordinatorLayout;
     private JsonObject newClient;
-    private ProgressBar progressBar;
-    private View whiteBackground;
     private TextView instituteName, contactPerson, contactNumber, noOfStudent, noOfTeacher, instituteAddress, comment, ShowDate;
     private DatePickerDialog datePickerDialog;
     private String selectedDate = "", clientData = "";
@@ -123,7 +120,7 @@ public class NewClientEntry extends SideNavigationMenuParentActivity implements 
 
         LayoutInflater inflater = (LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         final View childActivityLayout = Objects.requireNonNull(inflater).inflate(R.layout.client_entry_new, null);
-        LinearLayout parentActivityLayout = (LinearLayout) findViewById(R.id.contentMain);
+        LinearLayout parentActivityLayout = findViewById(R.id.contentMain);
         parentActivityLayout.addView(childActivityLayout, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
 
         newClient = new JsonObject();
@@ -235,10 +232,6 @@ public class NewClientEntry extends SideNavigationMenuParentActivity implements 
         }
 
         coordinatorLayout = findViewById(R.id.coordinator_layout);
-        whiteBackground = findViewById(R.id.whiteBackground);
-        progressBar = findViewById(R.id.progressBar);
-        progressBar.setVisibility(View.INVISIBLE);
-        whiteBackground.setVisibility(View.INVISIBLE);
 
         allInstituteType= new ArrayList<>();
         allPriority = new ArrayList<>();
@@ -431,235 +424,253 @@ public class NewClientEntry extends SideNavigationMenuParentActivity implements 
     }
 
     private void postNewClientToServer() {
-//        progressBar.setVisibility(View.VISIBLE);
-//        whiteBackground.setVisibility(View.VISIBLE);
+        if (StaticHelperClass.isNetworkAvailable(this)) {
+            dialog.show();
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(getString(R.string.baseUrl))
+                    .addConverterFactory(ScalarsConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .build();
 
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(getString(R.string.baseUrl))
-                .addConverterFactory(ScalarsConverterFactory.create())
-                .addConverterFactory(GsonConverterFactory.create())
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                .build();
+            Observable<String> observable = retrofit
+                    .create(RetrofitNetworkService.class)
+                    .postNewClient(newClient)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io());
 
-        Observable<String> observable = retrofit
-                .create(RetrofitNetworkService.class)
-                .postNewClient(newClient)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .unsubscribeOn(Schedulers.io());
+            finalDisposer.add( observable
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io())
+                    .subscribeWith(new DisposableObserver<String>() {
 
-        finalDisposer.add( observable
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .unsubscribeOn(Schedulers.io())
-                .subscribeWith(new DisposableObserver<String>() {
-
-                    @Override
-                    public void onNext(String response) {
-                        if (response!= null) {
-                            if (!response.equals("")&&!response.equals("[]")) {
-                                Toast.makeText(NewClientEntry.this,"Success",Toast.LENGTH_LONG).show();
-                                if (forUpdate && UserTypeID == 1) {
-                                    Intent mainIntent = new Intent(NewClientEntry.this, ClientList.class);
-                                    startActivity(mainIntent);
-                                    finish();
+                        @Override
+                        public void onNext(String response) {
+                            dialog.dismiss();
+                            if (response!= null) {
+                                if (!response.equals("")&&!response.equals("[]")) {
+                                    Toast.makeText(NewClientEntry.this,"Success",Toast.LENGTH_LONG).show();
+                                    if (forUpdate && UserTypeID == 1) {
+                                        Intent mainIntent = new Intent(NewClientEntry.this, ClientList.class);
+                                        startActivity(mainIntent);
+                                        finish();
+                                    }
                                 }
                             }
                         }
-                    }
 
-                    @Override
-                    public void onError(Throwable e) {
-                        Toast.makeText(NewClientEntry.this,"Not Successful !!!",Toast.LENGTH_LONG).show();
-                    }
+                        @Override
+                        public void onError(Throwable e) {
+                            dialog.dismiss();
+                            Toast.makeText(NewClientEntry.this,"Not Successful !!!",Toast.LENGTH_LONG).show();
+                        }
 
-                    @Override
-                    public void onComplete() {
+                        @Override
+                        public void onComplete() {
 
-                    }
-                }));
+                        }
+                    }));
+        } else {
+            Toast.makeText(this,"Please check your internet connection and select again!!! ",
+                    Toast.LENGTH_LONG).show();
+        }
     }
 
     private void entryNewClientByPostingDataToServer() {
-        Retrofit retrofit = new Retrofit.Builder()
-//                .baseUrl(getString(R.string.baseUrl))
-                .baseUrl("http://172.16.1.2:4000")
-                .addConverterFactory(ScalarsConverterFactory.create())
-                .addConverterFactory(GsonConverterFactory.create())
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                .build();
+        if (StaticHelperClass.isNetworkAvailable(this)) {
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(getString(R.string.baseUrl))
+                    .addConverterFactory(ScalarsConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .build();
 
-        List<MultipartBody.Part> vCardParts = new ArrayList<>();
-        List<MultipartBody.Part> photoParts = new ArrayList<>();
+            List<MultipartBody.Part> vCardParts = new ArrayList<>();
+            List<MultipartBody.Part> photoParts = new ArrayList<>();
 
-        if(vCardFileArray.size()<1 && photoFileArray.size()>=1) {
-            for (int i=0; i<photoFileArray.size(); i++) {
-                photoParts.add(prepareFilePart(photoFileArray.get(i)));
-            }
+            if(vCardFileArray.size()<1 && photoFileArray.size()>=1) {
+                dialog.show();
+                for (int i=0; i<photoFileArray.size(); i++) {
+                    photoParts.add(prepareFilePart(photoFileArray.get(i)));
+                }
 
-            Observable<String> photoObservable = retrofit
-                    .create(RetrofitNetworkService.class)
-                    .uploadMultipleFilesDynamic(photoParts)
-                    .subscribeOn(Schedulers.newThread())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .unsubscribeOn(Schedulers.io());
+                Observable<String> photoObservable = retrofit
+                        .create(RetrofitNetworkService.class)
+                        .uploadMultipleFilesDynamic(photoParts)
+                        .subscribeOn(Schedulers.newThread())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .unsubscribeOn(Schedulers.io());
 
-            finalDisposer.add(photoObservable
-                    .observeOn(Schedulers.io())
-                    .subscribeOn(AndroidSchedulers.mainThread())
-                    .unsubscribeOn(Schedulers.io())
-                    .subscribeWith(new DisposableObserver<String>() {
+                finalDisposer.add(photoObservable
+                        .observeOn(Schedulers.io())
+                        .subscribeOn(AndroidSchedulers.mainThread())
+                        .unsubscribeOn(Schedulers.io())
+                        .subscribeWith(new DisposableObserver<String>() {
 
-                        @Override
-                        public void onNext(String combinedReturnValue) {
-                            JsonParser parser = new JsonParser();
-                            JsonArray photoUrls = parser.parse(combinedReturnValue).getAsJsonArray();
-                            JsonArray parsedPhotoUrls = new JsonArray();
-                            for(int i = 0; i<photoUrls.size(); i++) {
-                                JsonObject jsonObject = new JsonObject();
-                                if(photoUrls.get(i).isJsonObject()) {
-                                    JsonObject tempJsonObject = photoUrls.get(i).getAsJsonObject();
-                                    jsonObject.addProperty("PhotoID", 0);
-                                    jsonObject.addProperty("PhotoURL", tempJsonObject.get("path").getAsString());
+                            @Override
+                            public void onNext(String combinedReturnValue) {
+                                dialog.dismiss();
+                                JsonParser parser = new JsonParser();
+                                JsonArray photoUrls = parser.parse(combinedReturnValue).getAsJsonArray();
+                                JsonArray parsedPhotoUrls = new JsonArray();
+                                for(int i = 0; i<photoUrls.size(); i++) {
+                                    JsonObject jsonObject = new JsonObject();
+                                    if(photoUrls.get(i).isJsonObject()) {
+                                        JsonObject tempJsonObject = photoUrls.get(i).getAsJsonObject();
+                                        jsonObject.addProperty("PhotoID", 0);
+                                        jsonObject.addProperty("PhotoURL", tempJsonObject.get("path").getAsString());
+                                    }
+                                    parsedPhotoUrls.add(jsonObject);
                                 }
-                                parsedPhotoUrls.add(jsonObject);
+                                newClient.add("Photo", parsedPhotoUrls);
+                                postNewClientToServer();
                             }
-                            newClient.add("Photo", parsedPhotoUrls);
-                            postNewClientToServer();
-                        }
 
-                        @Override
-                        public void onError(Throwable e) {
-                            Log.e("RXANDROID", "onError: " + e.getMessage());
-                        }
+                            @Override
+                            public void onError(Throwable e) {
+                                dialog.dismiss();
+                                Log.e("RXANDROID", "onError: " + e.getMessage());
+                            }
 
-                        @Override
-                        public void onComplete() {
-                            Log.e("COMPLETE", "Complete: ");
-                        }
-                    }));
+                            @Override
+                            public void onComplete() {
+                                Log.e("COMPLETE", "Complete: ");
+                            }
+                        }));
 
-        } else if (photoFileArray.size()<1 && vCardFileArray.size()>=1) {
-            for (int i=0; i<vCardFileArray.size(); i++) {
-                vCardParts.add(prepareFilePart(vCardFileArray.get(i)));
-            }
+            } else if (photoFileArray.size()<1 && vCardFileArray.size()>=1) {
+                dialog.show();
+                for (int i=0; i<vCardFileArray.size(); i++) {
+                    vCardParts.add(prepareFilePart(vCardFileArray.get(i)));
+                }
 
-            Observable<String> vCardObservable = retrofit
-                    .create(RetrofitNetworkService.class)
-                    .uploadMultipleFilesDynamic(vCardParts)
-                    .subscribeOn(Schedulers.newThread())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .unsubscribeOn(Schedulers.io());
+                Observable<String> vCardObservable = retrofit
+                        .create(RetrofitNetworkService.class)
+                        .uploadMultipleFilesDynamic(vCardParts)
+                        .subscribeOn(Schedulers.newThread())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .unsubscribeOn(Schedulers.io());
 
-            finalDisposer.add( vCardObservable
-                    .observeOn(Schedulers.io())
-                    .subscribeOn(AndroidSchedulers.mainThread())
-                    .unsubscribeOn(Schedulers.io())
-                    .subscribeWith(new DisposableObserver<String>() {
+                finalDisposer.add( vCardObservable
+                        .observeOn(Schedulers.io())
+                        .subscribeOn(AndroidSchedulers.mainThread())
+                        .unsubscribeOn(Schedulers.io())
+                        .subscribeWith(new DisposableObserver<String>() {
 
-                        @Override
-                        public void onNext(String combinedReturnValue) {
-                            JsonParser parser = new JsonParser();
-                            JsonArray vCardUrls = parser.parse(combinedReturnValue).getAsJsonArray();
-                            JsonArray parsedVCardUrls = new JsonArray();
-                            for(int i = 0; i<vCardUrls.size(); i++) {
-                                JsonObject jsonObject = new JsonObject();
-                                if(vCardUrls.get(i).isJsonObject()) {
-                                    JsonObject tempJsonObject = vCardUrls.get(i).getAsJsonObject();
-                                    jsonObject.addProperty("VCardID", 0);
-                                    jsonObject.addProperty("VCardURL", tempJsonObject.get("path").getAsString());
+                            @Override
+                            public void onNext(String combinedReturnValue) {
+                                dialog.dismiss();
+                                JsonParser parser = new JsonParser();
+                                JsonArray vCardUrls = parser.parse(combinedReturnValue).getAsJsonArray();
+                                JsonArray parsedVCardUrls = new JsonArray();
+                                for(int i = 0; i<vCardUrls.size(); i++) {
+                                    JsonObject jsonObject = new JsonObject();
+                                    if(vCardUrls.get(i).isJsonObject()) {
+                                        JsonObject tempJsonObject = vCardUrls.get(i).getAsJsonObject();
+                                        jsonObject.addProperty("VCardID", 0);
+                                        jsonObject.addProperty("VCardURL", tempJsonObject.get("path").getAsString());
+                                    }
+                                    parsedVCardUrls.add(jsonObject);
                                 }
-                                parsedVCardUrls.add(jsonObject);
+                                newClient.add("VCard", parsedVCardUrls);
+                                postNewClientToServer();
                             }
-                            newClient.add("VCard", parsedVCardUrls);
-                            postNewClientToServer();
-                        }
 
-                        @Override
-                        public void onError(Throwable e) {
-                            Log.e("RXANDROID", "onError: " + e.getMessage());
-                        }
+                            @Override
+                            public void onError(Throwable e) {
+                                dialog.dismiss();
+                                Log.e("RXANDROID", "onError: " + e.getMessage());
+                            }
 
-                        @Override
-                        public void onComplete() {
-                            Log.e("COMPLETE", "Complete: ");
-                        }
-                    }));
+                            @Override
+                            public void onComplete() {
+                                Log.e("COMPLETE", "Complete: ");
+                            }
+                        }));
 
-        } else if (vCardFileArray.size()<1 && photoFileArray.size()<1){
-            postNewClientToServer();
-        } else if (vCardFileArray.size()>=1 && photoFileArray.size()>=1){
-            for (int i=0; i<vCardFileArray.size(); i++) {
-                vCardParts.add(prepareFilePart(vCardFileArray.get(i)));
-            }
+            } else if (vCardFileArray.size()<1 && photoFileArray.size()<1){
+                postNewClientToServer();
+            } else if (vCardFileArray.size()>=1 && photoFileArray.size()>=1){
+                dialog.show();
+                for (int i=0; i<vCardFileArray.size(); i++) {
+                    vCardParts.add(prepareFilePart(vCardFileArray.get(i)));
+                }
 
-            for (int i=0; i<photoFileArray.size(); i++) {
-                photoParts.add(prepareFilePart(photoFileArray.get(i)));
-            }
+                for (int i=0; i<photoFileArray.size(); i++) {
+                    photoParts.add(prepareFilePart(photoFileArray.get(i)));
+                }
 
-            Observable<String> vCardObservable = retrofit
-                    .create(RetrofitNetworkService.class)
-                    .uploadMultipleFilesDynamic(vCardParts)
-                    .subscribeOn(Schedulers.newThread())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .unsubscribeOn(Schedulers.io());
+                Observable<String> vCardObservable = retrofit
+                        .create(RetrofitNetworkService.class)
+                        .uploadMultipleFilesDynamic(vCardParts)
+                        .subscribeOn(Schedulers.newThread())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .unsubscribeOn(Schedulers.io());
 
-            Observable<String> photoObservable = retrofit
-                    .create(RetrofitNetworkService.class)
-                    .uploadMultipleFilesDynamic(photoParts)
-                    .subscribeOn(Schedulers.newThread())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .unsubscribeOn(Schedulers.io());
+                Observable<String> photoObservable = retrofit
+                        .create(RetrofitNetworkService.class)
+                        .uploadMultipleFilesDynamic(photoParts)
+                        .subscribeOn(Schedulers.newThread())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .unsubscribeOn(Schedulers.io());
 
-            Observable<String> combinedReturnValueObservable = Observable.zip(vCardObservable, photoObservable, (vCardResponse, photoResponse) -> vCardResponse+"--"+photoResponse);
+                Observable<String> combinedReturnValueObservable = Observable.zip(vCardObservable, photoObservable, (vCardResponse, photoResponse) -> vCardResponse+"--"+photoResponse);
 
-            finalDisposer.add(combinedReturnValueObservable
-                    .observeOn(Schedulers.io())
-                    .subscribeOn(AndroidSchedulers.mainThread())
-                    .unsubscribeOn(Schedulers.io())
-                    .subscribeWith(new DisposableObserver<String>() {
+                finalDisposer.add(combinedReturnValueObservable
+                        .observeOn(Schedulers.io())
+                        .subscribeOn(AndroidSchedulers.mainThread())
+                        .unsubscribeOn(Schedulers.io())
+                        .subscribeWith(new DisposableObserver<String>() {
 
-                        @Override
-                        public void onNext(String combinedReturnValue) {
-                            String stringArray[] = combinedReturnValue.split("--");
-                            JsonParser parser = new JsonParser();
-                            JsonArray vCardUrls = parser.parse(stringArray[0]).getAsJsonArray();
-                            JsonArray parsedVCardUrls = new JsonArray();
-                            for(int i = 0; i<vCardUrls.size(); i++) {
-                                JsonObject jsonObject = new JsonObject();
-                                if(vCardUrls.get(i).isJsonObject()) {
-                                    JsonObject tempJsonObject = vCardUrls.get(i).getAsJsonObject();
-                                    jsonObject.addProperty("VCardID", 0);
-                                    jsonObject.addProperty("VCardURL", tempJsonObject.get("path").getAsString());
+                            @Override
+                            public void onNext(String combinedReturnValue) {
+                                dialog.dismiss();
+                                String stringArray[] = combinedReturnValue.split("--");
+                                JsonParser parser = new JsonParser();
+                                JsonArray vCardUrls = parser.parse(stringArray[0]).getAsJsonArray();
+                                JsonArray parsedVCardUrls = new JsonArray();
+                                for(int i = 0; i<vCardUrls.size(); i++) {
+                                    JsonObject jsonObject = new JsonObject();
+                                    if(vCardUrls.get(i).isJsonObject()) {
+                                        JsonObject tempJsonObject = vCardUrls.get(i).getAsJsonObject();
+                                        jsonObject.addProperty("VCardID", 0);
+                                        jsonObject.addProperty("VCardURL", tempJsonObject.get("path").getAsString());
+                                    }
+                                    parsedVCardUrls.add(jsonObject);
                                 }
-                                parsedVCardUrls.add(jsonObject);
-                            }
-                            newClient.add("VCard", parsedVCardUrls);
-                            JsonArray photoUrls = parser.parse(stringArray[1]).getAsJsonArray();
-                            JsonArray parsedPhotoUrls = new JsonArray();
-                            for(int i = 0; i<photoUrls.size(); i++) {
-                                JsonObject jsonObject = new JsonObject();
-                                if(photoUrls.get(i).isJsonObject()) {
-                                    JsonObject tempJsonObject = photoUrls.get(i).getAsJsonObject();
-                                    jsonObject.addProperty("PhotoID", 0);
-                                    jsonObject.addProperty("PhotoURL", tempJsonObject.get("path").getAsString());
+                                newClient.add("VCard", parsedVCardUrls);
+                                JsonArray photoUrls = parser.parse(stringArray[1]).getAsJsonArray();
+                                JsonArray parsedPhotoUrls = new JsonArray();
+                                for(int i = 0; i<photoUrls.size(); i++) {
+                                    JsonObject jsonObject = new JsonObject();
+                                    if(photoUrls.get(i).isJsonObject()) {
+                                        JsonObject tempJsonObject = photoUrls.get(i).getAsJsonObject();
+                                        jsonObject.addProperty("PhotoID", 0);
+                                        jsonObject.addProperty("PhotoURL", tempJsonObject.get("path").getAsString());
+                                    }
+                                    parsedPhotoUrls.add(jsonObject);
                                 }
-                                parsedPhotoUrls.add(jsonObject);
+                                newClient.add("Photo", parsedPhotoUrls);
+                                postNewClientToServer();
                             }
-                            newClient.add("Photo", parsedPhotoUrls);
-                            postNewClientToServer();
-                        }
 
-                        @Override
-                        public void onError(Throwable e) {
-                            Log.e("RXANDROID", "onError: " + e.getMessage());
-                        }
+                            @Override
+                            public void onError(Throwable e) {
+                                dialog.dismiss();
+                                Log.e("RXANDROID", "onError: " + e.getMessage());
+                            }
 
-                        @Override
-                        public void onComplete() {
-                            Log.e("COMPLETE", "Complete: ");
-                        }
-                    }));
+                            @Override
+                            public void onComplete() {
+                                Log.e("COMPLETE", "Complete: ");
+                            }
+                        }));
+            }
+        } else {
+            Toast.makeText(this,"Please check your internet connection and select again!!! ",
+                    Toast.LENGTH_LONG).show();
         }
     }
 
@@ -735,7 +746,7 @@ public class NewClientEntry extends SideNavigationMenuParentActivity implements 
     @Override
     public void onBackPressed() {
         if (forUpdate) {
-            DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+            DrawerLayout drawer = findViewById(R.id.drawer_layout);
             if (drawer.isDrawerOpen(GravityCompat.START)) {
                 drawer.closeDrawer(GravityCompat.START);
             } else if(UserTypeID == 1) {
@@ -744,7 +755,7 @@ public class NewClientEntry extends SideNavigationMenuParentActivity implements 
                 finish();
             }
         } else {
-            DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+            DrawerLayout drawer = findViewById(R.id.drawer_layout);
             if (drawer.isDrawerOpen(GravityCompat.START)) {
                 drawer.closeDrawer(GravityCompat.START);
             } else if(UserTypeID == 1) {
@@ -830,9 +841,7 @@ public class NewClientEntry extends SideNavigationMenuParentActivity implements 
 
     private void InstituteTypeGetRequest() {
         if(StaticHelperClass.isNetworkAvailable(this)) {
-            progressBar.setVisibility(View.VISIBLE);
-            whiteBackground.setVisibility(View.VISIBLE);
-
+            dialog.show();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
                     .addConverterFactory(ScalarsConverterFactory.create())
@@ -854,19 +863,18 @@ public class NewClientEntry extends SideNavigationMenuParentActivity implements 
 
                         @Override
                         public void onNext(String insTypeReturnValue) {
+                            dialog.dismiss();
                             parseInstituteTypeData(insTypeReturnValue);
                         }
 
                         @Override
                         public void onError(Throwable e) {
-                            progressBar.setVisibility(View.INVISIBLE);
-                            whiteBackground.setVisibility(View.INVISIBLE);
+                            dialog.dismiss();
                         }
 
                         @Override
                         public void onComplete() {
-                            progressBar.setVisibility(View.INVISIBLE);
-                            whiteBackground.setVisibility(View.INVISIBLE);
+
                         }
                     }));
         } else {
@@ -904,8 +912,6 @@ public class NewClientEntry extends SideNavigationMenuParentActivity implements 
         } catch (JSONException e) {
             Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
         }
-        progressBar.setVisibility(View.INVISIBLE);
-        whiteBackground.setVisibility(View.INVISIBLE);
         if (instituteType != -12345) {
             spinnerInsType.setSelection(instituteType+1);
             selectedInstituteType = allInstituteType.get(instituteType);
@@ -915,9 +921,7 @@ public class NewClientEntry extends SideNavigationMenuParentActivity implements 
 
     private void PriorityDataGetRequest() {
         if(StaticHelperClass.isNetworkAvailable(this)) {
-            progressBar.setVisibility(View.VISIBLE);
-            whiteBackground.setVisibility(View.VISIBLE);
-
+            dialog.show();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
                     .addConverterFactory(ScalarsConverterFactory.create())
@@ -939,19 +943,18 @@ public class NewClientEntry extends SideNavigationMenuParentActivity implements 
 
                         @Override
                         public void onNext(String priorityReturnValue) {
+                            dialog.dismiss();
                             parsePriorityData(priorityReturnValue);
                         }
 
                         @Override
                         public void onError(Throwable e) {
-                            progressBar.setVisibility(View.INVISIBLE);
-                            whiteBackground.setVisibility(View.INVISIBLE);
+                            dialog.dismiss();
                         }
 
                         @Override
                         public void onComplete() {
-                            progressBar.setVisibility(View.INVISIBLE);
-                            whiteBackground.setVisibility(View.INVISIBLE);
+
                         }
                     }));
         } else {
@@ -989,8 +992,6 @@ public class NewClientEntry extends SideNavigationMenuParentActivity implements 
         } catch (JSONException e) {
             Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
         }
-        progressBar.setVisibility(View.INVISIBLE);
-        whiteBackground.setVisibility(View.INVISIBLE);
         if (priority != -12345) {
             spinnerPriorityType.setSelection(priority+1);
             selectedPriority = allPriority.get(priority);

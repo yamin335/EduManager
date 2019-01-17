@@ -191,5 +191,14 @@
     <string name="lesson_digital_content">Lesson digital content:</string>
     <string name="show_syllabus">Show Syllabus</string>
     <string name="update">Update</string>
-
+    <string name="none">NONE</string>
+    <string name="select_user_type">Select User Type</string>
+    <string name="super_admin">Super Admin</string>
+    <string name="admin">Institute Admin</string>
+    <string name="student1">Student</string>
+    <string name="staff">Staff</string>
+    <string name="guardian1">Guardian</string>
+    <string name="breakk">Break</string>
+    <string name="select_shift">Select Shift</string>
+    <string name="select_subject">Select Subject</string>
 </resources>

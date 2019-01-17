@@ -1,6 +1,5 @@
 package onair.onems.result;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.ColorStateList;
@@ -23,20 +22,13 @@ import android.view.animation.AnimationUtils;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Objects;
 
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -50,7 +42,6 @@ import onair.onems.customised.MyDividerItemDecoration;
 import onair.onems.mainactivities.SideNavigationMenuParentActivity;
 import onair.onems.mainactivities.StudentMainScreen;
 import onair.onems.mainactivities.TeacherMainScreen;
-import onair.onems.network.MySingleton;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -59,10 +50,8 @@ import retrofit2.converter.scalars.ScalarsConverterFactory;
 public class ResultGradeStructure extends SideNavigationMenuParentActivity
         implements MediumAdapter.MediumAdapterListener, ClassAdapter.ClassAdapterListener {
 
-    private RecyclerView recyclerView;
     private String MediumID = "";
     private FloatingActionButton floatingMenu, menuItemMedium, menuItemClass;
-    private ConstraintLayout constraintLayout;
     private CardView cardMedium, cardClass;
     private Animation fab_open, fab_close, rotate_forward, rotate_backward;
     private Boolean isFabOpen = false;
@@ -84,11 +73,11 @@ public class ResultGradeStructure extends SideNavigationMenuParentActivity
         activityName = ResultGradeStructure.class.getName();
 
         LayoutInflater inflater = (LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        final View childActivityLayout = inflater.inflate(R.layout.result_grade_structure, null);
-        LinearLayout parentActivityLayout = (LinearLayout) findViewById(R.id.contentMain);
+        final View childActivityLayout = Objects.requireNonNull(inflater).inflate(R.layout.result_grade_structure, null);
+        LinearLayout parentActivityLayout = findViewById(R.id.contentMain);
         parentActivityLayout.addView(childActivityLayout, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
 
-        recyclerView = findViewById(R.id.recycler_view);
+        RecyclerView recyclerView = findViewById(R.id.recycler_view);
         ResultGradeSheet = new ArrayList<>();
         mAdapter = new ResultStructureAdapter(this, ResultGradeSheet);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
@@ -141,7 +130,7 @@ public class ResultGradeStructure extends SideNavigationMenuParentActivity
         rotate_forward = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.rotate_forward);
         rotate_backward = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.rotate_backward);
 
-        constraintLayout = findViewById(R.id.draggableFloatingMenu);
+        ConstraintLayout constraintLayout = findViewById(R.id.draggableFloatingMenu);
         constraintLayout.setOnClickListener(view-> animateFAB());
 
         cardMedium = findViewById(R.id.cardMedium);
@@ -215,6 +204,7 @@ public class ResultGradeStructure extends SideNavigationMenuParentActivity
 
     private void ResultGradeDataGetRequest(String MediumID, String ClassID){
         if (StaticHelperClass.isNetworkAvailable(this)) {
+            dialog.show();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
                     .addConverterFactory(ScalarsConverterFactory.create())
@@ -237,11 +227,13 @@ public class ResultGradeStructure extends SideNavigationMenuParentActivity
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             prepareResultGradeSheet(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
+                            dialog.dismiss();
                             Toast.makeText(ResultGradeStructure.this,"Grade sheet not found!!! ",
                                     Toast.LENGTH_LONG).show();
                         }
@@ -272,6 +264,7 @@ public class ResultGradeStructure extends SideNavigationMenuParentActivity
 
     private void MediumDataGetRequest() {
         if(StaticHelperClass.isNetworkAvailable(this)) {
+            dialog.show();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
                     .addConverterFactory(ScalarsConverterFactory.create())
@@ -294,12 +287,13 @@ public class ResultGradeStructure extends SideNavigationMenuParentActivity
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseMediumJsonData(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
-
+                            dialog.dismiss();
                         }
 
                         @Override
@@ -327,6 +321,7 @@ public class ResultGradeStructure extends SideNavigationMenuParentActivity
 
     private void ClassDataGetRequest(String MediumID) {
         if(StaticHelperClass.isNetworkAvailable(this)) {
+            dialog.show();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
                     .addConverterFactory(ScalarsConverterFactory.create())
@@ -350,11 +345,13 @@ public class ResultGradeStructure extends SideNavigationMenuParentActivity
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseClassJsonData(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
+                            dialog.dismiss();
                             Toast.makeText(ResultGradeStructure.this,"Class not found!!! ",
                                     Toast.LENGTH_LONG).show();
                         }
@@ -373,7 +370,7 @@ public class ResultGradeStructure extends SideNavigationMenuParentActivity
     void parseClassJsonData(String jsonString) {
         if(!jsonString.equalsIgnoreCase("[]")) {
             ClassSelectionDialog classSelectionDialog = new ClassSelectionDialog(this, jsonString, this);
-            classSelectionDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            Objects.requireNonNull(classSelectionDialog.getWindow()).setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
             classSelectionDialog.setCancelable(false);
             classSelectionDialog.show();
         } else {
@@ -384,7 +381,7 @@ public class ResultGradeStructure extends SideNavigationMenuParentActivity
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else if(UserTypeID == 1) {

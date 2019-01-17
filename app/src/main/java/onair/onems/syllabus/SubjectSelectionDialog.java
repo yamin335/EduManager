@@ -35,8 +35,8 @@ public class SubjectSelectionDialog extends Dialog implements View.OnClickListen
         setContentView(R.layout.selection_dialog);
         RecyclerView recyclerView = findViewById(R.id.recycler);
         TextView header = findViewById(R.id.header);
-        header.setText("Select Subject");
-        Button cross = (Button) findViewById(R.id.cross);
+        header.setText(R.string.select_subject);
+        Button cross = findViewById(R.id.cross);
         cross.setOnClickListener(this);
 
         SubjectAdapter mAdapter = new SubjectAdapter(currentActivity, subjectData, this);

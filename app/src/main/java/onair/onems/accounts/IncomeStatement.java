@@ -76,7 +76,7 @@ public class IncomeStatement extends SideNavigationMenuParentActivity {
 
         LayoutInflater inflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         final View childActivityLayout = Objects.requireNonNull(inflater).inflate(R.layout.acc_income_statemnt, null);
-        LinearLayout parentActivityLayout = (LinearLayout) findViewById(R.id.contentMain);
+        LinearLayout parentActivityLayout = findViewById(R.id.contentMain);
         parentActivityLayout.addView(childActivityLayout, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
 
         spinnerBranch = findViewById(R.id.spinnerBranch);
@@ -175,7 +175,7 @@ public class IncomeStatement extends SideNavigationMenuParentActivity {
 
     private void BranchDataGetRequest() {
         if (StaticHelperClass.isNetworkAvailable(this)) {
-
+            dialog.show();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
                     .addConverterFactory(ScalarsConverterFactory.create())
@@ -198,12 +198,13 @@ public class IncomeStatement extends SideNavigationMenuParentActivity {
 
                         @Override
                         public void onNext(String BranchDataReturnValue) {
+                            dialog.dismiss();
                             parseBranchData(BranchDataReturnValue);
                         }
 
                         @Override
                         public void onError(Throwable e) {
-
+                            dialog.dismiss();
                         }
 
                         @Override
@@ -248,7 +249,7 @@ public class IncomeStatement extends SideNavigationMenuParentActivity {
 
     private void YearDataGetRequest() {
         if (StaticHelperClass.isNetworkAvailable(this)) {
-
+            dialog.show();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
                     .addConverterFactory(ScalarsConverterFactory.create())
@@ -271,12 +272,13 @@ public class IncomeStatement extends SideNavigationMenuParentActivity {
 
                         @Override
                         public void onNext(String YearDataReturnValue) {
+                            dialog.dismiss();
                             parseYearData(YearDataReturnValue);
                         }
 
                         @Override
                         public void onError(Throwable e) {
-
+                            dialog.dismiss();
                         }
 
                         @Override
@@ -340,7 +342,7 @@ public class IncomeStatement extends SideNavigationMenuParentActivity {
 
     private void IncomeStatementDataGetRequest() {
         if (StaticHelperClass.isNetworkAvailable(this)) {
-
+            dialog.show();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
                     .addConverterFactory(ScalarsConverterFactory.create())
@@ -363,12 +365,13 @@ public class IncomeStatement extends SideNavigationMenuParentActivity {
 
                         @Override
                         public void onNext(String incomeStatementReturnValue) {
+                            dialog.dismiss();
                             parseIncomeStatement(incomeStatementReturnValue);
                         }
 
                         @Override
                         public void onError(Throwable e) {
-
+                            dialog.dismiss();
                         }
 
                         @Override
@@ -393,7 +396,7 @@ public class IncomeStatement extends SideNavigationMenuParentActivity {
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else if(UserTypeID == 1) {

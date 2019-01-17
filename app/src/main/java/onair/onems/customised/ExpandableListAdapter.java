@@ -10,6 +10,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
+
 import onair.onems.R;
 import onair.onems.models.ExpandedMenuModel;
 
@@ -81,11 +83,11 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
         ExpandedMenuModel headerTitle = (ExpandedMenuModel) getGroup(groupPosition);
         if (convertView == null) {
             LayoutInflater inflater = (LayoutInflater) this.mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            convertView = inflater.inflate(R.layout.side_menu_row_item, null);
+            convertView = Objects.requireNonNull(inflater).inflate(R.layout.side_menu_row_item, null);
         }
-        TextView lblListHeader = (TextView) convertView.findViewById(R.id.submenu);
-        ImageView headerIcon = (ImageView) convertView.findViewById(R.id.iconimage);
-        ImageView indicator = (ImageView) convertView.findViewById(R.id.arrow);
+        TextView lblListHeader = convertView.findViewById(R.id.submenu);
+        ImageView headerIcon = convertView.findViewById(R.id.iconimage);
+        ImageView indicator = convertView.findViewById(R.id.arrow);
 
         if(UserTypeID == 1) {
             switch (groupPosition) {
@@ -238,10 +240,10 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
         if (convertView == null) {
             LayoutInflater infalInflater = (LayoutInflater) this.mContext
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            convertView = infalInflater.inflate(R.layout.side_submenu_row_item, null);
+            convertView = Objects.requireNonNull(infalInflater).inflate(R.layout.side_submenu_row_item, null);
         }
 
-        TextView txtListChild = (TextView) convertView
+        TextView txtListChild = convertView
                 .findViewById(R.id.submenu);
 
         txtListChild.setText(childText);

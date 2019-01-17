@@ -7,7 +7,6 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
@@ -23,14 +22,13 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 import onair.onems.R;
-import onair.onems.contacts.ContactsMainScreen;
 import onair.onems.customised.MyDividerItemDecoration;
 import onair.onems.mainactivities.SideNavigationMenuParentActivity;
 import onair.onems.mainactivities.StudentMainScreen;
 import onair.onems.mainactivities.TeacherMainScreen;
-import onair.onems.user.Profile;
 
 public class NotificationMainScreen extends SideNavigationMenuParentActivity implements NotificationAdapter.NotificationAdapterListener,
         RecyclerItemTouchHelper.RecyclerItemTouchHelperListener, NotificationAdapter.NotificationSaverListener, SideNavigationMenuParentActivity.NotificationReceiverListener{
@@ -38,7 +36,6 @@ public class NotificationMainScreen extends SideNavigationMenuParentActivity imp
     private ArrayList<JSONObject> notificationList;
     private NotificationAdapter mAdapter;
     private CoordinatorLayout coordinatorLayout;
-    private int notificationCounter = 0;
     private RecyclerView  recyclerView;
 
     @Override
@@ -65,8 +62,8 @@ public class NotificationMainScreen extends SideNavigationMenuParentActivity imp
         super.onCreate(savedInstanceState);
 
         LayoutInflater inflater = (LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        final View childActivityLayout = inflater.inflate(R.layout.notification_main_screen, null);
-        LinearLayout parentActivityLayout = (LinearLayout) findViewById(R.id.contentMain);
+        final View childActivityLayout = Objects.requireNonNull(inflater).inflate(R.layout.notification_main_screen, null);
+        LinearLayout parentActivityLayout = findViewById(R.id.contentMain);
         parentActivityLayout.addView(childActivityLayout, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
         coordinatorLayout = findViewById(R.id.coordinator_layout);
 
@@ -88,7 +85,7 @@ public class NotificationMainScreen extends SideNavigationMenuParentActivity imp
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else if(UserTypeID == 1) {
@@ -166,7 +163,6 @@ public class NotificationMainScreen extends SideNavigationMenuParentActivity imp
     @Override
     public void onNotificationChanged(ArrayList<JSONObject> notificationListFiltered, int counter) {
         this.notificationList = notificationListFiltered;
-        notificationCounter = counter;
     }
 
     @Override

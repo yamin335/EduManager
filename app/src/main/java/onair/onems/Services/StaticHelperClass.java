@@ -1,11 +1,9 @@
 package onair.onems.Services;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.res.Resources;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.net.Uri;
 import android.util.TypedValue;
 
 import java.io.IOException;

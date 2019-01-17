@@ -2,7 +2,6 @@ package onair.onems.result;
 
 import android.app.Activity;
 import android.app.Dialog;
-import android.app.Fragment;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -16,7 +15,6 @@ import android.widget.TextView;
 import org.json.JSONObject;
 
 import onair.onems.R;
-import onair.onems.syllabus.ExamAdapter;
 
 public class ResultExamSelectionDialog extends Dialog implements View.OnClickListener, ResultExamAdapter.ExamAdapterListener{
     private Context context;
@@ -38,8 +36,8 @@ public class ResultExamSelectionDialog extends Dialog implements View.OnClickLis
         setContentView(R.layout.selection_dialog);
         RecyclerView recyclerView = findViewById(R.id.recycler);
         TextView header = findViewById(R.id.header);
-        header.setText("Select Exam");
-        Button cross = (Button) findViewById(R.id.cross);
+        header.setText(R.string.select_exam);
+        Button cross = findViewById(R.id.cross);
         cross.setOnClickListener(this);
 
         ResultExamAdapter mAdapter = new ResultExamAdapter(currentActivity, selectedListener, exams, this);

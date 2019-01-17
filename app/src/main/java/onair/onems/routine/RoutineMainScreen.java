@@ -1,18 +1,15 @@
 package onair.onems.routine;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
@@ -21,15 +18,8 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.Toast;
-
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -37,9 +27,8 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Objects;
 
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -52,10 +41,6 @@ import onair.onems.Services.StaticHelperClass;
 import onair.onems.mainactivities.SideNavigationMenuParentActivity;
 import onair.onems.mainactivities.StudentMainScreen;
 import onair.onems.mainactivities.TeacherMainScreen;
-import onair.onems.models.ShiftModel;
-import onair.onems.network.MySingleton;
-import onair.onems.result.ResultMainScreen;
-import onair.onems.syllabus.ExamSelectionDialog;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -67,7 +52,6 @@ public class RoutineMainScreen extends SideNavigationMenuParentActivity implemen
     private ViewPager viewPager;
     private TabLayout tabLayout;
     private FloatingActionButton fabShift;
-    private boolean hasShift = false;
     private CompositeDisposable finalDisposer = new CompositeDisposable();
 
     @Override
@@ -84,12 +68,12 @@ public class RoutineMainScreen extends SideNavigationMenuParentActivity implemen
         activityName = RoutineMainScreen.class.getName();
 
         LayoutInflater inflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        final View childActivityLayout = inflater.inflate(R.layout.routine_content_main, null);
-        LinearLayout parentActivityLayout = (LinearLayout) findViewById(R.id.contentMain);
+        final View childActivityLayout = Objects.requireNonNull(inflater).inflate(R.layout.routine_content_main, null);
+        LinearLayout parentActivityLayout = findViewById(R.id.contentMain);
         parentActivityLayout.addView(childActivityLayout, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
 
-        viewPager = (ViewPager) findViewById(R.id.pager);
-        tabLayout = (TabLayout) findViewById(R.id.tabLayout);
+        viewPager = findViewById(R.id.pager);
+        tabLayout = findViewById(R.id.tabLayout);
 
         saturdayJsonArray = new JSONArray();
         sundayJsonArray = new JSONArray();
@@ -101,12 +85,7 @@ public class RoutineMainScreen extends SideNavigationMenuParentActivity implemen
 
         fabShift = findViewById(R.id.fabShift);
         fabShift.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#9C077EF5")));
-        fabShift.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ShiftDataGetRequest();
-            }
-        });
+        fabShift.setOnClickListener(v -> ShiftDataGetRequest());
 
         if(UserTypeID==3 || UserTypeID==4 || UserTypeID==5){
             fabShift.setVisibility(View.GONE);
@@ -117,7 +96,7 @@ public class RoutineMainScreen extends SideNavigationMenuParentActivity implemen
         }
 
         if(UserTypeID == 4){
-            RoutineDataGetRequest(0);
+            RoutineDataGetRequest();
         }
 
         if(UserTypeID!=1 && UserTypeID!=2 && UserTypeID!=4){
@@ -132,7 +111,7 @@ public class RoutineMainScreen extends SideNavigationMenuParentActivity implemen
             if(UserTypeID == 1||UserTypeID == 2) {
                 RoutineDataGetRequestForAdmin(shift.getLong("ShiftID"));
             } else if(UserTypeID == 4) {
-                RoutineDataGetRequest(shift.getLong("ShiftID"));
+                RoutineDataGetRequest();
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -167,6 +146,7 @@ public class RoutineMainScreen extends SideNavigationMenuParentActivity implemen
             return mFragmentTitleList.get(position);
         }
 
+        @NonNull
         @Override
         public Object instantiateItem(ViewGroup container, int position) {
             return super.instantiateItem(container, position);
@@ -175,7 +155,7 @@ public class RoutineMainScreen extends SideNavigationMenuParentActivity implemen
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else if(UserTypeID == 1) {
@@ -265,6 +245,7 @@ public class RoutineMainScreen extends SideNavigationMenuParentActivity implemen
 
     private void RoutineDataGetRequestForAdmin(long ShiftID) {
         if(StaticHelperClass.isNetworkAvailable(this)) {
+            dialog.show();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
                     .addConverterFactory(ScalarsConverterFactory.create())
@@ -287,11 +268,13 @@ public class RoutineMainScreen extends SideNavigationMenuParentActivity implemen
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseReturnData(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
+                            dialog.dismiss();
                             Toast.makeText(RoutineMainScreen.this,"Routine not found!!! ",
                                     Toast.LENGTH_LONG).show();
                         }
@@ -306,8 +289,9 @@ public class RoutineMainScreen extends SideNavigationMenuParentActivity implemen
         }
     }
 
-    private void RoutineDataGetRequest(long ShiftID) {
+    private void RoutineDataGetRequest() {
         if(StaticHelperClass.isNetworkAvailable(this)) {
+            dialog.show();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
                     .addConverterFactory(ScalarsConverterFactory.create())
@@ -330,11 +314,13 @@ public class RoutineMainScreen extends SideNavigationMenuParentActivity implemen
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseReturnData(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
+                            dialog.dismiss();
                             Toast.makeText(RoutineMainScreen.this,"Routine not found!!! ",
                                     Toast.LENGTH_LONG).show();
                         }
@@ -394,6 +380,7 @@ public class RoutineMainScreen extends SideNavigationMenuParentActivity implemen
 
     private void ShiftDataGetRequest() {
         if (StaticHelperClass.isNetworkAvailable(this)) {
+            dialog.show();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
                     .addConverterFactory(ScalarsConverterFactory.create())
@@ -416,12 +403,13 @@ public class RoutineMainScreen extends SideNavigationMenuParentActivity implemen
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseShiftJsonData(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
-
+                            dialog.dismiss();
                         }
 
                         @Override
@@ -439,12 +427,11 @@ public class RoutineMainScreen extends SideNavigationMenuParentActivity implemen
         if (jsonString.equals("")||jsonString.equals("[]")) {
             Toast.makeText(RoutineMainScreen.this,"Shift not found!!! ",
                     Toast.LENGTH_LONG).show();
-            hasShift = false;
             fabShift.setVisibility(View.GONE);
-            RoutineDataGetRequest(0);
+            RoutineDataGetRequest();
         } else {
             ShiftSelectionDialog shiftSelectionDialog = new ShiftSelectionDialog(this, jsonString, this);
-            shiftSelectionDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            Objects.requireNonNull(shiftSelectionDialog.getWindow()).setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
             shiftSelectionDialog.setCancelable(false);
             shiftSelectionDialog.show();
         }

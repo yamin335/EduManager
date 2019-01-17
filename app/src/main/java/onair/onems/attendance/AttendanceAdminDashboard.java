@@ -59,7 +59,7 @@ public class AttendanceAdminDashboard extends SideNavigationMenuParentActivity {
 
         LayoutInflater inflater = (LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         final View childActivityLayout = Objects.requireNonNull(inflater).inflate(R.layout.attendance_admin_dashboard, null);
-        LinearLayout parentActivityLayout = (LinearLayout) findViewById(R.id.contentMain);
+        LinearLayout parentActivityLayout = findViewById(R.id.contentMain);
         parentActivityLayout.addView(childActivityLayout, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
@@ -77,33 +77,27 @@ public class AttendanceAdminDashboard extends SideNavigationMenuParentActivity {
         takeAttendance = findViewById(R.id.takeAttendance);
         showAttendance = findViewById(R.id.showAttendance);
 
-        takeAttendance.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent mainIntent = new Intent(AttendanceAdminDashboard.this, TakeAttendance.class);
-                mainIntent.putExtra("fromDashBoard", true);
-                mainIntent.putExtra("fromSideMenu", false);
-                startActivity(mainIntent);
-                finish();
-            }
+        takeAttendance.setOnClickListener(v -> {
+            Intent mainIntent = new Intent(AttendanceAdminDashboard.this, TakeAttendance.class);
+            mainIntent.putExtra("fromDashBoard", true);
+            mainIntent.putExtra("fromSideMenu", false);
+            startActivity(mainIntent);
+            finish();
         });
 
-        showAttendance.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent mainIntent = new Intent(AttendanceAdminDashboard.this, ShowAttendance.class);
-                mainIntent.putExtra("fromDashBoard", true);
-                mainIntent.putExtra("fromSideMenu", false);
-                startActivity(mainIntent);
-                finish();
-            }
+        showAttendance.setOnClickListener(v -> {
+            Intent mainIntent = new Intent(AttendanceAdminDashboard.this, ShowAttendance.class);
+            mainIntent.putExtra("fromDashBoard", true);
+            mainIntent.putExtra("fromSideMenu", false);
+            startActivity(mainIntent);
+            finish();
         });
 
     }
 
     private void teacherAttendanceDataGetRequest() {
         if(StaticHelperClass.isNetworkAvailable(this)) {
-
+            dialog.show();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
                     .addConverterFactory(ScalarsConverterFactory.create())
@@ -126,6 +120,7 @@ public class AttendanceAdminDashboard extends SideNavigationMenuParentActivity {
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseTeacherAttendanceJsonData(response);
                         }
 
@@ -136,6 +131,7 @@ public class AttendanceAdminDashboard extends SideNavigationMenuParentActivity {
 
                         @Override
                         public void onError(Throwable e) {
+                            dialog.dismiss();
                             Toast.makeText(AttendanceAdminDashboard.this,"Error occurred!!! ",
                                     Toast.LENGTH_LONG).show();
                         }
@@ -148,7 +144,7 @@ public class AttendanceAdminDashboard extends SideNavigationMenuParentActivity {
 
     private void studentAttendanceDataGetRequest() {
         if(StaticHelperClass.isNetworkAvailable(this)) {
-
+            dialog.show();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
                     .addConverterFactory(ScalarsConverterFactory.create())
@@ -171,6 +167,7 @@ public class AttendanceAdminDashboard extends SideNavigationMenuParentActivity {
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseStudentAttendanceJsonData(response);
                         }
 
@@ -181,6 +178,7 @@ public class AttendanceAdminDashboard extends SideNavigationMenuParentActivity {
 
                         @Override
                         public void onError(Throwable e) {
+                            dialog.dismiss();
                             Toast.makeText(AttendanceAdminDashboard.this,"Error occurred!!! ",
                                     Toast.LENGTH_LONG).show();
                         }
@@ -241,7 +239,7 @@ public class AttendanceAdminDashboard extends SideNavigationMenuParentActivity {
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {

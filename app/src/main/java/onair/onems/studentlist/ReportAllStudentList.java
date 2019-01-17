@@ -1,12 +1,10 @@
 package onair.onems.studentlist;
 
-import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -18,18 +16,11 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Objects;
 
 import io.reactivex.Observable;
 import io.reactivex.Observer;
@@ -41,15 +32,10 @@ import onair.onems.Services.RetrofitNetworkService;
 import onair.onems.Services.StaticHelperClass;
 import onair.onems.mainactivities.CommonToolbarParentActivity;
 import onair.onems.models.ReportAllStudentRowModel;
-import onair.onems.network.MySingleton;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.converter.scalars.ScalarsConverterFactory;
-
-/**
- * Created by User on 1/24/2018.
- */
 
 public class ReportAllStudentList extends CommonToolbarParentActivity implements ReportAllStudentShowListAdapter.ReportAllStudentShowListAdapterListener{
 
@@ -73,27 +59,24 @@ public class ReportAllStudentList extends CommonToolbarParentActivity implements
         super.onCreate(savedInstanceState);
 
         LayoutInflater inflater = (LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        final View childActivityLayout = inflater.inflate(R.layout.report_all_student_list_activity_main, null);
+        final View childActivityLayout = Objects.requireNonNull(inflater).inflate(R.layout.report_all_student_list_activity_main, null);
         LinearLayout parentActivityLayout = findViewById(R.id.contentMain);
         parentActivityLayout.addView(childActivityLayout, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
 
-        mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.activity_main_swipe_refresh_layout);
+        mSwipeRefreshLayout = findViewById(R.id.activity_main_swipe_refresh_layout);
         mSwipeRefreshLayout.setColorSchemeColors(getResources().getColor(R.color.colorAccent));
 
-        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                ClearStudentList();
-                StudentDataGetRequest();
-            }
+        mSwipeRefreshLayout.setOnRefreshListener(() -> {
+            ClearStudentList();
+            StudentDataGetRequest();
         });
 
-        recyclerView = (RecyclerView)findViewById(R.id.recycler_view);
+        recyclerView = findViewById(R.id.recycler_view);
         studentList = new ArrayList<>();
         mAdapter = new ReportAllStudentShowListAdapter(this, studentList, this);
 
         Bundle StudentSelection = getIntent().getExtras();
-        InstituteID = StudentSelection.getLong("InstituteID",0);
+        InstituteID = Objects.requireNonNull(StudentSelection).getLong("InstituteID",0);
         MediumID = StudentSelection.getLong("MediumID",0);
         ShiftID = StudentSelection.getLong("ShiftID",0);
         ClassID = StudentSelection.getLong("ClassID",0);
@@ -138,7 +121,7 @@ public class ReportAllStudentList extends CommonToolbarParentActivity implements
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         searchView = (SearchView) menu.findItem(R.id.action_search)
                 .getActionView();
-        searchView.setSearchableInfo(searchManager
+        searchView.setSearchableInfo(Objects.requireNonNull(searchManager)
                 .getSearchableInfo(getComponentName()));
         searchView.setMaxWidth(Integer.MAX_VALUE);
 
@@ -194,6 +177,7 @@ public class ReportAllStudentList extends CommonToolbarParentActivity implements
 
     public void StudentDataGetRequest(){
         if(StaticHelperClass.isNetworkAvailable(this)) {
+            dialog.show();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
                     .addConverterFactory(ScalarsConverterFactory.create())
@@ -222,6 +206,7 @@ public class ReportAllStudentList extends CommonToolbarParentActivity implements
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             mSwipeRefreshLayout.setRefreshing(false);
                             parseStudentJsonData(response);
                         }
@@ -233,6 +218,7 @@ public class ReportAllStudentList extends CommonToolbarParentActivity implements
 
                         @Override
                         public void onError(Throwable e) {
+                            dialog.dismiss();
                             mSwipeRefreshLayout.setRefreshing(false);
                             Toast.makeText(ReportAllStudentList.this,"Error getting student list !!!",Toast.LENGTH_LONG).show();
                         }

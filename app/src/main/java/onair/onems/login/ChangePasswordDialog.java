@@ -3,6 +3,8 @@ package onair.onems.login;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.View;
@@ -14,6 +16,8 @@ import android.widget.Toast;
 import org.json.JSONArray;
 import org.json.JSONException;
 
+import java.util.Objects;
+
 import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -22,6 +26,7 @@ import io.reactivex.schedulers.Schedulers;
 import onair.onems.R;
 import onair.onems.Services.RetrofitNetworkService;
 import onair.onems.Services.StaticHelperClass;
+import onair.onems.mainactivities.CommonProgressDialog;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -34,6 +39,7 @@ public class ChangePasswordDialog extends Dialog implements View.OnClickListener
     private String LoggedUserID, UserName, Password, confirmP;
     private long InstituteID;
     private Disposable finalDisposer;
+    public CommonProgressDialog dialog;
 
     @Override
     public void dismiss() {
@@ -57,6 +63,9 @@ public class ChangePasswordDialog extends Dialog implements View.OnClickListener
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.change_password_dialog);
+        dialog = new CommonProgressDialog(parentActivity);
+        Objects.requireNonNull(dialog.getWindow()).setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        dialog.setCancelable(false);
         Button cross = findViewById(R.id.cross);
         Button done = findViewById(R.id.done);
         currentPassword = findViewById(R.id.currentPassword);
@@ -102,6 +111,7 @@ public class ChangePasswordDialog extends Dialog implements View.OnClickListener
             Toast.makeText(context,"Please enter confirm password !!!",Toast.LENGTH_LONG).show();
         } else if(newP.equals(confirmP)) {
             if(StaticHelperClass.isNetworkAvailable(context)) {
+                dialog.show();
                 Retrofit retrofit = new Retrofit.Builder()
                         .baseUrl(context.getString(R.string.baseUrl))
                         .addConverterFactory(ScalarsConverterFactory.create())
@@ -130,6 +140,7 @@ public class ChangePasswordDialog extends Dialog implements View.OnClickListener
 
                             @Override
                             public void onNext(String response) {
+                                dialog.dismiss();
                                 parseReturnData(response);
                             }
 
@@ -140,6 +151,7 @@ public class ChangePasswordDialog extends Dialog implements View.OnClickListener
 
                             @Override
                             public void onError(Throwable e) {
+                                dialog.dismiss();
                                 dismiss();
                                 Toast.makeText(context,"Error changing password !!!",Toast.LENGTH_LONG).show();
                             }

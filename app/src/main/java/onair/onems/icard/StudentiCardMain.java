@@ -1,6 +1,5 @@
 package onair.onems.icard;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -10,27 +9,19 @@ import android.support.annotation.Nullable;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.Toast;
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Objects;
 
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -48,7 +39,6 @@ import onair.onems.models.MediumModel;
 import onair.onems.models.SectionModel;
 import onair.onems.models.ShiftModel;
 import onair.onems.models.SpinnerStudentInformation;
-import onair.onems.network.MySingleton;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -99,8 +89,8 @@ public class StudentiCardMain extends SideNavigationMenuParentActivity {
         activityName = StudentiCardMain.class.getName();
 
         LayoutInflater inflater = (LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        final View childActivityLayout = inflater.inflate(R.layout.icard_main_screen, null);
-        LinearLayout parentActivityLayout = (LinearLayout) findViewById(R.id.contentMain);
+        final View childActivityLayout = Objects.requireNonNull(inflater).inflate(R.layout.icard_main_screen, null);
+        LinearLayout parentActivityLayout = findViewById(R.id.contentMain);
         parentActivityLayout.addView(childActivityLayout, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
@@ -114,16 +104,16 @@ public class StudentiCardMain extends SideNavigationMenuParentActivity {
 
         Button showStudentData, newEntry, editStudentData;
 
-        spinnerClass = (Spinner)findViewById(R.id.spinnerClass);
-        spinnerShift = (Spinner)findViewById(R.id.spinnerShift);
-        spinnerSection = (Spinner)findViewById(R.id.spinnerSection);
-        spinnerMedium =(Spinner)findViewById(R.id.spinnerMedium);
-        spinnerDepartment =(Spinner)findViewById(R.id.spinnerDepartment);
-        spinnerStudent = (Spinner)findViewById(R.id.spinnerStudent);
+        spinnerClass = findViewById(R.id.spinnerClass);
+        spinnerShift = findViewById(R.id.spinnerShift);
+        spinnerSection = findViewById(R.id.spinnerSection);
+        spinnerMedium = findViewById(R.id.spinnerMedium);
+        spinnerDepartment = findViewById(R.id.spinnerDepartment);
+        spinnerStudent =  findViewById(R.id.spinnerStudent);
 
-        showStudentData = (Button)findViewById(R.id.showStudentData);
-        editStudentData = (Button)findViewById(R.id.editStudentInfo);
-        newEntry = (Button)findViewById(R.id.newEntry);
+        showStudentData = findViewById(R.id.showStudentData);
+        editStudentData = findViewById(R.id.editStudentInfo);
+        newEntry = findViewById(R.id.newEntry);
 
         ArrayAdapter<String> class_spinner_adapter = new ArrayAdapter<>(this, R.layout.spinner_item, tempClassArray);
         class_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -318,66 +308,57 @@ public class StudentiCardMain extends SideNavigationMenuParentActivity {
             }
         });
 
-        newEntry.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(StaticHelperClass.isNetworkAvailable(StudentiCardMain.this)) {
-                    Intent intent = new Intent(StudentiCardMain.this, StudentiCardNewEntry.class);
+        newEntry.setOnClickListener(view -> {
+            if(StaticHelperClass.isNetworkAvailable(StudentiCardMain.this)) {
+                Intent intent = new Intent(StudentiCardMain.this, StudentiCardNewEntry.class);
+                startActivity(intent);
+                finish();
+            } else {
+                Toast.makeText(StudentiCardMain.this,"Please check your internet connection !!! ",Toast.LENGTH_LONG).show();
+            }
+        });
+
+        editStudentData.setOnClickListener(v -> {
+            if(StaticHelperClass.isNetworkAvailable(StudentiCardMain.this)) {
+                if(selectedStudent != null) {
+                    CheckSelectedData();
+                    Bundle bundle = new Bundle();
+                    bundle.putString("UserID", selectedStudent.getUserID());
+                    bundle.putString("SectionID", Long.toString(selectedSection.getSectionID()));
+                    bundle.putString("ClassID", Long.toString(selectedClass.getClassID()));
+                    bundle.putString("ShiftID", Long.toString(selectedShift.getShiftID()));
+                    bundle.putString("MediumID", Long.toString(selectedMedium.getMediumID()));
+                    bundle.putString("DepartmentID", Long.toString(selectedDepartment.getDepartmentID()));
+                    Intent intent = new Intent(StudentiCardMain.this, StudentiCardDetailsEdit.class);
+                    intent.putExtras(bundle);
                     startActivity(intent);
-                    finish();
-                } else {
-                    Toast.makeText(StudentiCardMain.this,"Please check your internet connection !!! ",Toast.LENGTH_LONG).show();
+                } else if(selectedStudent == null) {
+                    Toast.makeText(StudentiCardMain.this,"Please select a student !!! ",Toast.LENGTH_LONG).show();
                 }
+            } else {
+                Toast.makeText(StudentiCardMain.this,"Please check your internet connection!!!",Toast.LENGTH_LONG).show();
             }
         });
 
-        editStudentData.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(StaticHelperClass.isNetworkAvailable(StudentiCardMain.this)) {
-                    if(selectedStudent != null) {
-                        CheckSelectedData();
-                        Bundle bundle = new Bundle();
-                        bundle.putString("UserID", selectedStudent.getUserID());
-                        bundle.putString("SectionID", Long.toString(selectedSection.getSectionID()));
-                        bundle.putString("ClassID", Long.toString(selectedClass.getClassID()));
-                        bundle.putString("ShiftID", Long.toString(selectedShift.getShiftID()));
-                        bundle.putString("MediumID", Long.toString(selectedMedium.getMediumID()));
-                        bundle.putString("DepartmentID", Long.toString(selectedDepartment.getDepartmentID()));
-                        Intent intent = new Intent(StudentiCardMain.this, StudentiCardDetailsEdit.class);
-                        intent.putExtras(bundle);
-                        startActivity(intent);
-                    } else if(selectedStudent == null) {
-                        Toast.makeText(StudentiCardMain.this,"Please select a student !!! ",Toast.LENGTH_LONG).show();
-                    }
-                } else {
-                    Toast.makeText(StudentiCardMain.this,"Please check your internet connection!!!",Toast.LENGTH_LONG).show();
+        showStudentData.setOnClickListener(v -> {
+            if(StaticHelperClass.isNetworkAvailable(StudentiCardMain.this)) {
+                if(selectedStudent != null) {
+                    CheckSelectedData();
+                    Bundle bundle = new Bundle();
+                    bundle.putString("UserID", selectedStudent.getUserID());
+                    bundle.putString("SectionID", Long.toString(selectedSection.getSectionID()));
+                    bundle.putString("ClassID", Long.toString(selectedClass.getClassID()));
+                    bundle.putString("ShiftID", Long.toString(selectedShift.getShiftID()));
+                    bundle.putString("MediumID", Long.toString(selectedMedium.getMediumID()));
+                    bundle.putString("DepartmentID", Long.toString(selectedDepartment.getDepartmentID()));
+                    Intent intent = new Intent(StudentiCardMain.this, StudentiCardDetails.class);
+                    intent.putExtras(bundle);
+                    startActivity(intent);
+                } else if(selectedStudent == null) {
+                    Toast.makeText(StudentiCardMain.this,"Please select a student !!! ",Toast.LENGTH_LONG).show();
                 }
-            }
-        });
-
-        showStudentData.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(StaticHelperClass.isNetworkAvailable(StudentiCardMain.this)) {
-                    if(selectedStudent != null) {
-                        CheckSelectedData();
-                        Bundle bundle = new Bundle();
-                        bundle.putString("UserID", selectedStudent.getUserID());
-                        bundle.putString("SectionID", Long.toString(selectedSection.getSectionID()));
-                        bundle.putString("ClassID", Long.toString(selectedClass.getClassID()));
-                        bundle.putString("ShiftID", Long.toString(selectedShift.getShiftID()));
-                        bundle.putString("MediumID", Long.toString(selectedMedium.getMediumID()));
-                        bundle.putString("DepartmentID", Long.toString(selectedDepartment.getDepartmentID()));
-                        Intent intent = new Intent(StudentiCardMain.this, StudentiCardDetails.class);
-                        intent.putExtras(bundle);
-                        startActivity(intent);
-                    } else if(selectedStudent == null) {
-                        Toast.makeText(StudentiCardMain.this,"Please select a student !!! ",Toast.LENGTH_LONG).show();
-                    }
-                } else {
-                    Toast.makeText(StudentiCardMain.this,"Please check your internet connection!!!",Toast.LENGTH_LONG).show();
-                }
+            } else {
+                Toast.makeText(StudentiCardMain.this,"Please check your internet connection!!!",Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -570,7 +551,7 @@ public class StudentiCardMain extends SideNavigationMenuParentActivity {
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {

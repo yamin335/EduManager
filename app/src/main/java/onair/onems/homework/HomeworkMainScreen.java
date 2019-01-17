@@ -4,7 +4,6 @@ import android.Manifest;
 import android.app.DatePickerDialog;
 import android.app.DownloadManager;
 import android.app.NotificationManager;
-import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -26,16 +25,9 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
-import android.widget.DatePicker;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -45,8 +37,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Objects;
 
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -58,7 +49,6 @@ import onair.onems.Services.RetrofitNetworkService;
 import onair.onems.Services.StaticHelperClass;
 import onair.onems.mainactivities.SideNavigationMenuParentActivity;
 import onair.onems.mainactivities.StudentMainScreen;
-import onair.onems.network.MySingleton;
 import onair.onems.syllabus.DigitalContentAdapter;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
@@ -96,8 +86,8 @@ public class HomeworkMainScreen extends SideNavigationMenuParentActivity impleme
         activityName = HomeworkMainScreen.class.getName();
 
         LayoutInflater inflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        final View rowView = inflater.inflate(R.layout.homework_main_screen, null);
-        LinearLayout parent = (LinearLayout) findViewById(R.id.contentMain);
+        final View rowView = Objects.requireNonNull(inflater).inflate(R.layout.homework_main_screen, null);
+        LinearLayout parent = findViewById(R.id.contentMain);
         parent.addView(rowView, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
 
         error = findViewById(R.id.homeworkEmpty);
@@ -150,33 +140,25 @@ public class HomeworkMainScreen extends SideNavigationMenuParentActivity impleme
         recycler.setItemAnimator(new DefaultItemAnimator());
         recycler.setAdapter(mDigitalAdapter);
 
-        datePicker = (Button)findViewById(R.id.pickDate);
-        datePicker.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // calender class's instance and get current date , month and year from calender
-                final Calendar c = Calendar.getInstance();
-                int mYear = c.get(Calendar.YEAR); // current year
-                int mMonth = c.get(Calendar.MONTH); // current month
-                int mDay = c.get(Calendar.DAY_OF_MONTH); // current day
-                // date picker dialog
-                datePickerDialog = new DatePickerDialog(HomeworkMainScreen.this,
-                        new DatePickerDialog.OnDateSetListener() {
-
-                            @Override
-                            public void onDateSet(DatePicker view, int year,
-                                                  int monthOfYear, int dayOfMonth) {
-                                // set day of month , month and year value in the edit text
+        datePicker = findViewById(R.id.pickDate);
+        datePicker.setOnClickListener(v -> {
+            // calender class's instance and get current date , month and year from calender
+            final Calendar c = Calendar.getInstance();
+            int mYear = c.get(Calendar.YEAR); // current year
+            int mMonth = c.get(Calendar.MONTH); // current month
+            int mDay = c.get(Calendar.DAY_OF_MONTH); // current day
+            // date picker dialog
+            datePickerDialog = new DatePickerDialog(HomeworkMainScreen.this,
+                    (view, year, monthOfYear, dayOfMonth) -> {
+                        // set day of month , month and year value in the edit text
 //                                selectedDate = dayOfMonth + "/" + (monthOfYear + 1) + "/" + year;
 //                                selectedDate = year + "-" + (monthOfYear + 1) + "-" + dayOfMonth;
-                                String date = (monthOfYear + 1)+"-"+dayOfMonth+"-"+year;
-                                datePicker.setText(date);
-                                homeworkDate.setText(date);
-                                homeworkGetRequest(date);
-                            }
-                        }, mYear, mMonth, mDay);
-                datePickerDialog.show();
-            }
+                        String date1 = (monthOfYear + 1) + "-" + dayOfMonth + "-" + year;
+                        datePicker.setText(date1);
+                        homeworkDate.setText(date1);
+                        homeworkGetRequest(date1);
+                    }, mYear, mMonth, mDay);
+            datePickerDialog.show();
         });
         registerReceiver(onComplete, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
         homeworkGetRequest(selectedDate);
@@ -184,7 +166,7 @@ public class HomeworkMainScreen extends SideNavigationMenuParentActivity impleme
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else if(UserTypeID == 1) {
@@ -223,6 +205,7 @@ public class HomeworkMainScreen extends SideNavigationMenuParentActivity impleme
 
     private void homeworkGetRequest(String date) {
         if (StaticHelperClass.isNetworkAvailable(this)) {
+            dialog.show();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
                     .addConverterFactory(ScalarsConverterFactory.create())
@@ -246,11 +229,13 @@ public class HomeworkMainScreen extends SideNavigationMenuParentActivity impleme
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseHomeworkData(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
+                            dialog.dismiss();
                             homeworkList.clear();
                             mAdapter.notifyDataSetChanged();
                             error.setVisibility(View.VISIBLE);
@@ -305,6 +290,7 @@ public class HomeworkMainScreen extends SideNavigationMenuParentActivity impleme
 
     private void homeworkDigitalContentGetRequest(String HomeWorkID) {
         if (StaticHelperClass.isNetworkAvailable(this)) {
+            dialog.show();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
                     .addConverterFactory(ScalarsConverterFactory.create())
@@ -327,11 +313,13 @@ public class HomeworkMainScreen extends SideNavigationMenuParentActivity impleme
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseDigitalContent(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
+                            dialog.dismiss();
                             errorDigital.setVisibility(View.VISIBLE);
                             digitalContentList.clear();
                             mDigitalAdapter.notifyDataSetChanged();

@@ -2,6 +2,7 @@ package onair.onems.studentlist;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -39,19 +40,16 @@ public class ReportAllStudentShowListAdapter extends RecyclerView.Adapter<Report
 
         public MyViewHolder(View view) {
             super(view);
-            studentName = (TextView)view.findViewById(R.id.name);
-            studentRoll = (TextView)view.findViewById(R.id.roll);
-            studentClass = (TextView)view.findViewById(R.id.classs);
-            studentRFID = (TextView)view.findViewById(R.id.rfid);
-            thumbnail = (ImageView)view.findViewById(R.id.thumbnail);
-            progressBar = (ProgressBar)view.findViewById(R.id.spin_kit);
+            studentName = view.findViewById(R.id.name);
+            studentRoll = view.findViewById(R.id.roll);
+            studentClass = view.findViewById(R.id.classs);
+            studentRFID = view.findViewById(R.id.rfid);
+            thumbnail = view.findViewById(R.id.thumbnail);
+            progressBar = view.findViewById(R.id.spin_kit);
 
-            view.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    // send selected contact in callback
-                    listener.onStudentSelected(studentListFiltered.get(getAdapterPosition()));
-                }
+            view.setOnClickListener(view1 -> {
+                // send selected contact in callback
+                listener.onStudentSelected(studentListFiltered.get(getAdapterPosition()));
             });
         }
     }
@@ -64,8 +62,9 @@ public class ReportAllStudentShowListAdapter extends RecyclerView.Adapter<Report
         this.studentListFiltered = studentList;
     }
 
+    @NonNull
     @Override
-    public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.report_all_student_row_item, parent, false);
 
@@ -73,7 +72,7 @@ public class ReportAllStudentShowListAdapter extends RecyclerView.Adapter<Report
     }
 
     @Override
-    public void onBindViewHolder(final MyViewHolder holder, final int position) {
+    public void onBindViewHolder(@NonNull final MyViewHolder holder, final int position) {
         ReportAllStudentRowModel reportAllStudentRowModel = studentListFiltered.get(position);
         holder.studentName.setText("Name: "+reportAllStudentRowModel.getUserName());
         holder.studentRoll.setText("Roll: "+reportAllStudentRowModel.getRollNo());

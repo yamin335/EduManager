@@ -1,9 +1,5 @@
 package onair.onems.models;
 
-/**
- * Created by User on 1/29/2018.
- */
-
 public class GenderModel {
     private long GenderID = -2;
     private String GenderName ="";

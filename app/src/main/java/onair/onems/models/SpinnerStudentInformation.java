@@ -1,9 +1,5 @@
 package onair.onems.models;
 
-/**
- * Created by User on 1/7/2018.
- */
-
 public class SpinnerStudentInformation {
 
     private String UserID = "";

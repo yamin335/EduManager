@@ -1,9 +1,5 @@
 package onair.onems.models;
 
-/**
- * Created by User on 1/29/2018.
- */
-
 public class ReligionModel {
 
     private long ReligionID = -2;

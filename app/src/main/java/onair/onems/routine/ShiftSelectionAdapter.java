@@ -1,6 +1,7 @@
 package onair.onems.routine;
 
 import android.app.Activity;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,7 +13,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import onair.onems.R;
-import onair.onems.syllabus.SyllabusMainScreen;
 
 public class ShiftSelectionAdapter extends RecyclerView.Adapter<ShiftSelectionAdapter.MyViewHolder> {
     private JSONArray shifts;
@@ -26,16 +26,13 @@ public class ShiftSelectionAdapter extends RecyclerView.Adapter<ShiftSelectionAd
             super(view);
             shiftName = view.findViewById(R.id.name);
 
-            view.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    // send selected exam in callback
-                    try {
-                        selectedListener.onShiftSelected(shifts.getJSONObject(getAdapterPosition()));
-                        dismissListener.onShiftSelected(shifts.getJSONObject(getAdapterPosition()));
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
+            view.setOnClickListener(view1 -> {
+                // send selected exam in callback
+                try {
+                    selectedListener.onShiftSelected(shifts.getJSONObject(getAdapterPosition()));
+                    dismissListener.onShiftSelected(shifts.getJSONObject(getAdapterPosition()));
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
             });
         }
@@ -52,8 +49,9 @@ public class ShiftSelectionAdapter extends RecyclerView.Adapter<ShiftSelectionAd
         }
     }
 
+    @NonNull
     @Override
-    public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.selection_row_item, parent, false);
 
@@ -61,7 +59,7 @@ public class ShiftSelectionAdapter extends RecyclerView.Adapter<ShiftSelectionAd
     }
 
     @Override
-    public void onBindViewHolder(MyViewHolder holder, final int position) {
+    public void onBindViewHolder(@NonNull MyViewHolder holder, final int position) {
         try {
             JSONObject shift = shifts.getJSONObject(position);
             holder.shiftName.setText(shift.getString("ShiftName"));

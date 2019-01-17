@@ -1,9 +1,5 @@
 package onair.onems.models;
 
-/**
- * Created by User on 2/4/2018.
- */
-
 public class BloodGroupModel {
 
     private long BloodGroupID = -2;

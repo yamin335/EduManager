@@ -3,6 +3,8 @@ package onair.onems.login;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
@@ -14,6 +16,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Objects;
+
 import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -22,7 +26,7 @@ import io.reactivex.schedulers.Schedulers;
 import onair.onems.R;
 import onair.onems.Services.RetrofitNetworkService;
 import onair.onems.Services.StaticHelperClass;
-import onair.onems.network.MySingleton;
+import onair.onems.mainactivities.CommonProgressDialog;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -32,8 +36,9 @@ public class ForgotPassChangePassDialog extends Dialog implements View.OnClickLi
     private Activity parentActivity;
     private Context context;
     private EditText newPassword, confirmPassword;
-    private String returnValue, passwordChangeUrl;
+    private String returnValue;
     private Disposable finalDisposer;
+    public CommonProgressDialog dialog;
 
     @Override
     public void dismiss() {
@@ -54,6 +59,9 @@ public class ForgotPassChangePassDialog extends Dialog implements View.OnClickLi
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.forgot_pass_change_pass_dialog);
+        dialog = new CommonProgressDialog(parentActivity);
+        Objects.requireNonNull(dialog.getWindow()).setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        dialog.setCancelable(false);
         Button cross = findViewById(R.id.cross);
         Button done = findViewById(R.id.done);
         newPassword = findViewById(R.id.newPassword);
@@ -89,6 +97,7 @@ public class ForgotPassChangePassDialog extends Dialog implements View.OnClickLi
         } else if(newP.equals(confirmP)) {
             if(StaticHelperClass.isNetworkAvailable(context)) {
                 try {
+                    dialog.show();
                     JSONObject jsonObject = new JSONObject(returnValue);
                     Retrofit retrofit = new Retrofit.Builder()
                             .baseUrl(context.getString(R.string.baseUrl))
@@ -118,6 +127,7 @@ public class ForgotPassChangePassDialog extends Dialog implements View.OnClickLi
 
                                 @Override
                                 public void onNext(String response) {
+                                    dialog.dismiss();
                                     parseReturnData(response);
                                 }
 
@@ -128,6 +138,7 @@ public class ForgotPassChangePassDialog extends Dialog implements View.OnClickLi
 
                                 @Override
                                 public void onError(Throwable e) {
+                                    dialog.dismiss();
                                     dismiss();
                                     Toast.makeText(context,"Error changing password !!!",Toast.LENGTH_LONG).show();
                                 }

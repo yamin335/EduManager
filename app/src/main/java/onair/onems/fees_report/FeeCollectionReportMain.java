@@ -79,7 +79,7 @@ public class FeeCollectionReportMain extends SideNavigationMenuParentActivity {
     private String selectedStatus;
 
     private int firstBranch = 0, firstShift = 0, firstMedium = 0, firstClass = 0, firstDepartment = 0,
-            firstSection = 0, firstSession = 0, firstMonth = 0, firstStatus = 0;
+            firstSection = 0, firstSession = 0, firstStatus = 0;
 
     private int  ReportType;
 
@@ -99,8 +99,8 @@ public class FeeCollectionReportMain extends SideNavigationMenuParentActivity {
 //        activityName = FeeCollectionReportMain.class.getName();
 
         LayoutInflater inflater = (LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        final View childActivityLayout = inflater.inflate(R.layout.fee_collection_report_main, null);
-        LinearLayout parentActivityLayout = (LinearLayout) findViewById(R.id.contentMain);
+        final View childActivityLayout = Objects.requireNonNull(inflater).inflate(R.layout.fee_collection_report_main, null);
+        LinearLayout parentActivityLayout = findViewById(R.id.contentMain);
         parentActivityLayout.addView(childActivityLayout, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
 
         ReportType = getIntent().getIntExtra("Report Type", 0);
@@ -128,35 +128,32 @@ public class FeeCollectionReportMain extends SideNavigationMenuParentActivity {
         allStatusArrayList.add("1");
         allStatusArrayList.add("2");
 
-        spinnerBranch = (Spinner)findViewById(R.id.spinnerBranch);
-        spinnerShift = (Spinner)findViewById(R.id.spinnerShift);
-        spinnerMedium =(Spinner)findViewById(R.id.spinnerMedium);
-        spinnerClass = (Spinner)findViewById(R.id.spinnerClass);
-        spinnerDepartment =(Spinner)findViewById(R.id.spinnerDepartment);
-        spinnerSection = (Spinner)findViewById(R.id.spinnerSection);
-        spinnerSession = (Spinner)findViewById(R.id.spinnerSession);
-        spinnerMonth = (Spinner)findViewById(R.id.spinnerMonth);
-        spinnerStatus = (Spinner)findViewById(R.id.spinnerStatus);
+        spinnerBranch = findViewById(R.id.spinnerBranch);
+        spinnerShift = findViewById(R.id.spinnerShift);
+        spinnerMedium = findViewById(R.id.spinnerMedium);
+        spinnerClass = findViewById(R.id.spinnerClass);
+        spinnerDepartment = findViewById(R.id.spinnerDepartment);
+        spinnerSection = findViewById(R.id.spinnerSection);
+        spinnerSession = findViewById(R.id.spinnerSession);
+        spinnerMonth = findViewById(R.id.spinnerMonth);
+        spinnerStatus = findViewById(R.id.spinnerStatus);
 
-        Button showList = (Button)findViewById(R.id.showList);
-        showList.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                CheckSelectedData();
-                Intent intent = new Intent(FeeCollectionReportMain.this, FeeCollectionReportList.class);
-                intent.putExtra("InstituteID", Long.toString(InstituteID));
-                intent.putExtra("BranchID", Long.toString(selectedBranch.getBrunchID()));
-                intent.putExtra("MediumID", Long.toString(selectedMedium.getMediumID()));
-                intent.putExtra("ClassID", Long.toString(selectedClass.getClassID()));
-                intent.putExtra("DepartmentID", Long.toString(selectedDepartment.getDepartmentID()));
-                intent.putExtra("SectionID", Long.toString(selectedSection.getSectionID()));
-                intent.putExtra("ShiftID", Long.toString(selectedShift.getShiftID()));
-                intent.putExtra("MonthID", Long.toString(selectedMonth.getMonthID()));
-                intent.putExtra("StatusID", selectedStatus);
-                intent.putExtra("SessionID", Long.toString(selectedSession.getSessionID()));
-                intent.putExtra("Report Type", ReportType);
-                startActivity(intent);
-            }
+        Button showList = findViewById(R.id.showList);
+        showList.setOnClickListener(v -> {
+            CheckSelectedData();
+            Intent intent = new Intent(FeeCollectionReportMain.this, FeeCollectionReportList.class);
+            intent.putExtra("InstituteID", Long.toString(InstituteID));
+            intent.putExtra("BranchID", Long.toString(selectedBranch.getBrunchID()));
+            intent.putExtra("MediumID", Long.toString(selectedMedium.getMediumID()));
+            intent.putExtra("ClassID", Long.toString(selectedClass.getClassID()));
+            intent.putExtra("DepartmentID", Long.toString(selectedDepartment.getDepartmentID()));
+            intent.putExtra("SectionID", Long.toString(selectedSection.getSectionID()));
+            intent.putExtra("ShiftID", Long.toString(selectedShift.getShiftID()));
+            intent.putExtra("MonthID", Long.toString(selectedMonth.getMonthID()));
+            intent.putExtra("StatusID", selectedStatus);
+            intent.putExtra("SessionID", Long.toString(selectedSession.getSessionID()));
+            intent.putExtra("Report Type", ReportType);
+            startActivity(intent);
         });
 
         ArrayAdapter<String> branch_spinner_adapter = new ArrayAdapter<>(this, R.layout.spinner_item, tempBranchArray);
@@ -424,6 +421,7 @@ public class FeeCollectionReportMain extends SideNavigationMenuParentActivity {
 
     private void BranchDataGetRequest() {
         if (StaticHelperClass.isNetworkAvailable(this)) {
+            dialog.show();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
                     .addConverterFactory(ScalarsConverterFactory.create())
@@ -446,12 +444,13 @@ public class FeeCollectionReportMain extends SideNavigationMenuParentActivity {
 
                         @Override
                         public void onNext(String BranchDataReturnValue) {
+                            dialog.dismiss();
                             parseBranchJsonData(BranchDataReturnValue);
                         }
 
                         @Override
                         public void onError(Throwable e) {
-
+                            dialog.dismiss();
                         }
 
                         @Override
@@ -495,6 +494,7 @@ public class FeeCollectionReportMain extends SideNavigationMenuParentActivity {
 
     private void ShiftDataGetRequest() {
         if (StaticHelperClass.isNetworkAvailable(this)) {
+            dialog.show();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
                     .addConverterFactory(ScalarsConverterFactory.create())
@@ -517,12 +517,13 @@ public class FeeCollectionReportMain extends SideNavigationMenuParentActivity {
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseShiftJsonData(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
-
+                            dialog.dismiss();
                         }
 
                         @Override
@@ -564,6 +565,7 @@ public class FeeCollectionReportMain extends SideNavigationMenuParentActivity {
 
     private void MediumDataGetRequest() {
         if(StaticHelperClass.isNetworkAvailable(this)) {
+            dialog.show();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
                     .addConverterFactory(ScalarsConverterFactory.create())
@@ -586,12 +588,13 @@ public class FeeCollectionReportMain extends SideNavigationMenuParentActivity {
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseMediumJsonData(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
-
+                            dialog.dismiss();
                         }
 
                         @Override
@@ -635,6 +638,7 @@ public class FeeCollectionReportMain extends SideNavigationMenuParentActivity {
 
     private void ClassDataGetRequest() {
         if(StaticHelperClass.isNetworkAvailable(this)) {
+            dialog.show();
             CheckSelectedData();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
@@ -658,12 +662,13 @@ public class FeeCollectionReportMain extends SideNavigationMenuParentActivity {
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseClassJsonData(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
-
+                            dialog.dismiss();
                         }
 
                         @Override
@@ -706,6 +711,7 @@ public class FeeCollectionReportMain extends SideNavigationMenuParentActivity {
 
     private void DepartmentDataGetRequest() {
         if(StaticHelperClass.isNetworkAvailable(this)) {
+            dialog.show();
             CheckSelectedData();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
@@ -729,12 +735,13 @@ public class FeeCollectionReportMain extends SideNavigationMenuParentActivity {
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseDepartmentJsonData(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
-
+                            dialog.dismiss();
                         }
 
                         @Override
@@ -779,6 +786,7 @@ public class FeeCollectionReportMain extends SideNavigationMenuParentActivity {
 
     private void SectionDataGetRequest() {
         if(StaticHelperClass.isNetworkAvailable(this)) {
+            dialog.show();
             CheckSelectedData();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
@@ -802,12 +810,13 @@ public class FeeCollectionReportMain extends SideNavigationMenuParentActivity {
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseSectionJsonData(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
-
+                            dialog.dismiss();
                         }
 
                         @Override
@@ -849,6 +858,7 @@ public class FeeCollectionReportMain extends SideNavigationMenuParentActivity {
 
     private void SessionDataGetRequest() {
         if (StaticHelperClass.isNetworkAvailable(this)) {
+            dialog.show();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
                     .addConverterFactory(ScalarsConverterFactory.create())
@@ -871,12 +881,13 @@ public class FeeCollectionReportMain extends SideNavigationMenuParentActivity {
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseSessionJsonData(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
-
+                            dialog.dismiss();
                         }
 
                         @Override
@@ -918,6 +929,7 @@ public class FeeCollectionReportMain extends SideNavigationMenuParentActivity {
 
     void MonthDataGetRequest(){
         if(StaticHelperClass.isNetworkAvailable(this)) {
+            dialog.show();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
                     .addConverterFactory(ScalarsConverterFactory.create())
@@ -940,12 +952,13 @@ public class FeeCollectionReportMain extends SideNavigationMenuParentActivity {
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseMonthJsonData(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
-
+                            dialog.dismiss();
                         }
 
                         @Override
@@ -1007,7 +1020,7 @@ public class FeeCollectionReportMain extends SideNavigationMenuParentActivity {
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {

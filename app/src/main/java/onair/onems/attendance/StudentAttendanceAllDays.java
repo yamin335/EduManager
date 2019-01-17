@@ -43,8 +43,7 @@ import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.converter.scalars.ScalarsConverterFactory;
 
-public class StudentAttendanceAllDays extends CommonToolbarParentActivity
-{
+public class StudentAttendanceAllDays extends CommonToolbarParentActivity {
     private ArrayList<DailyAttendanceModel> dailyAttendanceList;
     private DailyAttendanceModel selectedDay;
     private TableView tableView;
@@ -76,13 +75,13 @@ public class StudentAttendanceAllDays extends CommonToolbarParentActivity
         LinearLayout parentActivityLayout = findViewById(R.id.contentMain);
         parentActivityLayout.addView(childActivityLayout, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
 
-        tableView = (TableView) findViewById(R.id.tableView);
+        tableView = findViewById(R.id.tableView);
         totalClass = findViewById(R.id.totalClass);
         totalPresent = findViewById(R.id.totalPresent);
         ImageView studentImage = findViewById(R.id.studentImage);
-        TextView name=(TextView) findViewById(R.id.name);
-        TextView roll=(TextView) findViewById(R.id.roll);
-        TextView id=(TextView) findViewById(R.id.Id);
+        TextView name = findViewById(R.id.name);
+        TextView roll = findViewById(R.id.roll);
+        TextView id = findViewById(R.id.Id);
 
         dailyAttendanceList = new ArrayList<>();
         selectedDay = new DailyAttendanceModel();
@@ -150,20 +149,17 @@ public class StudentAttendanceAllDays extends CommonToolbarParentActivity
         // Configure Size of different Mobile Device End
 
        //Table View Click Event
-        tableView.addDataClickListener(new TableDataClickListener() {
-            @Override
-            public void onDataClicked(int rowIndex, Object clickedData) {
-                selectedDay = dailyAttendanceList.get(rowIndex);
-                Intent intent = new Intent(StudentAttendanceAllDays.this, StudentSubjectWiseAttendance.class);
-                intent.putExtra("UserID", UserID);
-                intent.putExtra("ShiftID", ShiftID);
-                intent.putExtra("MediumID", MediumID);
-                intent.putExtra("ClassID", ClassID);
-                intent.putExtra("DepartmentID", DepartmentID);
-                intent.putExtra("SectionID", SectionID);
-                intent.putExtra("Date", selectedDay.getDate());
-                startActivity(intent);
-            }
+        tableView.addDataClickListener((rowIndex, clickedData) -> {
+            selectedDay = dailyAttendanceList.get(rowIndex);
+            Intent intent1 = new Intent(StudentAttendanceAllDays.this, StudentSubjectWiseAttendance.class);
+            intent1.putExtra("UserID", UserID);
+            intent1.putExtra("ShiftID", ShiftID);
+            intent1.putExtra("MediumID", MediumID);
+            intent1.putExtra("ClassID", ClassID);
+            intent1.putExtra("DepartmentID", DepartmentID);
+            intent1.putExtra("SectionID", SectionID);
+            intent1.putExtra("Date", selectedDay.getDate());
+            startActivity(intent1);
         });
         //Table View Click Event  End
 
@@ -226,7 +222,7 @@ public class StudentAttendanceAllDays extends CommonToolbarParentActivity
 
     public void AttendanceDataGetRequest(){
         if(StaticHelperClass.isNetworkAvailable(this)) {
-
+            dialog.show();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
                     .addConverterFactory(ScalarsConverterFactory.create())
@@ -249,12 +245,13 @@ public class StudentAttendanceAllDays extends CommonToolbarParentActivity
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseMonthlyAttendanceJsonData(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
-
+                            dialog.dismiss();
                         }
 
                         @Override

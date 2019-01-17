@@ -1,13 +1,9 @@
 package onair.onems.result;
 
-import android.app.ProgressDialog;
-
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
@@ -28,11 +24,6 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
 import com.google.gson.JsonObject;
 
 import org.json.JSONArray;
@@ -40,9 +31,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Objects;
 
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -52,9 +42,6 @@ import io.reactivex.schedulers.Schedulers;
 import onair.onems.R;
 import onair.onems.Services.RetrofitNetworkService;
 import onair.onems.Services.StaticHelperClass;
-import onair.onems.attendance.OthersAttendanceReport;
-import onair.onems.attendance.SelfAttendanceReport;
-import onair.onems.attendance.StudentAttendanceReport;
 import onair.onems.mainactivities.SideNavigationMenuParentActivity;
 import onair.onems.mainactivities.StudentMainScreen;
 import onair.onems.mainactivities.TeacherMainScreen;
@@ -65,7 +52,6 @@ import onair.onems.models.MediumModel;
 import onair.onems.models.SectionModel;
 import onair.onems.models.SessionModel;
 import onair.onems.models.ShiftModel;
-import onair.onems.network.MySingleton;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -123,18 +109,18 @@ public class ResultMainScreen extends SideNavigationMenuParentActivity{
 
         if(UserTypeID == 3||UserTypeID==5) {
             LayoutInflater inflater = (LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            final View childActivityLayout = inflater.inflate(R.layout.result_student_content_main, null);
-            LinearLayout parentActivityLayout = (LinearLayout) findViewById(R.id.contentMain);
+            final View childActivityLayout = Objects.requireNonNull(inflater).inflate(R.layout.result_student_content_main, null);
+            LinearLayout parentActivityLayout = findViewById(R.id.contentMain);
             parentActivityLayout.addView(childActivityLayout, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
 
-            ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
+            ViewPager viewPager = findViewById(R.id.pager);
             setupViewPager(viewPager);
-            TabLayout tabLayout = (TabLayout) findViewById(R.id.tabLayout);
+            TabLayout tabLayout = findViewById(R.id.tabLayout);
             tabLayout.setupWithViewPager(viewPager);
         } else if(UserTypeID == 1||UserTypeID == 2||UserTypeID == 4) {
             LayoutInflater inflater = (LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            final View childActivityLayout = inflater.inflate(R.layout.result_content_main, null);
-            LinearLayout parentActivityLayout = (LinearLayout) findViewById(R.id.contentMain);
+            final View childActivityLayout = Objects.requireNonNull(inflater).inflate(R.layout.result_content_main, null);
+            LinearLayout parentActivityLayout = findViewById(R.id.contentMain);
             parentActivityLayout.addView(childActivityLayout, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
 
             allSessionArrayList = new ArrayList<>();
@@ -154,16 +140,16 @@ public class ResultMainScreen extends SideNavigationMenuParentActivity{
             selectedExam = new ExamModel();
             selectedStudent = null;
 
-            spinnerClass = (Spinner)findViewById(R.id.spinnerClass);
-            spinnerShift = (Spinner)findViewById(R.id.spinnerShift);
-            spinnerSection = (Spinner)findViewById(R.id.spinnerSection);
-            spinnerMedium =(Spinner)findViewById(R.id.spinnerMedium);
-            spinnerDepartment =(Spinner)findViewById(R.id.spinnerDepartment);
-            spinnerStudent = (Spinner)findViewById(R.id.spinnerStudent);
-            spinnerSession = (Spinner)findViewById(R.id.spinnerSession);
-            spinnerExam = (Spinner)findViewById(R.id.spinnerExam);
+            spinnerClass = findViewById(R.id.spinnerClass);
+            spinnerShift = findViewById(R.id.spinnerShift);
+            spinnerSection = findViewById(R.id.spinnerSection);
+            spinnerMedium = findViewById(R.id.spinnerMedium);
+            spinnerDepartment = findViewById(R.id.spinnerDepartment);
+            spinnerStudent = findViewById(R.id.spinnerStudent);
+            spinnerSession = findViewById(R.id.spinnerSession);
+            spinnerExam = findViewById(R.id.spinnerExam);
 
-            Button showResult = (Button)findViewById(R.id.showResult);
+            Button showResult = findViewById(R.id.showResult);
 
             ArrayAdapter<String> class_spinner_adapter = new ArrayAdapter<>(this, R.layout.spinner_item, tempClassArray);
             class_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -419,52 +405,49 @@ public class ResultMainScreen extends SideNavigationMenuParentActivity{
                 }
             });
 
-            showResult.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if(StaticHelperClass.isNetworkAvailable(ResultMainScreen.this)) {
-                        if(allSessionArrayList.size()>0 && selectedSession.getSessionID() == 0){
-                            Toast.makeText(ResultMainScreen.this,"Please select session!!! ",
-                                    Toast.LENGTH_LONG).show();
-                        } else if(allMediumArrayList.size()>0 && (selectedMedium.getMediumID() == -2 || selectedMedium.getMediumID() == 0)) {
-                            Toast.makeText(ResultMainScreen.this,"Please select medium!!! ",
-                                    Toast.LENGTH_LONG).show();
-                        } else if(allClassArrayList.size()>0 && (selectedClass.getClassID() == -2 || selectedClass.getClassID() == 0)) {
-                            Toast.makeText(ResultMainScreen.this,"Please select class!!! ",
-                                    Toast.LENGTH_LONG).show();
-                        } else if(allDepartmentArrayList.size()>0 && (selectedDepartment.getDepartmentID() == -2 || selectedDepartment.getDepartmentID() == 0)) {
-                            Toast.makeText(ResultMainScreen.this,"Please select department!!! ",
-                                    Toast.LENGTH_LONG).show();
-                        } else if(allSectionArrayList.size()>0 && (selectedSection.getSectionID() == -2 || selectedSection.getSectionID() == 0)) {
-                            Toast.makeText(ResultMainScreen.this,"Please select section!!! ",
-                                    Toast.LENGTH_LONG).show();
-                        } else if(allExamArrayList.size()>0 && selectedExam.getExamID() == 0) {
-                            Toast.makeText(ResultMainScreen.this,"Please select exam!!! ",
-                                    Toast.LENGTH_LONG).show();
-                        } else if(selectedStudent == null){
-                            Toast.makeText(ResultMainScreen.this,"Please select a student!!! ",
-                                    Toast.LENGTH_LONG).show();
-                        } else {
-                            try {
-                                Intent intent = new Intent(ResultMainScreen.this, SubjectWiseResult.class);
-                                intent.putExtra("UserID", selectedStudent.getString("UserID").equalsIgnoreCase("null")? "0":selectedStudent.getString("UserID"));
-                                intent.putExtra("ShiftID", selectedStudent.getString("ShiftID").equalsIgnoreCase("null")? "0":selectedStudent.getString("ShiftID"));
-                                intent.putExtra("MediumID", selectedStudent.getString("MediumID").equalsIgnoreCase("null")? "0":selectedStudent.getString("MediumID"));
-                                intent.putExtra("ClassID", selectedStudent.getString("ClassID").equalsIgnoreCase("null")? "0":selectedStudent.getString("ClassID"));
-                                intent.putExtra("DepartmentID", selectedStudent.getString("DepartmentID").equalsIgnoreCase("null")? "0":selectedStudent.getString("DepartmentID"));
-                                intent.putExtra("SectionID", selectedStudent.getString("SectionID").equalsIgnoreCase("null")? "0":selectedStudent.getString("SectionID"));
-                                intent.putExtra("SessionID", selectedStudent.getString("SessionID").equalsIgnoreCase("null")? "0":selectedStudent.getString("SessionID"));
-                                intent.putExtra("ExamID", Long.toString(selectedExam.getExamID()));
-                                intent.putExtra("InstituteID", selectedStudent.getString("InstituteID").equalsIgnoreCase("null")? "0":selectedStudent.getString("InstituteID"));
-                                startActivity(intent);
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    } else {
-                        Toast.makeText(ResultMainScreen.this,"Please check your internet connection and select again!!! ",
+            showResult.setOnClickListener(v -> {
+                if(StaticHelperClass.isNetworkAvailable(ResultMainScreen.this)) {
+                    if(allSessionArrayList.size()>0 && selectedSession.getSessionID() == 0){
+                        Toast.makeText(ResultMainScreen.this,"Please select session!!! ",
                                 Toast.LENGTH_LONG).show();
+                    } else if(allMediumArrayList.size()>0 && (selectedMedium.getMediumID() == -2 || selectedMedium.getMediumID() == 0)) {
+                        Toast.makeText(ResultMainScreen.this,"Please select medium!!! ",
+                                Toast.LENGTH_LONG).show();
+                    } else if(allClassArrayList.size()>0 && (selectedClass.getClassID() == -2 || selectedClass.getClassID() == 0)) {
+                        Toast.makeText(ResultMainScreen.this,"Please select class!!! ",
+                                Toast.LENGTH_LONG).show();
+                    } else if(allDepartmentArrayList.size()>0 && (selectedDepartment.getDepartmentID() == -2 || selectedDepartment.getDepartmentID() == 0)) {
+                        Toast.makeText(ResultMainScreen.this,"Please select department!!! ",
+                                Toast.LENGTH_LONG).show();
+                    } else if(allSectionArrayList.size()>0 && (selectedSection.getSectionID() == -2 || selectedSection.getSectionID() == 0)) {
+                        Toast.makeText(ResultMainScreen.this,"Please select section!!! ",
+                                Toast.LENGTH_LONG).show();
+                    } else if(allExamArrayList.size()>0 && selectedExam.getExamID() == 0) {
+                        Toast.makeText(ResultMainScreen.this,"Please select exam!!! ",
+                                Toast.LENGTH_LONG).show();
+                    } else if(selectedStudent == null){
+                        Toast.makeText(ResultMainScreen.this,"Please select a student!!! ",
+                                Toast.LENGTH_LONG).show();
+                    } else {
+                        try {
+                            Intent intent = new Intent(ResultMainScreen.this, SubjectWiseResult.class);
+                            intent.putExtra("UserID", selectedStudent.getString("UserID").equalsIgnoreCase("null")? "0":selectedStudent.getString("UserID"));
+                            intent.putExtra("ShiftID", selectedStudent.getString("ShiftID").equalsIgnoreCase("null")? "0":selectedStudent.getString("ShiftID"));
+                            intent.putExtra("MediumID", selectedStudent.getString("MediumID").equalsIgnoreCase("null")? "0":selectedStudent.getString("MediumID"));
+                            intent.putExtra("ClassID", selectedStudent.getString("ClassID").equalsIgnoreCase("null")? "0":selectedStudent.getString("ClassID"));
+                            intent.putExtra("DepartmentID", selectedStudent.getString("DepartmentID").equalsIgnoreCase("null")? "0":selectedStudent.getString("DepartmentID"));
+                            intent.putExtra("SectionID", selectedStudent.getString("SectionID").equalsIgnoreCase("null")? "0":selectedStudent.getString("SectionID"));
+                            intent.putExtra("SessionID", selectedStudent.getString("SessionID").equalsIgnoreCase("null")? "0":selectedStudent.getString("SessionID"));
+                            intent.putExtra("ExamID", Long.toString(selectedExam.getExamID()));
+                            intent.putExtra("InstituteID", selectedStudent.getString("InstituteID").equalsIgnoreCase("null")? "0":selectedStudent.getString("InstituteID"));
+                            startActivity(intent);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
                     }
+                } else {
+                    Toast.makeText(ResultMainScreen.this,"Please check your internet connection and select again!!! ",
+                            Toast.LENGTH_LONG).show();
                 }
             });
 
@@ -519,7 +502,7 @@ public class ResultMainScreen extends SideNavigationMenuParentActivity{
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else if(UserTypeID == 1) {
@@ -547,6 +530,7 @@ public class ResultMainScreen extends SideNavigationMenuParentActivity{
 
     private void SessionDataGetRequest() {
         if (StaticHelperClass.isNetworkAvailable(this)) {
+            dialog.show();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
                     .addConverterFactory(ScalarsConverterFactory.create())
@@ -569,11 +553,13 @@ public class ResultMainScreen extends SideNavigationMenuParentActivity{
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseSessionJsonData(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
+                            dialog.dismiss();
                             Toast.makeText(ResultMainScreen.this,"Session not found!!! ",
                                     Toast.LENGTH_LONG).show();
                         }
@@ -620,6 +606,7 @@ public class ResultMainScreen extends SideNavigationMenuParentActivity{
 
     private void ShiftDataGetRequest() {
         if (StaticHelperClass.isNetworkAvailable(this)) {
+            dialog.show();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
                     .addConverterFactory(ScalarsConverterFactory.create())
@@ -642,12 +629,13 @@ public class ResultMainScreen extends SideNavigationMenuParentActivity{
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseShiftJsonData(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
-
+                            dialog.dismiss();
                         }
 
                         @Override
@@ -692,6 +680,7 @@ public class ResultMainScreen extends SideNavigationMenuParentActivity{
 
     private void MediumDataGetRequest() {
         if(StaticHelperClass.isNetworkAvailable(this)) {
+            dialog.show();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
                     .addConverterFactory(ScalarsConverterFactory.create())
@@ -714,12 +703,13 @@ public class ResultMainScreen extends SideNavigationMenuParentActivity{
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseMediumJsonData(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
-
+                            dialog.dismiss();
                         }
 
                         @Override
@@ -766,6 +756,7 @@ public class ResultMainScreen extends SideNavigationMenuParentActivity{
 
     private void ClassDataGetRequest() {
         if(StaticHelperClass.isNetworkAvailable(this)) {
+            dialog.show();
             CheckSelectedData();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
@@ -789,12 +780,13 @@ public class ResultMainScreen extends SideNavigationMenuParentActivity{
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseClassJsonData(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
-
+                            dialog.dismiss();
                         }
 
                         @Override
@@ -840,6 +832,7 @@ public class ResultMainScreen extends SideNavigationMenuParentActivity{
 
     private void DepartmentDataGetRequest() {
         if(StaticHelperClass.isNetworkAvailable(this)) {
+            dialog.show();
             CheckSelectedData();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
@@ -863,12 +856,13 @@ public class ResultMainScreen extends SideNavigationMenuParentActivity{
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseDepartmentJsonData(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
-
+                            dialog.dismiss();
                         }
 
                         @Override
@@ -917,6 +911,7 @@ public class ResultMainScreen extends SideNavigationMenuParentActivity{
 
     private void SectionDataGetRequest() {
         if(StaticHelperClass.isNetworkAvailable(this)) {
+            dialog.show();
             CheckSelectedData();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
@@ -940,12 +935,13 @@ public class ResultMainScreen extends SideNavigationMenuParentActivity{
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseSectionJsonData(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
-
+                            dialog.dismiss();
                         }
 
                         @Override
@@ -990,6 +986,7 @@ public class ResultMainScreen extends SideNavigationMenuParentActivity{
 
     private void ExamDataGetRequest() {
         if (StaticHelperClass.isNetworkAvailable(this)) {
+            dialog.show();
             CheckSelectedData();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
@@ -1013,12 +1010,13 @@ public class ResultMainScreen extends SideNavigationMenuParentActivity{
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseExamJsonData(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
-
+                            dialog.dismiss();
                         }
 
                         @Override
@@ -1081,6 +1079,7 @@ public class ResultMainScreen extends SideNavigationMenuParentActivity{
             jsonObject.addProperty("MediumID", Long.toString(selectedMedium.getMediumID()));
             jsonObject.addProperty("ShiftID", Long.toString(selectedShift.getShiftID()));
 
+            dialog.show();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
                     .addConverterFactory(ScalarsConverterFactory.create())
@@ -1103,11 +1102,13 @@ public class ResultMainScreen extends SideNavigationMenuParentActivity{
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseStudentJsonData(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
+                            dialog.dismiss();
                             Toast.makeText(ResultMainScreen.this,"Student not found!!! ",
                                     Toast.LENGTH_LONG).show();
                         }

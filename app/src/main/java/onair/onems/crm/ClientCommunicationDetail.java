@@ -9,7 +9,6 @@ import android.app.NotificationManager;
 import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
@@ -40,7 +39,6 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -101,8 +99,6 @@ public class ClientCommunicationDetail extends CommonToolbarParentActivity imple
     private ArrayList<Uri> fileUriArray;
     private Uri backupFileUri;
     private CoordinatorLayout coordinatorLayout;
-    private ProgressBar progressBar;
-    private View whiteBackground;
     private String selectedDate = "";
     private String selectedNextMeetingDate = "";
     private CommunicationDetailModel communicationDetailModel;
@@ -232,10 +228,6 @@ public class ClientCommunicationDetail extends CommonToolbarParentActivity imple
 
 
         coordinatorLayout = findViewById(R.id.coordinator_layout);
-        whiteBackground = findViewById(R.id.whiteBackground);
-        progressBar = findViewById(R.id.progressBar);
-        progressBar.setVisibility(View.INVISIBLE);
-        whiteBackground.setVisibility(View.INVISIBLE);
 
         RecyclerView fileRecycler = findViewById(R.id.recycler);
         fileUriArray = new ArrayList<>();
@@ -257,8 +249,8 @@ public class ClientCommunicationDetail extends CommonToolbarParentActivity imple
             }
         }
 
-        spinnerCommunicationType =(Spinner)findViewById(R.id.spinnerCommunication);
-        spinnerPriorityType = (Spinner)findViewById(R.id.spinnerPriority);
+        spinnerCommunicationType = findViewById(R.id.spinnerCommunication);
+        spinnerPriorityType = findViewById(R.id.spinnerPriority);
 
         ArrayAdapter<String> CommunicationTypeAdapter = new ArrayAdapter<>(this, R.layout.spinner_item, tempCommunicationType);
         CommunicationTypeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -487,105 +479,120 @@ public class ClientCommunicationDetail extends CommonToolbarParentActivity imple
 
     private void postDocumentsAndData() {
         if (fileUriArray.size()>0) {
-            Retrofit retrofit = new Retrofit.Builder()
-//                .baseUrl(getString(R.string.baseUrl))
-                    .baseUrl("http://172.16.1.2:4000")
-                    .addConverterFactory(ScalarsConverterFactory.create())
-                    .addConverterFactory(GsonConverterFactory.create())
-                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                    .build();
+            if (StaticHelperClass.isNetworkAvailable(this)) {
+                dialog.show();
+                Retrofit retrofit = new Retrofit.Builder()
+                        .baseUrl(getString(R.string.baseUrl))
+                        .addConverterFactory(ScalarsConverterFactory.create())
+                        .addConverterFactory(GsonConverterFactory.create())
+                        .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                        .build();
 
-            List<MultipartBody.Part> documentParts = new ArrayList<>();
+                List<MultipartBody.Part> documentParts = new ArrayList<>();
 
-            for (int i=0; i<fileUriArray.size(); i++) {
-                documentParts.add(prepareFilePart(FileUtils.getFile(this, fileUriArray.get(i))));
-            }
+                for (int i=0; i<fileUriArray.size(); i++) {
+                    documentParts.add(prepareFilePart(FileUtils.getFile(this, fileUriArray.get(i))));
+                }
 
-            Observable<String> documentObservable = retrofit
-                    .create(RetrofitNetworkService.class)
-                    .uploadMultipleFilesDynamic(documentParts)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .unsubscribeOn(Schedulers.io());
+                Observable<String> documentObservable = retrofit
+                        .create(RetrofitNetworkService.class)
+                        .uploadMultipleFilesDynamic(documentParts)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .unsubscribeOn(Schedulers.io());
 
-            finalDisposer.add(documentObservable
-                    .observeOn(Schedulers.io())
-                    .subscribeOn(AndroidSchedulers.mainThread())
-                    .unsubscribeOn(Schedulers.io())
-                    .subscribeWith(new DisposableObserver<String>() {
+                finalDisposer.add(documentObservable
+                        .observeOn(Schedulers.io())
+                        .subscribeOn(AndroidSchedulers.mainThread())
+                        .unsubscribeOn(Schedulers.io())
+                        .subscribeWith(new DisposableObserver<String>() {
 
-                        @Override
-                        public void onNext(String returnValue) {
-                            JsonParser parser = new JsonParser();
-                            JsonArray documentUrls = parser.parse(returnValue).getAsJsonArray();
-                            ArrayList<DocumentModel> parsedDocumentUrls = new ArrayList<>();
-                            for(int i = 0; i<documentUrls.size(); i++) {
-                                if(documentUrls.get(i).isJsonObject()) {
-                                    JsonObject tempJsonObject = documentUrls.get(i).getAsJsonObject();
-                                    DocumentModel documentModel = new DocumentModel("0", tempJsonObject.get("path").getAsString());
-                                    parsedDocumentUrls.add(documentModel);
+                            @Override
+                            public void onNext(String returnValue) {
+                                dialog.dismiss();
+                                JsonParser parser = new JsonParser();
+                                JsonArray documentUrls = parser.parse(returnValue).getAsJsonArray();
+                                ArrayList<DocumentModel> parsedDocumentUrls = new ArrayList<>();
+                                for(int i = 0; i<documentUrls.size(); i++) {
+                                    if(documentUrls.get(i).isJsonObject()) {
+                                        JsonObject tempJsonObject = documentUrls.get(i).getAsJsonObject();
+                                        DocumentModel documentModel = new DocumentModel("0", tempJsonObject.get("path").getAsString());
+                                        parsedDocumentUrls.add(documentModel);
+                                    }
                                 }
+                                communicationDetailModel.setDocument(parsedDocumentUrls);
+                                postToServer();
                             }
-                            communicationDetailModel.setDocument(parsedDocumentUrls);
-                            postToServer();
-                        }
 
-                        @Override
-                        public void onError(Throwable e) {
-                            Log.e("RXANDROID", "onError: " + e.getMessage());
-                        }
+                            @Override
+                            public void onError(Throwable e) {
+                                dialog.dismiss();
+                                Log.e("RXANDROID", "onError: " + e.getMessage());
+                            }
 
-                        @Override
-                        public void onComplete() {
-                            Log.e("COMPLETE", "Complete: ");
-                        }
-                    }));
+                            @Override
+                            public void onComplete() {
+                                Log.e("COMPLETE", "Complete: ");
+                            }
+                        }));
+            } else {
+                Toast.makeText(this,"Please check your internet connection and select again!!! ",
+                        Toast.LENGTH_LONG).show();
+            }
         } else {
             postToServer();
         }
     }
 
     private void postToServer() {
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(getString(R.string.baseUrl))
-                .addConverterFactory(ScalarsConverterFactory.create())
-                .addConverterFactory(GsonConverterFactory.create())
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                .build();
+        if (StaticHelperClass.isNetworkAvailable(this)) {
+            dialog.show();
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(getString(R.string.baseUrl))
+                    .addConverterFactory(ScalarsConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .build();
 
-        Observable<String> observable = retrofit
-                .create(RetrofitNetworkService.class)
-                .postCommunicationDetail(communicationDetailModel)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .unsubscribeOn(Schedulers.io());
+            Observable<String> observable = retrofit
+                    .create(RetrofitNetworkService.class)
+                    .postCommunicationDetail(communicationDetailModel)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io());
 
-        finalDisposer.add( observable
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .unsubscribeOn(Schedulers.io())
-                .subscribeWith(new DisposableObserver<String>() {
+            finalDisposer.add( observable
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io())
+                    .subscribeWith(new DisposableObserver<String>() {
 
-                    @Override
-                    public void onNext(String response) {
-                        if (response!= null) {
-                            if (!response.equals("")&&!response.equals("[]")) {
-                                Toast.makeText(ClientCommunicationDetail.this,"Success",Toast.LENGTH_LONG).show();
-                                finish();
+                        @Override
+                        public void onNext(String response) {
+                            dialog.dismiss();
+                            if (response!= null) {
+                                if (!response.equals("")&&!response.equals("[]")) {
+                                    Toast.makeText(ClientCommunicationDetail.this,"Success",Toast.LENGTH_LONG).show();
+                                    finish();
+                                }
                             }
                         }
-                    }
 
-                    @Override
-                    public void onError(Throwable e) {
-                        Toast.makeText(ClientCommunicationDetail.this,"Not Successful !!!",Toast.LENGTH_LONG).show();
-                    }
+                        @Override
+                        public void onError(Throwable e) {
+                            dialog.dismiss();
+                            Toast.makeText(ClientCommunicationDetail.this,"Not Successful !!!",Toast.LENGTH_LONG).show();
+                        }
 
-                    @Override
-                    public void onComplete() {
+                        @Override
+                        public void onComplete() {
 
-                    }
-                }));
+                        }
+                    }));
+        } else {
+            Toast.makeText(this,"Please check your internet connection and select again!!! ",
+                    Toast.LENGTH_LONG).show();
+        }
     }
 
     private void showNextMeetingDate() {
@@ -653,14 +660,6 @@ public class ClientCommunicationDetail extends CommonToolbarParentActivity imple
                         final Uri uri = data.getData();
                         fileUriArray.add(uri);
                         fileAdapter.notifyDataSetChanged();
-                        try {
-                            // Get the file path from the URI
-                            final String path = FileUtils.getPath(this, uri);
-//                            Toast.makeText(ClientCommunicationDetail.this,
-//                                    "File Selected: " + path, Toast.LENGTH_LONG).show();
-                        } catch (Exception e) {
-                            Log.e(TAG, "File select error", e);
-                        }
                     }
                 }
                 break;
@@ -682,13 +681,10 @@ public class ClientCommunicationDetail extends CommonToolbarParentActivity imple
         // showing snack bar with Undo option
         Snackbar snackbar = Snackbar
                 .make(coordinatorLayout, " UNDO file?", Snackbar.LENGTH_LONG);
-        snackbar.setAction("UNDO", new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // undo is selected, restore the deleted item
-                fileUriArray.add(position, backupFileUri);
-                fileAdapter.notifyItemInserted(position);
-            }
+        snackbar.setAction("UNDO", view -> {
+            // undo is selected, restore the deleted item
+            fileUriArray.add(position, backupFileUri);
+            fileAdapter.notifyItemInserted(position);
         });
         snackbar.setActionTextColor(Color.YELLOW);
         snackbar.show();
@@ -750,21 +746,16 @@ public class ClientCommunicationDetail extends CommonToolbarParentActivity imple
         alertBuilder.setTitle("Permission necessary");
         alertBuilder.setMessage(msg + " permission is necessary");
         alertBuilder.setPositiveButton(android.R.string.yes,
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        ActivityCompat.requestPermissions((Activity) context,
-                                new String[] { permission },
-                                MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
-                    }
-                });
+                (dialog, which) -> ActivityCompat.requestPermissions((Activity) context,
+                        new String[] { permission },
+                        MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE));
         AlertDialog alert = alertBuilder.create();
         alert.show();
     }
 
     private void CommunicationTypeGetRequest() {
         if(StaticHelperClass.isNetworkAvailable(this)) {
-            progressBar.setVisibility(View.VISIBLE);
-            whiteBackground.setVisibility(View.VISIBLE);
+            dialog.show();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
                     .addConverterFactory(ScalarsConverterFactory.create())
@@ -787,15 +778,13 @@ public class ClientCommunicationDetail extends CommonToolbarParentActivity imple
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseCommunicationTypeData(response);
-                            progressBar.setVisibility(View.INVISIBLE);
-                            whiteBackground.setVisibility(View.INVISIBLE);
                         }
 
                         @Override
                         public void onError(Throwable e) {
-                            progressBar.setVisibility(View.INVISIBLE);
-                            whiteBackground.setVisibility(View.INVISIBLE);
+                            dialog.dismiss();
                         }
 
                         @Override
@@ -838,8 +827,6 @@ public class ClientCommunicationDetail extends CommonToolbarParentActivity imple
         } catch (JSONException e) {
             Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
         }
-        progressBar.setVisibility(View.INVISIBLE);
-        whiteBackground.setVisibility(View.INVISIBLE);
         if (communicationTypeIndex != -1234) {
             spinnerCommunicationType.setSelection(communicationTypeIndex+1);
             selectedCommunicationType = allCommunicationType.get(communicationTypeIndex);
@@ -848,9 +835,7 @@ public class ClientCommunicationDetail extends CommonToolbarParentActivity imple
 
     private void PriorityDataGetRequest() {
         if(StaticHelperClass.isNetworkAvailable(this)) {
-            progressBar.setVisibility(View.VISIBLE);
-            whiteBackground.setVisibility(View.VISIBLE);
-
+            dialog.show();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
                     .addConverterFactory(ScalarsConverterFactory.create())
@@ -873,15 +858,13 @@ public class ClientCommunicationDetail extends CommonToolbarParentActivity imple
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parsePriorityData(response);
-                            progressBar.setVisibility(View.INVISIBLE);
-                            whiteBackground.setVisibility(View.INVISIBLE);
                         }
 
                         @Override
                         public void onError(Throwable e) {
-                            progressBar.setVisibility(View.INVISIBLE);
-                            whiteBackground.setVisibility(View.INVISIBLE);
+                            dialog.dismiss();
                         }
 
                         @Override
@@ -924,8 +907,6 @@ public class ClientCommunicationDetail extends CommonToolbarParentActivity imple
         } catch (JSONException e) {
             Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
         }
-        progressBar.setVisibility(View.INVISIBLE);
-        whiteBackground.setVisibility(View.INVISIBLE);
         if (priority != -12345) {
             spinnerPriorityType.setSelection(priority+1);
             selectedPriority = allPriority.get(priority);

@@ -14,10 +14,6 @@ import com.craftman.cardform.OnPayBtnClickListner;
 
 import onair.onems.R;
 
-/**
- * Created by hp on 1/23/2018.
- */
-
 public class payment extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {

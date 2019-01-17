@@ -1,13 +1,11 @@
 package onair.onems.result;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -17,12 +15,6 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -30,9 +22,8 @@ import org.json.JSONObject;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Objects;
 
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -44,7 +35,6 @@ import onair.onems.Services.RetrofitNetworkService;
 import onair.onems.Services.StaticHelperClass;
 import onair.onems.customised.MyDividerItemDecoration;
 import onair.onems.mainactivities.CommonToolbarParentActivity;
-import onair.onems.network.MySingleton;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -71,7 +61,7 @@ public class SubjectWiseResult extends CommonToolbarParentActivity implements Su
         super.onCreate(savedInstanceState);
 
         LayoutInflater inflater = (LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        final View childActivityLayout = inflater.inflate(R.layout.result_subject_wise, null);
+        final View childActivityLayout = Objects.requireNonNull(inflater).inflate(R.layout.result_subject_wise, null);
         LinearLayout parentActivityLayout = findViewById(R.id.contentMain);
         parentActivityLayout.addView(childActivityLayout, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
 
@@ -103,7 +93,7 @@ public class SubjectWiseResult extends CommonToolbarParentActivity implements Su
         try {
             if(!subjectWiseResul.getString("SubjectName").equalsIgnoreCase("Total")) {
                 ResultDetailsDialog customDialog = new ResultDetailsDialog(this, subjectWiseResul);
-                customDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                Objects.requireNonNull(customDialog.getWindow()).setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                 customDialog.setCancelable(false);
                 customDialog.show();
             }
@@ -114,6 +104,7 @@ public class SubjectWiseResult extends CommonToolbarParentActivity implements Su
 
     private void ResultDataGetRequest() {
         if (StaticHelperClass.isNetworkAvailable(this)) {
+            dialog.show();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
                     .addConverterFactory(ScalarsConverterFactory.create())
@@ -137,11 +128,13 @@ public class SubjectWiseResult extends CommonToolbarParentActivity implements Su
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             prepareResult(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
+                            dialog.dismiss();
                             Toast.makeText(SubjectWiseResult.this,"Result not found!!! ",
                                     Toast.LENGTH_LONG).show();
                         }
@@ -235,6 +228,7 @@ public class SubjectWiseResult extends CommonToolbarParentActivity implements Su
 
     private void ResultGradeDataGetRequest(){
         if (StaticHelperClass.isNetworkAvailable(this)) {
+            dialog.show();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
                     .addConverterFactory(ScalarsConverterFactory.create())
@@ -257,11 +251,13 @@ public class SubjectWiseResult extends CommonToolbarParentActivity implements Su
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             prepareResultGradeSheet(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
+                            dialog.dismiss();
                             Toast.makeText(SubjectWiseResult.this,"Grade sheet not found!!! ",
                                     Toast.LENGTH_LONG).show();
                         }

@@ -1,8 +1,5 @@
 package onair.onems.models;
 
-/**
- * Created by ravi on 16/11/17.
- */
 
 public class Contact {
     private String name;

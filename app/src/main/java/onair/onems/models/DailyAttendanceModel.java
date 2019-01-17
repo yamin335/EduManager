@@ -1,9 +1,5 @@
 package onair.onems.models;
 
-/**
- * Created by onAir on 15-Mar-18.
- */
-
 public class DailyAttendanceModel {
 //    private String UserID = "";
 //    private String UserName = "";

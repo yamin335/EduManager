@@ -10,27 +10,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Filter;
 import android.widget.Filterable;
-import android.widget.ImageView;
-import android.widget.RelativeLayout;
+
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.RequestOptions;
-
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import onair.onems.R;
-import onair.onems.mainactivities.SideNavigationMenuParentActivity;
-import onair.onems.models.Contact;
-
-/**
- * Created by ravi on 16/11/17.
- */
 
 public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapter.MyViewHolder>
         implements Filterable {
@@ -45,7 +33,6 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
         public TextView title, detail, icon;
-        public RelativeLayout viewBackground;
         public ConstraintLayout viewForeground;
 
         public MyViewHolder(View view) {
@@ -53,21 +40,17 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
             icon = view.findViewById(R.id.icon);
             title = view.findViewById(R.id.title);
             detail = view.findViewById(R.id.detail);
-            viewBackground = view.findViewById(R.id.view_background);
             viewForeground = view.findViewById(R.id.view_foreground);
 
-            view.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    // send selected contact in callback
-                    listener.onNotificationSelected(notificationListFiltered.get(getAdapterPosition()));
-                }
+            view.setOnClickListener(view1 -> {
+                // send selected contact in callback
+                listener.onNotificationSelected(notificationListFiltered.get(getAdapterPosition()));
             });
         }
     }
 
 
-    public NotificationAdapter(Context context, ArrayList<JSONObject> notificationList, NotificationAdapterListener listener,
+    NotificationAdapter(Context context, ArrayList<JSONObject> notificationList, NotificationAdapterListener listener,
                                DecreaseCounterListener decreaseCounterListener, IncreaseCounterListener increaseCounterListener,
                                NotificationSaverListener notificationSaverListener) {
         this.context = context;
@@ -81,8 +64,9 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         this.notificationSaverListener = notificationSaverListener;
     }
 
+    @NonNull
     @Override
-    public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.notification_row_item, parent, false);
 
@@ -90,7 +74,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
     }
 
     @Override
-    public void onBindViewHolder(MyViewHolder holder, final int position) {
+    public void onBindViewHolder(@NonNull MyViewHolder holder, final int position) {
         final JSONObject jsonObject = notificationListFiltered.get(position);
         try {
             holder.title.setText(jsonObject.getString("title").toUpperCase());

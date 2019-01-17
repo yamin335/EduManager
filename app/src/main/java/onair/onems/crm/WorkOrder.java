@@ -37,7 +37,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -135,10 +134,6 @@ public class WorkOrder extends CommonToolbarParentActivity implements FileAdapte
         RecyclerView fileRecycler = findViewById(R.id.recycler);
         coordinatorLayout = findViewById(R.id.coordinator_layout);
         Button proceed = findViewById(R.id.proceed);
-        View whiteBackground = findViewById(R.id.whiteBackground);
-        ProgressBar progressBar = findViewById(R.id.progressBar);
-        progressBar.setVisibility(View.INVISIBLE);
-        whiteBackground.setVisibility(View.INVISIBLE);
 
         newWorkOrder = new WorkOrderModel();
         allPaymentType = new ArrayList<>();
@@ -458,60 +453,66 @@ public class WorkOrder extends CommonToolbarParentActivity implements FileAdapte
 
     private void postDocumentsAndData() {
         if (fileUriArray.size()>0) {
-            Retrofit retrofit = new Retrofit.Builder()
-//                .baseUrl(getString(R.string.baseUrl))
-                    .baseUrl("http://172.16.1.2:4000")
-                    .addConverterFactory(ScalarsConverterFactory.create())
-                    .addConverterFactory(GsonConverterFactory.create())
-                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                    .build();
+            if (StaticHelperClass.isNetworkAvailable(this)) {
+                dialog.show();
+                Retrofit retrofit = new Retrofit.Builder()
+                        .baseUrl(getString(R.string.baseUrl))
+                        .addConverterFactory(ScalarsConverterFactory.create())
+                        .addConverterFactory(GsonConverterFactory.create())
+                        .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                        .build();
 
-            List<MultipartBody.Part> documentParts = new ArrayList<>();
+                List<MultipartBody.Part> documentParts = new ArrayList<>();
 
-            for (int i=0; i<fileUriArray.size(); i++) {
-                documentParts.add(prepareFilePart(FileUtils.getFile(this, fileUriArray.get(i))));
-            }
+                for (int i=0; i<fileUriArray.size(); i++) {
+                    documentParts.add(prepareFilePart(FileUtils.getFile(this, fileUriArray.get(i))));
+                }
 
-            Observable<String> documentObservable = retrofit
-                    .create(RetrofitNetworkService.class)
-                    .uploadMultipleFilesDynamic(documentParts)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .unsubscribeOn(Schedulers.io());
+                Observable<String> documentObservable = retrofit
+                        .create(RetrofitNetworkService.class)
+                        .uploadMultipleFilesDynamic(documentParts)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .unsubscribeOn(Schedulers.io());
 
-            finalDisposer.add( documentObservable
-                    .observeOn(Schedulers.io())
-                    .subscribeOn(AndroidSchedulers.mainThread())
-                    .unsubscribeOn(Schedulers.io())
-                    .subscribeWith(new DisposableObserver<String>() {
+                finalDisposer.add( documentObservable
+                        .observeOn(Schedulers.io())
+                        .subscribeOn(AndroidSchedulers.mainThread())
+                        .unsubscribeOn(Schedulers.io())
+                        .subscribeWith(new DisposableObserver<String>() {
 
-                        @Override
-                        public void onNext(String returnValue) {
-                            JsonParser parser = new JsonParser();
-                            JsonArray documentUrls = parser.parse(returnValue).getAsJsonArray();
-                            ArrayList<DocumentModel> parsedDocumentUrls = new ArrayList<>();
-                            for(int i = 0; i<documentUrls.size(); i++) {
-                                if(documentUrls.get(i).isJsonObject()) {
-                                    JsonObject tempJsonObject = documentUrls.get(i).getAsJsonObject();
-                                    DocumentModel documentModel = new DocumentModel("0", tempJsonObject.get("path").getAsString());
-                                    parsedDocumentUrls.add(documentModel);
+                            @Override
+                            public void onNext(String returnValue) {
+                                dialog.dismiss();
+                                JsonParser parser = new JsonParser();
+                                JsonArray documentUrls = parser.parse(returnValue).getAsJsonArray();
+                                ArrayList<DocumentModel> parsedDocumentUrls = new ArrayList<>();
+                                for(int i = 0; i<documentUrls.size(); i++) {
+                                    if(documentUrls.get(i).isJsonObject()) {
+                                        JsonObject tempJsonObject = documentUrls.get(i).getAsJsonObject();
+                                        DocumentModel documentModel = new DocumentModel("0", tempJsonObject.get("path").getAsString());
+                                        parsedDocumentUrls.add(documentModel);
+                                    }
                                 }
+                                newWorkOrder.setDocumentList(parsedDocumentUrls);
+                                workOrderPostRequest();
                             }
-                            newWorkOrder.setDocumentList(parsedDocumentUrls);
-                            workOrderPostRequest();
-                        }
 
-                        @Override
-                        public void onError(Throwable e) {
-                            Log.e("RXANDROID", "onError: " + e.getMessage());
-                        }
+                            @Override
+                            public void onError(Throwable e) {
+                                dialog.dismiss();
+                                Log.e("RXANDROID", "onError: " + e.getMessage());
+                            }
 
-                        @Override
-                        public void onComplete() {
-                            Log.e("COMPLETE", "Complete: ");
-                        }
-                    }));
-
+                            @Override
+                            public void onComplete() {
+                                Log.e("COMPLETE", "Complete: ");
+                            }
+                        }));
+            } else {
+                Toast.makeText(this,"Please check your internet connection and select again!!! ",
+                        Toast.LENGTH_LONG).show();
+            }
         } else {
             workOrderPostRequest();
         }
@@ -519,7 +520,7 @@ public class WorkOrder extends CommonToolbarParentActivity implements FileAdapte
 
     private void workOrderPostRequest() {
         if(StaticHelperClass.isNetworkAvailable(this)) {
-
+            dialog.show();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
                     .addConverterFactory(ScalarsConverterFactory.create())
@@ -541,6 +542,7 @@ public class WorkOrder extends CommonToolbarParentActivity implements FileAdapte
 
                         @Override
                         public void onNext(String paymentTypeReturnValue) {
+                            dialog.dismiss();
                             Toast.makeText(WorkOrder.this,"Successful",
                                     Toast.LENGTH_LONG).show();
                             finish();
@@ -548,6 +550,7 @@ public class WorkOrder extends CommonToolbarParentActivity implements FileAdapte
 
                         @Override
                         public void onError(Throwable e) {
+                            dialog.dismiss();
                             Toast.makeText(WorkOrder.this,"Not Successful",
                                     Toast.LENGTH_LONG).show();
                         }
@@ -566,7 +569,7 @@ public class WorkOrder extends CommonToolbarParentActivity implements FileAdapte
 
     private void PaymentTypeGetRequest() {
         if(StaticHelperClass.isNetworkAvailable(this)) {
-
+            dialog.show();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
                     .addConverterFactory(ScalarsConverterFactory.create())
@@ -588,12 +591,13 @@ public class WorkOrder extends CommonToolbarParentActivity implements FileAdapte
 
                         @Override
                         public void onNext(String paymentTypeReturnValue) {
+                            dialog.dismiss();
                             parsePaymentTypeData(paymentTypeReturnValue);
                         }
 
                         @Override
                         public void onError(Throwable e) {
-
+                            dialog.dismiss();
                         }
 
                         @Override

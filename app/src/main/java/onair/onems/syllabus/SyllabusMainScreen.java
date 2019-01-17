@@ -3,10 +3,8 @@ package onair.onems.syllabus;
 import android.Manifest;
 import android.app.DownloadManager;
 import android.app.NotificationManager;
-import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
@@ -35,12 +33,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -51,8 +43,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Objects;
 
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -62,11 +53,8 @@ import io.reactivex.schedulers.Schedulers;
 import onair.onems.R;
 import onair.onems.Services.RetrofitNetworkService;
 import onair.onems.Services.StaticHelperClass;
-import onair.onems.lesson_plan.LessonPlanMainScreen;
 import onair.onems.mainactivities.SideNavigationMenuParentActivity;
 import onair.onems.mainactivities.StudentMainScreen;
-import onair.onems.mainactivities.TeacherMainScreen;
-import onair.onems.network.MySingleton;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -87,7 +75,6 @@ public class SyllabusMainScreen extends SideNavigationMenuParentActivity impleme
     private DigitalContentAdapter mAdapter;
     private DigitalContentAdapter mLessonAdapter;
     private ArrayList<JSONObject> lessonDigitalContentUrls;
-    private Intent intent;
     private CompositeDisposable finalDisposer = new CompositeDisposable();
 
     @Override
@@ -105,11 +92,11 @@ public class SyllabusMainScreen extends SideNavigationMenuParentActivity impleme
         activityName = SyllabusMainScreen.class.getName();
 
         LayoutInflater inflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        final View rowView = inflater.inflate(R.layout.syllabus_main_screen, null);
-        LinearLayout parent = (LinearLayout) findViewById(R.id.contentMain);
+        final View rowView = Objects.requireNonNull(inflater).inflate(R.layout.syllabus_main_screen, null);
+        LinearLayout parent = findViewById(R.id.contentMain);
         parent.addView(rowView, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
 
-        intent = getIntent();
+        Intent intent = getIntent();
 
         error = findViewById(R.id.empty);
         lessonError = findViewById(R.id.lessonEmpty);
@@ -141,34 +128,22 @@ public class SyllabusMainScreen extends SideNavigationMenuParentActivity impleme
         floatingMenu.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#FF5722")));
         floatingMenu.setRippleColor(Color.parseColor("#e50b00"));
 
-//        if (UserTypeID == 1 || UserTypeID == 2 || UserTypeID == 4) {
-//
-//            floatingMenu.setVisibility(View.GONE);
-//            floatingMenu.setClickable(false);
-//        }
-
-        floatingMenu.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                floatingMenu.setImageResource(R.drawable.ic_clear);
-                shadow.setVisibility(View.VISIBLE);
-                FloatingMenuDialog floatingMenuDialog = new FloatingMenuDialog(SyllabusMainScreen.this,
-                        SyllabusMainScreen.this, SyllabusMainScreen.this);
-                floatingMenuDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-                floatingMenuDialog.setCancelable(true);
-                floatingMenuDialog.getWindow().getAttributes().gravity = Gravity.TOP | Gravity.END;
-                floatingMenuDialog.getWindow().getAttributes().x = dpToPx(5);
-                floatingMenuDialog.getWindow().getAttributes().y = dpToPx(113);
-                floatingMenuDialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
-                floatingMenuDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-                    @Override
-                    public void onDismiss(DialogInterface dialog) {
-                        shadow.setVisibility(View.GONE);
-                        floatingMenu.setImageResource(R.drawable.ic_keyboard_arrow_down);
-                    }
-                });
-                floatingMenuDialog.show();
-            }
+        floatingMenu.setOnClickListener(v -> {
+            floatingMenu.setImageResource(R.drawable.ic_clear);
+            shadow.setVisibility(View.VISIBLE);
+            FloatingMenuDialog floatingMenuDialog = new FloatingMenuDialog(SyllabusMainScreen.this,
+                    SyllabusMainScreen.this, SyllabusMainScreen.this);
+            floatingMenuDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            floatingMenuDialog.setCancelable(true);
+            floatingMenuDialog.getWindow().getAttributes().gravity = Gravity.TOP | Gravity.END;
+            floatingMenuDialog.getWindow().getAttributes().x = dpToPx(5);
+            floatingMenuDialog.getWindow().getAttributes().y = dpToPx(113);
+            floatingMenuDialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+            floatingMenuDialog.setOnDismissListener(dialog -> {
+                shadow.setVisibility(View.GONE);
+                floatingMenu.setImageResource(R.drawable.ic_keyboard_arrow_down);
+            });
+            floatingMenuDialog.show();
         });
 
         Date date = Calendar.getInstance().getTime();
@@ -215,7 +190,7 @@ public class SyllabusMainScreen extends SideNavigationMenuParentActivity impleme
             DownloadManager downloadManager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
             DownloadManager.Query query = new DownloadManager.Query();
             query.setFilterById(referenceId);
-            Cursor cursor = downloadManager.query(query);
+            Cursor cursor = Objects.requireNonNull(downloadManager).query(query);
             if (cursor.moveToFirst()) {
                 int downloadStatus = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS));
                 String downloadLocalUri = cursor.getString(cursor.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI));
@@ -245,13 +220,14 @@ public class SyllabusMainScreen extends SideNavigationMenuParentActivity impleme
 
 
                 NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-                notificationManager.notify(455, mBuilder.build());
+                Objects.requireNonNull(notificationManager).notify(455, mBuilder.build());
             }
         }
     };
 
     private void examDataGetRequest() {
         if (StaticHelperClass.isNetworkAvailable(this)) {
+            dialog.show();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
                     .addConverterFactory(ScalarsConverterFactory.create())
@@ -274,12 +250,13 @@ public class SyllabusMainScreen extends SideNavigationMenuParentActivity impleme
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseExamData(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
-
+                            dialog.dismiss();
                         }
 
                         @Override
@@ -296,7 +273,7 @@ public class SyllabusMainScreen extends SideNavigationMenuParentActivity impleme
     private void parseExamData(String examData) {
         if(!examData.equalsIgnoreCase("[]")) {
             ExamSelectionDialog examSelectionDialog = new ExamSelectionDialog(this, examData, this);
-            examSelectionDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            Objects.requireNonNull(examSelectionDialog.getWindow()).setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
             examSelectionDialog.setCancelable(false);
             examSelectionDialog.show();
         } else {
@@ -323,6 +300,7 @@ public class SyllabusMainScreen extends SideNavigationMenuParentActivity impleme
 
     private void subjectDataGetRequest() {
         if (StaticHelperClass.isNetworkAvailable(this)) {
+            dialog.show();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
                     .addConverterFactory(ScalarsConverterFactory.create())
@@ -345,12 +323,13 @@ public class SyllabusMainScreen extends SideNavigationMenuParentActivity impleme
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseSubjectData(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
-
+                            dialog.dismiss();
                         }
 
                         @Override
@@ -367,7 +346,7 @@ public class SyllabusMainScreen extends SideNavigationMenuParentActivity impleme
     private void parseSubjectData(String subjectData) {
         if(!subjectData.equalsIgnoreCase("[]")) {
             SubjectSelectionDialog subjectSelectionDialog = new SubjectSelectionDialog(this, subjectData, this);
-            subjectSelectionDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            Objects.requireNonNull(subjectSelectionDialog.getWindow()).setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
             subjectSelectionDialog.setCancelable(false);
             subjectSelectionDialog.show();
         } else {
@@ -399,6 +378,7 @@ public class SyllabusMainScreen extends SideNavigationMenuParentActivity impleme
 
     private void syllabusDataGetRequest(String date) {
         if (StaticHelperClass.isNetworkAvailable(this)) {
+            dialog.show();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
                     .addConverterFactory(ScalarsConverterFactory.create())
@@ -422,11 +402,13 @@ public class SyllabusMainScreen extends SideNavigationMenuParentActivity impleme
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseSyllabusData(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
+                            dialog.dismiss();
                             Toast.makeText(SyllabusMainScreen.this,"Syllabus data not found!!! ",
                                     Toast.LENGTH_LONG).show();
                         }
@@ -471,6 +453,7 @@ public class SyllabusMainScreen extends SideNavigationMenuParentActivity impleme
 
     private void syllabusDigitalContentGetRequest(String SyllabusID) {
         if (StaticHelperClass.isNetworkAvailable(this)) {
+            dialog.show();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
                     .addConverterFactory(ScalarsConverterFactory.create())
@@ -493,6 +476,7 @@ public class SyllabusMainScreen extends SideNavigationMenuParentActivity impleme
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             if(!response.equalsIgnoreCase("[]")){
                                 parseDigitalContent(response);
                             }
@@ -500,6 +484,7 @@ public class SyllabusMainScreen extends SideNavigationMenuParentActivity impleme
 
                         @Override
                         public void onError(Throwable e) {
+                            dialog.dismiss();
                             Toast.makeText(SyllabusMainScreen.this,"Digital content not found!!! ",
                                     Toast.LENGTH_LONG).show();
                         }
@@ -539,6 +524,7 @@ public class SyllabusMainScreen extends SideNavigationMenuParentActivity impleme
 
     private void lessonPlanDigitalContentGetRequest(String SyllabusID, String SyllabusDetailID) {
         if (StaticHelperClass.isNetworkAvailable(this)) {
+            dialog.show();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
                     .addConverterFactory(ScalarsConverterFactory.create())
@@ -561,6 +547,7 @@ public class SyllabusMainScreen extends SideNavigationMenuParentActivity impleme
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             if(!response.equalsIgnoreCase("[]")){
                                 parseLessonDigitalContent(response);
                             }
@@ -568,6 +555,7 @@ public class SyllabusMainScreen extends SideNavigationMenuParentActivity impleme
 
                         @Override
                         public void onError(Throwable e) {
+                            dialog.dismiss();
                             Toast.makeText(SyllabusMainScreen.this,"Lesson plan digital content not found!!! ",
                                     Toast.LENGTH_LONG).show();
                         }
@@ -607,7 +595,7 @@ public class SyllabusMainScreen extends SideNavigationMenuParentActivity impleme
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else if(UserTypeID == 1) {
@@ -680,7 +668,7 @@ public class SyllabusMainScreen extends SideNavigationMenuParentActivity impleme
                         request.allowScanningByMediaScanner();
                         request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
                     }
-                    long refId = manager.enqueue(request);
+                    long refId = Objects.requireNonNull(manager).enqueue(request);
                     refIdList.add(refId);
 
                 } catch (Exception e){

@@ -1,7 +1,6 @@
 package onair.onems.syllabus;
 
 import android.app.DatePickerDialog;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -12,16 +11,9 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.DatePicker;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.Toast;
-
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -29,8 +21,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Objects;
 
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -40,20 +31,14 @@ import io.reactivex.schedulers.Schedulers;
 import onair.onems.R;
 import onair.onems.Services.RetrofitNetworkService;
 import onair.onems.Services.StaticHelperClass;
-import onair.onems.attendance.TakeAttendance;
 import onair.onems.mainactivities.SideNavigationMenuParentActivity;
-import onair.onems.mainactivities.StudentMainScreen;
 import onair.onems.mainactivities.TeacherMainScreen;
 import onair.onems.models.ClassModel;
 import onair.onems.models.DepartmentModel;
 import onair.onems.models.ExamModel;
 import onair.onems.models.MediumModel;
 import onair.onems.models.SectionModel;
-import onair.onems.models.SessionModel;
-import onair.onems.models.ShiftModel;
 import onair.onems.models.SubjectModel;
-import onair.onems.network.MySingleton;
-import onair.onems.result.ResultMainScreen;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -103,8 +88,8 @@ public class SyllabusMainScreenForAdmin extends SideNavigationMenuParentActivity
         activityName = SyllabusMainScreenForAdmin.class.getName();
 
         LayoutInflater inflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        final View rowView = inflater.inflate(R.layout.syllabus_main_screen_for_admin, null);
-        LinearLayout parent = (LinearLayout) findViewById(R.id.contentMain);
+        final View rowView = Objects.requireNonNull(inflater).inflate(R.layout.syllabus_main_screen_for_admin, null);
+        LinearLayout parent = findViewById(R.id.contentMain);
         parent.addView(rowView, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
 
         allMediumArrayList = new ArrayList<>();
@@ -121,15 +106,15 @@ public class SyllabusMainScreenForAdmin extends SideNavigationMenuParentActivity
         selectedSubject = new SubjectModel();
         selectedExam = new ExamModel();
 
-        spinnerMedium =(Spinner)findViewById(R.id.spinnerMedium);
-        spinnerClass = (Spinner)findViewById(R.id.spinnerClass);
-        spinnerDepartment =(Spinner)findViewById(R.id.spinnerDepartment);
-        spinnerSection = (Spinner)findViewById(R.id.spinnerSection);
-        spinnerSubject = (Spinner)findViewById(R.id.spinnerSubject);
-        spinnerExam = (Spinner)findViewById(R.id.spinnerExam);
+        spinnerMedium = findViewById(R.id.spinnerMedium);
+        spinnerClass = findViewById(R.id.spinnerClass);
+        spinnerDepartment = findViewById(R.id.spinnerDepartment);
+        spinnerSection = findViewById(R.id.spinnerSection);
+        spinnerSubject = findViewById(R.id.spinnerSubject);
+        spinnerExam = findViewById(R.id.spinnerExam);
 
-        Button datePicker = (Button)findViewById(R.id.pickDate);
-        Button showSyllabus = (Button)findViewById(R.id.showSyllabus);
+        Button datePicker = findViewById(R.id.pickDate);
+        Button showSyllabus = findViewById(R.id.showSyllabus);
 
         ArrayAdapter<String> medium_spinner_adapter = new ArrayAdapter<>(this, R.layout.spinner_item, tempMediumArray);
         medium_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -155,31 +140,23 @@ public class SyllabusMainScreenForAdmin extends SideNavigationMenuParentActivity
         exam_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerExam.setAdapter(exam_spinner_adapter);
 
-        datePicker.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // calender class's instance and get current date , month and year from calender
-                final Calendar c = Calendar.getInstance();
-                int mYear = c.get(Calendar.YEAR); // current year
-                int mMonth = c.get(Calendar.MONTH); // current month
-                int mDay = c.get(Calendar.DAY_OF_MONTH); // current day
-                // date picker dialog
-                datePickerDialog = new DatePickerDialog(SyllabusMainScreenForAdmin.this,
-                        new DatePickerDialog.OnDateSetListener() {
-
-                            @Override
-                            public void onDateSet(DatePicker view, int year,
-                                                  int monthOfYear, int dayOfMonth) {
-                                // set day of month , month and year value in the edit text
+        datePicker.setOnClickListener(v -> {
+            // calender class's instance and get current date , month and year from calender
+            final Calendar c = Calendar.getInstance();
+            int mYear = c.get(Calendar.YEAR); // current year
+            int mMonth = c.get(Calendar.MONTH); // current month
+            int mDay = c.get(Calendar.DAY_OF_MONTH); // current day
+            // date picker dialog
+            datePickerDialog = new DatePickerDialog(SyllabusMainScreenForAdmin.this,
+                    (view, year, monthOfYear, dayOfMonth) -> {
+                        // set day of month , month and year value in the edit text
 //                                selectedDate = dayOfMonth + "/" + (monthOfYear + 1) + "/" + year;
 //                                selectedDate = year + "-" + (monthOfYear + 1) + "-" + dayOfMonth;
-                                selectedDate = (monthOfYear + 1)+"-"+dayOfMonth+"-"+year;
-                                datePicker.setText(selectedDate);
+                        selectedDate = (monthOfYear + 1) + "-" + dayOfMonth + "-" + year;
+                        datePicker.setText(selectedDate);
 
-                            }
-                        }, mYear, mMonth, mDay);
-                datePickerDialog.show();
-            }
+                    }, mYear, mMonth, mDay);
+            datePickerDialog.show();
         });
 
         MediumDataGetRequest();
@@ -344,52 +321,49 @@ public class SyllabusMainScreenForAdmin extends SideNavigationMenuParentActivity
             }
         });
 
-        showSyllabus.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(StaticHelperClass.isNetworkAvailable(SyllabusMainScreenForAdmin.this)) {
-                    if(allMediumArrayList.size()>0 && (selectedMedium.getMediumID() == -2 || selectedMedium.getMediumID() == 0)) {
-                        Toast.makeText(SyllabusMainScreenForAdmin.this,"Please select medium!!! ",
-                                Toast.LENGTH_LONG).show();
-                    } else if(allClassArrayList.size()>0 && (selectedClass.getClassID() == -2 || selectedClass.getClassID() == 0)) {
-                        Toast.makeText(SyllabusMainScreenForAdmin.this,"Please select class!!! ",
-                                Toast.LENGTH_LONG).show();
-                    } else if(allDepartmentArrayList.size()>0 && (selectedDepartment.getDepartmentID() == -2 || selectedDepartment.getDepartmentID() == 0)) {
-                        Toast.makeText(SyllabusMainScreenForAdmin.this,"Please select department!!! ",
-                                Toast.LENGTH_LONG).show();
-                    } else if(allSectionArrayList.size()>0 && (selectedSection.getSectionID() == -2 || selectedSection.getSectionID() == 0)) {
-                        Toast.makeText(SyllabusMainScreenForAdmin.this,"Please select section!!! ",
-                                Toast.LENGTH_LONG).show();
-                    } else if(allSubjectArrayList.size()>0 && selectedSubject.getSubjectID() == 0) {
-                        Toast.makeText(SyllabusMainScreenForAdmin.this,"Please select subject!!! ",
-                                Toast.LENGTH_LONG).show();
-                    } else if(allExamArrayList.size()>0 && selectedExam.getExamID() == 0) {
-                        Toast.makeText(SyllabusMainScreenForAdmin.this,"Please select exam!!! ",
-                                Toast.LENGTH_LONG).show();
-                    } else {
-                        CheckSelectedData();
-                        Intent intent = new Intent(SyllabusMainScreenForAdmin.this, SyllabusMainScreen.class);
-                        intent.putExtra("MediumID", selectedMedium.getMediumID());
-                        intent.putExtra("ClassID", selectedClass.getClassID());
-                        intent.putExtra("DepartmentID", selectedDepartment.getDepartmentID());
-                        intent.putExtra("SectionID", selectedSection.getSectionID());
-                        intent.putExtra("SubjectID", selectedSubject.getSubjectID());
-                        intent.putExtra("ExamID", selectedExam.getExamID());
-                        intent.putExtra("Date", selectedDate);
-                        startActivity(intent);
-                        finish();
-                    }
-                } else {
-                    Toast.makeText(SyllabusMainScreenForAdmin.this,"Please check your internet connection and select again!!! ",
+        showSyllabus.setOnClickListener(v -> {
+            if(StaticHelperClass.isNetworkAvailable(SyllabusMainScreenForAdmin.this)) {
+                if(allMediumArrayList.size()>0 && (selectedMedium.getMediumID() == -2 || selectedMedium.getMediumID() == 0)) {
+                    Toast.makeText(SyllabusMainScreenForAdmin.this,"Please select medium!!! ",
                             Toast.LENGTH_LONG).show();
+                } else if(allClassArrayList.size()>0 && (selectedClass.getClassID() == -2 || selectedClass.getClassID() == 0)) {
+                    Toast.makeText(SyllabusMainScreenForAdmin.this,"Please select class!!! ",
+                            Toast.LENGTH_LONG).show();
+                } else if(allDepartmentArrayList.size()>0 && (selectedDepartment.getDepartmentID() == -2 || selectedDepartment.getDepartmentID() == 0)) {
+                    Toast.makeText(SyllabusMainScreenForAdmin.this,"Please select department!!! ",
+                            Toast.LENGTH_LONG).show();
+                } else if(allSectionArrayList.size()>0 && (selectedSection.getSectionID() == -2 || selectedSection.getSectionID() == 0)) {
+                    Toast.makeText(SyllabusMainScreenForAdmin.this,"Please select section!!! ",
+                            Toast.LENGTH_LONG).show();
+                } else if(allSubjectArrayList.size()>0 && selectedSubject.getSubjectID() == 0) {
+                    Toast.makeText(SyllabusMainScreenForAdmin.this,"Please select subject!!! ",
+                            Toast.LENGTH_LONG).show();
+                } else if(allExamArrayList.size()>0 && selectedExam.getExamID() == 0) {
+                    Toast.makeText(SyllabusMainScreenForAdmin.this,"Please select exam!!! ",
+                            Toast.LENGTH_LONG).show();
+                } else {
+                    CheckSelectedData();
+                    Intent intent = new Intent(SyllabusMainScreenForAdmin.this, SyllabusMainScreen.class);
+                    intent.putExtra("MediumID", selectedMedium.getMediumID());
+                    intent.putExtra("ClassID", selectedClass.getClassID());
+                    intent.putExtra("DepartmentID", selectedDepartment.getDepartmentID());
+                    intent.putExtra("SectionID", selectedSection.getSectionID());
+                    intent.putExtra("SubjectID", selectedSubject.getSubjectID());
+                    intent.putExtra("ExamID", selectedExam.getExamID());
+                    intent.putExtra("Date", selectedDate);
+                    startActivity(intent);
+                    finish();
                 }
+            } else {
+                Toast.makeText(SyllabusMainScreenForAdmin.this,"Please check your internet connection and select again!!! ",
+                        Toast.LENGTH_LONG).show();
             }
         });
     }
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else if(UserTypeID == 1) {
@@ -409,6 +383,7 @@ public class SyllabusMainScreenForAdmin extends SideNavigationMenuParentActivity
 
     private void MediumDataGetRequest() {
         if(StaticHelperClass.isNetworkAvailable(this)) {
+            dialog.show();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
                     .addConverterFactory(ScalarsConverterFactory.create())
@@ -431,12 +406,13 @@ public class SyllabusMainScreenForAdmin extends SideNavigationMenuParentActivity
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseMediumJsonData(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
-
+                            dialog.dismiss();
                         }
 
                         @Override
@@ -479,6 +455,7 @@ public class SyllabusMainScreenForAdmin extends SideNavigationMenuParentActivity
 
     private void ClassDataGetRequest() {
         if(StaticHelperClass.isNetworkAvailable(this)) {
+            dialog.show();
             CheckSelectedData();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
@@ -502,12 +479,13 @@ public class SyllabusMainScreenForAdmin extends SideNavigationMenuParentActivity
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseClassJsonData(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
-
+                            dialog.dismiss();
                         }
 
                         @Override
@@ -550,6 +528,7 @@ public class SyllabusMainScreenForAdmin extends SideNavigationMenuParentActivity
 
     private void DepartmentDataGetRequest() {
         if(StaticHelperClass.isNetworkAvailable(this)) {
+            dialog.show();
             CheckSelectedData();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
@@ -573,12 +552,13 @@ public class SyllabusMainScreenForAdmin extends SideNavigationMenuParentActivity
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseDepartmentJsonData(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
-
+                            dialog.dismiss();
                         }
 
                         @Override
@@ -628,6 +608,7 @@ public class SyllabusMainScreenForAdmin extends SideNavigationMenuParentActivity
 
     private void SectionDataGetRequest() {
         if(StaticHelperClass.isNetworkAvailable(this)) {
+            dialog.show();
             CheckSelectedData();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
@@ -651,12 +632,13 @@ public class SyllabusMainScreenForAdmin extends SideNavigationMenuParentActivity
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseSectionJsonData(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
-
+                            dialog.dismiss();
                         }
 
                         @Override
@@ -699,6 +681,7 @@ public class SyllabusMainScreenForAdmin extends SideNavigationMenuParentActivity
 
     private void SubjectDataGetRequest() {
         if(StaticHelperClass.isNetworkAvailable(this)) {
+            dialog.show();
             CheckSelectedData();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
@@ -722,12 +705,13 @@ public class SyllabusMainScreenForAdmin extends SideNavigationMenuParentActivity
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseSubjectJsonData(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
-
+                            dialog.dismiss();
                         }
 
                         @Override
@@ -772,6 +756,7 @@ public class SyllabusMainScreenForAdmin extends SideNavigationMenuParentActivity
 
     private void ExamDataGetRequest() {
         if (StaticHelperClass.isNetworkAvailable(this)) {
+            dialog.show();
             CheckSelectedData();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
@@ -795,12 +780,13 @@ public class SyllabusMainScreenForAdmin extends SideNavigationMenuParentActivity
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseExamJsonData(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
-
+                            dialog.dismiss();
                         }
 
                         @Override

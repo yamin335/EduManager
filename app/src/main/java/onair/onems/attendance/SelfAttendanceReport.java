@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
@@ -28,7 +30,6 @@ import java.util.Calendar;
 import java.util.Objects;
 
 import de.codecrafters.tableview.TableView;
-import de.codecrafters.tableview.listeners.TableDataClickListener;
 import de.codecrafters.tableview.model.TableColumnWeightModel;
 import de.codecrafters.tableview.toolkit.SimpleTableDataAdapter;
 import de.codecrafters.tableview.toolkit.SimpleTableHeaderAdapter;
@@ -42,6 +43,7 @@ import onair.onems.R;
 import onair.onems.Services.GlideApp;
 import onair.onems.Services.RetrofitNetworkService;
 import onair.onems.Services.StaticHelperClass;
+import onair.onems.mainactivities.CommonProgressDialog;
 import onair.onems.models.MonthModel;
 import onair.onems.models.DailyAttendanceModel;
 import retrofit2.Retrofit;
@@ -64,8 +66,8 @@ public class SelfAttendanceReport extends Fragment {
     private TextView totalClass, totalPresent;
     private String ImageUrl = "";
     private CompositeDisposable finalDisposer = new CompositeDisposable();
-    public SelfAttendanceReport()
-    {
+    public CommonProgressDialog dialog;
+    public SelfAttendanceReport() {
 
     }
 
@@ -86,7 +88,11 @@ public class SelfAttendanceReport extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View rootView = inflater.inflate(R.layout.attendance_report_self_attendance, container, false);
-        tableView = (TableView)rootView.findViewById(R.id.tableView);
+        dialog = new CommonProgressDialog(getActivity());
+        Objects.requireNonNull(dialog.getWindow()).setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        dialog.setCancelable(false);
+
+        tableView = rootView.findViewById(R.id.tableView);
         totalClass = rootView.findViewById(R.id.totalClass);
         totalPresent = rootView.findViewById(R.id.totalPresent);
         ImageView studentImage = rootView.findViewById(R.id.studentImage);
@@ -168,7 +174,7 @@ public class SelfAttendanceReport extends Fragment {
 
         selectedMonth = new MonthModel();
 
-        spinnerMonth = (Spinner)rootView.findViewById(R.id.spinnerMonth);
+        spinnerMonth = rootView.findViewById(R.id.spinnerMonth);
         ArrayAdapter<String> month_spinner_adapter = new ArrayAdapter<>(Objects.requireNonNull(getActivity()), R.layout.spinner_item, tempMonthArray);
         month_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerMonth.setAdapter(month_spinner_adapter);
@@ -191,21 +197,17 @@ public class SelfAttendanceReport extends Fragment {
         columnModel.setColumnWeight(1, 2);
         tableView.setColumnModel(columnModel);
 
-        tableView.addDataClickListener(new TableDataClickListener() {
-            @Override
-            public void onDataClicked(int rowIndex, Object clickedData)
-            {
-                selectedDay = dailyAttendanceList.get(rowIndex);
-                Intent intent = new Intent(getActivity(), StudentSubjectWiseAttendance.class);
-                intent.putExtra("UserID", UserID);
-                intent.putExtra("ShiftID", ShiftID);
-                intent.putExtra("MediumID", MediumID);
-                intent.putExtra("ClassID", ClassID);
-                intent.putExtra("DepartmentID", DepartmentID);
-                intent.putExtra("SectionID", SectionID);
-                intent.putExtra("Date", selectedDay.getDate());
-                startActivity(intent);
-            }
+        tableView.addDataClickListener((rowIndex, clickedData) -> {
+            selectedDay = dailyAttendanceList.get(rowIndex);
+            Intent intent = new Intent(getActivity(), StudentSubjectWiseAttendance.class);
+            intent.putExtra("UserID", UserID);
+            intent.putExtra("ShiftID", ShiftID);
+            intent.putExtra("MediumID", MediumID);
+            intent.putExtra("ClassID", ClassID);
+            intent.putExtra("DepartmentID", DepartmentID);
+            intent.putExtra("SectionID", SectionID);
+            intent.putExtra("Date", selectedDay.getDate());
+            startActivity(intent);
         });
 
         MonthDataGetRequest();
@@ -303,6 +305,7 @@ public class SelfAttendanceReport extends Fragment {
 
     void MonthDataGetRequest(){
         if(StaticHelperClass.isNetworkAvailable(Objects.requireNonNull(getActivity()))) {
+            dialog.show();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
                     .addConverterFactory(ScalarsConverterFactory.create())
@@ -325,12 +328,13 @@ public class SelfAttendanceReport extends Fragment {
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseMonthJsonData(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
-
+                            dialog.dismiss();
                         }
 
                         @Override
@@ -346,6 +350,7 @@ public class SelfAttendanceReport extends Fragment {
 
     void MonthlyAttendanceDataGetRequest(int MonthID){
         if(StaticHelperClass.isNetworkAvailable(Objects.requireNonNull(getActivity()))) {
+            dialog.show();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
                     .addConverterFactory(ScalarsConverterFactory.create())
@@ -368,12 +373,13 @@ public class SelfAttendanceReport extends Fragment {
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             parseMonthlyAttendanceJsonData(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
-
+                            dialog.dismiss();
                         }
 
                         @Override

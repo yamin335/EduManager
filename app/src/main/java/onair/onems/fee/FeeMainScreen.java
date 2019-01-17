@@ -1,18 +1,15 @@
 package onair.onems.fee;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -41,7 +38,6 @@ public class FeeMainScreen extends SideNavigationMenuParentActivity {
 
     Spinner spinner,type_spinner;
     String monthUrl = "", monthFeesDetailsUrl="",monthFineDetailsUrl="",monthDueDetailsUrl="",monthScholarshipUrl="";
-    ProgressDialog dialog;
     int MonthID[];
     int monthselectindex,TotalFineAmount=0;
     Button paymentButton;
@@ -245,7 +241,6 @@ public class FeeMainScreen extends SideNavigationMenuParentActivity {
         } catch (Exception e)
         {
             Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
-            dialog.dismiss();
 
         }
 
@@ -280,7 +275,6 @@ public class FeeMainScreen extends SideNavigationMenuParentActivity {
         catch (Exception e)
         {
             Toast.makeText(getApplicationContext(),""+e,Toast.LENGTH_LONG).show();
-            dialog.dismiss();
         }
         cardModels.add(new CardModel("Total Fees: ", Double.toString( total_fees)+" TK"));
 
@@ -304,7 +298,6 @@ public class FeeMainScreen extends SideNavigationMenuParentActivity {
             @Override
             public void onErrorResponse(VolleyError error) {
 
-                dialog.dismiss();
             }
         });
 
@@ -375,7 +368,6 @@ public class FeeMainScreen extends SideNavigationMenuParentActivity {
             @Override
             public void onErrorResponse(VolleyError error) {
 
-                dialog.dismiss();
             }
         });
 
@@ -424,7 +416,6 @@ public class FeeMainScreen extends SideNavigationMenuParentActivity {
                 @Override
                 public void onErrorResponse(VolleyError error) {
 
-                    dialog.dismiss();
                 }
             });
 
@@ -434,7 +425,6 @@ public class FeeMainScreen extends SideNavigationMenuParentActivity {
         catch (Exception e)
         {
             Toast.makeText(getApplicationContext(),""+e,Toast.LENGTH_LONG).show();
-            dialog.dismiss();
         }
 
 

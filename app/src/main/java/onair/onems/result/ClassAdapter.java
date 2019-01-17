@@ -13,7 +13,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import onair.onems.R;
-import onair.onems.syllabus.SyllabusMainScreen;
 
 public class ClassAdapter extends RecyclerView.Adapter<ClassAdapter.MyViewHolder> {
     private JSONArray classes;
@@ -27,16 +26,13 @@ public class ClassAdapter extends RecyclerView.Adapter<ClassAdapter.MyViewHolder
             super(view);
             className = view.findViewById(R.id.name);
 
-            view.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    // send selected exam in callback
-                    try {
-                        selectedListener.onClassSelected(classes.getJSONObject(getAdapterPosition()));
-                        dismissListener.onClassSelected(classes.getJSONObject(getAdapterPosition()));
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
+            view.setOnClickListener(view1 -> {
+                // send selected exam in callback
+                try {
+                    selectedListener.onClassSelected(classes.getJSONObject(getAdapterPosition()));
+                    dismissListener.onClassSelected(classes.getJSONObject(getAdapterPosition()));
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
             });
         }

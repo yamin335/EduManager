@@ -7,7 +7,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -31,13 +30,13 @@ public class TakeAttendanceAdapter extends RecyclerView.Adapter<TakeAttendanceAd
 
         public MyViewHolder(View view) {
             super(view);
-            name = (TextView) view.findViewById(R.id.studentName);
-            roll = (TextView) view.findViewById(R.id.studentRoll);
-            present = (CheckBox) view.findViewById(R.id.present);
-            absent = (CheckBox) view.findViewById(R.id.absent);
-            late = (CheckBox) view.findViewById(R.id.lateCheck);
-            leave = (CheckBox) view.findViewById(R.id.leave);
-            lateInput = (EditText) view.findViewById(R.id.lateInput);
+            name = view.findViewById(R.id.studentName);
+            roll = view.findViewById(R.id.studentRoll);
+            present = view.findViewById(R.id.present);
+            absent = view.findViewById(R.id.absent);
+            late = view.findViewById(R.id.lateCheck);
+            leave = view.findViewById(R.id.leave);
+            lateInput = view.findViewById(R.id.lateInput);
         }
     }
 

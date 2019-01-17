@@ -1,13 +1,8 @@
 package onair.onems.notice;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -19,19 +14,12 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Objects;
 
 import io.reactivex.Observable;
 import io.reactivex.Observer;
@@ -44,7 +32,6 @@ import onair.onems.Services.StaticHelperClass;
 import onair.onems.mainactivities.SideNavigationMenuParentActivity;
 import onair.onems.mainactivities.StudentMainScreen;
 import onair.onems.mainactivities.TeacherMainScreen;
-import onair.onems.network.MySingleton;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -54,7 +41,6 @@ public class NoticeMainScreen extends SideNavigationMenuParentActivity implement
 
     private RecyclerView recyclerView;
     private ArrayList<JSONObject> noticeList;
-    private NoticeAdapter mAdapter;
     private Disposable finalDisposer;
 
     @Override
@@ -71,7 +57,7 @@ public class NoticeMainScreen extends SideNavigationMenuParentActivity implement
         activityName = NoticeMainScreen.class.getName();
 
         LayoutInflater inflater = (LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        final View childActivityLayout = inflater.inflate(R.layout.notice_content_main, null);
+        final View childActivityLayout = Objects.requireNonNull(inflater).inflate(R.layout.notice_content_main, null);
         LinearLayout parentActivityLayout = findViewById(R.id.contentMain);
         parentActivityLayout.addView(childActivityLayout, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
 
@@ -83,7 +69,7 @@ public class NoticeMainScreen extends SideNavigationMenuParentActivity implement
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else if(UserTypeID == 1) {
@@ -118,6 +104,7 @@ public class NoticeMainScreen extends SideNavigationMenuParentActivity implement
 
     private void NoticeDataGetRequest() {
         if (StaticHelperClass.isNetworkAvailable(this)) {
+            dialog.show();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
                     .addConverterFactory(ScalarsConverterFactory.create())
@@ -144,6 +131,7 @@ public class NoticeMainScreen extends SideNavigationMenuParentActivity implement
 
                         @Override
                         public void onNext(String response) {
+                            dialog.dismiss();
                             prepareNoticeList(response);
                         }
 
@@ -154,6 +142,7 @@ public class NoticeMainScreen extends SideNavigationMenuParentActivity implement
 
                         @Override
                         public void onError(Throwable e) {
+                            dialog.dismiss();
                             Toast.makeText(NoticeMainScreen.this,"No notice found !!!",Toast.LENGTH_LONG).show();
                         }
                     });
@@ -171,7 +160,7 @@ public class NoticeMainScreen extends SideNavigationMenuParentActivity implement
                 noticeList.add(noticeJsonArray.getJSONObject(i));
             }
 
-            mAdapter = new NoticeAdapter(this, noticeList, this);
+            NoticeAdapter mAdapter = new NoticeAdapter(this, noticeList, this);
 
             RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
             recyclerView.setLayoutManager(mLayoutManager);

@@ -13,6 +13,8 @@ import android.widget.TextView;
 
 import com.bumptech.glide.request.RequestOptions;
 
+import java.util.Objects;
+
 import onair.onems.R;
 import onair.onems.Services.GlideApp;
 import onair.onems.mainactivities.SideNavigationMenuParentActivity;
@@ -29,8 +31,8 @@ public class Profile extends SideNavigationMenuParentActivity {
         super.onCreate(savedInstanceState);
 
         LayoutInflater inflater = (LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        final View childActivityLayout = inflater.inflate(R.layout.profile, null);
-        LinearLayout parentActivityLayout = (LinearLayout) findViewById(R.id.contentMain);
+        final View childActivityLayout = Objects.requireNonNull(inflater).inflate(R.layout.profile, null);
+        LinearLayout parentActivityLayout = findViewById(R.id.contentMain);
         parentActivityLayout.addView(childActivityLayout, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
 
         ImageView imageProfile, cover;
@@ -48,19 +50,19 @@ public class Profile extends SideNavigationMenuParentActivity {
 
         switch (UserTypeID) {
             case 1:
-                designation.setText("Super Admin");
+                designation.setText(R.string.super_admin);
                 break;
             case 2:
-                designation.setText("Institute Admin");
+                designation.setText(R.string.admin);
                 break;
             case 3:
-                designation.setText("Student");
+                designation.setText(R.string.student1);
                 break;
             case 4:
-                designation.setText("Teacher");
+                designation.setText(R.string.teacher);
                 break;
             case 5:
-                designation.setText("Guardian");
+                designation.setText(R.string.guardian1);
                 break;
         }
 
@@ -68,7 +70,7 @@ public class Profile extends SideNavigationMenuParentActivity {
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else if(UserTypeID == 1) {

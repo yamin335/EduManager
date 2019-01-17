@@ -2,13 +2,9 @@ package onair.onems.service;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
-import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
@@ -20,9 +16,7 @@ import org.json.JSONObject;
 import java.util.Random;
 
 import onair.onems.app.Config;
-import onair.onems.customised.GuardianStudentSelectionDialog;
 import onair.onems.notification.NotificationDetails;
-import onair.onems.notification.NotificationMainScreen;
 import onair.onems.utils.NotificationUtils;
 
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
