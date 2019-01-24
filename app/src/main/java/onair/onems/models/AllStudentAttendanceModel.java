@@ -12,53 +12,57 @@ public class AllStudentAttendanceModel {
     private long ShiftID = 0;
     private long ClassID = 0;
     private String ImageUrl = "";
+    private long SessionID = 0;
 
     public AllStudentAttendanceModel(){
         super();
     }
 
-    public void setUserID(String UserID)
-    {
+    public void setUserID(String UserID) {
         this.UserID = UserID;
     }
 
-    public String getUserID()
-    {
+    public String getUserID() {
         return UserID;
     }
 
-    public void setUserFullName(String UserFullName)
-    {
+    public void setUserFullName(String UserFullName) {
         this.UserFullName = UserFullName;
     }
 
-    public String getUserFullName()
-    {
+    public String getUserFullName() {
         return UserFullName;
     }
 
-    public void setRFID(String RFID)
-    {
+    public void setRFID(String RFID) {
         this.RFID = RFID;
     }
 
-    public String getRFID()
-    {
+    public String getRFID() {
         return RFID;
     }
 
-    public void setRollNo(String RollNo)
-    {
+    public void setRollNo(String RollNo) {
         this.RollNo = RollNo;
     }
 
-    public String getRollNo()
-    {
+    public String getRollNo() {
         return RollNo;
     }
 
-    public void setDepartmentID(String DepartmentID)
-    {
+    public void setSessionID(String SessionID) {
+        if(!SessionID.equalsIgnoreCase("null")){
+            this.SessionID = Long.parseLong(SessionID);
+        }else {
+            this.SessionID = 0;
+        }
+    }
+
+    public long getSessionID() {
+        return SessionID;
+    }
+
+    public void setDepartmentID(String DepartmentID) {
         if(!DepartmentID.equalsIgnoreCase("null")){
             this.DepartmentID = Long.parseLong(DepartmentID);
         }else {
@@ -66,13 +70,11 @@ public class AllStudentAttendanceModel {
         }
     }
 
-    public long getDepartmentID()
-    {
+    public long getDepartmentID() {
         return DepartmentID;
     }
 
-    public void setSectionID(String SectionID)
-    {
+    public void setSectionID(String SectionID) {
         if(!SectionID.equalsIgnoreCase("null")){
             this.SectionID = Long.parseLong(SectionID);
         }else {
@@ -80,13 +82,11 @@ public class AllStudentAttendanceModel {
         }
     }
 
-    public long getSectionID()
-    {
+    public long getSectionID() {
         return SectionID;
     }
 
-    public void setMediumID(String MediumID)
-    {
+    public void setMediumID(String MediumID) {
         if(!MediumID.equalsIgnoreCase("null")){
             this.MediumID = Long.parseLong(MediumID);
         }else {
@@ -94,13 +94,11 @@ public class AllStudentAttendanceModel {
         }
     }
 
-    public long getMediumID()
-    {
+    public long getMediumID() {
         return MediumID;
     }
 
-    public void setShiftID(String ShiftID)
-    {
+    public void setShiftID(String ShiftID) {
         if(!ShiftID.equalsIgnoreCase("null")){
             this.ShiftID = Long.parseLong(ShiftID);
         }else {
@@ -108,13 +106,11 @@ public class AllStudentAttendanceModel {
         }
     }
 
-    public long getShiftID()
-    {
+    public long getShiftID() {
         return ShiftID;
     }
 
-    public void setClassID(String ClassID)
-    {
+    public void setClassID(String ClassID) {
         if(!ClassID.equalsIgnoreCase("null")){
             this.ClassID = Long.parseLong(ClassID);
         }else {
@@ -122,8 +118,7 @@ public class AllStudentAttendanceModel {
         }
     }
 
-    public long getClassID()
-    {
+    public long getClassID() {
         return ClassID;
     }
 

@@ -13,6 +13,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -38,6 +39,8 @@ public class ForgotPassVerCodeInputDialog extends Dialog implements View.OnClick
     private Context context;
     private String returnValue, selectedWay, sentVerificationCode;
     private EditText input;
+    private boolean isPhone = false, isMail = false;
+    private long InstituteID;
     private CompositeDisposable finalDisposer = new CompositeDisposable();
     public CommonProgressDialog dialog;
 
@@ -48,13 +51,16 @@ public class ForgotPassVerCodeInputDialog extends Dialog implements View.OnClick
             finalDisposer.dispose();
     }
 
-    ForgotPassVerCodeInputDialog(Activity activity, Context context, String returnValue, String selectedWay, String sentVerificationCode) {
+    ForgotPassVerCodeInputDialog(Activity activity, Context context, long InstituteID, String returnValue, String selectedWay, boolean isPhone, boolean isMail, String sentVerificationCode) {
         super(activity);
         this.parentActivity = activity;
         this.context = context;
         this.returnValue = returnValue;
         this.selectedWay = selectedWay;
+        this.isPhone = isPhone;
+        this.isMail = isMail;
         this.sentVerificationCode = sentVerificationCode;
+        this.InstituteID = InstituteID;
     }
 
     @Override
@@ -84,7 +90,7 @@ public class ForgotPassVerCodeInputDialog extends Dialog implements View.OnClick
                 verifyCode();
                 break;
             case R.id.resend:
-                resendVerifyCode();
+                resendVerifyCode(isPhone, isMail);
             default:
                 break;
         }
@@ -92,20 +98,34 @@ public class ForgotPassVerCodeInputDialog extends Dialog implements View.OnClick
 
     private void verifyCode() {
         if(sentVerificationCode.equals(input.getText().toString())) {
-            dismiss();
             ForgotPassChangePassDialog forgotPassChangePassDialog = new ForgotPassChangePassDialog(parentActivity, context, returnValue);
-            forgotPassChangePassDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            Objects.requireNonNull(forgotPassChangePassDialog.getWindow()).setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
             forgotPassChangePassDialog.setCancelable(false);
             forgotPassChangePassDialog.show();
+            dismiss();
         } else {
             Toast.makeText(context,"Invalid verification code !!!",Toast.LENGTH_LONG).show();
         }
     }
 
-    private void resendVerifyCode() {
+    private void resendVerifyCode(boolean isPhone, boolean isMail) {
         if(StaticHelperClass.isNetworkAvailable(context)) {
             dialog.show();
             int verificationCode = new Random().nextInt(900000)+100000;
+            sentVerificationCode = Integer.toString(verificationCode);
+            if (isPhone) {
+                getInstituteSmsToken(verificationCode);
+            } else if (isMail) {
+                sendVerifyCodeViaMail(verificationCode);
+            }
+        } else {
+            Toast.makeText(context,"Please check your INTERNET connection !!!",Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private void sendVerifyCodeViaMail(int verificationCode){
+        if(StaticHelperClass.isNetworkAvailable(context)) {
+            dialog.show();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(context.getString(R.string.baseUrl))
                     .addConverterFactory(ScalarsConverterFactory.create())
@@ -129,7 +149,7 @@ public class ForgotPassVerCodeInputDialog extends Dialog implements View.OnClick
                         @Override
                         public void onNext(String response) {
                             dialog.dismiss();
-                            parseReturnData(response);
+                            parseMailReturnData(response);
                         }
 
                         @Override
@@ -149,7 +169,7 @@ public class ForgotPassVerCodeInputDialog extends Dialog implements View.OnClick
         }
     }
 
-    private void parseReturnData(String string) {
+    private void parseMailReturnData(String string) {
         try {
             JSONObject jsonObject = new JSONObject(string);
             String RandomNo = jsonObject.getString("RandomNo");
@@ -162,6 +182,119 @@ public class ForgotPassVerCodeInputDialog extends Dialog implements View.OnClick
             e.printStackTrace();
             dismiss();
             Toast.makeText(context,"Error in json parsing !!!",Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private void getInstituteSmsToken(int verificationCode){
+        if(StaticHelperClass.isNetworkAvailable(context)) {
+            dialog.show();
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(context.getString(R.string.baseUrl))
+                    .addConverterFactory(ScalarsConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .build();
+
+            Observable<String> observable = retrofit
+                    .create(RetrofitNetworkService.class)
+                    .getInstituteAvailableSMS(InstituteID)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io());
+
+            finalDisposer.add( observable
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io())
+                    .subscribeWith(new DisposableObserver<String>() {
+
+                        @Override
+                        public void onNext(String response) {
+                            dialog.dismiss();
+                            parseTokenData(response, verificationCode);
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+                            dialog.dismiss();
+                            dismiss();
+                            Toast.makeText(context,"Error getting sms token !!!",Toast.LENGTH_LONG).show();
+                        }
+
+                        @Override
+                        public void onComplete() {
+
+                        }
+                    }));
+        } else {
+            Toast.makeText(context,"Please check your INTERNET connection !!!",Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private void parseTokenData(String token, int verificationCode) {
+        try {
+            JSONArray jsonArray = new JSONArray(token);
+            token = jsonArray.getJSONObject(0).getString("InsToken");
+            if (!token.equalsIgnoreCase("null")) {
+                sendVerifyCodeViaSMS(token, verificationCode);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void sendVerifyCodeViaSMS(String token, int verificationCode){
+        if(StaticHelperClass.isNetworkAvailable(context)) {
+            dialog.show();
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl("http://sms.greenweb.com.bd")
+                    .addConverterFactory(ScalarsConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .build();
+
+            Observable<String> observable = retrofit
+                    .create(RetrofitNetworkService.class)
+                    .sendVerificationCodeViaSMS(token, selectedWay, "Your onEMS password reset code is "+verificationCode)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io());
+
+            finalDisposer.add( observable
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io())
+                    .subscribeWith(new DisposableObserver<String>() {
+
+                        @Override
+                        public void onNext(String response) {
+                            dialog.dismiss();
+                            parseSmsReturnData(response);
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+                            dialog.dismiss();
+                            dismiss();
+                            Toast.makeText(context,"Error sending verification code!!!",Toast.LENGTH_LONG).show();
+                        }
+
+                        @Override
+                        public void onComplete() {
+
+                        }
+                    }));
+        } else {
+            Toast.makeText(context,"Please check your INTERNET connection !!!",Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private void parseSmsReturnData(String response) {
+        if(response.contains("Ok: SMS Sent Successfully")) {
+            Toast.makeText(context,"Verification code sent !!!", Toast.LENGTH_LONG).show();
+        } else {
+            dismiss();
+            Toast.makeText(context,"Error sending verification code !!!", Toast.LENGTH_LONG).show();
         }
     }
 }

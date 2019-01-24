@@ -46,7 +46,7 @@ public class TakeAttendanceDetails extends CommonToolbarParentActivity {
 
     private TakeAttendanceAdapter adapter;
     private ArrayList<AttendanceStudentModel> attendanceSheetArrayList;
-    private long InstituteID, MediumID, ShiftID, ClassID, SectionID, SubjectID, DepertmentID;
+    private long InstituteID, MediumID, ShiftID, ClassID, SectionID, SubjectID, DepertmentID, SessionID;
     private String date, UserID, SubAtdID;
     private JsonObject postDataJsonObject;
     private CompositeDisposable finalDisposer = new CompositeDisposable();
@@ -85,7 +85,8 @@ public class TakeAttendanceDetails extends CommonToolbarParentActivity {
         UserID = prefs.getString("UserID", "0");
 
         Bundle StudentSelection = getIntent().getExtras();
-        InstituteID = StudentSelection.getLong("InstituteID",0);
+        InstituteID = Objects.requireNonNull(StudentSelection).getLong("InstituteID",0);
+        SessionID = StudentSelection.getLong("SessionID",0);
         MediumID = StudentSelection.getLong("MediumID",0);
         ShiftID = StudentSelection.getLong("ShiftID",0);
         ClassID = StudentSelection.getLong("ClassID",0);
@@ -270,7 +271,7 @@ public class TakeAttendanceDetails extends CommonToolbarParentActivity {
 
             Observable<String> observable = retrofit
                     .create(RetrofitNetworkService.class)
-                    .getHrmSubWiseAtdDetail(InstituteID, MediumID, ShiftID, ClassID, SectionID, SubjectID, DepertmentID, date)
+                    .getHrmSubWiseAtdDetail(InstituteID, MediumID, ShiftID, ClassID, SectionID, SubjectID, DepertmentID, date, SessionID)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .unsubscribeOn(Schedulers.io());

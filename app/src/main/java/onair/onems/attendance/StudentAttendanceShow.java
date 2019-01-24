@@ -46,7 +46,7 @@ public class StudentAttendanceShow extends CommonToolbarParentActivity {
     private int MonthID = 0;
     private SimpleTableHeaderAdapter simpleTableHeaderAdapter;
     private Disposable disposable;
-    private long instituteID, shiftID, mediumID, classID, departmentID, sectionID;
+    private long instituteID, shiftID, mediumID, classID, departmentID, sectionID, SessionID;
 
     @Override
     protected void onDestroy() {
@@ -74,7 +74,7 @@ public class StudentAttendanceShow extends CommonToolbarParentActivity {
         departmentID = intent.getLongExtra("DepartmentID", 0);
         sectionID = intent.getLongExtra("SectionID", 0);
         MonthID = intent.getIntExtra("MonthID", 0);
-
+        SessionID = intent.getLongExtra("SessionID", 0);
 
         simpleTableHeaderAdapter = new SimpleTableHeaderAdapter(this, "SI", "Student Name", "ID", "Roll");
         simpleTableHeaderAdapter.setTextColor(ContextCompat.getColor(this, R.color.table_header_text));
@@ -103,6 +103,7 @@ public class StudentAttendanceShow extends CommonToolbarParentActivity {
             intent1.putExtra("SectionID", selectedStudent.getSectionID());
             intent1.putExtra("MonthID", MonthID);
             intent1.putExtra("ImageUrl", selectedStudent.getImageUrl());
+            intent1.putExtra("SessionID", SessionID);
             startActivity(intent1);
         });
 
@@ -157,7 +158,7 @@ public class StudentAttendanceShow extends CommonToolbarParentActivity {
                     .build();
             Observable<String> observable = retrofit
                     .create(RetrofitNetworkService.class)
-                    .getHrmSubWiseAtdDetail(instituteID, mediumID, shiftID, classID, sectionID, departmentID)
+                    .getHrmSubWiseAtdDetail(instituteID, mediumID, shiftID, classID, sectionID, departmentID, SessionID)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .unsubscribeOn(Schedulers.io());

@@ -209,8 +209,8 @@ public class ForgotPassSelectDialog extends Dialog implements View.OnClickListen
             String RandomNo = jsonObject.getString("RandomNo");
             String status = jsonObject.getString("Message");
             if(RandomNo.length()>3&&status.equalsIgnoreCase("sent")) {
-                ForgotPassVerCodeInputDialog forgotPassVerCodeInputDialog = new ForgotPassVerCodeInputDialog(parentActivity, context, returnValue, selectedWay, RandomNo);
-                forgotPassVerCodeInputDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                ForgotPassVerCodeInputDialog forgotPassVerCodeInputDialog = new ForgotPassVerCodeInputDialog(parentActivity, context, InstituteID, returnValue, selectedWay, false, true, RandomNo);
+                Objects.requireNonNull(forgotPassVerCodeInputDialog.getWindow()).setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                 forgotPassVerCodeInputDialog.setCancelable(false);
                 forgotPassVerCodeInputDialog.show();
                 dismiss();
@@ -296,7 +296,7 @@ public class ForgotPassSelectDialog extends Dialog implements View.OnClickListen
 
             Observable<String> observable = retrofit
                     .create(RetrofitNetworkService.class)
-                    .sendVerificationCodeViaSMS(token, selectedWay, verificationCode)
+                    .sendVerificationCodeViaSMS(token, selectedWay, "Your onEMS password reset code is "+verificationCode)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .unsubscribeOn(Schedulers.io());
@@ -310,7 +310,7 @@ public class ForgotPassSelectDialog extends Dialog implements View.OnClickListen
                         @Override
                         public void onNext(String response) {
                             dialog.dismiss();
-                            parseSmsReturnData(response);
+                            parseSmsReturnData(response, verificationCode);
                         }
 
                         @Override
@@ -330,8 +330,17 @@ public class ForgotPassSelectDialog extends Dialog implements View.OnClickListen
         }
     }
 
-    private void parseSmsReturnData(String string) {
-        String returnMessage = string;
+    private void parseSmsReturnData(String response, int verificationCode) {
+        if(response.contains("Ok: SMS Sent Successfully")) {
+            ForgotPassVerCodeInputDialog forgotPassVerCodeInputDialog = new ForgotPassVerCodeInputDialog(parentActivity, context, InstituteID, returnValue, selectedWay, true, false, Integer.toString(verificationCode));
+            Objects.requireNonNull(forgotPassVerCodeInputDialog.getWindow()).setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            forgotPassVerCodeInputDialog.setCancelable(false);
+            forgotPassVerCodeInputDialog.show();
+            dismiss();
+        } else {
+            dismiss();
+            Toast.makeText(context,"Error sending verification code !!!", Toast.LENGTH_LONG).show();
+        }
     }
 
 }

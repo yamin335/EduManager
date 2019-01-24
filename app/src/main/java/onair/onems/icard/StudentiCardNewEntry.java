@@ -47,6 +47,7 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Objects;
 
@@ -61,11 +62,13 @@ import okhttp3.RequestBody;
 import onair.onems.R;
 import onair.onems.Services.RetrofitNetworkService;
 import onair.onems.Services.StaticHelperClass;
+import onair.onems.attendance.ShowAttendance;
 import onair.onems.mainactivities.SideNavigationMenuParentActivity;
 import onair.onems.models.ClassModel;
 import onair.onems.models.DepartmentModel;
 import onair.onems.models.MediumModel;
 import onair.onems.models.SectionModel;
+import onair.onems.models.SessionModel;
 import onair.onems.models.ShiftModel;
 import onair.onems.models.StudentInformationEntry;
 import onair.onems.utils.ImageUtils;
@@ -86,19 +89,23 @@ public class StudentiCardNewEntry extends SideNavigationMenuParentActivity {
     private CheckBox checkBox;
     private Uri mCropImageUri;
     private long InstituteID;
-    private Spinner spinnerClass, spinnerShift, spinnerSection, spinnerMedium, spinnerDepartment;
+    private Spinner spinnerClass, spinnerShift, spinnerSection, spinnerMedium, spinnerDepartment, spinnerSession;
+
+    private ArrayList<SessionModel> allSessionArrayList;
     private ArrayList<ClassModel> allClassArrayList;
     private ArrayList<ShiftModel> allShiftArrayList;
     private ArrayList<SectionModel> allSectionArrayList;
     private ArrayList<MediumModel> allMediumArrayList;
     private ArrayList<DepartmentModel> allDepartmentArrayList;
 
+    private String[] tempSessionArray = {"Select Session"};
     private String[] tempClassArray = {"Select Class"};
     private String[] tempShiftArray = {"Select Shift"};
     private String[] tempSectionArray = {"Select Section"};
     private String[] tempDepartmentArray = {"Select Department"};
     private String[] tempMediumArray = {"Select Medium"};
 
+    private SessionModel selectedSession = null;
     private ClassModel selectedClass = null;
     private ShiftModel selectedShift = null;
     private SectionModel selectedSection = null;
@@ -154,6 +161,8 @@ public class StudentiCardNewEntry extends SideNavigationMenuParentActivity {
         parentActivityLayout.addView(childActivityLayout, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
 
         studentInformationEntry = new StudentInformationEntry();
+
+        selectedSession = new SessionModel();
         selectedClass = new ClassModel();
         selectedShift = new ShiftModel();
         selectedSection = new SectionModel();
@@ -182,6 +191,7 @@ public class StudentiCardNewEntry extends SideNavigationMenuParentActivity {
 
         checkBox = findViewById(R.id.checkbox);
 
+        spinnerSession = findViewById(R.id.spinnerSession);
         spinnerClass = findViewById(R.id.spinnerClass);
         spinnerShift = findViewById(R.id.spinnerShift);
         spinnerSection = findViewById(R.id.spinnerSection);
@@ -193,6 +203,10 @@ public class StudentiCardNewEntry extends SideNavigationMenuParentActivity {
         editaddress = findViewById(R.id.edited_address);
         editparent = findViewById(R.id.edited_parent);
         editparentnumber = findViewById(R.id.edited_parentPhone);
+
+        ArrayAdapter<String> session_spinner_adapter = new ArrayAdapter<>(this, R.layout.spinner_item, tempSessionArray);
+        session_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerSession.setAdapter(session_spinner_adapter);
 
         ArrayAdapter<String> class_spinner_adapter = new ArrayAdapter<>(this, R.layout.spinner_item, tempClassArray);
         class_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -241,8 +255,32 @@ public class StudentiCardNewEntry extends SideNavigationMenuParentActivity {
             }
         });
 
+        SessionDataGetRequest();
         ShiftDataGetRequest();
         MediumDataGetRequest();
+
+        spinnerSession.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                if(position != 0) {
+                    try {
+                        selectedSession = allSessionArrayList.get(position-1);
+                        studentInformationEntry.setSessionID(Long.toString(selectedSession.getSessionID()));
+                    } catch (IndexOutOfBoundsException e) {
+                        Toast.makeText(StudentiCardNewEntry.this,"No session found !!!",Toast.LENGTH_LONG).show();
+                    }
+                } else {
+                    selectedSession = new SessionModel();
+                    studentInformationEntry.setSessionID(Long.toString(selectedSession.getSessionID()));
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
 
         spinnerShift.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -409,7 +447,10 @@ public class StudentiCardNewEntry extends SideNavigationMenuParentActivity {
         doneButton.setOnClickListener(view -> {
             if(StaticHelperClass.isNetworkAvailable(StudentiCardNewEntry.this)) {
                 StudentiCardNewEntry.this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
-                if(editname.getText().toString().equals("")) {
+                if(allSessionArrayList.size()>0 && selectedSession.getSessionID() == 0){
+                    Toast.makeText(StudentiCardNewEntry.this,"Please select session!!! ",
+                            Toast.LENGTH_LONG).show();
+                } else if(editname.getText().toString().equals("")) {
                     Toast.makeText(StudentiCardNewEntry.this,"Please enter student name!!!",Toast.LENGTH_LONG).show();
                 } else if(editroll.getText().toString().equals("")) {
                     Toast.makeText(StudentiCardNewEntry.this,"Please enter student roll!!!",Toast.LENGTH_LONG).show();
@@ -438,7 +479,7 @@ public class StudentiCardNewEntry extends SideNavigationMenuParentActivity {
                         studentInformationEntry.setInstituteID(Long.toString(InstituteID));
                         Gson gson = new Gson();
                         String json = gson.toJson(studentInformationEntry);
-                        postUsingVolley(json);
+                        postUsingRetrofit2(json);
                     } else {
                         if(checkBox.isChecked()) {
                             tempBitmap = mCropImageView.getCroppedImage(500, 500);
@@ -588,14 +629,14 @@ public class StudentiCardNewEntry extends SideNavigationMenuParentActivity {
             studentInformationEntry.setIsImageCaptured(IsImageCaptured);
             Gson gson = new Gson();
             String json = gson.toJson(studentInformationEntry);
-            postUsingVolley(json);
+            postUsingRetrofit2(json);
             Log.d( "ImageUrl", jsonObject.getString("path"));
         } catch (JSONException e1) {
             e1.printStackTrace();
         }
     }
 
-    public void postUsingVolley(String json) {
+    public void postUsingRetrofit2(String json) {
         if (StaticHelperClass.isNetworkAvailable(this)) {
             try {
                 JsonParser parser = new JsonParser();
@@ -663,6 +704,86 @@ public class StudentiCardNewEntry extends SideNavigationMenuParentActivity {
         } else {
             Toast.makeText(this,"Please check your internet connection and select again!!! ",
                     Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private void SessionDataGetRequest() {
+        if (StaticHelperClass.isNetworkAvailable(this)) {
+            dialog.show();
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(getString(R.string.baseUrl))
+                    .addConverterFactory(ScalarsConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .build();
+
+            Observable<String> observable = retrofit
+                    .create(RetrofitNetworkService.class)
+                    .getallsession()
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io());
+
+            finalDisposer.add( observable
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io())
+                    .subscribeWith(new DisposableObserver<String>() {
+
+                        @Override
+                        public void onNext(String response) {
+                            dialog.dismiss();
+                            parseSessionJsonData(response);
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+                            dialog.dismiss();
+                            Toast.makeText(StudentiCardNewEntry.this,"Session not found!!! ",
+                                    Toast.LENGTH_LONG).show();
+                        }
+
+                        @Override
+                        public void onComplete() {
+
+                        }
+                    }));
+        } else {
+            Toast.makeText(this,"Please check your internet connection and select again!!! ",
+                    Toast.LENGTH_LONG).show();
+        }
+    }
+
+    void parseSessionJsonData(String jsonString) {
+        try {
+            String year = Integer.toString(Calendar.getInstance().get(Calendar.YEAR));
+            int yearIndex = 0;
+            allSessionArrayList = new ArrayList<>();
+            JSONArray sessionJsonArray = new JSONArray(jsonString);
+            ArrayList<String> sessionArrayList = new ArrayList<>();
+            sessionArrayList.add("Select Session");
+            for(int i = 0; i < sessionJsonArray.length(); ++i) {
+                JSONObject sessionJsonObject = sessionJsonArray.getJSONObject(i);
+                SessionModel sessionModel = new SessionModel(sessionJsonObject.getString("SessionID"), sessionJsonObject.getString("SessionName"));
+                allSessionArrayList.add(sessionModel);
+                sessionArrayList.add(sessionModel.getSessionName());
+                if (year.equalsIgnoreCase(sessionModel.getSessionName())) {
+                    yearIndex = i;
+                }
+            }
+            try {
+                String[] strings = new String[sessionArrayList.size()];
+                strings = sessionArrayList.toArray(strings);
+                ArrayAdapter<String> session_spinner_adapter = new ArrayAdapter<>(this,R.layout.spinner_item, strings);
+                session_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                spinnerSession.setAdapter(session_spinner_adapter);
+                spinnerSession.setSelection(yearIndex+1);
+                selectedSession = allSessionArrayList.get(yearIndex);
+            } catch (IndexOutOfBoundsException e) {
+                Toast.makeText(this,"No session found !!!",Toast.LENGTH_LONG).show();
+            }
+        } catch (JSONException e) {
+            Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
         }
     }
 

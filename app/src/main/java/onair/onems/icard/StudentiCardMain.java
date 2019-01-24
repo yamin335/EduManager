@@ -21,6 +21,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Objects;
 
 import io.reactivex.Observable;
@@ -31,12 +32,14 @@ import io.reactivex.schedulers.Schedulers;
 import onair.onems.R;
 import onair.onems.Services.RetrofitNetworkService;
 import onair.onems.Services.StaticHelperClass;
+import onair.onems.attendance.ShowAttendance;
 import onair.onems.mainactivities.SideNavigationMenuParentActivity;
 import onair.onems.mainactivities.TeacherMainScreen;
 import onair.onems.models.ClassModel;
 import onair.onems.models.DepartmentModel;
 import onair.onems.models.MediumModel;
 import onair.onems.models.SectionModel;
+import onair.onems.models.SessionModel;
 import onair.onems.models.ShiftModel;
 import onair.onems.models.SpinnerStudentInformation;
 import retrofit2.Retrofit;
@@ -46,8 +49,9 @@ import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 public class StudentiCardMain extends SideNavigationMenuParentActivity {
 
-    private Spinner spinnerClass, spinnerShift, spinnerSection, spinnerMedium, spinnerDepartment, spinnerStudent;
+    private Spinner spinnerClass, spinnerShift, spinnerSection, spinnerMedium, spinnerDepartment, spinnerStudent, spinnerSession;
 
+    private ArrayList<SessionModel> allSessionArrayList;
     private ArrayList<ClassModel> allClassArrayList;
     private ArrayList<ShiftModel> allShiftArrayList;
     private ArrayList<SectionModel> allSectionArrayList;
@@ -55,6 +59,7 @@ public class StudentiCardMain extends SideNavigationMenuParentActivity {
     private ArrayList<DepartmentModel> allDepartmentArrayList;
     private ArrayList<SpinnerStudentInformation> allStudentArrayList;
 
+    private String[] tempSessionArray = {"Select Session"};
     private String[] tempClassArray = {"Select Class"};
     private String[] tempShiftArray = {"Select Shift"};
     private String[] tempSectionArray = {"Select Section"};
@@ -62,6 +67,7 @@ public class StudentiCardMain extends SideNavigationMenuParentActivity {
     private String[] tempMediumArray = {"Select Medium"};
     private String[] tempStudentArray = {"Select Student"};
 
+    private SessionModel selectedSession = null;
     private ClassModel selectedClass;
     private ShiftModel selectedShift;
     private SectionModel selectedSection;
@@ -96,6 +102,7 @@ public class StudentiCardMain extends SideNavigationMenuParentActivity {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         InstituteID = prefs.getLong("InstituteID",0);
 
+        selectedSession = new SessionModel();
         selectedClass = new ClassModel();
         selectedShift = new ShiftModel();
         selectedSection = new SectionModel();
@@ -104,6 +111,7 @@ public class StudentiCardMain extends SideNavigationMenuParentActivity {
 
         Button showStudentData, newEntry, editStudentData;
 
+        spinnerSession = findViewById(R.id.spinnerSession);
         spinnerClass = findViewById(R.id.spinnerClass);
         spinnerShift = findViewById(R.id.spinnerShift);
         spinnerSection = findViewById(R.id.spinnerSection);
@@ -114,6 +122,10 @@ public class StudentiCardMain extends SideNavigationMenuParentActivity {
         showStudentData = findViewById(R.id.showStudentData);
         editStudentData = findViewById(R.id.editStudentInfo);
         newEntry = findViewById(R.id.newEntry);
+
+        ArrayAdapter<String> session_spinner_adapter = new ArrayAdapter<>(this, R.layout.spinner_item, tempSessionArray);
+        session_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerSession.setAdapter(session_spinner_adapter);
 
         ArrayAdapter<String> class_spinner_adapter = new ArrayAdapter<>(this, R.layout.spinner_item, tempClassArray);
         class_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -139,8 +151,30 @@ public class StudentiCardMain extends SideNavigationMenuParentActivity {
         student_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerStudent.setAdapter(student_spinner_adapter);
 
+        SessionDataGetRequest();
         ShiftDataGetRequest();
         MediumDataGetRequest();
+
+        spinnerSession.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                if(position != 0) {
+                    try {
+                        selectedSession = allSessionArrayList.get(position-1);
+                    } catch (IndexOutOfBoundsException e) {
+                        Toast.makeText(StudentiCardMain.this,"No session found !!!",Toast.LENGTH_LONG).show();
+                    }
+                } else {
+                    selectedSession = new SessionModel();
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
 
         spinnerShift.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -319,11 +353,15 @@ public class StudentiCardMain extends SideNavigationMenuParentActivity {
         });
 
         editStudentData.setOnClickListener(v -> {
-            if(StaticHelperClass.isNetworkAvailable(StudentiCardMain.this)) {
+            if(allSessionArrayList.size()>0 && selectedSession.getSessionID() == 0){
+                Toast.makeText(StudentiCardMain.this,"Please select session!!! ",
+                        Toast.LENGTH_LONG).show();
+            } else if(StaticHelperClass.isNetworkAvailable(StudentiCardMain.this)) {
                 if(selectedStudent != null) {
                     CheckSelectedData();
                     Bundle bundle = new Bundle();
                     bundle.putString("UserID", selectedStudent.getUserID());
+                    bundle.putString("SessionID", Long.toString(selectedSession.getSessionID()));
                     bundle.putString("SectionID", Long.toString(selectedSection.getSectionID()));
                     bundle.putString("ClassID", Long.toString(selectedClass.getClassID()));
                     bundle.putString("ShiftID", Long.toString(selectedShift.getShiftID()));
@@ -342,10 +380,14 @@ public class StudentiCardMain extends SideNavigationMenuParentActivity {
 
         showStudentData.setOnClickListener(v -> {
             if(StaticHelperClass.isNetworkAvailable(StudentiCardMain.this)) {
-                if(selectedStudent != null) {
+                if(allSessionArrayList.size()>0 && selectedSession.getSessionID() == 0){
+                    Toast.makeText(StudentiCardMain.this,"Please select session!!! ",
+                            Toast.LENGTH_LONG).show();
+                } else if(selectedStudent != null) {
                     CheckSelectedData();
                     Bundle bundle = new Bundle();
                     bundle.putString("UserID", selectedStudent.getUserID());
+                    bundle.putString("SessionID", Long.toString(selectedSession.getSessionID()));
                     bundle.putString("SectionID", Long.toString(selectedSection.getSectionID()));
                     bundle.putString("ClassID", Long.toString(selectedClass.getClassID()));
                     bundle.putString("ShiftID", Long.toString(selectedShift.getShiftID()));
@@ -361,6 +403,86 @@ public class StudentiCardMain extends SideNavigationMenuParentActivity {
                 Toast.makeText(StudentiCardMain.this,"Please check your internet connection!!!",Toast.LENGTH_LONG).show();
             }
         });
+    }
+
+    private void SessionDataGetRequest() {
+        if (StaticHelperClass.isNetworkAvailable(this)) {
+            dialog.show();
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(getString(R.string.baseUrl))
+                    .addConverterFactory(ScalarsConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .build();
+
+            Observable<String> observable = retrofit
+                    .create(RetrofitNetworkService.class)
+                    .getallsession()
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io());
+
+            finalDisposer.add( observable
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io())
+                    .subscribeWith(new DisposableObserver<String>() {
+
+                        @Override
+                        public void onNext(String response) {
+                            dialog.dismiss();
+                            parseSessionJsonData(response);
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+                            dialog.dismiss();
+                            Toast.makeText(StudentiCardMain.this,"Session not found!!! ",
+                                    Toast.LENGTH_LONG).show();
+                        }
+
+                        @Override
+                        public void onComplete() {
+
+                        }
+                    }));
+        } else {
+            Toast.makeText(this,"Please check your internet connection and select again!!! ",
+                    Toast.LENGTH_LONG).show();
+        }
+    }
+
+    void parseSessionJsonData(String jsonString) {
+        try {
+            String year = Integer.toString(Calendar.getInstance().get(Calendar.YEAR));
+            int yearIndex = 0;
+            allSessionArrayList = new ArrayList<>();
+            JSONArray sessionJsonArray = new JSONArray(jsonString);
+            ArrayList<String> sessionArrayList = new ArrayList<>();
+            sessionArrayList.add("Select Session");
+            for(int i = 0; i < sessionJsonArray.length(); ++i) {
+                JSONObject sessionJsonObject = sessionJsonArray.getJSONObject(i);
+                SessionModel sessionModel = new SessionModel(sessionJsonObject.getString("SessionID"), sessionJsonObject.getString("SessionName"));
+                allSessionArrayList.add(sessionModel);
+                sessionArrayList.add(sessionModel.getSessionName());
+                if (year.equalsIgnoreCase(sessionModel.getSessionName())) {
+                    yearIndex = i;
+                }
+            }
+            try {
+                String[] strings = new String[sessionArrayList.size()];
+                strings = sessionArrayList.toArray(strings);
+                ArrayAdapter<String> session_spinner_adapter = new ArrayAdapter<>(this,R.layout.spinner_item, strings);
+                session_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                spinnerSession.setAdapter(session_spinner_adapter);
+                spinnerSession.setSelection(yearIndex+1);
+                selectedSession = allSessionArrayList.get(yearIndex);
+            } catch (IndexOutOfBoundsException e) {
+                Toast.makeText(this,"No session found !!!",Toast.LENGTH_LONG).show();
+            }
+        } catch (JSONException e) {
+            Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
+        }
     }
 
     void parseShiftJsonData(String jsonString) {
@@ -805,7 +927,7 @@ public class StudentiCardMain extends SideNavigationMenuParentActivity {
                     .getStudent(InstituteID,
                             Long.toString(selectedClass.getClassID()), Long.toString(selectedSection.getSectionID()),
                             Long.toString(selectedDepartment.getDepartmentID()), Long.toString(selectedMedium.getMediumID()),
-                            Long.toString(selectedShift.getShiftID()), "0")
+                            Long.toString(selectedShift.getShiftID()), "0", Long.toString(selectedSession.getSessionID()))
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .unsubscribeOn(Schedulers.io());

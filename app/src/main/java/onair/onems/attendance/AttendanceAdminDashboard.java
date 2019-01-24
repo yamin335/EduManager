@@ -18,6 +18,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -198,6 +200,7 @@ public class AttendanceAdminDashboard extends SideNavigationMenuParentActivity {
             double attendancePercentage = 0.0;
             if(total!=0){
                 attendancePercentage = (double)(present*100)/total;
+                attendancePercentage = new BigDecimal(attendancePercentage).setScale(2, RoundingMode.HALF_UP).doubleValue();
             }
             TextView totalTeacher, presentTeacher, absentTeacher, percentageTeacher;
             totalTeacher = findViewById(R.id.totalTeacher);
@@ -222,6 +225,7 @@ public class AttendanceAdminDashboard extends SideNavigationMenuParentActivity {
             double attendancePercentage = 0.0;
             if(total!=0){
                 attendancePercentage = (double)(present*100)/total;
+                attendancePercentage = new BigDecimal(attendancePercentage).setScale(2, RoundingMode.HALF_UP).doubleValue();
             }
             TextView totalStudent, presentStudent, absentStudent, percentageStudent;
             totalStudent = findViewById(R.id.totalStudent);

@@ -34,6 +34,7 @@ import onair.onems.models.ClassModel;
 import onair.onems.models.DepartmentModel;
 import onair.onems.models.MediumModel;
 import onair.onems.models.SectionModel;
+import onair.onems.models.SessionModel;
 import onair.onems.models.ShiftModel;
 import onair.onems.models.SubjectModel;
 import onair.onems.Services.StaticHelperClass;
@@ -44,8 +45,10 @@ import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 public class TakeAttendance extends SideNavigationMenuParentActivity {
 
-    private Spinner spinnerClass, spinnerShift, spinnerSection, spinnerMedium, spinnerDepartment, spinnerSubject;
+    private Spinner spinnerClass, spinnerShift, spinnerSection, spinnerMedium, spinnerDepartment, spinnerSubject, spinnerSession;
     private Button datePicker;
+
+    private ArrayList<SessionModel> allSessionArrayList;
     private ArrayList<ClassModel> allClassArrayList;
     private ArrayList<ShiftModel> allShiftArrayList;
     private ArrayList<SectionModel> allSectionArrayList;
@@ -53,6 +56,7 @@ public class TakeAttendance extends SideNavigationMenuParentActivity {
     private ArrayList<DepartmentModel> allDepartmentArrayList;
     private ArrayList<SubjectModel> allSubjectArrayList;
 
+    private String[] tempSessionArray = {"Select Session"};
     private String[] tempClassArray = {"Select Class"};
     private String[] tempShiftArray = {"Select Shift"};
     private String[] tempSectionArray = {"Select Section"};
@@ -60,6 +64,7 @@ public class TakeAttendance extends SideNavigationMenuParentActivity {
     private String[] tempMediumArray = {"Select Medium"};
     private String[] tempSubjectArray = {"Select Subject"};
 
+    private SessionModel selectedSession = null;
     private ClassModel selectedClass = null;
     private ShiftModel selectedShift = null;
     private SectionModel selectedSection = null;
@@ -100,12 +105,14 @@ public class TakeAttendance extends SideNavigationMenuParentActivity {
         LinearLayout parentActivityLayout = findViewById(R.id.contentMain);
         parentActivityLayout.addView(childActivityLayout, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
 
+        selectedSession = new SessionModel();
         selectedClass = new ClassModel();
         selectedShift = new ShiftModel();
         selectedSection = new SectionModel();
         selectedMedium = new MediumModel();
         selectedDepartment = new DepartmentModel();
 
+        spinnerSession = findViewById(R.id.spinnerSession);
         spinnerClass = findViewById(R.id.spinnerClass);
         spinnerShift = findViewById(R.id.spinnerShift);
         spinnerSection = findViewById(R.id.spinnerSection);
@@ -116,6 +123,10 @@ public class TakeAttendance extends SideNavigationMenuParentActivity {
         Button takeAttendance = findViewById(R.id.takeAttendance);
 
         datePicker = findViewById(R.id.pickDate);
+
+        ArrayAdapter<String> session_spinner_adapter = new ArrayAdapter<>(this, R.layout.spinner_item, tempSessionArray);
+        session_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerSession.setAdapter(session_spinner_adapter);
 
         ArrayAdapter<String> class_spinner_adapter = new ArrayAdapter<>(this, R.layout.spinner_item, tempClassArray);
         class_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -157,15 +168,20 @@ public class TakeAttendance extends SideNavigationMenuParentActivity {
             datePickerDialog.show();
         });
 
+        SessionDataGetRequest();
         ShiftDataGetRequest();
         MediumDataGetRequest();
 
         takeAttendance.setOnClickListener(v -> {
             if(StaticHelperClass.isNetworkAvailable(TakeAttendance.this)) {
-                if((selectedClass.getClassID() != -2)&&(!selectedDate.isEmpty())&&(selectedSubject != null)) {
+                if(allSessionArrayList.size()>0 && selectedSession.getSessionID() == 0){
+                    Toast.makeText(TakeAttendance.this,"Please select session!!! ",
+                            Toast.LENGTH_LONG).show();
+                } else if((selectedClass.getClassID() != -2)&&(!selectedDate.isEmpty())&&(selectedSubject != null)) {
                     CheckSelectedData();
                     Bundle bundle = new Bundle();
                     bundle.putLong("InstituteID", InstituteID);
+                    bundle.putLong("SessionID",selectedSession.getSessionID());
                     bundle.putLong("MediumID",selectedMedium.getMediumID());
                     bundle.putLong("ShiftID",selectedShift.getShiftID());
                     bundle.putLong("ClassID",selectedClass.getClassID());
@@ -189,6 +205,26 @@ public class TakeAttendance extends SideNavigationMenuParentActivity {
             }
         });
 
+        spinnerSession.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                if(position != 0) {
+                    try {
+                        selectedSession = allSessionArrayList.get(position-1);
+                    } catch (IndexOutOfBoundsException e) {
+                        Toast.makeText(TakeAttendance.this,"No session found !!!",Toast.LENGTH_LONG).show();
+                    }
+                } else {
+                    selectedSession = new SessionModel();
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
 
         spinnerShift.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -357,6 +393,86 @@ public class TakeAttendance extends SideNavigationMenuParentActivity {
 
             }
         });
+    }
+
+    private void SessionDataGetRequest() {
+        if (StaticHelperClass.isNetworkAvailable(this)) {
+            dialog.show();
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(getString(R.string.baseUrl))
+                    .addConverterFactory(ScalarsConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .build();
+
+            Observable<String> observable = retrofit
+                    .create(RetrofitNetworkService.class)
+                    .getallsession()
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io());
+
+            finalDisposer.add( observable
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io())
+                    .subscribeWith(new DisposableObserver<String>() {
+
+                        @Override
+                        public void onNext(String response) {
+                            dialog.dismiss();
+                            parseSessionJsonData(response);
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+                            dialog.dismiss();
+                            Toast.makeText(TakeAttendance.this,"Session not found!!! ",
+                                    Toast.LENGTH_LONG).show();
+                        }
+
+                        @Override
+                        public void onComplete() {
+
+                        }
+                    }));
+        } else {
+            Toast.makeText(this,"Please check your internet connection and select again!!! ",
+                    Toast.LENGTH_LONG).show();
+        }
+    }
+
+    void parseSessionJsonData(String jsonString) {
+        try {
+            String year = Integer.toString(Calendar.getInstance().get(Calendar.YEAR));
+            int yearIndex = 0;
+            allSessionArrayList = new ArrayList<>();
+            JSONArray sessionJsonArray = new JSONArray(jsonString);
+            ArrayList<String> sessionArrayList = new ArrayList<>();
+            sessionArrayList.add("Select Session");
+            for(int i = 0; i < sessionJsonArray.length(); ++i) {
+                JSONObject sessionJsonObject = sessionJsonArray.getJSONObject(i);
+                SessionModel sessionModel = new SessionModel(sessionJsonObject.getString("SessionID"), sessionJsonObject.getString("SessionName"));
+                allSessionArrayList.add(sessionModel);
+                sessionArrayList.add(sessionModel.getSessionName());
+                if (year.equalsIgnoreCase(sessionModel.getSessionName())) {
+                    yearIndex = i;
+                }
+            }
+            try {
+                String[] strings = new String[sessionArrayList.size()];
+                strings = sessionArrayList.toArray(strings);
+                ArrayAdapter<String> session_spinner_adapter = new ArrayAdapter<>(this,R.layout.spinner_item, strings);
+                session_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                spinnerSession.setAdapter(session_spinner_adapter);
+                spinnerSession.setSelection(yearIndex+1);
+                selectedSession = allSessionArrayList.get(yearIndex);
+            } catch (IndexOutOfBoundsException e) {
+                Toast.makeText(this,"No session found !!!",Toast.LENGTH_LONG).show();
+            }
+        } catch (JSONException e) {
+            Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
+        }
     }
 
     void parseShiftJsonData(String jsonString) {

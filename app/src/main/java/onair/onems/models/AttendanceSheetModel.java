@@ -48,8 +48,7 @@ public class AttendanceSheetModel {
 
     private ArrayList<AttendanceStudentModel> attendenceArr;
 
-    public AttendanceSheetModel()
-    {
+    public AttendanceSheetModel() {
 //        this.CreateBy = 0;
 //        this.CreateOn = "";
 //        this.CreatePc = "";
@@ -67,88 +66,60 @@ public class AttendanceSheetModel {
                                 String MediumID, String ShiftID, String ClassID, String AtdUserID, String AtdDate,
                                 String InstituteID, String CreateBy, String CreateOn, String CreatePc,
                                 String UpdateBy, String UpdateOn, String UpdatePc, String IsDeleted,
-                                String DeleteBy, String DeleteOn, String DeletePc, ArrayList<AttendanceStudentModel> attendenceArr)
-    {
-        if(SubAtdID.equals("null"))
-        {
+                                String DeleteBy, String DeleteOn, String DeletePc, ArrayList<AttendanceStudentModel> attendenceArr) {
+        if(SubAtdID.equals("null")) {
             this.SubAtdID = 0;
-        }
-        else
-        {
+        } else {
             this.SubAtdID = Long.parseLong(SubAtdID);
         }
 
-        if(SubjectID.equals("null"))
-        {
+        if(SubjectID.equals("null")) {
             this.SubjectID = 0;
-        }
-        else
-        {
+        } else {
             this.SubjectID = Long.parseLong(SubjectID);
         }
 
-        if(SectionID.equals("null"))
-        {
+        if(SectionID.equals("null")) {
             this.SectionID = -2;
-        }
-        else
-        {
+        } else {
             this.SectionID = Long.parseLong(SectionID);
         }
 
-        if(DepartmentID.equals("null"))
-        {
+        if(DepartmentID.equals("null")) {
             this.DepartmentID = -2;
-        }
-        else
-        {
+        } else {
             this.DepartmentID = Long.parseLong(DepartmentID);
         }
 
-        if(MediumID.equals("null"))
-        {
+        if(MediumID.equals("null")) {
             this.MediumID = -2;
-        }
-        else
-        {
+        } else {
             this.MediumID = Long.parseLong(MediumID);
         }
 
-        if(ShiftID.equals("null"))
-        {
+        if(ShiftID.equals("null")) {
             this.ShiftID = -2;
-        }
-        else
-        {
+        } else {
             this.ShiftID = Long.parseLong(ShiftID);
         }
 
-        if(ClassID.equals("null"))
-        {
+        if(ClassID.equals("null")) {
             this.ClassID = -2;
-        }
-        else
-        {
+        } else {
             this.ClassID = Long.parseLong(ClassID);
         }
 
-        if(AtdUserID.equals("null"))
-        {
+        if(AtdUserID.equals("null")) {
             this.AtdUserID = 0;
-        }
-        else
-        {
+        } else {
             this.AtdUserID = Long.parseLong(AtdUserID);
         }
 
         this.AtdDate = AtdDate;
 
-        if(InstituteID.equals("null"))
-        {
+        if(InstituteID.equals("null")) {
             this.InstituteID = 0;
-        }
-        else
-        {
+        } else {
             this.InstituteID = Long.parseLong(InstituteID);
         }
 //
@@ -199,98 +170,66 @@ public class AttendanceSheetModel {
         this.attendenceArr = attendenceArr;
     }
 
-    public void setSubAtdID(String SubAtdID)
-    {
-        if(SubAtdID.equals("null"))
-        {
+    public void setSubAtdID(String SubAtdID) {
+        if(SubAtdID.equals("null")) {
             this.SubAtdID = 0;
-        }
-        else
-        {
+        } else {
             this.SubAtdID = Long.parseLong(SubAtdID);
         }
     }
 
-    public void setSubjectID(String SubjectID)
-    {
-        if(SubjectID.equals("null"))
-        {
+    public void setSubjectID(String SubjectID) {
+        if(SubjectID.equals("null")) {
             this.SubjectID = 0;
-        }
-        else
-        {
+        } else {
             this.SubjectID = Long.parseLong(SubjectID);
         }
     }
 
-    public void setSectionID(String SectionID)
-    {
-        if(SectionID.equals("null"))
-        {
+    public void setSectionID(String SectionID) {
+        if(SectionID.equals("null")) {
             this.SectionID = -2;
-        }
-        else
-        {
+        } else {
             this.SectionID = Long.parseLong(SectionID);
         }
     }
 
-    public void setDepartmentID(String DepartmentID)
-    {
-        if(DepartmentID.equals("null"))
-        {
+    public void setDepartmentID(String DepartmentID) {
+        if(DepartmentID.equals("null")) {
             this.DepartmentID = -2;
-        }
-        else
-        {
+        } else {
             this.DepartmentID = Long.parseLong(DepartmentID);
         }
     }
 
-    public void setMediumID(String MediumID)
-    {
-        if(MediumID.equals("null"))
-        {
+    public void setMediumID(String MediumID) {
+        if(MediumID.equals("null")) {
             this.MediumID = -2;
-        }
-        else
-        {
+        } else {
             this.MediumID = Long.parseLong(MediumID);
         }
     }
 
-    public void setShiftID(String ShiftID)
-    {
-        if(ShiftID.equals("null"))
-        {
+    public void setShiftID(String ShiftID) {
+        if(ShiftID.equals("null")) {
             this.ShiftID = -2;
-        }
-        else
-        {
+        } else {
             this.ShiftID = Long.parseLong(ShiftID);
         }
     }
 
-    public void setClassID(String ClassID)
-    {
-        if(ClassID.equals("null"))
-        {
+    public void setClassID(String ClassID) {
+        if(ClassID.equals("null")) {
             this.ClassID = -2;
-        }
-        else
-        {
+        } else {
             this.ClassID = Long.parseLong(ClassID);
         }
     }
 
-    public void setAtdUserID(String AtdUserID)
-    {
-        if(AtdUserID.equals("null"))
-        {
+    public void setAtdUserID(String AtdUserID) {
+        if(AtdUserID.equals("null")) {
             this.AtdUserID = 0;
-        }
-        else
-        {
+        } else {
             this.AtdUserID = Long.parseLong(AtdUserID);
         }
     }
@@ -300,20 +239,15 @@ public class AttendanceSheetModel {
         this.AtdDate = AtdDate;
     }
 
-    public void setInstituteID(String InstituteID)
-    {
-        if(InstituteID.equals("null"))
-        {
+    public void setInstituteID(String InstituteID) {
+        if(InstituteID.equals("null")) {
             this.InstituteID = 0;
-        }
-        else
-        {
+        } else {
             this.InstituteID = Long.parseLong(InstituteID);
         }
     }
 
-    public void setLoggedUserID(String LoggedUserID)
-    {
+    public void setLoggedUserID(String LoggedUserID) {
         this.LoggedUserID = Long.parseLong(LoggedUserID);
     }
 //
@@ -395,63 +329,51 @@ public class AttendanceSheetModel {
 //        this.DeletePc = DeletePc;
 //    }
 
-    public void setattendenceArr(ArrayList<AttendanceStudentModel> attendenceArr)
-    {
+    public void setattendenceArr(ArrayList<AttendanceStudentModel> attendenceArr) {
         this.attendenceArr = attendenceArr;
     }
 
-    public long getSubAtdID()
-    {
+    public long getSubAtdID() {
         return SubAtdID;
     }
 
-    public long getSubjectID()
-    {
+    public long getSubjectID() {
         return SubjectID;
     }
 
-    public long getSectionID()
-    {
+    public long getSectionID() {
         return SectionID;
     }
 
-    public long getDepartmentID()
-    {
+    public long getDepartmentID() {
         return DepartmentID;
     }
 
-    public long getMediumID()
-    {
+    public long getMediumID() {
         return MediumID;
     }
 
-    public long getShiftID()
-    {
+    public long getShiftID() {
         return ShiftID;
     }
 
-    public long getClassID()
-    {
+    public long getClassID() {
         return ClassID;
     }
 
-    public long getAtdUserID()
-    {
+    public long getAtdUserID() {
         return AtdUserID;
     }
 
-    public String getAtdDate()
-    {
+    public String getAtdDate() {
         return AtdDate;
     }
 
-    public long getInstituteID()
-    {
+    public long getInstituteID() {
         return InstituteID;
     }
 
-    public long getLoggedUserID()
-    {
+    public long getLoggedUserID() {
         return LoggedUserID;
     }
 
@@ -505,8 +427,7 @@ public class AttendanceSheetModel {
 //        return DeletePc;
 //    }
 
-    public ArrayList<AttendanceStudentModel> getattendenceArr()
-    {
+    public ArrayList<AttendanceStudentModel> getattendenceArr() {
         return attendenceArr;
     }
 }

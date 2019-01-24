@@ -44,7 +44,7 @@ public class ReportAllStudentList extends CommonToolbarParentActivity implements
     private ReportAllStudentShowListAdapter mAdapter;
     private SearchView searchView;
     private SwipeRefreshLayout mSwipeRefreshLayout;
-    private long InstituteID, MediumID, ShiftID, ClassID, SectionID, DepertmentID;
+    private long InstituteID, MediumID, ShiftID, ClassID, SectionID, DepertmentID, SessionID;
     private Disposable finalDisposer;
 
     @Override
@@ -82,6 +82,7 @@ public class ReportAllStudentList extends CommonToolbarParentActivity implements
         ClassID = StudentSelection.getLong("ClassID",0);
         SectionID = StudentSelection.getLong("SectionID",0);
         DepertmentID = StudentSelection.getLong("DepertmentID",0);
+        SessionID = StudentSelection.getLong("SessionID",0);
 
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(mLayoutManager);
@@ -188,7 +189,7 @@ public class ReportAllStudentList extends CommonToolbarParentActivity implements
             Observable<String> observable = retrofit
                     .create(RetrofitNetworkService.class)
                     .getStudent(InstituteID,Long.toString(ClassID), Long.toString(SectionID), Long.toString(DepertmentID),
-                            Long.toString(MediumID), Long.toString(ShiftID),"0")
+                            Long.toString(MediumID), Long.toString(ShiftID),"0", Long.toString(SessionID))
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .unsubscribeOn(Schedulers.io());

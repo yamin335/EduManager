@@ -54,7 +54,7 @@ public class TakeAttendanceAdapter extends RecyclerView.Adapter<TakeAttendanceAd
     }
 
     @Override
-    public void onBindViewHolder(@NonNull final MyViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull final MyViewHolder holder, final int position) {
         AttendanceStudentModel attendanceStudentModel = attendanceSheetList.get(position);
         holder.name.setText(attendanceStudentModel.getUserFullName());
         holder.roll.setText("Roll: "+ attendanceStudentModel.getRollNo());
@@ -63,57 +63,67 @@ public class TakeAttendanceAdapter extends RecyclerView.Adapter<TakeAttendanceAd
                 (!attendanceStudentModel.getSubAtdID().equals("0"))) {
             if(attendanceStudentModel.getIsPresent() == 1) {
                 holder.present.setChecked(true);
-            } else {
-                holder.present.setChecked(false);
             }
+//            else {
+//                holder.present.setChecked(false);
+//            }
 
             if(attendanceStudentModel.getIsAbsent() == 1) {
                 holder.absent.setChecked(true);
-            } else {
-                holder.absent.setChecked(false);
             }
+//            else {
+//                holder.absent.setChecked(false);
+//            }
 
             if(attendanceStudentModel.getIslate() == 1) {
                 holder.lateInput.setText(Integer.toString(attendanceStudentModel.getLateTime()));
                 holder.late.setChecked(true);
-            } else {
-                holder.late.setChecked(false);
-                holder.lateInput.setText("");
             }
+//            else {
+//                holder.late.setChecked(false);
+//                holder.lateInput.setText("");
+//            }
 
             if(attendanceStudentModel.getIsLeave() == 1) {
                 holder.leave.setChecked(true);
-            } else {
-                holder.leave.setChecked(false);
             }
+//            else {
+//                holder.leave.setChecked(false);
+//            }
         } else if(attendanceStudentModel.getSubAtdDetailID().equals("0")&&
                 attendanceStudentModel.getSubAtdID().equals("0")){
 
+            attendanceStudentModel = new AttendanceStudentModel();
+
             if(attendanceStudentModel.getIsPresent() == 1) {
                 holder.present.setChecked(true);
-            } else {
-                holder.present.setChecked(false);
             }
+//            else {
+//                holder.present.setChecked(false);
+//            }
 
             if(attendanceStudentModel.getIsAbsent() == 1) {
                 holder.absent.setChecked(true);
-            } else {
-                holder.absent.setChecked(false);
             }
+//            else {
+//                holder.absent.setChecked(false);
+//            }
 
             if(attendanceStudentModel.getIslate() == 1) {
                 holder.lateInput.setText(Integer.toString(attendanceStudentModel.getLateTime()));
                 holder.late.setChecked(true);
-            } else {
-                holder.late.setChecked(false);
-                holder.lateInput.setText("");
             }
+//            else {
+//                holder.late.setChecked(false);
+//                holder.lateInput.setText("");
+//            }
 
             if(attendanceStudentModel.getIsLeave() == 1) {
                 holder.leave.setChecked(true);
-            } else {
-                holder.leave.setChecked(false);
             }
+//            else {
+//                holder.leave.setChecked(false);
+//            }
         }
 
         if(holder.late.isChecked()) {

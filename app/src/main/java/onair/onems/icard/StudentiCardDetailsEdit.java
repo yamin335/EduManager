@@ -134,7 +134,7 @@ public class StudentiCardDetailsEdit extends CommonToolbarParentActivity {
     private FileFromBitmap fileFromBitmap = null;
 
     private String selected_Class, selected_Shift,
-            selected_Section, selected_Medium, selected_Department, UserID;
+            selected_Section, selected_Medium, selected_Department, UserID, selected_Session;
     private int PICK_IMAGE_REQUEST = 1;
 
     private long InstituteID;
@@ -195,7 +195,8 @@ public class StudentiCardDetailsEdit extends CommonToolbarParentActivity {
         Intent intent = getIntent();
         Bundle bundle = intent.getExtras();
 
-        selected_Class = bundle.getString("ClassID");
+        selected_Class = Objects.requireNonNull(bundle).getString("ClassID");
+        selected_Session = bundle.getString("SessionID");
         selected_Shift = bundle.getString("ShiftID");
         selected_Section = bundle.getString("SectionID");
         selected_Medium = bundle.getString("MediumID");
@@ -682,7 +683,7 @@ public class StudentiCardDetailsEdit extends CommonToolbarParentActivity {
                     .create(RetrofitNetworkService.class)
                     .getStudent(InstituteID,
                             selected_Class, selected_Section,
-                            selected_Department, selected_Medium, selected_Shift, UserID)
+                            selected_Department, selected_Medium, selected_Shift, UserID, selected_Session)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .unsubscribeOn(Schedulers.io());

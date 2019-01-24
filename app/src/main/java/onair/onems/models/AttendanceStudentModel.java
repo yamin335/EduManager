@@ -81,21 +81,15 @@ public class AttendanceStudentModel {
                                   String IsLeave, String IsAbsent, String Remarks, String Subject,
                                   String Department, String Medium, String Shift, String Class,
                                   String DisplayDate, String isReadOnly, String IsPresentID) {
-        if(SubAtdDetailID.equals("null"))
-        {
+        if(SubAtdDetailID.equals("null")) {
             this.SubAtdDetailID = "0";
-        }
-        else
-        {
+        } else {
             this.SubAtdDetailID = SubAtdDetailID;
         }
 
-        if(SubAtdID.equals("null"))
-        {
+        if(SubAtdID.equals("null")) {
             this.SubAtdID = "0";
-        }
-        else
-        {
+        } else {
             this.SubAtdID = SubAtdID;
         }
 
@@ -104,68 +98,47 @@ public class AttendanceStudentModel {
         this.RFID = RFID;
         this.RollNo = RollNo;
 
-        if(SubjectID.equals("null"))
-        {
+        if(SubjectID.equals("null")) {
             this.SubjectID = -2;
-        }
-        else
-        {
+        } else {
             this.SubjectID = Long.parseLong(SubjectID);
         }
 
-        if(DepartmentID.equals("null"))
-        {
+        if(DepartmentID.equals("null")) {
             this.DepartmentID = -2;
-        }
-        else
-        {
+        } else {
             this.DepartmentID = Long.parseLong(DepartmentID);
         }
 
-        if(SectionID.equals("null"))
-        {
+        if(SectionID.equals("null")) {
             this.SectionID = -2;
-        }
-        else
-        {
+        } else {
             this.SectionID = Long.parseLong(SectionID);
         }
 
         this.Section = Section;
 
-        if(MediumID.equals("null"))
-        {
+        if(MediumID.equals("null")) {
             this.MediumID = -2;
-        }
-        else
-        {
+        } else {
             this.MediumID = Long.parseLong(MediumID);
         }
 
-        if(ShiftID.equals("null"))
-        {
+        if(ShiftID.equals("null")) {
             this.ShiftID = -2;
-        }
-        else
-        {
+        } else {
             this.ShiftID = Long.parseLong(ShiftID);
         }
 
-        if(ClassID.equals("null"))
-        {
+        if(ClassID.equals("null")) {
             this.ClassID = -2;
-        }
-        else
-        {
+        } else {
             this.ClassID = Long.parseLong(ClassID);
         }
 
-        if(BoardID.equals("null"))
-        {
+        if(BoardID.equals("null")) {
             this.BoardID = -2;
-        }
-        else
-        {
+        } else {
             this.BoardID = Long.parseLong(BoardID);
         }
 
@@ -173,21 +146,15 @@ public class AttendanceStudentModel {
         this.Brunch = Brunch;
         this.Session = Session;
 
-        if(BrunchID.equals("null"))
-        {
+        if(BrunchID.equals("null")) {
             this.BrunchID = -2;
-        }
-        else
-        {
+        } else {
             this.BrunchID = Long.parseLong(BrunchID);
         }
 
-        if(SessionID.equals("null"))
-        {
+        if(SessionID.equals("null")) {
             this.SessionID = -2;
-        }
-        else
-        {
+        } else {
             this.SessionID = Long.parseLong(SessionID);
         }
 
@@ -205,39 +172,27 @@ public class AttendanceStudentModel {
                 break;
         }
 
-        if(Islate.equals("null"))
-        {
+        if(Islate.equals("null")) {
             this.Islate = 0;
-        }
-        else
-        {
+        } else {
             this.Islate = Integer.parseInt(Islate);
         }
 
-        if(LateTime.equals("null"))
-        {
+        if(LateTime.equals("null")) {
             this.LateTime = 0;
-        }
-        else
-        {
+        } else {
             this.LateTime = Integer.parseInt(LateTime);
         }
 
-        if(IsLeave.equals("null"))
-        {
+        if(IsLeave.equals("null")) {
             this.IsLeave = 0;
-        }
-        else
-        {
+        } else {
             this.IsLeave = Integer.parseInt(IsLeave);
         }
 
-        if(IsAbsent.equals("null"))
-        {
+        if(IsAbsent.equals("null")) {
             this.IsAbsent = 0;
-        }
-        else
-        {
+        } else {
             this.IsAbsent = Integer.parseInt(IsAbsent);
         }
 
@@ -249,458 +204,339 @@ public class AttendanceStudentModel {
         this.Class = Class;
         this.DisplayDate = DisplayDate;
 
-        if(isReadOnly.equals("null"))
-        {
+        if(isReadOnly.equals("null")) {
             this.isReadOnly = false;
-        }
-        else
-        {
+        } else {
             this.isReadOnly = Boolean.parseBoolean(isReadOnly);
         }
 
-        if(IsPresentID.equals("null"))
-        {
+        if(IsPresentID.equals("null")) {
             this.IsPresentID = 0;
-        }
-        else
-        {
+        } else {
             this.IsPresentID = Integer.parseInt(IsPresentID);
         }
     }
 
-    public void setSubAtdDetailID(String SubAtdDetailID)
-    {
+    public void setSubAtdDetailID(String SubAtdDetailID) {
         this.SubAtdDetailID = SubAtdDetailID;
     }
 
-    public void setSubAtdID(String SubAtdID)
-    {
+    public void setSubAtdID(String SubAtdID) {
         this.SubAtdID = SubAtdID;
     }
 
-    public void setUserFullName(String UserFullName)
-    {
+    public void setUserFullName(String UserFullName) {
         this.UserFullName = UserFullName;
     }
 
-    public void setUserID(String UserID)
-    {
+    public void setUserID(String UserID) {
         this.UserID = UserID;
     }
 
-    public void setRFID(String RFID)
-    {
+    public void setRFID(String RFID) {
         this.RFID = RFID;
     }
 
-    public void setRollNo(String RollNo)
-    {
+    public void setRollNo(String RollNo) {
         this.RollNo = RollNo;
     }
 
-    public void setSubjectID(String SubjectID)
-    {
-        if(SubjectID.equals("null"))
-        {
+    public void setSubjectID(String SubjectID) {
+        if(SubjectID.equals("null")) {
             this.SubjectID = -2;
-        }
-        else
-        {
+        } else {
             this.SubjectID = Long.parseLong(SubjectID);
         }
     }
 
-    public void setDepartmentID(String DepartmentID)
-    {
-        if(DepartmentID.equals("null"))
-        {
+    public void setDepartmentID(String DepartmentID) {
+        if(DepartmentID.equals("null")) {
             this.DepartmentID = -2;
-        }
-        else
-        {
+        } else {
             this.DepartmentID = Long.parseLong(DepartmentID);
         }
     }
 
-    public void setSectionID(String SectionID)
-    {
-        if(SectionID.equals("null"))
-        {
+    public void setSectionID(String SectionID) {
+        if(SectionID.equals("null")) {
             this.SectionID = -2;
-        }
-        else
-        {
+        } else {
             this.SectionID = Long.parseLong(SectionID);
         }
     }
 
-    public void setMediumID(String MediumID)
-    {
-        if(MediumID.equals("null"))
-        {
+    public void setMediumID(String MediumID) {
+        if(MediumID.equals("null")) {
             this.MediumID = -2;
-        }
-        else
-        {
+        } else {
             this.MediumID = Long.parseLong(MediumID);
         }
     }
 
-    public void setShiftID(String ShiftID)
-    {
-        if(ShiftID.equals("null"))
-        {
+    public void setShiftID(String ShiftID) {
+        if(ShiftID.equals("null")) {
             this.ShiftID = -2;
-        }
-        else
-        {
+        } else {
             this.ShiftID = Long.parseLong(ShiftID);
         }
     }
 
-    public void setClassID(String ClassID)
-    {
-        if(ClassID.equals("null"))
-        {
+    public void setClassID(String ClassID) {
+        if(ClassID.equals("null")) {
             this.ClassID = -2;
-        }
-        else
-        {
+        } else {
             this.ClassID = Long.parseLong(ClassID);
         }
     }
 
-    public void setBoardID(String BoardID)
-    {
-        if(BoardID.equals("null"))
-        {
+    public void setBoardID(String BoardID) {
+        if(BoardID.equals("null")) {
             this.BoardID = -2;
-        }
-        else
-        {
+        } else {
             this.BoardID = Long.parseLong(BoardID);
         }
     }
 
-    public void setBoard(String Board)
-    {
+    public void setBoard(String Board) {
         this.Board = Board;
     }
 
-    public void setBrunch(String Brunch)
-    {
+    public void setBrunch(String Brunch) {
         this.Brunch = Brunch;
     }
 
-    public void setSession(String Session)
-    {
+    public void setSession(String Session) {
         this.Session = Session;
     }
 
-    public void setBrunchID(String BrunchID)
-    {
-        if(BrunchID.equals("null"))
-        {
+    public void setBrunchID(String BrunchID) {
+        if(BrunchID.equals("null")) {
             this.BrunchID = -2;
-        }
-        else
-        {
+        } else {
             this.BrunchID = Long.parseLong(BrunchID);
         }
     }
 
-    public void setSessionID(String SessionID)
-    {
-        if(SessionID.equals("null"))
-        {
+    public void setSessionID(String SessionID) {
+        if(SessionID.equals("null")) {
             this.SessionID = -2;
-        }
-        else
-        {
+        } else {
             this.SessionID = Long.parseLong(SessionID);
         }
     }
 
-    public void setIsPresent(String IsPresent)
-    {
-        if(IsPresent.equals("null"))
-        {
+    public void setIsPresent(String IsPresent) {
+        if(IsPresent.equals("null")) {
             this.IsPresent = 0;
-        }
-        else
-        {
+        } else {
             this.IsPresent = Integer.parseInt(IsPresent);
         }
     }
 
-    public void setIslate(String Islate)
-    {
-        if(Islate.equals("null"))
-        {
+    public void setIslate(String Islate) {
+        if(Islate.equals("null")) {
             this.Islate = 0;
-        }
-        else
-        {
+        } else {
             this.Islate = Integer.parseInt(Islate);
         }
     }
 
-    public void setLateTime(String LateTime)
-    {
-        if(LateTime.equals("null"))
-        {
+    public void setLateTime(String LateTime) {
+        if(LateTime.equals("null")) {
             this.LateTime = 0;
-        }
-        else
-        {
+        } else {
             this.LateTime = Integer.parseInt(LateTime);
         }
     }
 
-    public void setIsLeave(String IsLeave)
-    {
-        if(IsLeave.equals("null"))
-        {
+    public void setIsLeave(String IsLeave) {
+        if(IsLeave.equals("null")) {
             this.IsLeave = 0;
-        }
-        else
-        {
+        } else {
             this.IsLeave = Integer.parseInt(IsLeave);
         }
     }
 
-    public void setIsAbsent(String IsAbsent)
-    {
-        if(IsAbsent.equals("null"))
-        {
+    public void setIsAbsent(String IsAbsent) {
+        if(IsAbsent.equals("null")) {
             this.IsAbsent = 0;
-        }
-        else
-        {
+        } else {
             this.IsAbsent = Integer.parseInt(IsAbsent);
         }
     }
 
-    public void setRemarks(String Remarks)
-    {
+    public void setRemarks(String Remarks) {
         this.Remarks = Remarks;
     }
 
-    public void setSubject(String Subject)
-    {
+    public void setSubject(String Subject) {
         this.Subject = Subject;
     }
 
-    public void setDepartment(String Department)
-    {
+    public void setDepartment(String Department) {
         this.Department = Department;
     }
 
-    public void setMedium(String Medium)
-    {
+    public void setMedium(String Medium) {
         this.Medium = Medium;
     }
 
-    public void setShift(String Shift)
-    {
+    public void setShift(String Shift) {
         this.Shift = Shift;
     }
 
-    public void setClass(String Class)
-    {
+    public void setClass(String Class) {
         this.Class = Class;
     }
 
-    public void setDisplayDate(String DisplayDate)
-    {
+    public void setDisplayDate(String DisplayDate) {
         this.DisplayDate = DisplayDate;
     }
 
-    public void setisReadOnly(String isReadOnly)
-    {
-        if(isReadOnly.equals("null"))
-        {
+    public void setisReadOnly(String isReadOnly) {
+        if(isReadOnly.equals("null")) {
             this.isReadOnly = false;
-        }
-        else
-        {
+        } else {
             this.isReadOnly = Boolean.parseBoolean(isReadOnly);
         }
     }
 
-    public void setIsPresentID(String IsPresentID)
-    {
-        if(IsPresentID.equals("null"))
-        {
+    public void setIsPresentID(String IsPresentID) {
+        if(IsPresentID.equals("null")) {
             this.IsPresentID = 0;
-        }
-        else
-        {
+        } else {
             this.IsPresentID = Integer.parseInt(IsPresentID);
         }
     }
 
-    public String getDisplayDate()
-    {
+    public String getDisplayDate() {
         return this.DisplayDate;
     }
-    public boolean getisReadOnly()
-    {
+    public boolean getisReadOnly() {
         return this.isReadOnly;
     }
-    public int getIsPresentID()
-    {
+    public int getIsPresentID() {
         return this.IsPresentID;
     }
 
-    public String getSubAtdDetailID()
-    {
+    public String getSubAtdDetailID() {
         return this.SubAtdDetailID;
     }
 
-    public String getSubAtdID()
-    {
+    public String getSubAtdID() {
         return this.SubAtdID;
     }
 
-    public String getUserFullName()
-    {
+    public String getUserFullName() {
         return UserFullName;
     }
 
-    public String getUserID()
-    {
+    public String getUserID() {
         return UserID;
     }
 
-    public String getRFID()
-    {
+    public String getRFID() {
         return RFID;
     }
 
-    public String getRollNo()
-    {
+    public String getRollNo() {
         return RollNo;
     }
 
-    public long getSubjectID()
-    {
+    public long getSubjectID() {
         return SubjectID;
     }
 
-    public long getDepartmentID()
-    {
+    public long getDepartmentID() {
         return DepartmentID;
     }
 
-    public long getSectionID()
-    {
+    public long getSectionID() {
         return SectionID;
     }
 
-    public String getSection()
-    {
+    public String getSection() {
         return this.Section;
     }
 
-    public long getMediumID()
-    {
+    public long getMediumID() {
         return MediumID;
     }
 
-    public long getShiftID()
-    {
+    public long getShiftID() {
         return ShiftID;
     }
 
-    public long getClassID()
-    {
+    public long getClassID() {
         return ClassID;
     }
 
-    public long getBoardID()
-    {
+    public long getBoardID() {
         return BoardID;
     }
 
-    public String getBoard()
-    {
+    public String getBoard() {
         return this.Board;
     }
 
-    public String getBrunch()
-    {
+    public String getBrunch() {
         return this.Brunch;
     }
 
-    public String getSession()
-    {
+    public String getSession() {
         return this.Session;
     }
 
-    public long getBrunchID()
-    {
+    public long getBrunchID() {
         return BrunchID;
     }
 
-    public long getSessionID()
-    {
+    public long getSessionID() {
         return SessionID;
     }
 
-    public int getIsPresent()
-    {
+    public int getIsPresent() {
         return IsPresent;
     }
 
-    public int getIslate()
-    {
+    public int getIslate() {
         return Islate;
     }
 
-    public int getLateTime()
-    {
+    public int getLateTime() {
         return LateTime;
     }
 
-    public int getIsLeave()
-    {
+    public int getIsLeave() {
         return IsLeave;
     }
 
-    public int getIsAbsent()
-    {
+    public int getIsAbsent() {
         return IsAbsent;
     }
 
 
-    public String getRemarks()
-    {
+    public String getRemarks() {
         return Remarks;
     }
 
-    public String getSubject()
-    {
+    public String getSubject() {
         return this.Subject;
     }
 
-    public String getDepartment()
-    {
+    public String getDepartment() {
         return this.Department;
     }
 
-    public String getMedium()
-    {
+    public String getMedium() {
         return this.Medium;
     }
 
-    public String getShift()
-    {
+    public String getShift() {
         return this.Shift;
     }
 
-    public String getClasss()
-    {
+    public String getClasss() {
         return this.Class;
     }
 }

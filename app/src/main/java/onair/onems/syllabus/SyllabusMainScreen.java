@@ -133,7 +133,7 @@ public class SyllabusMainScreen extends SideNavigationMenuParentActivity impleme
             shadow.setVisibility(View.VISIBLE);
             FloatingMenuDialog floatingMenuDialog = new FloatingMenuDialog(SyllabusMainScreen.this,
                     SyllabusMainScreen.this, SyllabusMainScreen.this);
-            floatingMenuDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            Objects.requireNonNull(floatingMenuDialog.getWindow()).setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
             floatingMenuDialog.setCancelable(true);
             floatingMenuDialog.getWindow().getAttributes().gravity = Gravity.TOP | Gravity.END;
             floatingMenuDialog.getWindow().getAttributes().x = dpToPx(5);

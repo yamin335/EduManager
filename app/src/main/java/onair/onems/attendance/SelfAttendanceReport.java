@@ -56,7 +56,7 @@ public class SelfAttendanceReport extends Fragment {
     private Spinner spinnerMonth;
     private String UserID="";
     private Configuration config;
-    private long SectionID, ClassID, ShiftID, MediumID, DepartmentID, InstituteID;
+    private long SectionID, ClassID, ShiftID, MediumID, DepartmentID, InstituteID, SessionID;
     private SimpleTableHeaderAdapter simpleTableHeaderAdapter;
     private ArrayList<MonthModel> allMonthArrayList;
     private String[] tempMonthArray = {"Select Month"};
@@ -113,6 +113,7 @@ public class SelfAttendanceReport extends Fragment {
             MediumID=sharedPre.getLong("MediumID",0);
             ClassID=sharedPre.getLong("ClassID",0);
             SectionID=sharedPre.getLong("SectionID",0);
+            SessionID = sharedPre.getLong("SessionID",0);
             userFullName = sharedPre.getString("UserFullName","");
             rollNo = sharedPre.getString("RollNo","");
             RFID = sharedPre.getString("RFID","");
@@ -124,6 +125,11 @@ public class SelfAttendanceReport extends Fragment {
             try {
                 JSONObject selectedStudent = new JSONObject(getActivity().getSharedPreferences("CURRENT_STUDENT", Context.MODE_PRIVATE)
                         .getString("guardianSelectedStudent", "{}"));
+                if(selectedStudent.getString("SessionID").equalsIgnoreCase("null")||selectedStudent.getString("SessionID").equalsIgnoreCase("")) {
+                    SessionID = 0;
+                } else {
+                    SessionID = Long.parseLong(selectedStudent.getString("SessionID"));
+                }
                 if(selectedStudent.getString("ShiftID").equalsIgnoreCase("null")||selectedStudent.getString("ShiftID").equalsIgnoreCase("")) {
                     ShiftID = 0;
                 } else {
@@ -200,6 +206,7 @@ public class SelfAttendanceReport extends Fragment {
         tableView.addDataClickListener((rowIndex, clickedData) -> {
             selectedDay = dailyAttendanceList.get(rowIndex);
             Intent intent = new Intent(getActivity(), StudentSubjectWiseAttendance.class);
+            intent.putExtra("SessionID", SessionID);
             intent.putExtra("UserID", UserID);
             intent.putExtra("ShiftID", ShiftID);
             intent.putExtra("MediumID", MediumID);
@@ -360,7 +367,7 @@ public class SelfAttendanceReport extends Fragment {
 
             Observable<String> observable = retrofit
                     .create(RetrofitNetworkService.class)
-                    .getStudentMonthlyDeviceAttendance(ShiftID, MediumID, ClassID, SectionID, DepartmentID, MonthID, UserID, InstituteID)
+                    .getStudentMonthlyDeviceAttendance(ShiftID, MediumID, ClassID, SectionID, DepartmentID, MonthID, UserID, InstituteID, SessionID)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .unsubscribeOn(Schedulers.io());

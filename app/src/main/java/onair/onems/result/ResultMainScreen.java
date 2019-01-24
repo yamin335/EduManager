@@ -192,7 +192,7 @@ public class ResultMainScreen extends SideNavigationMenuParentActivity{
                             selectedSession = allSessionArrayList.get(position-1);
                             selectedStudent = null;
                         } catch (IndexOutOfBoundsException e) {
-                            Toast.makeText(ResultMainScreen.this,"No shift found !!!",Toast.LENGTH_LONG).show();
+                            Toast.makeText(ResultMainScreen.this,"No session found !!!",Toast.LENGTH_LONG).show();
                         }
                     } else {
                         if(firstSession++>1) {

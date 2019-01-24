@@ -2,8 +2,10 @@ package onair.onems.attendance;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -55,6 +57,7 @@ public class StudentAttendanceAllDays extends CommonToolbarParentActivity {
     private long MediumID=0;
     private long ShiftID=0;
     private long DepartmentID = 0;
+    private long SessionID = 0;
     private TextView totalClass, totalPresent;
     private int MonthID = 0;
     private CompositeDisposable finalDisposer = new CompositeDisposable();
@@ -86,6 +89,9 @@ public class StudentAttendanceAllDays extends CommonToolbarParentActivity {
         dailyAttendanceList = new ArrayList<>();
         selectedDay = new DailyAttendanceModel();
 
+        SharedPreferences sharedPre = PreferenceManager.getDefaultSharedPreferences(this);
+        InstituteID = sharedPre.getLong("InstituteID", 0);
+
         Intent intent = getIntent();
         ShiftID = intent.getLongExtra("ShiftID", 0);
         MediumID = intent.getLongExtra("MediumID", 0);
@@ -93,6 +99,7 @@ public class StudentAttendanceAllDays extends CommonToolbarParentActivity {
         DepartmentID = intent.getLongExtra("DepartmentID", 0);
         SectionID = intent.getLongExtra("SectionID", 0);
         MonthID = intent.getIntExtra("MonthID", 0);
+        SessionID = intent.getLongExtra("SessionID", 0);
         String RFID = intent.getStringExtra("RFID");
         String userFullName = intent.getStringExtra("UserFullName");
         String rollNo = intent.getStringExtra("RollNo");
@@ -152,6 +159,7 @@ public class StudentAttendanceAllDays extends CommonToolbarParentActivity {
         tableView.addDataClickListener((rowIndex, clickedData) -> {
             selectedDay = dailyAttendanceList.get(rowIndex);
             Intent intent1 = new Intent(StudentAttendanceAllDays.this, StudentSubjectWiseAttendance.class);
+            intent1.putExtra("SessionID", SessionID);
             intent1.putExtra("UserID", UserID);
             intent1.putExtra("ShiftID", ShiftID);
             intent1.putExtra("MediumID", MediumID);
@@ -232,7 +240,7 @@ public class StudentAttendanceAllDays extends CommonToolbarParentActivity {
 
             Observable<String> observable = retrofit
                     .create(RetrofitNetworkService.class)
-                    .getStudentMonthlyDeviceAttendance(ShiftID, MediumID, ClassID, SectionID, DepartmentID, MonthID, UserID, InstituteID)
+                    .getStudentMonthlyDeviceAttendance(ShiftID, MediumID, ClassID, SectionID, DepartmentID, MonthID, UserID, InstituteID, SessionID)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .unsubscribeOn(Schedulers.io());

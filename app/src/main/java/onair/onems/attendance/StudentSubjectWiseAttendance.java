@@ -40,7 +40,7 @@ public class StudentSubjectWiseAttendance extends CommonToolbarParentActivity {
     private Configuration config;
     private TableView tableView;
     private SimpleTableHeaderAdapter simpleTableHeaderAdapter;
-    private long InstituteID=0, SectionID=0, ClassID=0, MediumID=0, ShiftID=0, DepartmentID = 0;
+    private long InstituteID=0, SectionID=0, ClassID=0, MediumID=0, ShiftID=0, DepartmentID = 0, SessionID = 0;
     private Disposable disposable;
     private String UserID, Date;
 
@@ -65,7 +65,7 @@ public class StudentSubjectWiseAttendance extends CommonToolbarParentActivity {
 
         tableView = findViewById(R.id.tableView);
 
-        simpleTableHeaderAdapter = new SimpleTableHeaderAdapter(this, "Subject Name", "Code ", "Status", "Teacher");
+        simpleTableHeaderAdapter = new SimpleTableHeaderAdapter(this, "Subject", "Code ", "Status", "Teacher");
         simpleTableHeaderAdapter.setTextColor(ContextCompat.getColor(this, R.color.table_header_text));
         tableView.setHeaderAdapter(simpleTableHeaderAdapter);
 
@@ -79,6 +79,7 @@ public class StudentSubjectWiseAttendance extends CommonToolbarParentActivity {
         SectionID = intent.getLongExtra("SectionID", 0);
         UserID = intent.getStringExtra("UserID");
         Date = intent.getStringExtra("Date");
+        SessionID = intent.getLongExtra("SessionID", 0);
 
         int colorEvenRows = getResources().getColor(R.color.table_data_row_even);
         int colorOddRows = getResources().getColor(R.color.table_data_row_odd);
@@ -192,6 +193,8 @@ public class StudentSubjectWiseAttendance extends CommonToolbarParentActivity {
                         @Override
                         public void onError(Throwable e) {
                             dialog.dismiss();
+                            Toast.makeText(StudentSubjectWiseAttendance.this,"Error: "+e.toString(),
+                                    Toast.LENGTH_LONG).show();
                         }
 
                         @Override
