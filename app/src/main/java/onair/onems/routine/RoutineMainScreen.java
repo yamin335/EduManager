@@ -57,7 +57,7 @@ public class RoutineMainScreen extends SideNavigationMenuParentActivity implemen
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (!finalDisposer.isDisposed())
+        if (finalDisposer != null && !finalDisposer.isDisposed())
             finalDisposer.dispose();
     }
 

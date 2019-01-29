@@ -1067,7 +1067,7 @@ public class ResultMainScreen extends SideNavigationMenuParentActivity{
         if(StaticHelperClass.isNetworkAvailable(this)) {
             JsonObject jsonObject = new JsonObject();
             jsonObject.addProperty("pageNumber", "0");
-            jsonObject.addProperty("pageSize", "10000");
+            jsonObject.addProperty("pageSize", "100000");
             jsonObject.addProperty("IsPaging", "0");
             jsonObject.addProperty("InstituteID", Long.toString(InstituteID));
             jsonObject.addProperty("LoggedUserID", LoggedUserID);
@@ -1078,6 +1078,7 @@ public class ResultMainScreen extends SideNavigationMenuParentActivity{
             jsonObject.addProperty("DepartmentID", Long.toString(selectedDepartment.getDepartmentID()));
             jsonObject.addProperty("MediumID", Long.toString(selectedMedium.getMediumID()));
             jsonObject.addProperty("ShiftID", Long.toString(selectedShift.getShiftID()));
+            jsonObject.addProperty("SessionID", Long.toString(selectedSession.getSessionID()));
 
             dialog.show();
             Retrofit retrofit = new Retrofit.Builder()

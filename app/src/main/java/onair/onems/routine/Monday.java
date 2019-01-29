@@ -45,7 +45,7 @@ public class Monday extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (!finalDisposer.isDisposed())
+        if (finalDisposer != null && !finalDisposer.isDisposed())
             finalDisposer.dispose();
     }
 

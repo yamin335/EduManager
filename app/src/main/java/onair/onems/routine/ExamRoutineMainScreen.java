@@ -76,7 +76,7 @@ public class ExamRoutineMainScreen extends SideNavigationMenuParentActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (!finalDisposer.isDisposed())
+        if (finalDisposer != null && !finalDisposer.isDisposed())
             finalDisposer.dispose();
     }
 
