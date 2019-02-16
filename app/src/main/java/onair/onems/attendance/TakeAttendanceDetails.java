@@ -23,7 +23,13 @@ import com.google.gson.JsonParser;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 import java.util.Objects;
 
 import io.reactivex.Observable;
@@ -188,6 +194,10 @@ public class TakeAttendanceDetails extends CommonToolbarParentActivity {
                 attendanceSheetModel.setInstituteID(Long.toString(InstituteID));
                 attendanceSheetModel.setLoggedUserID(UserID);
                 attendanceSheetModel.setattendenceArr(attendanceSheetArrayList);
+                attendanceSheetModel.setAttendanceID("0");
+                DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss", Locale.ENGLISH);
+                String time = dateFormat.format(Calendar.getInstance().getTime());
+                attendanceSheetModel.setTimes(time);
                 Gson gson = new Gson();
                 String json = gson.toJson(attendanceSheetModel);
                 postUsingVolley(json);

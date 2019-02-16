@@ -24,6 +24,10 @@ public class AttendanceSheetModel {
 
     private long InstituteID;
 
+    private int AttendanceID;
+
+    private String Times;
+
 //    private long CreateBy;
 
 //    private String CreateOn;
@@ -60,6 +64,7 @@ public class AttendanceSheetModel {
 //        this.DeleteOn = "";
 //        this.DeletePc = "";
         this.LoggedUserID = 0;
+        this.AttendanceID = 0;
     }
 
     public AttendanceSheetModel(String SubAtdID, String SubjectID, String SectionID, String DepartmentID,
@@ -377,7 +382,27 @@ public class AttendanceSheetModel {
         return LoggedUserID;
     }
 
-//    public long getCreateBy()
+    public void setAttendanceID(String AttendanceID) {
+        if(AttendanceID.equals("null")) {
+            this.AttendanceID = 0;
+        } else {
+            this.AttendanceID = Integer.parseInt(AttendanceID);
+        }
+    }
+
+    public int getAttendanceID() {
+        return AttendanceID;
+    }
+
+    public void setTimes(String times) {
+        Times = times;
+    }
+
+    public String getTimes() {
+        return Times;
+    }
+
+    //    public long getCreateBy()
 //    {
 //        return CreateBy;
 //    }

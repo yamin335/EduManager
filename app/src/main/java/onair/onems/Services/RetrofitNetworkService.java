@@ -147,7 +147,7 @@ public interface RetrofitNetworkService {
                                         @Path("date") String date);
 
     @Headers("Authorization: Request_From_onEMS_Android_app")
-    @GET("/api/onEms/getStudent/{InstituteID}/{ClassID}/{SectionID}/{DepartmentID}/{MediumID}/{ShiftID}/{UserID}/{SessionID}")
+    @GET("/api/onEms/getStudents/{InstituteID}/{ClassID}/{SectionID}/{DepartmentID}/{MediumID}/{ShiftID}/{UserID}/{SessionID}")
     Observable<String> getStudent(@Path("InstituteID") long InstituteID, @Path("ClassID") String ClassID,
                                   @Path("SectionID") String SectionID, @Path("DepartmentID") String DepartmentID,
                                   @Path("MediumID") String MediumID, @Path("ShiftID") String ShiftID,

@@ -69,7 +69,7 @@ public class AttendanceStudentModel {
     private int IsPresentID;
 
     public AttendanceStudentModel() {
-        this.IsPresent = 1;
+
     }
 
     public AttendanceStudentModel(String SubAtdDetailID, String SubAtdID, String UserFullName,
@@ -160,12 +160,12 @@ public class AttendanceStudentModel {
 
         switch (IsPresent) {
             case "null":
-                if(this.SubAtdDetailID.equalsIgnoreCase("0") && this.SubAtdID.equalsIgnoreCase("0"))
-                this.IsPresent = 1;
+//                if(this.SubAtdDetailID.equalsIgnoreCase("0") && this.SubAtdID.equalsIgnoreCase("0"))
+                this.IsPresent = 0;
                 break;
             case "0":
-                if(this.SubAtdDetailID.equalsIgnoreCase("0") && this.SubAtdID.equalsIgnoreCase("0"))
-                this.IsPresent = 1;
+//                if(this.SubAtdDetailID.equalsIgnoreCase("0") && this.SubAtdID.equalsIgnoreCase("0"))
+                this.IsPresent = Integer.parseInt(IsPresent);
                 break;
             default:
                 this.IsPresent = Integer.parseInt(IsPresent);

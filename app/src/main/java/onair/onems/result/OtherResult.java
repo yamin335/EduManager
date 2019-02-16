@@ -995,6 +995,7 @@ public class OtherResult extends Fragment {
             jsonObject.addProperty("DepartmentID", Long.toString(selectedDepartment.getDepartmentID()));
             jsonObject.addProperty("MediumID", Long.toString(selectedMedium.getMediumID()));
             jsonObject.addProperty("ShiftID", Long.toString(selectedShift.getShiftID()));
+            jsonObject.addProperty("SessionID", selectedSession.getSessionID());
             dialog.show();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
