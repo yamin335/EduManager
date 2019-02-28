@@ -18,6 +18,7 @@ import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -26,6 +27,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.github.ybq.android.spinkit.SpinKitView;
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonObject;
 
@@ -33,6 +35,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Objects;
 import java.util.UUID;
 
 import io.reactivex.Observable;
@@ -159,38 +162,32 @@ public class LoginScreen extends AppCompatActivity {
         spinKitView = findViewById(R.id.spin_kit);
         mainContainer = findViewById(R.id.main_container);
 
-        Button loginButton = (Button)findViewById(R.id.login_button);
-        takeId = (EditText)findViewById(R.id.email);
-        takePassword = (EditText) findViewById(R.id.password);
-        errorView = (TextView)findViewById(R.id.error);
+        Button loginButton = findViewById(R.id.login_button);
+        takeId = findViewById(R.id.email);
+        takePassword = findViewById(R.id.password);
+        errorView = findViewById(R.id.error);
         final TextView forgotPassword = findViewById(R.id.forgotPassword);
-        forgotPassword.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ForgotPassInputDialog forgotPassInputDialog = new ForgotPassInputDialog(LoginScreen.this, LoginScreen.this);
-                forgotPassInputDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-                forgotPassInputDialog.setCancelable(false);
-                forgotPassInputDialog.show();
-            }
+        forgotPassword.setOnClickListener(v -> {
+            ForgotPassInputDialog forgotPassInputDialog = new ForgotPassInputDialog(LoginScreen.this, LoginScreen.this);
+            forgotPassInputDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            forgotPassInputDialog.setCancelable(false);
+            forgotPassInputDialog.show();
         });
 
-        loginButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                LoginScreen.this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
-                if(StaticHelperClass.isNetworkAvailable(LoginScreen.this)) {
-                    if(takeId.getText().toString().isEmpty()) {
-                        takeId.setError("This field is required");
-                        takeId.requestFocus();
-                    } else if(takePassword.getText().toString().isEmpty()) {
-                        takePassword.setError("This field is required");
-                        takePassword.requestFocus();
-                    } else {
-                        getLoginData(takeId.getText().toString(), takePassword.getText().toString());
-                    }
+        loginButton.setOnClickListener(v -> {
+            LoginScreen.this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+            if(StaticHelperClass.isNetworkAvailable(LoginScreen.this)) {
+                if(takeId.getText().toString().isEmpty()) {
+                    takeId.setError("This field is required");
+                    takeId.requestFocus();
+                } else if(takePassword.getText().toString().isEmpty()) {
+                    takePassword.setError("This field is required");
+                    takePassword.requestFocus();
                 } else {
-                    Toast.makeText(LoginScreen.this,"Please check your internet connection!!!",Toast.LENGTH_LONG).show();
+                    getLoginData(takeId.getText().toString(), takePassword.getText().toString());
                 }
+            } else {
+                Toast.makeText(LoginScreen.this,"Please check your internet connection!!!",Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -391,16 +388,8 @@ public class LoginScreen extends AppCompatActivity {
         builder.setIcon(R.drawable.onair);
         builder.setMessage("Do you want to exit?")
                 .setCancelable(false)
-                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        finish();
-                    }
-                })
-                .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        dialog.cancel();
-                    }
-                });
+                .setPositiveButton("Yes", (dialog, id) -> finish())
+                .setNegativeButton("No", (dialog, id) -> dialog.cancel());
         AlertDialog alert = builder.create();
         alert.show();
     }
@@ -586,6 +575,20 @@ public class LoginScreen extends AppCompatActivity {
         if(!LoggedUserID.equals("0")&&!previousToken.equals("")&&!uuid.equals("")){
             // sending reg id to your server
             sendRegistrationToServer(previousToken);
+        } else if (!LoggedUserID.equals("0")&&previousToken.equals("")&&!uuid.equals("")){
+            FirebaseInstanceId.getInstance().getInstanceId()
+                    .addOnCompleteListener(task -> {
+                        if (!task.isSuccessful()) {
+                            Toast.makeText(this,"ERROR: Failed to generate TOKEN ",
+                                    Toast.LENGTH_LONG).show();
+                            return;
+                        }
+
+                        // Get new Instance ID token
+                        previousToken = Objects.requireNonNull(task.getResult()).getToken();
+                        storeRegIdInPref(previousToken);
+                        sendRegistrationToServer(previousToken);
+                    });
         }
     }
 
@@ -734,6 +737,13 @@ public class LoginScreen extends AppCompatActivity {
             spinKitView.setVisibility(View.INVISIBLE);
         if (mainContainer.getVisibility() == View.INVISIBLE)
             mainContainer.setVisibility(View.VISIBLE);
+    }
+
+    private void storeRegIdInPref(String token) {
+        getApplicationContext().getSharedPreferences(Config.SHARED_PREF, Context.MODE_PRIVATE)
+                .edit()
+                .putString("regId", token)
+                .apply();
     }
 
 }

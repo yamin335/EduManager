@@ -281,14 +281,14 @@ public class SelfAttendanceReport extends Fragment {
                 JSONObject dailyAttendanceJsonObject = dailyAttendanceJsonArray.getJSONObject(i);
                 if(i == 0) {
                     totalClass.setText("Total class: "+dailyAttendanceJsonObject.getString("TotalClassDay"));
-                    totalPresent.setText("Total present: "+dailyAttendanceJsonObject.getString("TotalPresent"));
+                    totalPresent.setText("Total present: "+dailyAttendanceJsonObject.getJSONArray("TotalPresent").optString(0));
                 }
                 DailyAttendanceModel perDayAttendance = new DailyAttendanceModel();
                 perDayAttendance.setDate(dailyAttendanceJsonObject.getString("Date"));
                 perDayAttendance.setPresent(dailyAttendanceJsonObject.getString("Present"));
                 perDayAttendance.setLate(dailyAttendanceJsonObject.getString("Late"));
                 perDayAttendance.setTotalClassDay(dailyAttendanceJsonObject.getString("TotalClassDay"));
-                perDayAttendance.setTotalPresent(dailyAttendanceJsonObject.getString("TotalPresent"));
+                perDayAttendance.setTotalPresent(dailyAttendanceJsonObject.getJSONArray("TotalPresent").optString(0));
                 DATA_TO_SHOW[i][0] = String.valueOf((i+1));
                 DATA_TO_SHOW [i][1] = perDayAttendance.getDate();
                 DATA_TO_SHOW[i][2] = perDayAttendance.getPresent() == 1 ? "YES" : "NO";

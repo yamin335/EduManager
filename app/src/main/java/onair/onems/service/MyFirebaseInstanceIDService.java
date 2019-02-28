@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.google.firebase.messaging.FirebaseMessagingService;
@@ -48,6 +47,8 @@ public class MyFirebaseInstanceIDService extends FirebaseMessagingService {
 
     @Override
     public void onNewToken(String token) {
+        // Saving reg id to shared preferences
+        storeRegIdInPref(token);
         LoggedUserID = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString("UserID", "0");
         uuid = getApplicationContext().getSharedPreferences("UNIQUE_ID", Context.MODE_PRIVATE)
                 .getString("uuid", "");
@@ -57,9 +58,9 @@ public class MyFirebaseInstanceIDService extends FirebaseMessagingService {
 //        FirebaseInstanceId.getInstance().getInstanceId();
 
         // Saving reg id to shared preferences
-        storeRegIdInPref(token);
+//        storeRegIdInPref(token);
 
-        Log.d("Token: ", token);
+//        Log.d("Token: ", token);
 
         if(!LoggedUserID.equals("0")){
             // sending reg id to your server
@@ -126,7 +127,7 @@ public class MyFirebaseInstanceIDService extends FirebaseMessagingService {
 
                         @Override
                         public void onError(Throwable e) {
-
+                            e.printStackTrace();
                         }
 
                         @Override

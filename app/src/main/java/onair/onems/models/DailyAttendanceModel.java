@@ -129,8 +129,7 @@ public class DailyAttendanceModel {
         return TotalClassDay;
     }
 
-    public void setTotalPresent(String TotalPresent)
-    {
+    public void setTotalPresent(String TotalPresent) {
         if(!TotalPresent.equalsIgnoreCase("null")){
             this.TotalPresent = Integer.parseInt(TotalPresent);
         }else {
