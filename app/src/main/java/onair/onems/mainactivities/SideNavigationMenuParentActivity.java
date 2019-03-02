@@ -113,7 +113,6 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
     private TextView textDashboard, textProfile, textNotification, textContacts, notificationCounter;
     private ImageView iconDashboard, iconProfile, iconNotification, iconContacts;
     private NotificationReceiverListener notificationReceiverListener;
-    private boolean returnValue = false;
     public Toolbar toolbar;
     private CompositeDisposable finalDisposer = new CompositeDisposable();
 
@@ -555,7 +554,7 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_logout) {
-            return logOut();
+            return doLogOut();
         } else if(id == R.id.changePassword) {
             ChangePasswordDialog changePasswordDialog = new ChangePasswordDialog(this, this, LoggedUserID, UserName, InstituteID);
             Objects.requireNonNull(changePasswordDialog.getWindow()).setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
@@ -581,79 +580,21 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
         return super.onOptionsItemSelected(item);
     }
 
-    private boolean logOut() {
-        if (StaticHelperClass.isNetworkAvailable(this)) {
-            dialog.show();
-            Retrofit retrofit = new Retrofit.Builder()
-                    .baseUrl(getString(R.string.baseUrl))
-                    .addConverterFactory(ScalarsConverterFactory.create())
-                    .addConverterFactory(GsonConverterFactory.create())
-                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                    .build();
+    private boolean doLogOut() {
+        SharedPreferences sharedPreferences  = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean("LogInState", false);
+        editor.apply();
 
-            Observable<String> observable = retrofit
-                    .create(RetrofitNetworkService.class)
-                    .deleteFcmToken(LoggedUserID, "android", getSharedPreferences("UNIQUE_ID", Context.MODE_PRIVATE).getString("uuid", ""))
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .unsubscribeOn(Schedulers.io());
+        getSharedPreferences("PUSH_NOTIFICATIONS", Context.MODE_PRIVATE)
+                .edit()
+                .putString("notifications", "[]")
+                .apply();
 
-            finalDisposer.add( observable
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .unsubscribeOn(Schedulers.io())
-                    .subscribeWith(new DisposableObserver<String>() {
-
-                        @Override
-                        public void onNext(String response) {
-                            dialog.dismiss();
-                            doLogOut(response);
-                        }
-
-                        @Override
-                        public void onError(Throwable e) {
-                            dialog.dismiss();
-                            returnValue = false;
-                            Toast.makeText(SideNavigationMenuParentActivity.this,"Server error while logging out!!! ",
-                                    Toast.LENGTH_LONG).show();
-                        }
-
-                        @Override
-                        public void onComplete() {
-
-                        }
-                    }));
-        } else {
-            Toast.makeText(SideNavigationMenuParentActivity.this,"Please check your internet connection and select again!!! ",
-                    Toast.LENGTH_LONG).show();
-        }
-        return returnValue;
-    }
-
-    private void doLogOut(String returnValueFromServer) {
-        try {
-            if (new JSONArray(returnValueFromServer).getJSONObject(0).getInt("ReturnValue") == 1) {
-                SharedPreferences sharedPreferences  = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
-                SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.putBoolean("LogInState", false);
-                editor.apply();
-
-                getSharedPreferences("PUSH_NOTIFICATIONS", Context.MODE_PRIVATE)
-                        .edit()
-                        .putString("notifications", "[]")
-                        .apply();
-
-                returnValue = true;
-                Intent intent = new Intent(getApplicationContext(), LoginScreen.class);
-                startActivity(intent);
-                finish();
-            } else {
-                returnValue = false;
-            }
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        Intent intent = new Intent(getApplicationContext(), LoginScreen.class);
+        startActivity(intent);
+        finish();
+        return true;
     }
 
     private void prepareSuperAdminSideMenu() {

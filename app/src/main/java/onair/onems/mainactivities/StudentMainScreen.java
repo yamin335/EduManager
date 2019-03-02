@@ -79,7 +79,6 @@ public class StudentMainScreen extends AppCompatActivity {
     private TextView textDashboard, textProfile, textNotification, textContacts, notificationCounter;
     private ImageView iconDashboard, iconProfile, iconNotification, iconContacts;
     private BroadcastReceiver mRegistrationBroadcastReceiver;
-    private boolean returnValue = false;
     private CompositeDisposable finalDisposer = new CompositeDisposable();
     public CommonProgressDialog dialog;
 
@@ -163,7 +162,7 @@ public class StudentMainScreen extends AppCompatActivity {
         fabLogout = findViewById(R.id.log_out);
 //        fabLogout.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#5f27cd")));
         fabLogout.setRippleColor(Color.parseColor("#341f97"));
-        fabLogout.setOnClickListener(v -> logOut());
+        fabLogout.setOnClickListener(v -> doLogOut());
 
         fabChangePassword = findViewById(R.id.change_password);
 //        fabChangePassword.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#5f27cd")));
@@ -549,78 +548,68 @@ public class StudentMainScreen extends AppCompatActivity {
         }
     }
 
-    private boolean logOut() {
-        if (StaticHelperClass.isNetworkAvailable(this)) {
-            dialog.show();
-            Retrofit retrofit = new Retrofit.Builder()
-                    .baseUrl(getString(R.string.baseUrl))
-                    .addConverterFactory(ScalarsConverterFactory.create())
-                    .addConverterFactory(GsonConverterFactory.create())
-                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                    .build();
+//    private boolean logOut() {
+//        if (StaticHelperClass.isNetworkAvailable(this)) {
+//            dialog.show();
+//            Retrofit retrofit = new Retrofit.Builder()
+//                    .baseUrl(getString(R.string.baseUrl))
+//                    .addConverterFactory(ScalarsConverterFactory.create())
+//                    .addConverterFactory(GsonConverterFactory.create())
+//                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+//                    .build();
+//
+//            Observable<String> observable = retrofit
+//                    .create(RetrofitNetworkService.class)
+//                    .deleteFcmToken(LoggedUserID, "android", getSharedPreferences("UNIQUE_ID", Context.MODE_PRIVATE).getString("uuid", ""))
+//                    .subscribeOn(Schedulers.io())
+//                    .observeOn(AndroidSchedulers.mainThread())
+//                    .unsubscribeOn(Schedulers.io());
+//
+//            finalDisposer.add( observable
+//                    .subscribeOn(Schedulers.io())
+//                    .observeOn(AndroidSchedulers.mainThread())
+//                    .unsubscribeOn(Schedulers.io())
+//                    .subscribeWith(new DisposableObserver<String>() {
+//
+//                        @Override
+//                        public void onNext(String response) {
+//                            dialog.dismiss();
+//                            doLogOut(response);
+//                        }
+//
+//                        @Override
+//                        public void onError(Throwable e) {
+//                            dialog.dismiss();
+//                            returnValue = false;
+//                            Toast.makeText(StudentMainScreen.this,"Server error while logging out!!! ",
+//                                    Toast.LENGTH_LONG).show();
+//                        }
+//
+//                        @Override
+//                        public void onComplete() {
+//
+//                        }
+//                    }));
+//        } else {
+//            Toast.makeText(StudentMainScreen.this,"Please check your internet connection and select again!!! ",
+//                    Toast.LENGTH_LONG).show();
+//        }
+//        return returnValue;
+//    }
 
-            Observable<String> observable = retrofit
-                    .create(RetrofitNetworkService.class)
-                    .deleteFcmToken(LoggedUserID, "android", getSharedPreferences("UNIQUE_ID", Context.MODE_PRIVATE).getString("uuid", ""))
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .unsubscribeOn(Schedulers.io());
+    private void doLogOut() {
+        SharedPreferences sharedPreferences  = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean("LogInState", false);
+        editor.apply();
 
-            finalDisposer.add( observable
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .unsubscribeOn(Schedulers.io())
-                    .subscribeWith(new DisposableObserver<String>() {
+        getSharedPreferences("PUSH_NOTIFICATIONS", Context.MODE_PRIVATE)
+                .edit()
+                .putString("notifications", "[]")
+                .apply();
 
-                        @Override
-                        public void onNext(String response) {
-                            dialog.dismiss();
-                            doLogOut(response);
-                        }
-
-                        @Override
-                        public void onError(Throwable e) {
-                            dialog.dismiss();
-                            returnValue = false;
-                            Toast.makeText(StudentMainScreen.this,"Server error while logging out!!! ",
-                                    Toast.LENGTH_LONG).show();
-                        }
-
-                        @Override
-                        public void onComplete() {
-
-                        }
-                    }));
-        } else {
-            Toast.makeText(StudentMainScreen.this,"Please check your internet connection and select again!!! ",
-                    Toast.LENGTH_LONG).show();
-        }
-        return returnValue;
-    }
-
-    private void doLogOut(String returnValueFromServer) {
-        try {
-            if (new JSONArray(returnValueFromServer).getJSONObject(0).getInt("ReturnValue") == 1) {
-                SharedPreferences sharedPreferences  = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
-                SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.putBoolean("LogInState", false);
-                editor.apply();
-
-                getSharedPreferences("PUSH_NOTIFICATIONS", Context.MODE_PRIVATE)
-                        .edit()
-                        .putString("notifications", "[]")
-                        .apply();
-
-                returnValue = true;
-                Intent intent = new Intent(getApplicationContext(), LoginScreen.class);
-                startActivity(intent);
-                finish();
-            } else {
-                returnValue = false;
-            }
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        Intent intent = new Intent(getApplicationContext(), LoginScreen.class);
+        startActivity(intent);
+        finish();
     }
 }
