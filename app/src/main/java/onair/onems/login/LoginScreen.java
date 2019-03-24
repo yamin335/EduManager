@@ -5,7 +5,6 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -18,7 +17,6 @@ import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -202,140 +200,170 @@ public class LoginScreen extends AppCompatActivity {
                 takePassword.setText("");
                 takeId.requestFocus();
             } else {
-                String UserID = jsonArray.getJSONObject(0).getString("UserID");
-                getUserTypes(UserID);
-                String UserName = jsonArray.getJSONObject(0).getString("UserName");
-                String Password = jsonArray.getJSONObject(0).getString("Password");
-                String UserTypeIDTemp = jsonArray.getJSONObject(0).getString("UserTypeID");
-                int UserTypeID;
-                if(UserTypeIDTemp.equals("null")) {
-                    UserTypeID = 0;
-                } else {
-                    UserTypeID = Integer.parseInt(UserTypeIDTemp);
-                }
-                String UserFullName = jsonArray.getJSONObject(0).getString("UserFullName");
-                String InstituteName = jsonArray.getJSONObject(0).getString("InstituteName");
-                String InstituteIDTemp = jsonArray.getJSONObject(0).getString("InstituteID");
-                long InstituteID;
-                if(InstituteIDTemp.equals("null")) {
-                    InstituteID = 0;
-                } else {
-                    InstituteID = Long.parseLong(InstituteIDTemp);
-                }
-                String ImageUrl = jsonArray.getJSONObject(0).getString("ImageUrl");
-                String DepartmentIDTemp = jsonArray.getJSONObject(0).getString("DepartmentID");
-                long DepartmentID;
-                if(DepartmentIDTemp.equals("null")) {
-                    DepartmentID = 0;
-                } else {
-                    DepartmentID = Long.parseLong(DepartmentIDTemp);
-                }
-                String DesignationIDTemp = jsonArray.getJSONObject(0).getString("DesignationID");
-                long DesignationID;
-                if(DesignationIDTemp.equals("null")) {
-                    DesignationID = 0;
-                } else {
-                    DesignationID = Long.parseLong(DesignationIDTemp);
-                }
-                String BrunchIDTemp = jsonArray.getJSONObject(0).getString("BrunchID");
-                long BrunchID;
-                if(BrunchIDTemp.equals("null")) {
-                    BrunchID = 0;
-                } else {
-                    BrunchID = Long.parseLong(BrunchIDTemp);
-                }
-                String DepartmentName = jsonArray.getJSONObject(0).getString("DepartmentName");
-                String DesignationName = jsonArray.getJSONObject(0).getString("DesignationName");
-                String BrunchName = jsonArray.getJSONObject(0).getString("BrunchName");
-                String SBrunchIDTemp = jsonArray.getJSONObject(0).getString("SBrunchID");
-                long SBrunchID;
-                if(SBrunchIDTemp.equals("null")) {
-                    SBrunchID = 0;
-                } else {
-                    SBrunchID = Long.parseLong(SBrunchIDTemp);
-                }
-                String BoardIDTemp = jsonArray.getJSONObject(0).getString("BoardID");
-                long BoardID;
-                if(BoardIDTemp.equals("null")) {
-                    BoardID = 0;
-                } else {
-                    BoardID = Long.parseLong(BoardIDTemp);
-                }
-                String SDepartmentIDTemp = jsonArray.getJSONObject(0).getString("SDepartmentID");
-                long SDepartmentID;
-                if(SDepartmentIDTemp.equals("null")) {
-                    SDepartmentID = 0;
-                } else {
-                    SDepartmentID = Long.parseLong(SDepartmentIDTemp);
-                }
-                String MediumIDTemp = jsonArray.getJSONObject(0).getString("MediumID");
-                long MediumID;
-                if(MediumIDTemp.equals("null")) {
-                    MediumID = 0;
-                } else {
-                    MediumID = Long.parseLong(MediumIDTemp);
-                }
-                String RFID = jsonArray.getJSONObject(0).getString("RFID");
-                String RollNo = jsonArray.getJSONObject(0).getString("RollNo");
-                String SectionIDTemp = jsonArray.getJSONObject(0).getString("SectionID");
-                long SectionID;
-                if(SectionIDTemp.equals("null")) {
-                    SectionID = 0;
-                } else {
-                    SectionID = Long.parseLong(SectionIDTemp);
-                }
-                String SessionIDTemp = jsonArray.getJSONObject(0).getString("SessionID");
-                long SessionID;
-                if(SessionIDTemp.equals("null")) {
-                    SessionID = 0;
-                } else {
-                    SessionID = Long.parseLong(SessionIDTemp);
-                }
-                String ShiftIDTemp = jsonArray.getJSONObject(0).getString("ShiftID");
-                long ShiftID;
-                if(ShiftIDTemp.equals("null")) {
-                    ShiftID = 0;
-                } else {
-                    ShiftID = Long.parseLong(ShiftIDTemp);
-                }
-                String ClassIDTemp = jsonArray.getJSONObject(0).getString("ClassID");
-                long ClassID;
-                if(ClassIDTemp.equals("null")) {
-                    ClassID = 0;
-                } else {
-                    ClassID = Long.parseLong(ClassIDTemp);
-                }
-                String StudentNo = jsonArray.getJSONObject(0).getString("StudentNo");
-                // Parse Json data From API END
-
-                // Using SharedPreferences For save Internal Data
+                String UserID = "";
+                int UserTypeID = 0;
+                long InstituteID = 0;
                 SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
                 SharedPreferences.Editor editor = prefs.edit();
-                editor.putString("UserID", UserID);
-                editor.putString("UserName", UserName);
-                editor.putString("Password",Password);
-                editor.putInt("UserTypeID",UserTypeID);
-                editor.putString("UserFullName",UserFullName);
-                editor.putLong("InstituteID",InstituteID);
-                editor.putString("InstituteName",InstituteName);
-                editor.putString("ImageUrl",ImageUrl);
-                editor.putLong("DepartmentID",DepartmentID);
-                editor.putLong("DesignationID",DesignationID);
-                editor.putLong("BrunchID",BrunchID);
-                editor.putString("DepartmentName",DepartmentName);
-                editor.putString("DesignationName",DesignationName);
-                editor.putString("BrunchName",BrunchName);
-                editor.putLong("SBrunchID",SBrunchID);
-                editor.putLong(" BoardID", BoardID);
-                editor.putLong("SDepartmentID",SDepartmentID);
-                editor.putLong("MediumID",MediumID);
-                editor.putString("RFID",RFID);
-                editor.putString("RollNo",RollNo);
-                editor.putLong("SectionID",SectionID);
-                editor.putLong("SessionID",SessionID);
-                editor.putLong("ShiftID",ShiftID);
-                editor.putLong("ClassID",ClassID );
-                editor.putString("StudentNo",StudentNo);
+
+                if (jsonArray.getJSONObject(0).has("UserID")) {
+                    UserID = jsonArray.getJSONObject(0).getString("UserID");
+                    editor.putString("UserID", jsonArray.getJSONObject(0).getString("UserID"));
+                    getUserTypes(jsonArray.getJSONObject(0).getString("UserID"));
+                }
+
+                if (jsonArray.getJSONObject(0).has("UserName")) {
+                    editor.putString("UserName", jsonArray.getJSONObject(0).getString("UserName"));
+                }
+
+                if (jsonArray.getJSONObject(0).has("Password")) {
+                    editor.putString("Password", jsonArray.getJSONObject(0).getString("Password"));
+                }
+
+                if (jsonArray.getJSONObject(0).has("UserTypeID")) {
+                    if(jsonArray.getJSONObject(0).getString("UserTypeID").equals("null")) {
+                        editor.putInt("UserTypeID", 0);
+                    } else {
+                        editor.putInt("UserTypeID", Integer.parseInt(jsonArray.getJSONObject(0).getString("UserTypeID")));
+                        UserTypeID = Integer.parseInt(jsonArray.getJSONObject(0).getString("UserTypeID"));
+                    }
+                }
+
+                if (jsonArray.getJSONObject(0).has("UserFullName")) {
+                    editor.putString("UserFullName", jsonArray.getJSONObject(0).getString("UserFullName"));
+                }
+
+                if (jsonArray.getJSONObject(0).has("InstituteID")) {
+                    if(jsonArray.getJSONObject(0).getString("InstituteID").equals("null")) {
+                        editor.putLong("InstituteID", 0);
+                    } else {
+                        editor.putLong("InstituteID", Long.parseLong(jsonArray.getJSONObject(0).getString("InstituteID")));
+                        InstituteID = Long.parseLong(jsonArray.getJSONObject(0).getString("InstituteID"));
+                    }
+                }
+
+                if (jsonArray.getJSONObject(0).has("InstituteName")) {
+                    editor.putString("InstituteName", jsonArray.getJSONObject(0).getString("InstituteName"));
+                }
+
+                if (jsonArray.getJSONObject(0).has("ImageUrl")) {
+                    editor.putString("ImageUrl", jsonArray.getJSONObject(0).getString("ImageUrl"));
+                }
+
+                if (jsonArray.getJSONObject(0).has("DepartmentID")) {
+                    if(jsonArray.getJSONObject(0).getString("DepartmentID").equals("null")) {
+                        editor.putLong("DepartmentID", 0);
+                    } else {
+                        editor.putLong("DepartmentID", Long.parseLong(jsonArray.getJSONObject(0).getString("DepartmentID")));
+                    }
+                }
+
+                if (jsonArray.getJSONObject(0).has("DesignationID")) {
+                    if(jsonArray.getJSONObject(0).getString("DesignationID").equals("null")) {
+                        editor.putLong("DesignationID", 0);
+                    } else {
+                        editor.putLong("DesignationID", Long.parseLong(jsonArray.getJSONObject(0).getString("DesignationID")));
+                    }
+                }
+
+                if (jsonArray.getJSONObject(0).has("BrunchID")) {
+                    if(jsonArray.getJSONObject(0).getString("BrunchID").equals("null")) {
+                        editor.putLong("BrunchID", 0);
+                    } else {
+                        editor.putLong("BrunchID", Long.parseLong(jsonArray.getJSONObject(0).getString("BrunchID")));
+                    }
+                }
+
+                if (jsonArray.getJSONObject(0).has("DepartmentName")) {
+                    editor.putString("DepartmentName", jsonArray.getJSONObject(0).getString("DepartmentName"));
+                }
+
+                if (jsonArray.getJSONObject(0).has("DesignationName")) {
+                    editor.putString("DesignationName", jsonArray.getJSONObject(0).getString("DesignationName"));
+                }
+
+                if (jsonArray.getJSONObject(0).has("BrunchName")) {
+                    editor.putString("BrunchName", jsonArray.getJSONObject(0).getString("BrunchName"));
+                }
+
+                if (jsonArray.getJSONObject(0).has("UserID")) {
+
+                }
+
+                if (jsonArray.getJSONObject(0).has("SBrunchID")) {
+                    if(jsonArray.getJSONObject(0).getString("SBrunchID").equals("null")) {
+                        editor.putLong("SBrunchID", 0);
+                    } else {
+                        editor.putLong("SBrunchID", Long.parseLong(jsonArray.getJSONObject(0).getString("SBrunchID")));
+                    }
+                }
+
+                if (jsonArray.getJSONObject(0).has("BoardID")) {
+                    if(jsonArray.getJSONObject(0).getString("BoardID").equals("null")) {
+                        editor.putLong(" BoardID", 0);
+                    } else {
+                        editor.putLong(" BoardID", Long.parseLong(jsonArray.getJSONObject(0).getString("BoardID")));
+                    }
+                }
+
+                if (jsonArray.getJSONObject(0).has("SDepartmentID")) {
+                    if(jsonArray.getJSONObject(0).getString("SDepartmentID").equals("null")) {
+                        editor.putLong("SDepartmentID", 0);
+                    } else {
+                        editor.putLong("SDepartmentID", Long.parseLong(jsonArray.getJSONObject(0).getString("SDepartmentID")));
+                    }
+                }
+
+                if (jsonArray.getJSONObject(0).has("MediumID")) {
+                    if( jsonArray.getJSONObject(0).getString("MediumID").equals("null")) {
+                        editor.putLong("MediumID", 0);
+                    } else {
+                        editor.putLong("MediumID", Long.parseLong( jsonArray.getJSONObject(0).getString("MediumID")));
+                    }
+                }
+
+                if (jsonArray.getJSONObject(0).has("RFID")) {
+                    editor.putString("RFID", jsonArray.getJSONObject(0).getString("RFID"));
+                }
+
+                if (jsonArray.getJSONObject(0).has("RollNo")) {
+                    editor.putString("RollNo", jsonArray.getJSONObject(0).getString("RollNo"));
+                }
+
+                if (jsonArray.getJSONObject(0).has("SectionID")) {
+                    if(jsonArray.getJSONObject(0).getString("SectionID").equals("null")) {
+                        editor.putLong("SectionID", 0);
+                    } else {
+                        editor.putLong("SectionID", Long.parseLong(jsonArray.getJSONObject(0).getString("SectionID")));
+                    }
+                }
+
+                if (jsonArray.getJSONObject(0).has("SessionID")) {
+                    if(jsonArray.getJSONObject(0).getString("SessionID").equals("null")) {
+                        editor.putLong("SessionID", 0);
+                    } else {
+                        editor.putLong("SessionID", Long.parseLong(jsonArray.getJSONObject(0).getString("SessionID")));
+                    }
+                }
+
+                if (jsonArray.getJSONObject(0).has("ShiftID")) {
+                    if(jsonArray.getJSONObject(0).getString("ShiftID").equals("null")) {
+                        editor.putLong("ShiftID", 0);
+                    } else {
+                        editor.putLong("ShiftID", Long.parseLong(jsonArray.getJSONObject(0).getString("ShiftID")));
+                    }
+                }
+
+                if (jsonArray.getJSONObject(0).has("ClassID")) {
+                    if(jsonArray.getJSONObject(0).getString("ClassID").equals("null")) {
+                        editor.putLong("ClassID", 0);
+                    } else {
+                        editor.putLong("ClassID", Long.parseLong(jsonArray.getJSONObject(0).getString("ClassID")));
+                    }
+                }
+                if (jsonArray.getJSONObject(0).has("StudentNo")) {
+                    editor.putString("RollNo", jsonArray.getJSONObject(0).getString("StudentNo"));
+                }
                 editor.apply();
 
                 sharedPreferences  = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
@@ -377,7 +405,7 @@ public class LoginScreen extends AppCompatActivity {
             }
 
         } catch (JSONException e) {
-            Toast.makeText(this,"Json : "+e,Toast.LENGTH_LONG).show();
+            Toast.makeText(this,"Error in JSON parsing",Toast.LENGTH_LONG).show();
         }
     }
 

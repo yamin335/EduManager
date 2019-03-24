@@ -2,10 +2,12 @@ package onair.onems.studentlist;
 
 import android.app.SearchManager;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
@@ -30,6 +32,7 @@ import io.reactivex.schedulers.Schedulers;
 import onair.onems.R;
 import onair.onems.Services.RetrofitNetworkService;
 import onair.onems.Services.StaticHelperClass;
+import onair.onems.customised.MyDividerItemDecoration;
 import onair.onems.mainactivities.CommonToolbarParentActivity;
 import onair.onems.models.ReportAllStudentRowModel;
 import retrofit2.Retrofit;
@@ -87,6 +90,7 @@ public class ReportAllStudentList extends CommonToolbarParentActivity implements
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.addItemDecoration(new MyDividerItemDecoration(this, DividerItemDecoration.VERTICAL, 0));
         recyclerView.setAdapter(mAdapter);
 
         StudentDataGetRequest();
@@ -98,6 +102,7 @@ public class ReportAllStudentList extends CommonToolbarParentActivity implements
             for(int i = 0; i < studentJsonArray.length(); ++i) {
                 JSONObject studentJsonObject = studentJsonArray.getJSONObject(i);
                 ReportAllStudentRowModel reportAllStudentRowModel = new ReportAllStudentRowModel();
+                reportAllStudentRowModel.setUserID(studentJsonObject.getString("UserID"));
                 reportAllStudentRowModel.setRollNo(studentJsonObject.getString("RollNo"));
                 reportAllStudentRowModel.setUserName(studentJsonObject.getString("UserName"));
                 reportAllStudentRowModel.setImageUrl(studentJsonObject.getString("ImageUrl"));
@@ -173,7 +178,12 @@ public class ReportAllStudentList extends CommonToolbarParentActivity implements
 
     @Override
     public void onStudentSelected(ReportAllStudentRowModel reportAllStudentRowModel) {
-        Toast.makeText(getApplicationContext(), "Selected: " + reportAllStudentRowModel.getUserName() + ", " + reportAllStudentRowModel.getRollNo(), Toast.LENGTH_LONG).show();
+        Intent intent = new Intent(ReportAllStudentList.this, ReportAllStudentListDetails.class);
+        intent.putExtra("UserID", reportAllStudentRowModel.getUserID());
+        intent.putExtra("RFID", reportAllStudentRowModel.getRFID());
+        intent.putExtra("ImageUrl", reportAllStudentRowModel.getImageUrl());
+        intent.putExtra("UserName", reportAllStudentRowModel.getUserName());
+        startActivity(intent);
     }
 
     public void StudentDataGetRequest(){
@@ -233,7 +243,7 @@ public class ReportAllStudentList extends CommonToolbarParentActivity implements
     public void ClearStudentList(){
         int size = studentList.size();
         studentList.clear();
-        mAdapter.notifyItemRangeRemoved(0, size+0);
+        mAdapter.notifyItemRangeRemoved(0, size);
     }
     //testing
 }

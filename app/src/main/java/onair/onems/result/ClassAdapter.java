@@ -24,7 +24,7 @@ public class ClassAdapter extends RecyclerView.Adapter<ClassAdapter.MyViewHolder
 
         MyViewHolder(View view) {
             super(view);
-            className = view.findViewById(R.id.name);
+            className = view.findViewById(R.id.teacherName);
 
             view.setOnClickListener(view1 -> {
                 // send selected exam in callback

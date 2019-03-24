@@ -25,6 +25,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Objects;
 
 import io.reactivex.Observable;
@@ -88,7 +89,7 @@ public class ExamRoutineMainScreen extends SideNavigationMenuParentActivity {
 
         LayoutInflater inflater = (LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         final View childActivityLayout = Objects.requireNonNull(inflater).inflate(R.layout.exam_routine_main_screen, null);
-        LinearLayout parentActivityLayout = (LinearLayout) findViewById(R.id.contentMain);
+        LinearLayout parentActivityLayout = findViewById(R.id.contentMain);
         parentActivityLayout.addView(childActivityLayout, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
 
         allSessionArrayList = new ArrayList<>();
@@ -101,14 +102,12 @@ public class ExamRoutineMainScreen extends SideNavigationMenuParentActivity {
         selectedClass = new ClassModel();
         selectedExam = new ExamModel();
 
-        spinnerSession = (Spinner)findViewById(R.id.spinnerSession);
-        spinnerMedium =(Spinner)findViewById(R.id.spinnerMedium);
-        spinnerClass = (Spinner)findViewById(R.id.spinnerClass);
-        spinnerExam = (Spinner)findViewById(R.id.spinnerExam);
+        spinnerSession = findViewById(R.id.spinnerSession);
+        spinnerMedium = findViewById(R.id.spinnerMedium);
+        spinnerClass = findViewById(R.id.spinnerClass);
+        spinnerExam = findViewById(R.id.spinnerExam);
         recyclerView = findViewById(R.id.routineClasses);
         className = findViewById(R.id.className);
-
-        Button showRoutine = (Button)findViewById(R.id.showRoutine);
 
         ArrayAdapter<String> session_spinner_adapter = new ArrayAdapter<>(this, R.layout.spinner_item, tempSessionArray);
         session_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -135,7 +134,7 @@ public class ExamRoutineMainScreen extends SideNavigationMenuParentActivity {
             MediumID = PreferenceManager.getDefaultSharedPreferences(this).getLong("MediumID", 0);
             ClassID = PreferenceManager.getDefaultSharedPreferences(this).getLong("ClassID", 0);
             SessionDataGetRequest();
-            ExamDataGetRequest();
+            ExamDataGetRequest(InstituteID, MediumID, ClassID);
         } else if (UserTypeID == 5) {
             spinnerMedium.setVisibility(View.GONE);
             spinnerClass.setVisibility(View.GONE);
@@ -148,7 +147,7 @@ public class ExamRoutineMainScreen extends SideNavigationMenuParentActivity {
                 e.printStackTrace();
             }
             SessionDataGetRequest();
-            ExamDataGetRequest();
+            ExamDataGetRequest(InstituteID, MediumID, ClassID);
         }
 
         spinnerSession.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -214,7 +213,7 @@ public class ExamRoutineMainScreen extends SideNavigationMenuParentActivity {
                     try {
                         selectedClass = allClassArrayList.get(position-1);
                         ClassID = selectedClass.getClassID();
-                        ExamDataGetRequest();
+                        ExamDataGetRequest(InstituteID, selectedMedium.getMediumID(), selectedClass.getClassID());
                         selectedExam = new ExamModel();
                         ExamID = selectedExam.getExamID();
                     } catch (IndexOutOfBoundsException e) {
@@ -242,6 +241,28 @@ public class ExamRoutineMainScreen extends SideNavigationMenuParentActivity {
                     try {
                         selectedExam = allExamArrayList.get(position-1);
                         ExamID = selectedExam.getExamID();
+
+                        if(StaticHelperClass.isNetworkAvailable(ExamRoutineMainScreen.this)) {
+                            if(allSessionArrayList.size()>0 && selectedSession.getSessionID() == 0){
+                                Toast.makeText(ExamRoutineMainScreen.this,"Please select session!!! ",
+                                        Toast.LENGTH_LONG).show();
+                            } else if(allMediumArrayList.size()>0 && (selectedMedium.getMediumID() == -2 || selectedMedium.getMediumID() == 0) && UserTypeID != 3 && UserTypeID != 5) {
+                                Toast.makeText(ExamRoutineMainScreen.this,"Please select medium!!! ",
+                                        Toast.LENGTH_LONG).show();
+                            } else if(allClassArrayList.size()>0 && (selectedClass.getClassID() == -2 || selectedClass.getClassID() == 0) && UserTypeID != 3 && UserTypeID != 5) {
+                                Toast.makeText(ExamRoutineMainScreen.this,"Please select class!!! ",
+                                        Toast.LENGTH_LONG).show();
+                            } else if(allExamArrayList.size()>0 && selectedExam.getExamID() == 0) {
+                                Toast.makeText(ExamRoutineMainScreen.this,"Please select exam!!! ",
+                                        Toast.LENGTH_LONG).show();
+                            } else {
+                                ExamRoutineDataGetRequest();
+                            }
+                        } else {
+                            Toast.makeText(ExamRoutineMainScreen.this,"Please check your internet connection and select again!!! ",
+                                    Toast.LENGTH_LONG).show();
+                        }
+
                     } catch (IndexOutOfBoundsException e) {
                         Toast.makeText(ExamRoutineMainScreen.this,"No Exam found !!!",Toast.LENGTH_LONG).show();
                     }
@@ -254,29 +275,6 @@ public class ExamRoutineMainScreen extends SideNavigationMenuParentActivity {
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
 
-            }
-        });
-
-        showRoutine.setOnClickListener(v -> {
-            if(StaticHelperClass.isNetworkAvailable(ExamRoutineMainScreen.this)) {
-                if(allSessionArrayList.size()>0 && selectedSession.getSessionID() == 0){
-                    Toast.makeText(ExamRoutineMainScreen.this,"Please select session!!! ",
-                            Toast.LENGTH_LONG).show();
-                } else if(allMediumArrayList.size()>0 && (selectedMedium.getMediumID() == -2 || selectedMedium.getMediumID() == 0) && UserTypeID != 3 && UserTypeID != 5) {
-                    Toast.makeText(ExamRoutineMainScreen.this,"Please select medium!!! ",
-                            Toast.LENGTH_LONG).show();
-                } else if(allClassArrayList.size()>0 && (selectedClass.getClassID() == -2 || selectedClass.getClassID() == 0) && UserTypeID != 3 && UserTypeID != 5) {
-                    Toast.makeText(ExamRoutineMainScreen.this,"Please select class!!! ",
-                            Toast.LENGTH_LONG).show();
-                } else if(allExamArrayList.size()>0 && selectedExam.getExamID() == 0) {
-                    Toast.makeText(ExamRoutineMainScreen.this,"Please select exam!!! ",
-                            Toast.LENGTH_LONG).show();
-                } else {
-                    ExamRoutineDataGetRequest();
-                }
-            } else {
-                Toast.makeText(ExamRoutineMainScreen.this,"Please check your internet connection and select again!!! ",
-                        Toast.LENGTH_LONG).show();
             }
         });
 
@@ -331,6 +329,8 @@ public class ExamRoutineMainScreen extends SideNavigationMenuParentActivity {
 
     void parseSessionJsonData(String jsonString) {
         try {
+            String year = Integer.toString(Calendar.getInstance().get(Calendar.YEAR));
+            int yearIndex = 0;
             allSessionArrayList = new ArrayList<>();
             JSONArray sessionJsonArray = new JSONArray(jsonString);
             ArrayList<String> sessionArrayList = new ArrayList<>();
@@ -340,6 +340,9 @@ public class ExamRoutineMainScreen extends SideNavigationMenuParentActivity {
                 SessionModel sessionModel = new SessionModel(sessionJsonObject.getString("SessionID"), sessionJsonObject.getString("SessionName"));
                 allSessionArrayList.add(sessionModel);
                 sessionArrayList.add(sessionModel.getSessionName());
+                if (year.equalsIgnoreCase(sessionModel.getSessionName())) {
+                    yearIndex = i;
+                }
             }
             try {
                 String[] strings = new String[sessionArrayList.size()];
@@ -347,6 +350,8 @@ public class ExamRoutineMainScreen extends SideNavigationMenuParentActivity {
                 ArrayAdapter<String> session_spinner_adapter = new ArrayAdapter<>(this,R.layout.spinner_item, strings);
                 session_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinnerSession.setAdapter(session_spinner_adapter);
+                spinnerSession.setSelection(yearIndex+1);
+                selectedSession = allSessionArrayList.get(yearIndex);
             } catch (IndexOutOfBoundsException e) {
                 Toast.makeText(this,"No session found !!!",Toast.LENGTH_LONG).show();
             }
@@ -503,7 +508,7 @@ public class ExamRoutineMainScreen extends SideNavigationMenuParentActivity {
         }
     }
 
-    private void ExamDataGetRequest() {
+    private void ExamDataGetRequest(long InstituteID, long MediumID, long ClassID) {
         if (StaticHelperClass.isNetworkAvailable(this)) {
             dialog.show();
             CheckSelectedData();
@@ -516,7 +521,7 @@ public class ExamRoutineMainScreen extends SideNavigationMenuParentActivity {
 
             Observable<String> observable = retrofit
                     .create(RetrofitNetworkService.class)
-                    .getClassWiseInsExame(InstituteID, selectedMedium.getMediumID(), selectedClass.getClassID())
+                    .getClassWiseInsExame(InstituteID, MediumID, ClassID)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .unsubscribeOn(Schedulers.io());
@@ -607,12 +612,14 @@ public class ExamRoutineMainScreen extends SideNavigationMenuParentActivity {
                         @Override
                         public void onNext(String response) {
                             dialog.dismiss();
+                            className.setText("");
                             parseExamRoutineJsonData(response);
                         }
 
                         @Override
                         public void onError(Throwable e) {
                             dialog.dismiss();
+                            className.setText("");
                             Toast.makeText(ExamRoutineMainScreen.this,"Routine not found!!! ",
                                     Toast.LENGTH_LONG).show();
                         }

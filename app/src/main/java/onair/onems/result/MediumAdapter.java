@@ -24,7 +24,7 @@ public class MediumAdapter extends RecyclerView.Adapter<MediumAdapter.MyViewHold
 
         MyViewHolder(View view) {
             super(view);
-            mediumName = view.findViewById(R.id.name);
+            mediumName = view.findViewById(R.id.teacherName);
 
             view.setOnClickListener(view1 -> {
                 // send selected exam in callback

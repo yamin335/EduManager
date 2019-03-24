@@ -28,7 +28,7 @@ public class FeeCollectionReportSublistAdapter extends RecyclerView.Adapter<Recy
         TextView balance;
         CollectionViewHolder(View view) {
             super(view);
-            name = view.findViewById(R.id.name);
+            name = view.findViewById(R.id.teacherName);
             roll = view.findViewById(R.id.roll);
             id = view.findViewById(R.id.rfid);
             previousBalance = view.findViewById(R.id.previousBalance);

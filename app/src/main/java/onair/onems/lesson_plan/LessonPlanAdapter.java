@@ -26,7 +26,7 @@ public class LessonPlanAdapter extends RecyclerView.Adapter<LessonPlanAdapter.My
 
         MyViewHolder(View view) {
             super(view);
-            LessonPlanName = view.findViewById(R.id.name);
+            LessonPlanName = view.findViewById(R.id.teacherName);
 
             view.setOnClickListener(view1 -> {
                 // send selected homework in callback

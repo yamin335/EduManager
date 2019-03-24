@@ -4,8 +4,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -16,6 +19,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.transition.Transition;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -24,7 +29,6 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 import de.codecrafters.tableview.TableView;
-import de.codecrafters.tableview.listeners.TableDataClickListener;
 import de.codecrafters.tableview.model.TableColumnWeightModel;
 import de.codecrafters.tableview.toolkit.SimpleTableDataAdapter;
 import de.codecrafters.tableview.toolkit.SimpleTableHeaderAdapter;
@@ -82,7 +86,7 @@ public class StudentAttendanceAllDays extends CommonToolbarParentActivity {
         totalClass = findViewById(R.id.totalClass);
         totalPresent = findViewById(R.id.totalPresent);
         ImageView studentImage = findViewById(R.id.studentImage);
-        TextView name = findViewById(R.id.name);
+        TextView name = findViewById(R.id.teacherName);
         TextView roll = findViewById(R.id.roll);
         TextView id = findViewById(R.id.Id);
 
@@ -108,10 +112,26 @@ public class StudentAttendanceAllDays extends CommonToolbarParentActivity {
 
       try {
           GlideApp.with(this)
-                  .load(getString(R.string.baseUrl) + "/" + ImageUrl.replace("\\", "/")).apply(RequestOptions.circleCropTransform())
+                  .asBitmap()
+                  .error(getResources().getDrawable(R.drawable.profileavater))
+                  .load(getString(R.string.baseUrl) + "/" + ImageUrl.replace("\\", "/"))
+                  .apply(RequestOptions.circleCropTransform())
                   .diskCacheStrategy(DiskCacheStrategy.NONE)
                   .skipMemoryCache(true)
-                  .into(studentImage);
+                  .into(new SimpleTarget<Bitmap>() {
+                      @Override
+                      public void onResourceReady(@NonNull Bitmap resource, Transition<? super Bitmap> transition) {
+                          if(resource != null) {
+                              studentImage.setImageBitmap(resource);
+                          }
+                      }
+                      @Override
+                      public void onLoadFailed(Drawable errorDrawable) {
+                          super.onLoadFailed(errorDrawable);
+                          studentImage.setImageDrawable(errorDrawable);
+                          Toast.makeText(StudentAttendanceAllDays.this,"No image found!!!",Toast.LENGTH_LONG).show();
+                      }
+                  });
       } catch (Exception e) {
           e.printStackTrace();
       }
@@ -204,7 +224,11 @@ public class StudentAttendanceAllDays extends CommonToolbarParentActivity {
                 DailyAttendanceModel perDayAttendance = new DailyAttendanceModel();
                 perDayAttendance.setDate(dailyAttendanceJsonObject.getString("Date"));
                 perDayAttendance.setPresent(dailyAttendanceJsonObject.getString("Present"));
-                perDayAttendance.setLate(dailyAttendanceJsonObject.getString("Late"));
+                if (dailyAttendanceJsonObject.getString("Late").charAt(0) == '-') {
+                    StringBuilder lateTime = new StringBuilder(dailyAttendanceJsonObject.getString("Late"));
+                    lateTime.deleteCharAt(0);
+                    perDayAttendance.setLate(lateTime.toString());
+                }
                 perDayAttendance.setTotalClassDay(dailyAttendanceJsonObject.getString("TotalClassDay"));
                 perDayAttendance.setTotalPresent(dailyAttendanceJsonObject.getJSONArray("TotalPresent").optString(0));
                 DATA_TO_SHOW[i][0] = String.valueOf((i+1));

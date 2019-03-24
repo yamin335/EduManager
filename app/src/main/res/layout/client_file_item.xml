@@ -34,7 +34,7 @@
             android:drawableLeft="@drawable/ic_clear_white_18dp"
             android:layout_alignParentRight="true" />
         <TextView
-            android:id="@+id/name"
+            android:id="@+id/teacherName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="#ffffff"

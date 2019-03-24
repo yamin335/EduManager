@@ -33,7 +33,7 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.MyView
 
         public MyViewHolder(View view) {
             super(view);
-            name = view.findViewById(R.id.name);
+            name = view.findViewById(R.id.teacherName);
             phone = view.findViewById(R.id.phone);
             thumbnail = view.findViewById(R.id.thumbnail);
 

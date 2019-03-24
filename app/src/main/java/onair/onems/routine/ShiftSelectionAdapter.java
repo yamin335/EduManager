@@ -24,7 +24,7 @@ public class ShiftSelectionAdapter extends RecyclerView.Adapter<ShiftSelectionAd
 
         MyViewHolder(View view) {
             super(view);
-            shiftName = view.findViewById(R.id.name);
+            shiftName = view.findViewById(R.id.teacherName);
 
             view.setOnClickListener(view1 -> {
                 // send selected exam in callback

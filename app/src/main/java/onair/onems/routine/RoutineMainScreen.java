@@ -87,16 +87,12 @@ public class RoutineMainScreen extends SideNavigationMenuParentActivity implemen
         fabShift.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#9C077EF5")));
         fabShift.setOnClickListener(v -> ShiftDataGetRequest());
 
-        if(UserTypeID==3 || UserTypeID==4 || UserTypeID==5){
+        if(UserTypeID==3 || UserTypeID==5) {
             fabShift.setVisibility(View.GONE);
         }
 
-        if (UserTypeID == 1 || UserTypeID == 2) {
+        if (UserTypeID == 1 || UserTypeID == 2 || UserTypeID == 4) {
             ShiftDataGetRequest();
-        }
-
-        if(UserTypeID == 4){
-            RoutineDataGetRequest();
         }
 
         if(UserTypeID!=1 && UserTypeID!=2 && UserTypeID!=4){
@@ -111,7 +107,7 @@ public class RoutineMainScreen extends SideNavigationMenuParentActivity implemen
             if(UserTypeID == 1||UserTypeID == 2) {
                 RoutineDataGetRequestForAdmin(shift.getLong("ShiftID"));
             } else if(UserTypeID == 4) {
-                RoutineDataGetRequest();
+                RoutineDataGetRequest(shift.getLong("ShiftID"));
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -240,7 +236,29 @@ public class RoutineMainScreen extends SideNavigationMenuParentActivity implemen
         adapter.notifyDataSetChanged();
         Calendar c = Calendar.getInstance();
         int currentDay = c.get(Calendar.DAY_OF_WEEK);
-        viewPager.setCurrentItem(currentDay);
+        switch (currentDay) {
+            case Calendar.SATURDAY:
+                viewPager.setCurrentItem(0);
+                break;
+            case Calendar.SUNDAY:
+                viewPager.setCurrentItem(1);
+                break;
+            case Calendar.MONDAY:
+                viewPager.setCurrentItem(2);
+                break;
+            case Calendar.TUESDAY:
+                viewPager.setCurrentItem(3);
+                break;
+            case Calendar.WEDNESDAY:
+                viewPager.setCurrentItem(4);
+                break;
+            case Calendar.THURSDAY:
+                viewPager.setCurrentItem(5);
+                break;
+            case Calendar.FRIDAY:
+                viewPager.setCurrentItem(6);
+                break;
+        }
     }
 
     private void RoutineDataGetRequestForAdmin(long ShiftID) {
@@ -289,7 +307,7 @@ public class RoutineMainScreen extends SideNavigationMenuParentActivity implemen
         }
     }
 
-    private void RoutineDataGetRequest() {
+    private void RoutineDataGetRequest(long ShiftID) {
         if(StaticHelperClass.isNetworkAvailable(this)) {
             dialog.show();
             Retrofit retrofit = new Retrofit.Builder()
@@ -301,7 +319,7 @@ public class RoutineMainScreen extends SideNavigationMenuParentActivity implemen
 
             Observable<String> observable = retrofit
                     .create(RetrofitNetworkService.class)
-                    .spGetTeacherStudentMyClassRoutine(InstituteID, LoggedUserClassID, LoggedUserID)
+                    .spGetTeacherStudentMyClassRoutine(InstituteID, LoggedUserClassID, LoggedUserID, ShiftID, LoggedUserSectionID, LoggedUserMediumID)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .unsubscribeOn(Schedulers.io());
@@ -428,7 +446,6 @@ public class RoutineMainScreen extends SideNavigationMenuParentActivity implemen
             Toast.makeText(RoutineMainScreen.this,"Shift not found!!! ",
                     Toast.LENGTH_LONG).show();
             fabShift.setVisibility(View.GONE);
-            RoutineDataGetRequest();
         } else {
             ShiftSelectionDialog shiftSelectionDialog = new ShiftSelectionDialog(this, jsonString, this);
             Objects.requireNonNull(shiftSelectionDialog.getWindow()).setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));

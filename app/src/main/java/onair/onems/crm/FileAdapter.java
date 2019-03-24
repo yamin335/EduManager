@@ -40,7 +40,7 @@ public class FileAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             super(view);
             cross = view.findViewById(R.id.cross);
             image = view.findViewById(R.id.image);
-            name = view.findViewById(R.id.name);
+            name = view.findViewById(R.id.teacherName);
             if (forUpdate) {
                 cross.setClickable(false);
                 cross.setVisibility(View.GONE);

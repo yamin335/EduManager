@@ -1,5 +1,7 @@
 package onair.onems.models;
 
+import java.util.ArrayList;
+
 public class AttendanceStudentModel {
 
     private String SubAtdDetailID;
@@ -68,6 +70,14 @@ public class AttendanceStudentModel {
 
     private int IsPresentID;
 
+    private String UserFirstName;
+
+    private String UserLastName;
+
+    private String ImageUrl;
+
+    private ArrayList<Long> InstituteID;
+
     public AttendanceStudentModel() {
 
     }
@@ -80,7 +90,7 @@ public class AttendanceStudentModel {
                                   String SessionID, String IsPresent, String Islate, String LateTime,
                                   String IsLeave, String IsAbsent, String Remarks, String Subject,
                                   String Department, String Medium, String Shift, String Class,
-                                  String DisplayDate, String isReadOnly, String IsPresentID) {
+                                  String DisplayDate, String isReadOnly, String IsPresentID, String UserFirstName, String UserLastName, String ImageUrl, ArrayList<Long> InstituteID) {
         if(SubAtdDetailID.equals("null")) {
             this.SubAtdDetailID = "0";
         } else {
@@ -215,6 +225,11 @@ public class AttendanceStudentModel {
         } else {
             this.IsPresentID = Integer.parseInt(IsPresentID);
         }
+
+        this.UserFirstName = UserFirstName;
+        this.UserLastName = UserLastName;
+        this.ImageUrl = ImageUrl;
+        this.InstituteID = InstituteID;
     }
 
     public void setSubAtdDetailID(String SubAtdDetailID) {

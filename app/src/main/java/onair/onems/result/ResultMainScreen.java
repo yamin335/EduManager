@@ -31,6 +31,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Objects;
 
@@ -577,6 +578,8 @@ public class ResultMainScreen extends SideNavigationMenuParentActivity{
 
     void parseSessionJsonData(String jsonString) {
         try {
+            String year = Integer.toString(Calendar.getInstance().get(Calendar.YEAR));
+            int yearIndex = 0;
             allSessionArrayList = new ArrayList<>();
             JSONArray sessionJsonArray = new JSONArray(jsonString);
             ArrayList<String> sessionArrayList = new ArrayList<>();
@@ -586,16 +589,18 @@ public class ResultMainScreen extends SideNavigationMenuParentActivity{
                 SessionModel sessionModel = new SessionModel(sessionJsonObject.getString("SessionID"), sessionJsonObject.getString("SessionName"));
                 allSessionArrayList.add(sessionModel);
                 sessionArrayList.add(sessionModel.getSessionName());
+                if (year.equalsIgnoreCase(sessionModel.getSessionName())) {
+                    yearIndex = i;
+                }
             }
-//            if(allSessionArrayList.size() == 1){
-//                selectedSession = allSessionArrayList.get(0);
-//            }
             try {
                 String[] strings = new String[sessionArrayList.size()];
                 strings = sessionArrayList.toArray(strings);
                 ArrayAdapter<String> session_spinner_adapter = new ArrayAdapter<>(this,R.layout.spinner_item, strings);
                 session_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinnerSession.setAdapter(session_spinner_adapter);
+                spinnerSession.setSelection(yearIndex+1);
+                selectedSession = allSessionArrayList.get(yearIndex);
             } catch (IndexOutOfBoundsException e) {
                 Toast.makeText(this,"No session found !!!",Toast.LENGTH_LONG).show();
             }

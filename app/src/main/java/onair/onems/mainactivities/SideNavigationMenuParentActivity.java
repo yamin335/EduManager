@@ -7,9 +7,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.NotificationCompat;
@@ -33,30 +36,30 @@ import android.widget.Toast;
 
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.transition.Transition;
 import com.google.firebase.messaging.FirebaseMessaging;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.Random;
 
-import io.reactivex.Observable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.observers.DisposableObserver;
-import io.reactivex.schedulers.Schedulers;
 import onair.onems.PrivacyPolicy;
 import onair.onems.R;
-import onair.onems.Services.RetrofitNetworkService;
-import onair.onems.Services.StaticHelperClass;
 import onair.onems.accounts.IncomeStatement;
 import onair.onems.app.Config;
 import onair.onems.attendance.AttendanceAdminDashboard;
+import onair.onems.attendance.AttendanceReportDailyMain;
+import onair.onems.attendance.AttendanceTeacherDaily;
+import onair.onems.attendance.AttendanceTeacherMonthly;
 import onair.onems.contacts.ContactsMainScreen;
 import onair.onems.crm.ClientList;
 import onair.onems.crm.NewClientEntry;
@@ -89,10 +92,6 @@ import onair.onems.studentlist.ReportAllStudentMain;
 import onair.onems.syllabus.SyllabusMainScreen;
 import onair.onems.syllabus.SyllabusMainScreenForAdmin;
 import onair.onems.user.Profile;
-import retrofit2.Retrofit;
-import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
-import retrofit2.converter.gson.GsonConverterFactory;
-import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 public class SideNavigationMenuParentActivity extends AppCompatActivity implements NotificationAdapter.DecreaseCounterListener,
         NotificationAdapter.IncreaseCounterListener {
@@ -334,11 +333,31 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
             userType.setText(R.string.guardian1);
         }
 
-        GlideApp.with(this)
-                .load(getString(R.string.baseUrl)+"/"+ImageUrl.replace("\\","/")).apply(RequestOptions.circleCropTransform())
-                .diskCacheStrategy(DiskCacheStrategy.NONE)
-                .skipMemoryCache(true)
-                .into(profilePicture);
+        try {
+            GlideApp.with(this)
+                    .asBitmap()
+                    .error(getResources().getDrawable(R.drawable.profileavater))
+                    .load(getString(R.string.baseUrl)+"/"+ImageUrl.replace("\\","/")).apply(RequestOptions.circleCropTransform())
+                    .apply(RequestOptions.circleCropTransform())
+                    .diskCacheStrategy(DiskCacheStrategy.NONE)
+                    .skipMemoryCache(true)
+                    .into(new SimpleTarget<Bitmap>() {
+                        @Override
+                        public void onResourceReady(@NonNull Bitmap resource, Transition<? super Bitmap> transition) {
+                            if(resource != null) {
+                                profilePicture.setImageBitmap(resource);
+                            }
+                        }
+                        @Override
+                        public void onLoadFailed(Drawable errorDrawable) {
+                            super.onLoadFailed(errorDrawable);
+                            profilePicture.setImageDrawable(errorDrawable);
+                            Toast.makeText(SideNavigationMenuParentActivity.this,"No profile image found!!!",Toast.LENGTH_LONG).show();
+                        }
+                    });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         switch (UserTypeID) {
             case 1: prepareSuperAdminSideMenu();
@@ -687,9 +706,12 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
         headingRoutine.add("Exam Routine");
 
         List<String> headingAttendance = new ArrayList<>();
-        headingAttendance.add("Total Report");
+        headingAttendance.add("All Report");
         headingAttendance.add("Take Attendance");
-        headingAttendance.add("Show Attendance");
+        headingAttendance.add("Teacher Daily Report");
+        headingAttendance.add("Teacher Monthly Report");
+        headingAttendance.add("Student Daily Report");
+        headingAttendance.add("Student Monthly Report");
 
         List<String> headingSyllabus = new ArrayList<>();
 
@@ -865,6 +887,45 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
             }
 
             if((i == 3) && (i1 == 2) && (l == 2)) {
+                if(activityName.equals(AttendanceTeacherDaily.class.getName())){
+                    DrawerLayout drawer = findViewById(R.id.drawer_layout);
+                    if (drawer.isDrawerOpen(GravityCompat.START)) {
+                        drawer.closeDrawer(GravityCompat.START);
+                    }
+                } else {
+                    Intent intent = new Intent(getApplicationContext(), AttendanceTeacherDaily.class);
+                    startActivity(intent);
+                    finish();
+                }
+            }
+
+            if((i == 3) && (i1 == 3) && (l == 3)) {
+                if(activityName.equals(AttendanceTeacherMonthly.class.getName())){
+                    DrawerLayout drawer = findViewById(R.id.drawer_layout);
+                    if (drawer.isDrawerOpen(GravityCompat.START)) {
+                        drawer.closeDrawer(GravityCompat.START);
+                    }
+                } else {
+                    Intent intent = new Intent(getApplicationContext(), AttendanceTeacherMonthly.class);
+                    startActivity(intent);
+                    finish();
+                }
+            }
+
+            if((i == 3) && (i1 == 4) && (l == 4)) {
+                if(activityName.equals(AttendanceReportDailyMain.class.getName())){
+                    DrawerLayout drawer = findViewById(R.id.drawer_layout);
+                    if (drawer.isDrawerOpen(GravityCompat.START)) {
+                        drawer.closeDrawer(GravityCompat.START);
+                    }
+                } else {
+                    Intent intent = new Intent(getApplicationContext(), AttendanceReportDailyMain.class);
+                    startActivity(intent);
+                    finish();
+                }
+            }
+
+            if((i == 3) && (i1 == 5) && (l == 5)) {
                 if(activityName.equals(ShowAttendance.class.getName())){
                     DrawerLayout drawer = findViewById(R.id.drawer_layout);
                     if (drawer.isDrawerOpen(GravityCompat.START)) {
@@ -1131,9 +1192,12 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
         headingRoutine.add("Exam Routine");
 
         List<String> headingAttendance = new ArrayList<>();
-        headingAttendance.add("Total Report");
+        headingAttendance.add("All Report");
         headingAttendance.add("Take Attendance");
-        headingAttendance.add("Show Attendance");
+        headingAttendance.add("Teacher Daily Report");
+        headingAttendance.add("Teacher Monthly Report");
+        headingAttendance.add("Student Daily Report");
+        headingAttendance.add("Student Monthly Report");
 
         List<String> headingSyllabus = new ArrayList<>();
 
@@ -1309,15 +1373,39 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
             }
 
             if((i == 3) && (i1 == 2) && (l == 2)) {
-                if(activityName.equals(ShowAttendance.class.getName())){
+                if(activityName.equals(AttendanceTeacherDaily.class.getName())){
                     DrawerLayout drawer = findViewById(R.id.drawer_layout);
                     if (drawer.isDrawerOpen(GravityCompat.START)) {
                         drawer.closeDrawer(GravityCompat.START);
                     }
                 } else {
-                    Intent intent = new Intent(getApplicationContext(), ShowAttendance.class);
-                    intent.putExtra("fromDashBoard", false);
-                    intent.putExtra("fromSideMenu", true);
+                    Intent intent = new Intent(getApplicationContext(), AttendanceTeacherDaily.class);
+                    startActivity(intent);
+                    finish();
+                }
+            }
+
+            if((i == 3) && (i1 == 3) && (l == 3)) {
+                if(activityName.equals(AttendanceTeacherMonthly.class.getName())){
+                    DrawerLayout drawer = findViewById(R.id.drawer_layout);
+                    if (drawer.isDrawerOpen(GravityCompat.START)) {
+                        drawer.closeDrawer(GravityCompat.START);
+                    }
+                } else {
+                    Intent intent = new Intent(getApplicationContext(), AttendanceTeacherMonthly.class);
+                    startActivity(intent);
+                    finish();
+                }
+            }
+
+            if((i == 3) && (i1 == 4) && (l == 4)) {
+                if(activityName.equals(AttendanceReportDailyMain.class.getName())){
+                    DrawerLayout drawer = findViewById(R.id.drawer_layout);
+                    if (drawer.isDrawerOpen(GravityCompat.START)) {
+                        drawer.closeDrawer(GravityCompat.START);
+                    }
+                } else {
+                    Intent intent = new Intent(getApplicationContext(), AttendanceReportDailyMain.class);
                     startActivity(intent);
                     finish();
                 }
@@ -1575,7 +1663,8 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
 
         List<String> headingAttendance = new ArrayList<>();
         headingAttendance.add("Take Attendance");
-        headingAttendance.add("Show Attendance");
+        headingAttendance.add("Daily Report");
+        headingAttendance.add("Monthly Report");
 
         List<String> headingSyllabus = new ArrayList<>();
 
@@ -1738,6 +1827,19 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
             }
 
             if((i == 3) && (i1 == 1) && (l == 1)) {
+                if(activityName.equals(AttendanceReportDailyMain.class.getName())){
+                    DrawerLayout drawer = findViewById(R.id.drawer_layout);
+                    if (drawer.isDrawerOpen(GravityCompat.START)) {
+                        drawer.closeDrawer(GravityCompat.START);
+                    }
+                } else {
+                    Intent intent = new Intent(getApplicationContext(), AttendanceReportDailyMain.class);
+                    startActivity(intent);
+                    finish();
+                }
+            }
+
+            if((i == 3) && (i1 == 2) && (l == 2)) {
                 if(activityName.equals(ShowAttendance.class.getName())){
                     DrawerLayout drawer = findViewById(R.id.drawer_layout);
                     if (drawer.isDrawerOpen(GravityCompat.START)) {

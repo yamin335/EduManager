@@ -35,6 +35,7 @@ import onair.onems.R;
 import onair.onems.Services.RetrofitNetworkService;
 import onair.onems.mainactivities.SideNavigationMenuParentActivity;
 import onair.onems.mainactivities.TeacherMainScreen;
+import onair.onems.models.AttendanceSubjectModel;
 import onair.onems.models.ClassModel;
 import onair.onems.models.DepartmentModel;
 import onair.onems.models.MediumModel;
@@ -59,7 +60,7 @@ public class TakeAttendance extends SideNavigationMenuParentActivity {
     private ArrayList<SectionModel> allSectionArrayList;
     private ArrayList<MediumModel> allMediumArrayList;
     private ArrayList<DepartmentModel> allDepartmentArrayList;
-    private ArrayList<SubjectModel> allSubjectArrayList;
+    private ArrayList<AttendanceSubjectModel> allSubjectArrayList;
 
     private String[] tempSessionArray = {"Select Session"};
     private String[] tempClassArray = {"Select Class"};
@@ -74,7 +75,7 @@ public class TakeAttendance extends SideNavigationMenuParentActivity {
     private ShiftModel selectedShift = null;
     private SectionModel selectedSection = null;
     private MediumModel selectedMedium = null;
-    private SubjectModel selectedSubject = null;
+    private AttendanceSubjectModel selectedSubject = null;
     private DepartmentModel selectedDepartment = null;
     private boolean hasDepartment = false;
     private String selectedDate = "";
@@ -157,6 +158,11 @@ public class TakeAttendance extends SideNavigationMenuParentActivity {
         subject_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerSubject.setAdapter(subject_spinner_adapter);
 
+        Date date = Calendar.getInstance().getTime();
+        SimpleDateFormat df = new SimpleDateFormat("MM-dd-yyyy");
+        selectedDate = df.format(date);
+        datePicker.setText(selectedDate);
+
         datePicker.setOnClickListener(v -> {
             // calender class's instance and get current date , month and year from calender
             final Calendar c = Calendar.getInstance();
@@ -192,7 +198,7 @@ public class TakeAttendance extends SideNavigationMenuParentActivity {
                     bundle.putLong("ClassID",selectedClass.getClassID());
                     bundle.putLong("SectionID",selectedSection.getSectionID());
                     bundle.putLong("SubjectID",selectedSubject.getSubjectID());
-                    bundle.putLong("DepertmentID",selectedDepartment.getDepartmentID());
+                    bundle.putLong("DepartmentID",selectedDepartment.getDepartmentID());
                     bundle.putString("Date",selectedDate);
 
                     Intent tempIntent = new Intent(TakeAttendance.this, TakeAttendanceDetails.class);
@@ -265,7 +271,11 @@ public class TakeAttendance extends SideNavigationMenuParentActivity {
                         selectedDepartment = new DepartmentModel();
                         selectedSection = new SectionModel();
                         ClassDataGetRequest();
-                        SubjectDataGetRequest();
+                        if (UserTypeID == 1 || UserTypeID == 2) {
+                            SubjectDataGetRequest("0");
+                        } else {
+                            SubjectDataGetRequest(LoggedUserID);
+                        }
                         selectedSubject = null;
                     } catch (IndexOutOfBoundsException e) {
                         Toast.makeText(TakeAttendance.this,"No medium found !!!",Toast.LENGTH_LONG).show();
@@ -297,7 +307,11 @@ public class TakeAttendance extends SideNavigationMenuParentActivity {
                         selectedDepartment = new DepartmentModel();
                         selectedSection = new SectionModel();
                         DepartmentDataGetRequest();
-                        SubjectDataGetRequest();
+                        if (UserTypeID == 1 || UserTypeID == 2) {
+                            SubjectDataGetRequest("0");
+                        } else {
+                            SubjectDataGetRequest(LoggedUserID);
+                        }
                         selectedSubject = null;
                     } catch (IndexOutOfBoundsException e) {
                         Toast.makeText(TakeAttendance.this,"No class found !!!",Toast.LENGTH_LONG).show();
@@ -328,7 +342,11 @@ public class TakeAttendance extends SideNavigationMenuParentActivity {
                         selectedSection = new SectionModel();
                         SectionDataGetRequest();
                         if(hasDepartment){
-                            SubjectDataGetRequest();
+                            if (UserTypeID == 1 || UserTypeID == 2) {
+                                SubjectDataGetRequest("0");
+                            } else {
+                                SubjectDataGetRequest(LoggedUserID);
+                            }
                             selectedSubject = null;
                         }
                     } catch (IndexOutOfBoundsException e) {
@@ -358,7 +376,11 @@ public class TakeAttendance extends SideNavigationMenuParentActivity {
                 if(position != 0) {
                     try {
                         selectedSection = allSectionArrayList.get(position-1);
-                        SubjectDataGetRequest();
+                        if (UserTypeID == 1 || UserTypeID == 2) {
+                            SubjectDataGetRequest("0");
+                        } else {
+                            SubjectDataGetRequest(LoggedUserID);
+                        }
                         selectedSubject = null;
                     } catch (IndexOutOfBoundsException e) {
                         Toast.makeText(TakeAttendance.this,"No section found !!!",Toast.LENGTH_LONG).show();
@@ -640,10 +662,8 @@ public class TakeAttendance extends SideNavigationMenuParentActivity {
             subjectArrayList.add("Select Subject");
             for(int i = 0; i < subjectJsonArray.length(); ++i) {
                 JSONObject subjectJsonObject = subjectJsonArray.getJSONObject(i);
-                SubjectModel subjectModel = new SubjectModel(subjectJsonObject.getString("SubjectID"), subjectJsonObject.getString("SubjectNo"),
-                        subjectJsonObject.getString("SubjectName"), subjectJsonObject.getString("InsSubjectID"), subjectJsonObject.getString("InstituteID"),
-                        subjectJsonObject.getString("DepartmentID"), subjectJsonObject.getString("MediumID"), subjectJsonObject.getString("ClassID"),
-                        subjectJsonObject.getString("IsActive"), subjectJsonObject.getString("IsCombined"), subjectJsonObject.getString("ParentID"));
+                AttendanceSubjectModel subjectModel = new AttendanceSubjectModel(subjectJsonObject.getString("SubjectID"), subjectJsonObject.getString("SubjectNo"),
+                        subjectJsonObject.getString("SubjectName"));
                 allSubjectArrayList.add(subjectModel);
                 subjectArrayList.add(subjectModel.getSubjectName());
             }
@@ -909,10 +929,37 @@ public class TakeAttendance extends SideNavigationMenuParentActivity {
         }
     }
 
-    private void SubjectDataGetRequest() {
+    private void SubjectDataGetRequest(String TeacherID) {
         if(StaticHelperClass.isNetworkAvailable(this)) {
             dialog.show();
             CheckSelectedData();
+            Calendar c = Calendar.getInstance();
+            int DayID = 0;
+            int currentDay = c.get(Calendar.DAY_OF_WEEK);
+            switch (currentDay) {
+                case Calendar.SATURDAY:
+                    DayID = 1;
+                    break;
+                case Calendar.SUNDAY:
+                    DayID = 2;
+                    break;
+                case Calendar.MONDAY:
+                    DayID = 3;
+                    break;
+                case Calendar.TUESDAY:
+                    DayID = 4;
+                    break;
+                case Calendar.WEDNESDAY:
+                    DayID = 5;
+                    break;
+                case Calendar.THURSDAY:
+                    DayID = 6;
+                    break;
+                case Calendar.FRIDAY:
+                    DayID = 7;
+                    break;
+            }
+
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
                     .addConverterFactory(ScalarsConverterFactory.create())
@@ -922,7 +969,8 @@ public class TakeAttendance extends SideNavigationMenuParentActivity {
 
             Observable<String> observable = retrofit
                     .create(RetrofitNetworkService.class)
-                    .getInsSubject(InstituteID, selectedDepartment.getDepartmentID(), selectedMedium.getMediumID(), selectedClass.getClassID())
+                    .getSubAttendence(selectedMedium.getMediumID(), selectedClass.getClassID(), selectedDepartment.getDepartmentID(),
+                            selectedSection.getSectionID(), selectedShift.getShiftID(), selectedSession.getSessionID(), InstituteID, DayID, TeacherID )
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .unsubscribeOn(Schedulers.io());

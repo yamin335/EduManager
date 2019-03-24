@@ -1,6 +1,7 @@
 package onair.onems.models;
 
 public class ReportAllStudentRowModel {
+    private String UserID = "";
     private String UserName = "";
     private String RollNo = "";
     private String ClassName = "";
@@ -12,6 +13,14 @@ public class ReportAllStudentRowModel {
     public ReportAllStudentRowModel()
     {
 
+    }
+
+    public String getUserID() {
+        return UserID;
+    }
+
+    public void setUserID(String userID) {
+        UserID = userID;
     }
 
     public String getRollNo() {

@@ -24,7 +24,7 @@ public class SubjectAdapter extends RecyclerView.Adapter<SubjectAdapter.MyViewHo
 
         MyViewHolder(View view) {
             super(view);
-            subjectName = view.findViewById(R.id.name);
+            subjectName = view.findViewById(R.id.teacherName);
 
             view.setOnClickListener(view1 -> {
                 // send selected contact in callback

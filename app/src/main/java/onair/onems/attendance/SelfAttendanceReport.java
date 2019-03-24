@@ -4,8 +4,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
@@ -22,6 +24,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.transition.Transition;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -96,7 +101,7 @@ public class SelfAttendanceReport extends Fragment {
         totalClass = rootView.findViewById(R.id.totalClass);
         totalPresent = rootView.findViewById(R.id.totalPresent);
         ImageView studentImage = rootView.findViewById(R.id.studentImage);
-        TextView name = rootView.findViewById(R.id.name);
+        TextView name = rootView.findViewById(R.id.teacherName);
         TextView roll = rootView.findViewById(R.id.roll);
         TextView id = rootView.findViewById(R.id.Id);
         tableView.setColumnCount(4);
@@ -114,6 +119,7 @@ public class SelfAttendanceReport extends Fragment {
             ClassID=sharedPre.getLong("ClassID",0);
             SectionID=sharedPre.getLong("SectionID",0);
             SessionID = sharedPre.getLong("SessionID",0);
+            UserID = sharedPre.getString("UserID", "");
             userFullName = sharedPre.getString("UserFullName","");
             rollNo = sharedPre.getString("RollNo","");
             RFID = sharedPre.getString("RFID","");
@@ -170,10 +176,26 @@ public class SelfAttendanceReport extends Fragment {
 
         try {
             GlideApp.with(this)
-                    .load(getString(R.string.baseUrl)+"/"+ImageUrl.replace("\\","/")).apply(RequestOptions.circleCropTransform())
+                    .asBitmap()
+                    .error(getResources().getDrawable(R.drawable.profileavater))
+                    .load(getString(R.string.baseUrl)+"/"+ImageUrl.replace("\\","/"))
+                    .apply(RequestOptions.circleCropTransform())
                     .diskCacheStrategy(DiskCacheStrategy.NONE)
                     .skipMemoryCache(true)
-                    .into(studentImage);
+                    .into(new SimpleTarget<Bitmap>() {
+                        @Override
+                        public void onResourceReady(@NonNull Bitmap resource, Transition<? super Bitmap> transition) {
+                            if(resource != null) {
+                                studentImage.setImageBitmap(resource);
+                            }
+                        }
+                        @Override
+                        public void onLoadFailed(Drawable errorDrawable) {
+                            super.onLoadFailed(errorDrawable);
+                            studentImage.setImageDrawable(errorDrawable);
+                            Toast.makeText(getActivity(),"No image found!!!",Toast.LENGTH_LONG).show();
+                        }
+                    });
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -222,12 +244,13 @@ public class SelfAttendanceReport extends Fragment {
         spinnerMonth.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
                 try {
-                    selectedMonth = allMonthArrayList.get(position);
-                    MonthlyAttendanceDataGetRequest(selectedMonth.getMonthID());
+                    if (allMonthArrayList.size()>0) {
+                        selectedMonth = allMonthArrayList.get(position);
+                        MonthlyAttendanceDataGetRequest(selectedMonth.getMonthID());
+                    }
                 } catch (Exception e) {
-                    Toast.makeText(getActivity(),"No section found !!!",Toast.LENGTH_LONG).show();
+                    Toast.makeText(getActivity(),"No month found !!!",Toast.LENGTH_LONG).show();
                 }
             }
 
@@ -286,7 +309,11 @@ public class SelfAttendanceReport extends Fragment {
                 DailyAttendanceModel perDayAttendance = new DailyAttendanceModel();
                 perDayAttendance.setDate(dailyAttendanceJsonObject.getString("Date"));
                 perDayAttendance.setPresent(dailyAttendanceJsonObject.getString("Present"));
-                perDayAttendance.setLate(dailyAttendanceJsonObject.getString("Late"));
+                if (dailyAttendanceJsonObject.getString("Late").charAt(0) == '-') {
+                    StringBuilder lateTime = new StringBuilder(dailyAttendanceJsonObject.getString("Late"));
+                    lateTime.deleteCharAt(0);
+                    perDayAttendance.setLate(lateTime.toString());
+                }
                 perDayAttendance.setTotalClassDay(dailyAttendanceJsonObject.getString("TotalClassDay"));
                 perDayAttendance.setTotalPresent(dailyAttendanceJsonObject.getJSONArray("TotalPresent").optString(0));
                 DATA_TO_SHOW[i][0] = String.valueOf((i+1));
@@ -387,6 +414,9 @@ public class SelfAttendanceReport extends Fragment {
                         @Override
                         public void onError(Throwable e) {
                             dialog.dismiss();
+                            totalClass.setText("Total class: ");
+                            totalPresent.setText("Total present: ");
+                            dailyAttendanceList.clear();
                         }
 
                         @Override

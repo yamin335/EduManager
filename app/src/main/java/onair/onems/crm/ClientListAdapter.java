@@ -30,7 +30,7 @@ public class ClientListAdapter extends RecyclerView.Adapter<ClientListAdapter.My
 
         public MyViewHolder(View view) {
             super(view);
-            name = view.findViewById(R.id.name);
+            name = view.findViewById(R.id.teacherName);
             institute = view.findViewById(R.id.institute);
             address = view.findViewById(R.id.address);
             student = view.findViewById(R.id.student);

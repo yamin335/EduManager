@@ -28,11 +28,13 @@ public class NoticeDetails extends CommonToolbarParentActivity {
 
         TextView title = findViewById(R.id.title);
         TextView detail = findViewById(R.id.detail);
+        TextView date = findViewById(R.id.date);
 
         try {
             JSONObject notice = new JSONObject(getIntent().getStringExtra("notice"));
             title.setText(notice.getString("NoticeHead"));
             detail.setText(notice.getString("NoticeBody"));
+            date.setText(notice.getString("NoticeDate"));
         } catch (JSONException e) {
             e.printStackTrace();
         }

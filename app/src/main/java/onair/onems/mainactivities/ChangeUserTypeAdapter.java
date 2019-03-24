@@ -24,7 +24,7 @@ public class ChangeUserTypeAdapter extends RecyclerView.Adapter<ChangeUserTypeAd
 
         MyViewHolder(View view) {
             super(view);
-            UserTypeName = view.findViewById(R.id.name);
+            UserTypeName = view.findViewById(R.id.teacherName);
 
             view.setOnClickListener(view1 -> {
                 // send selected contact in callback

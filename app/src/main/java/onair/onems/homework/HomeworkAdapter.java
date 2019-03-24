@@ -29,7 +29,7 @@ public class HomeworkAdapter extends RecyclerView.Adapter<HomeworkAdapter.MyView
 
         MyViewHolder(View view) {
             super(view);
-            homeworkName = view.findViewById(R.id.name);
+            homeworkName = view.findViewById(R.id.teacherName);
             card = view.findViewById(R.id.card);
 
 //            view.setOnClickListener(new View.OnClickListener() {

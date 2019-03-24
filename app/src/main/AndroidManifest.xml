@@ -17,6 +17,7 @@
         android:roundIcon="@drawable/onair"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
         <provider
             android:name="android.support.v4.content.FileProvider"
             android:authorities="${applicationId}.provider"
@@ -44,9 +45,7 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-
-        <!-- Firebase Notifications -->
+        </activity> <!-- Firebase Notifications -->
         <service android:name=".service.MyFirebaseMessagingService">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
@@ -56,16 +55,12 @@
             <intent-filter>
                 <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
             </intent-filter>
-        </service>
-        <!-- ./Firebase Notifications -->
-
+        </service> <!-- ./Firebase Notifications -->
         <activity
             android:name=".login.LoginScreen"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="adjustResize"/>
-            <!--android:windowSoftInputMode="stateHidden|adjustPan"-->
-
+            android:windowSoftInputMode="adjustResize" /> <!-- android:windowSoftInputMode="stateHidden|adjustPan" -->
         <activity
             android:name=".mainactivities.StudentMainScreen"
             android:screenOrientation="portrait"
@@ -74,6 +69,16 @@
             android:name=".mainactivities.TeacherMainScreen"
             android:screenOrientation="portrait"
             android:theme="@style/SplashScreen" />
+        <activity android:name=".attendance.AttendanceTeacherDaily"
+            android:label="Daily Report"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden|adjustPan"/>
+        <activity android:name=".attendance.AttendanceTeacherMonthly"
+            android:label="Monthly Report"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden|adjustPan"/>
         <activity
             android:name=".attendance.TakeAttendance"
             android:label="Take Attendance"
@@ -119,6 +124,18 @@
         <activity
             android:name=".attendance.AttendanceAdminDashboard"
             android:label="Attendance"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden|adjustPan" />
+        <activity
+            android:name=".attendance.AttendanceReportDailyMain"
+            android:label="Daily Report"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden|adjustPan" />
+        <activity
+            android:name=".attendance.AttendanceReportDaily"
+            android:label="Daily Attendance Report"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="stateHidden|adjustPan" />
@@ -371,10 +388,11 @@
             android:label="Communication details"
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="stateHidden|adjustPan" />
-        <activity android:name=".Test"
+        <activity
+            android:name=".Test"
             android:label="Test"
             android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="stateHidden|adjustPan"/>
+            android:windowSoftInputMode="stateHidden|adjustPan" />
         <activity
             android:name=".PrivacyPolicy"
             android:label="Privacy Policy"
@@ -394,23 +412,22 @@
             android:name=".crm.ClientCommunicationDetailList"
             android:label="Details List"
             android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="stateHidden|adjustPan">
-
-        </activity>
+            android:windowSoftInputMode="stateHidden|adjustPan" />
         <activity
             android:name=".crm.WorkOrder"
             android:label="Work Order"
             android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="stateHidden|adjustPan">
-
-        </activity>
+            android:windowSoftInputMode="stateHidden|adjustPan" />
         <activity
             android:name=".accounts.IncomeStatement"
             android:label="Income Statement"
             android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="stateHidden|adjustPan">
-
-        </activity>
+            android:windowSoftInputMode="stateHidden|adjustPan" />
+        <activity
+            android:name=".studentlist.ReportAllStudentListDetails"
+            android:label="Student Information"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden|adjustPan" />
     </application>
 
 </manifest>

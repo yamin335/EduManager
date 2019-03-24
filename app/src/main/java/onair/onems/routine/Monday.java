@@ -40,7 +40,6 @@ public class Monday extends Fragment {
     private RoutineAdapter mAdapter;
     private RecyclerView recyclerView;
     private Disposable finalDisposer;
-    public CommonProgressDialog dialog;
 
     @Override
     public void onDestroy() {
@@ -62,10 +61,6 @@ public class Monday extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.routine_day_pager_item, container, false);
         recyclerView = rootView.findViewById(R.id.routinePeriods);
-
-        dialog = new CommonProgressDialog(getActivity());
-        Objects.requireNonNull(dialog.getWindow()).setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        dialog.setCancelable(false);
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         long instituteID = prefs.getLong("InstituteID", 0);
         long shiftID = prefs.getLong("ShiftID", 0);
@@ -114,7 +109,6 @@ public class Monday extends Fragment {
     void mondayRoutineDataGetRequest(String ShiftID, String MediumID, String ClassID, String SectionID,
                                      String DepartmentID, String DayID, String InstituteID) {
         if(StaticHelperClass.isNetworkAvailable(Objects.requireNonNull(getActivity()))) {
-            dialog.show();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
                     .addConverterFactory(ScalarsConverterFactory.create())
@@ -142,7 +136,6 @@ public class Monday extends Fragment {
 
                         @Override
                         public void onNext(String response) {
-                            dialog.show();
                             mAdapter = new RoutineAdapter(getActivity(), response, UserTypeID);
                             RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity());
                             recyclerView.setLayoutManager(mLayoutManager);
@@ -157,7 +150,6 @@ public class Monday extends Fragment {
 
                         @Override
                         public void onError(Throwable e) {
-                            dialog.dismiss();
                             Toast.makeText(getActivity() ,"Error getting routine !!!",Toast.LENGTH_LONG).show();
                         }
                     });

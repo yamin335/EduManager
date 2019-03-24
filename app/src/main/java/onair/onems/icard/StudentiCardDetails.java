@@ -163,7 +163,7 @@ public class StudentiCardDetails extends CommonToolbarParentActivity {
         checkBox = findViewById(R.id.checkbox);
 
         t_roll = findViewById(R.id.roll);
-        t_name = findViewById(R.id.name);
+        t_name = findViewById(R.id.teacherName);
         t_class = findViewById(R.id.classs);
         t_section = findViewById(R.id.section);
         t_birthDay = findViewById(R.id.birthday);

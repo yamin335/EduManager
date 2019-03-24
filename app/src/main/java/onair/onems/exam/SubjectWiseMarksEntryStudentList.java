@@ -76,10 +76,11 @@ public class SubjectWiseMarksEntryStudentList extends CommonToolbarParentActivit
 
             Observable<String> observable = retrofit
                     .create(RetrofitNetworkService.class)
-                    .getSubjectWiseMarks(intent.getLongExtra("InstituteID", 0), intent.getLongExtra("ClassID", 0),
+                    .getSubjectWiseMarks("0", intent.getLongExtra("InstituteID", 0), intent.getLongExtra("ClassID", 0),
                             intent.getLongExtra("SectionID", 0), intent.getLongExtra("DepartmentID", 0),
                             intent.getLongExtra("MediumID", 0), intent.getLongExtra("ShiftID", 0),
-                            intent.getLongExtra("SubjectID", 0), intent.getLongExtra("ExamID", 0))
+                            intent.getLongExtra("SubjectID", 0), intent.getLongExtra("ExamID", 0),
+                            intent.getLongExtra("SessionID", 0))
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .unsubscribeOn(Schedulers.io());
@@ -109,7 +110,7 @@ public class SubjectWiseMarksEntryStudentList extends CommonToolbarParentActivit
                         @Override
                         public void onError(Throwable e) {
                             dialog.dismiss();
-                            Toast.makeText(getApplicationContext(),"ERROR posting token",Toast.LENGTH_LONG).show();
+                            Toast.makeText(getApplicationContext(),"ERROR getting student list",Toast.LENGTH_LONG).show();
                         }
                     });
         } else {
@@ -139,9 +140,9 @@ public class SubjectWiseMarksEntryStudentList extends CommonToolbarParentActivit
 
     @Override
     public void onStudentSelected(JSONObject result) {
-        Intent intent = new Intent(SubjectWiseMarksEntryStudentList.this, SubjectWiseMarksEntryInputs.class);
-        intent.putExtra("student", result.toString());
-        intent.putExtra("SubjectID", SubjectID);
-        startActivity(intent);
+        Intent otherIntent = new Intent(SubjectWiseMarksEntryStudentList.this, SubjectWiseMarksEntryInputs.class);
+        otherIntent.putExtra("student", result.toString());
+        otherIntent.putExtra("SubjectID", SubjectID);
+        startActivity(otherIntent);
     }
 }

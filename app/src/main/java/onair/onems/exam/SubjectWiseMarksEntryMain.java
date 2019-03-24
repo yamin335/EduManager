@@ -18,6 +18,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Objects;
 
 import io.reactivex.Observable;
@@ -28,6 +29,7 @@ import io.reactivex.schedulers.Schedulers;
 import onair.onems.R;
 import onair.onems.Services.RetrofitNetworkService;
 import onair.onems.Services.StaticHelperClass;
+import onair.onems.attendance.TakeAttendance;
 import onair.onems.mainactivities.SideNavigationMenuParentActivity;
 import onair.onems.mainactivities.TeacherMainScreen;
 import onair.onems.models.ClassModel;
@@ -35,6 +37,7 @@ import onair.onems.models.DepartmentModel;
 import onair.onems.models.ExamModel;
 import onair.onems.models.MediumModel;
 import onair.onems.models.SectionModel;
+import onair.onems.models.SessionModel;
 import onair.onems.models.ShiftModel;
 import onair.onems.models.SubjectModel;
 import retrofit2.Retrofit;
@@ -44,8 +47,9 @@ import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 public class SubjectWiseMarksEntryMain extends SideNavigationMenuParentActivity {
 
-    private Spinner spinnerShift, spinnerMedium, spinnerClass, spinnerDepartment, spinnerSection, spinnerSubject, spinnerExam;
+    private Spinner spinnerSession, spinnerShift, spinnerMedium, spinnerClass, spinnerDepartment, spinnerSection, spinnerSubject, spinnerExam;
 
+    private ArrayList<SessionModel> allSessionArrayList;
     private ArrayList<ShiftModel> allShiftArrayList;
     private ArrayList<MediumModel> allMediumArrayList;
     private ArrayList<ClassModel> allClassArrayList;
@@ -54,6 +58,7 @@ public class SubjectWiseMarksEntryMain extends SideNavigationMenuParentActivity 
     private ArrayList<SubjectModel> allSubjectArrayList;
     private ArrayList<ExamModel> allExamArrayList;
 
+    private String[] tempSessionArray = {"Select Session"};
     private String[] tempShiftArray = {"Select Shift"};
     private String[] tempMediumArray = {"Select Medium"};
     private String[] tempClassArray = {"Select Class"};
@@ -62,6 +67,7 @@ public class SubjectWiseMarksEntryMain extends SideNavigationMenuParentActivity 
     private String[] tempSubjectArray = {"Select Subject"};
     private String[] tempExamArray = {"Select Exam"};
 
+    private SessionModel selectedSession = null;
     private ShiftModel selectedShift = null;
     private MediumModel selectedMedium = null;
     private ClassModel selectedClass = null;
@@ -90,12 +96,14 @@ public class SubjectWiseMarksEntryMain extends SideNavigationMenuParentActivity 
         LinearLayout parentActivityLayout = findViewById(R.id.contentMain);
         parentActivityLayout.addView(childActivityLayout, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
 
+        selectedSession = new SessionModel();
         selectedShift = new ShiftModel();
         selectedMedium = new MediumModel();
         selectedClass = new ClassModel();
         selectedDepartment = new DepartmentModel();
         selectedSection = new SectionModel();
 
+        spinnerSession = findViewById(R.id.spinnerSession);
         spinnerShift = findViewById(R.id.spinnerShift);
         spinnerMedium = findViewById(R.id.spinnerMedium);
         spinnerClass = findViewById(R.id.spinnerClass);
@@ -123,9 +131,14 @@ public class SubjectWiseMarksEntryMain extends SideNavigationMenuParentActivity 
                 intent.putExtra("ShiftID", selectedShift.getShiftID());
                 intent.putExtra("SubjectID", selectedSubject.getSubjectID());
                 intent.putExtra("ExamID", selectedExam.getExamID());
+                intent.putExtra("SessionID", selectedSession.getSessionID());
                 startActivity(intent);
             }
         });
+
+        ArrayAdapter<String> session_spinner_adapter = new ArrayAdapter<>(this, R.layout.spinner_item, tempSessionArray);
+        session_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerSession.setAdapter(session_spinner_adapter);
 
         ArrayAdapter<String> shift_spinner_adapter = new ArrayAdapter<>(this, R.layout.spinner_item, tempShiftArray);
         shift_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -154,6 +167,27 @@ public class SubjectWiseMarksEntryMain extends SideNavigationMenuParentActivity 
         ArrayAdapter<String> exam_spinner_adapter = new ArrayAdapter<>(this, R.layout.spinner_item, tempExamArray);
         exam_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerExam.setAdapter(exam_spinner_adapter);
+
+        spinnerSession.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                if(position != 0) {
+                    try {
+                        selectedSession = allSessionArrayList.get(position-1);
+                    } catch (IndexOutOfBoundsException e) {
+                        Toast.makeText(SubjectWiseMarksEntryMain.this,"No session found !!!",Toast.LENGTH_LONG).show();
+                    }
+                } else {
+                    selectedSession = new SessionModel();
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
 
         spinnerShift.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -346,8 +380,89 @@ public class SubjectWiseMarksEntryMain extends SideNavigationMenuParentActivity 
             }
         });
 
+        SessionDataGetRequest();
         ShiftDataGetRequest();
         MediumDataGetRequest();
+    }
+
+    private void SessionDataGetRequest() {
+        if (StaticHelperClass.isNetworkAvailable(this)) {
+            dialog.show();
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(getString(R.string.baseUrl))
+                    .addConverterFactory(ScalarsConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .build();
+
+            Observable<String> observable = retrofit
+                    .create(RetrofitNetworkService.class)
+                    .getallsession()
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io());
+
+            finalDisposer.add( observable
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io())
+                    .subscribeWith(new DisposableObserver<String>() {
+
+                        @Override
+                        public void onNext(String response) {
+                            dialog.dismiss();
+                            parseSessionJsonData(response);
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+                            dialog.dismiss();
+                            Toast.makeText(SubjectWiseMarksEntryMain.this,"Session not found!!! ",
+                                    Toast.LENGTH_LONG).show();
+                        }
+
+                        @Override
+                        public void onComplete() {
+
+                        }
+                    }));
+        } else {
+            Toast.makeText(this,"Please check your internet connection and select again!!! ",
+                    Toast.LENGTH_LONG).show();
+        }
+    }
+
+    void parseSessionJsonData(String jsonString) {
+        try {
+            String year = Integer.toString(Calendar.getInstance().get(Calendar.YEAR));
+            int yearIndex = 0;
+            allSessionArrayList = new ArrayList<>();
+            JSONArray sessionJsonArray = new JSONArray(jsonString);
+            ArrayList<String> sessionArrayList = new ArrayList<>();
+            sessionArrayList.add("Select Session");
+            for(int i = 0; i < sessionJsonArray.length(); ++i) {
+                JSONObject sessionJsonObject = sessionJsonArray.getJSONObject(i);
+                SessionModel sessionModel = new SessionModel(sessionJsonObject.getString("SessionID"), sessionJsonObject.getString("SessionName"));
+                allSessionArrayList.add(sessionModel);
+                sessionArrayList.add(sessionModel.getSessionName());
+                if (year.equalsIgnoreCase(sessionModel.getSessionName())) {
+                    yearIndex = i;
+                }
+            }
+            try {
+                String[] strings = new String[sessionArrayList.size()];
+                strings = sessionArrayList.toArray(strings);
+                ArrayAdapter<String> session_spinner_adapter = new ArrayAdapter<>(this,R.layout.spinner_item, strings);
+                session_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                spinnerSession.setAdapter(session_spinner_adapter);
+                spinnerSession.setSelection(yearIndex+1);
+                selectedSession = allSessionArrayList.get(yearIndex);
+            } catch (IndexOutOfBoundsException e) {
+                Toast.makeText(this,"No session found !!!",Toast.LENGTH_LONG).show();
+            }
+        } catch (JSONException e) {
+            Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
+        }
     }
 
     private void ShiftDataGetRequest() {
@@ -770,7 +885,7 @@ public class SubjectWiseMarksEntryMain extends SideNavigationMenuParentActivity 
                 JSONObject subjectJsonObject = subjectJsonArray.getJSONObject(i);
                 SubjectModel subjectModel = new SubjectModel(subjectJsonObject.getString("SubjectID"), subjectJsonObject.getString("SubjectNo"),
                         subjectJsonObject.getString("SubjectName"), subjectJsonObject.getString("InsSubjectID"), subjectJsonObject.getString("InstituteID"),
-                        subjectJsonObject.getString("DpartmentID"), subjectJsonObject.getString("MediumID"), subjectJsonObject.getString("ClassID"),
+                        subjectJsonObject.getString("DepartmentID"), subjectJsonObject.getString("MediumID"), subjectJsonObject.getString("ClassID"),
                         subjectJsonObject.getString("IsActive"), subjectJsonObject.getString("IsCombined"), subjectJsonObject.getString("ParentID"));
                 allSubjectArrayList.add(subjectModel);
                 subjectArrayList.add(subjectModel.getSubjectName());

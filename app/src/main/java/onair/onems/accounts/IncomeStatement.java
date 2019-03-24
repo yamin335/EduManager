@@ -112,7 +112,7 @@ public class IncomeStatement extends SideNavigationMenuParentActivity {
 
         ArrayAdapter<String> year_spinner_adapter = new ArrayAdapter<>(this, R.layout.spinner_item, tempYearArray);
         year_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerBranch.setAdapter(year_spinner_adapter);
+        spinnerYear.setAdapter(year_spinner_adapter);
 
         spinnerBranch.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override

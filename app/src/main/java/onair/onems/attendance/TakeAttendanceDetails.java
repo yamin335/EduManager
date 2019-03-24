@@ -52,7 +52,7 @@ public class TakeAttendanceDetails extends CommonToolbarParentActivity {
 
     private TakeAttendanceAdapter adapter;
     private ArrayList<AttendanceStudentModel> attendanceSheetArrayList;
-    private long InstituteID, MediumID, ShiftID, ClassID, SectionID, SubjectID, DepertmentID, SessionID;
+    private long InstituteID, MediumID, ShiftID, ClassID, SectionID, SubjectID, DepartmentID, SessionID;
     private String date, UserID, SubAtdID;
     private JsonObject postDataJsonObject;
     private CompositeDisposable finalDisposer = new CompositeDisposable();
@@ -98,7 +98,7 @@ public class TakeAttendanceDetails extends CommonToolbarParentActivity {
         ClassID = StudentSelection.getLong("ClassID",0);
         SectionID = StudentSelection.getLong("SectionID",0);
         SubjectID = StudentSelection.getLong("SubjectID",0);
-        DepertmentID = StudentSelection.getLong("DepertmentID",0);
+        DepartmentID = StudentSelection.getLong("DepartmentID",0);
         date = StudentSelection.getString("Date", "");
 
         RecyclerView recyclerView = findViewById(R.id.recycler_view);
@@ -118,6 +118,9 @@ public class TakeAttendanceDetails extends CommonToolbarParentActivity {
 
         try {
             JSONArray studentJsonArray = new JSONArray(jsonString);
+            ArrayList<Long> institute = new ArrayList<>();
+            institute.add(InstituteID);
+            institute.add(InstituteID);
             for(int i = 0; i < studentJsonArray.length(); ++i) {
                 JSONObject studentJsonObject = studentJsonArray.getJSONObject(i);
                 AttendanceStudentModel attendanceStudentModel = new AttendanceStudentModel(
@@ -153,7 +156,11 @@ public class TakeAttendanceDetails extends CommonToolbarParentActivity {
                         studentJsonObject.getString("Class"),
                         studentJsonObject.getString("DisplayDate"),
                         "true",
-                        "0");
+                        "0",
+                        studentJsonObject.getString("UserFirstName"),
+                        studentJsonObject.getString("UserLastName"),
+                        studentJsonObject.getString("ImageUrl"),
+                        institute);
                 attendanceSheetArrayList.add(attendanceStudentModel);
                 SubAtdID = studentJsonObject.getString("SubAtdID");
             }
@@ -185,7 +192,7 @@ public class TakeAttendanceDetails extends CommonToolbarParentActivity {
                 attendanceSheetModel.setSubAtdID(SubAtdID);
                 attendanceSheetModel.setSubjectID(Long.toString(SubjectID));
                 attendanceSheetModel.setSectionID(Long.toString(SectionID==0 ? -2 : SectionID));
-                attendanceSheetModel.setDepartmentID(Long.toString(DepertmentID==0 ? -2 : DepertmentID));
+                attendanceSheetModel.setDepartmentID(Long.toString(DepartmentID==0 ? -2 : DepartmentID));
                 attendanceSheetModel.setMediumID(Long.toString(MediumID==0 ? -2 : MediumID));
                 attendanceSheetModel.setShiftID(Long.toString(ShiftID==0 ? -2 : ShiftID));
                 attendanceSheetModel.setClassID(Long.toString(ClassID==0 ? -2 : ClassID));
@@ -281,7 +288,7 @@ public class TakeAttendanceDetails extends CommonToolbarParentActivity {
 
             Observable<String> observable = retrofit
                     .create(RetrofitNetworkService.class)
-                    .getHrmSubWiseAtdDetail(InstituteID, MediumID, ShiftID, ClassID, SectionID, SubjectID, DepertmentID, date, SessionID)
+                    .getHrmSubWiseAtdDetail(InstituteID, MediumID, ShiftID, ClassID, SectionID, SubjectID, DepartmentID, date, SessionID)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .unsubscribeOn(Schedulers.io());
@@ -294,8 +301,8 @@ public class TakeAttendanceDetails extends CommonToolbarParentActivity {
 
                         @Override
                         public void onNext(String response) {
-                            dialog.dismiss();
                             prepareAlbums(response);
+                            dialog.dismiss();
                         }
 
                         @Override

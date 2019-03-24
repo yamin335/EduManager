@@ -55,6 +55,7 @@ import onair.onems.notice.NoticeMainScreen;
 import onair.onems.notification.NotificationDetails;
 import onair.onems.notification.NotificationMainScreen;
 import onair.onems.result.ResultMainScreen;
+import onair.onems.routine.ExamRoutineMainScreen;
 import onair.onems.routine.RoutineMainScreen;
 import onair.onems.syllabus.SyllabusMainScreen;
 import onair.onems.user.Profile;
@@ -265,7 +266,7 @@ public class StudentMainScreen extends AppCompatActivity {
             finish();
         });
 
-        // Exam module start point
+        // Homework module start point
         homework.setOnClickListener(v -> {
             Intent mainIntent = new Intent(StudentMainScreen.this, HomeworkMainScreen.class);
             StudentMainScreen.this.startActivity(mainIntent);
@@ -294,11 +295,11 @@ public class StudentMainScreen extends AppCompatActivity {
 //                }
         });
 
-        // Contact module start point
+        // Exam module start point
         exam.setOnClickListener(v -> {
-//                Intent mainIntent = new Intent(StudentMainScreen.this, NotificationMainScreen.class);
-//                startActivity(mainIntent);
-//                finish();
+                Intent mainIntent = new Intent(StudentMainScreen.this, ExamRoutineMainScreen.class);
+                startActivity(mainIntent);
+                finish();
         });
 
         notificationCounter = findViewById(R.id.notificationCounter);

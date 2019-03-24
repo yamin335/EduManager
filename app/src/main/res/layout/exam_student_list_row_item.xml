@@ -26,7 +26,7 @@
             android:textSize="15sp"
             android:textColor="#505458"/>
         <TextView
-            android:id="@+id/name"
+            android:id="@+id/teacherName"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"

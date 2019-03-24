@@ -24,7 +24,7 @@ public class StudentListAdapter extends RecyclerView.Adapter<StudentListAdapter.
 
         public MyViewHolder(View view) {
             super(view);
-            name = view.findViewById(R.id.name);
+            name = view.findViewById(R.id.teacherName);
             roll = view.findViewById(R.id.roll);
 
             view.setOnClickListener(holderView -> {

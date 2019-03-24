@@ -9,6 +9,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -18,16 +19,15 @@ import android.widget.Toast;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Objects;
 
 import io.reactivex.Observable;
-import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.Disposable;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
 import onair.onems.R;
 import onair.onems.Services.RetrofitNetworkService;
@@ -43,7 +43,7 @@ public class SubjectWiseMarksEntryInputs extends CommonToolbarParentActivity {
     private JSONObject student;
     private int totalMarks = 0, mcqMark = 0, writtenMark = 0, attendanceMark = 0, practicalMark = 0;
     private long SubjectID;
-    private Disposable finalDisposer;
+    private CompositeDisposable finalDisposer = new CompositeDisposable();
 
     @Override
     protected void onDestroy() {
@@ -55,6 +55,7 @@ public class SubjectWiseMarksEntryInputs extends CommonToolbarParentActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
         LayoutInflater inflater = (LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         final View childActivityLayout = Objects.requireNonNull(inflater).inflate(R.layout.exam_subject_wise_marks_entry_inputs, null);
@@ -93,36 +94,32 @@ public class SubjectWiseMarksEntryInputs extends CommonToolbarParentActivity {
             }
         });
 
-        Button save = findViewById(R.id.save);
+        Button save = findViewById(R.id.show);
         save.setOnClickListener(view -> {
+
             JSONObject jsonObject = new JSONObject();
             try {
-                student.put("MCQ", mcqMark);
-                student.put("Written", writtenMark);
-                student.put("Precticle", practicalMark);
-                student.put("Attendance", attendanceMark);
-                student.put("Total", totalMarks);
-                jsonObject.put("ExamMarkID", student.get("ExamMarkID"));
-                jsonObject.put("ExamID", student.get("examID"));
-                jsonObject.put("SectionID", student.get("SectionID"));
-                jsonObject.put("ShiftID", student.get("ShiftID"));
-                jsonObject.put("UserID", student.get("UserID"));
-                jsonObject.put("DepartmentID", student.get("DepartmentID"));
-                jsonObject.put("MeduimID", student.get("MediumID"));
-                jsonObject.put("ClassID", student.get("ClassID"));
+                jsonObject.put("MCQ", mcqMark);
+                jsonObject.put("Written", writtenMark);
+                jsonObject.put("Precticle", practicalMark);
+                jsonObject.put("Attendance", attendanceMark);
+                jsonObject.put("Total", totalMarks);
+                jsonObject.put("ExamMarkID", student.getString("ExamMarkID").equalsIgnoreCase("null")?"null":student.get("ExamMarkID"));
+                jsonObject.put("ExamID", student.getString("examID").equalsIgnoreCase("null")?"null":student.get("examID"));
+                jsonObject.put("SectionID", student.getString("SectionID").equalsIgnoreCase("null")?"null":student.get("SectionID"));
+                jsonObject.put("ShiftID", student.getString("ShiftID").equalsIgnoreCase("null")?"null":student.get("ShiftID"));
+                jsonObject.put("UserID", student.getString("UserID").equalsIgnoreCase("null")?"null":student.get("UserID"));
+                jsonObject.put("DepartmentID", student.getString("DepartmentID").equalsIgnoreCase("null")?"null":student.get("DepartmentID"));
+                jsonObject.put("MeduimID", student.getString("MediumID").equalsIgnoreCase("null")?"null":student.get("MediumID"));
+                jsonObject.put("ClassID", student.getString("ClassID").equalsIgnoreCase("null")?"null":student.get("ClassID"));
                 jsonObject.put("SubjectID", SubjectID);
-                jsonObject.put("MCQ", student.get("MCQ"));
-                jsonObject.put("Written", student.get("Written"));
-                jsonObject.put("Total", student.get("Total"));
-                jsonObject.put("InstituteID", student.get("InstituteID"));
-                jsonObject.put("IsAbsent", student.get("IsAbsent"));
+                jsonObject.put("InstituteID", student.getString("InstituteID").equalsIgnoreCase("null")?"null":student.get("InstituteID"));
+                jsonObject.put("SessionID", student.getString("SessionID").equalsIgnoreCase("null")?"null":student.get("SessionID"));
+                jsonObject.put("IsAbsent", student.getString("IsAbsent").equalsIgnoreCase("null")?"null":student.get("IsAbsent"));
                 SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(SubjectWiseMarksEntryInputs.this);
                 String LoggedUserID = prefs.getString("UserID", "0");
                 jsonObject.put("LoggedUserID", LoggedUserID);
                 jsonObject.put("IsDeleted", 0);
-                JSONArray jsonArray = new JSONArray();
-                jsonArray.put(student);
-                jsonObject.put("examMarks", jsonArray);
                 String stringObject = jsonObject.toString();
                 postMarks(stringObject);
 
@@ -262,21 +259,16 @@ public class SubjectWiseMarksEntryInputs extends CommonToolbarParentActivity {
 
             Observable<String> observable = retrofit
                     .create(RetrofitNetworkService.class)
-                    .setMarks(jsonObject)
+                    .indivisualSetMark(jsonObject)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .unsubscribeOn(Schedulers.io());
 
-            observable
+            finalDisposer.add(observable
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .unsubscribeOn(Schedulers.io())
-                    .subscribe(new Observer<String>() {
-
-                        @Override
-                        public void onSubscribe(Disposable d) {
-                            finalDisposer = d;
-                        }
+                    .subscribeWith(new DisposableObserver<String>() {
 
                         @Override
                         public void onNext(String returnData) {
@@ -293,9 +285,9 @@ public class SubjectWiseMarksEntryInputs extends CommonToolbarParentActivity {
                         @Override
                         public void onError(Throwable e) {
                             dialog.dismiss();
-                            Toast.makeText(getApplicationContext(),"ERROR posting token",Toast.LENGTH_LONG).show();
+                            Toast.makeText(getApplicationContext(),"ERROR posting data",Toast.LENGTH_LONG).show();
                         }
-                    });
+                    }));
         } else {
             Toast.makeText(this,"Please check your internet connection and select again!!! ",
                     Toast.LENGTH_LONG).show();

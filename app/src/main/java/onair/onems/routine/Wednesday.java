@@ -42,7 +42,6 @@ public class Wednesday extends Fragment {
     private RoutineAdapter mAdapter;
     private RecyclerView recyclerView;
     private Disposable finalDisposer;
-    public CommonProgressDialog dialog;
 
     @Override
     public void onDestroy() {
@@ -64,10 +63,6 @@ public class Wednesday extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.routine_day_pager_item, container, false);
-
-        dialog = new CommonProgressDialog(getActivity());
-        Objects.requireNonNull(dialog.getWindow()).setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        dialog.setCancelable(false);
         recyclerView = rootView.findViewById(R.id.routinePeriods);
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
@@ -118,7 +113,6 @@ public class Wednesday extends Fragment {
     void wednesdayRoutineDataGetRequest(String ShiftID, String MediumID, String ClassID, String SectionID,
                                         String DepartmentID, String DayID, String InstituteID) {
         if(StaticHelperClass.isNetworkAvailable(Objects.requireNonNull(getActivity()))) {
-            dialog.show();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.baseUrl))
                     .addConverterFactory(ScalarsConverterFactory.create())
@@ -146,7 +140,6 @@ public class Wednesday extends Fragment {
 
                         @Override
                         public void onNext(String response) {
-                            dialog.dismiss();
                             mAdapter = new RoutineAdapter(getActivity(), response, UserTypeID);
                             RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity());
                             recyclerView.setLayoutManager(mLayoutManager);
@@ -161,7 +154,6 @@ public class Wednesday extends Fragment {
 
                         @Override
                         public void onError(Throwable e) {
-                            dialog.dismiss();
                             Toast.makeText(getActivity() ,"Error getting routine !!!",Toast.LENGTH_LONG).show();
                         }
                     });

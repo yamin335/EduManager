@@ -1,9 +1,9 @@
 package onair.onems.studentlist;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,12 +13,9 @@ import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-
-import com.bumptech.glide.load.DataSource;
-import com.bumptech.glide.load.engine.GlideException;
-import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.RequestOptions;
-import com.bumptech.glide.request.target.Target;
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.transition.Transition;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,28 +31,24 @@ public class ReportAllStudentShowListAdapter extends RecyclerView.Adapter<Report
     private ReportAllStudentShowListAdapterListener listener;
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
-        public TextView studentName, studentRoll, studentClass, studentRFID;
-        public ImageView thumbnail;
+        private TextView studentName, studentRoll, studentClass, studentRFID;
+        private ImageView thumbnail;
         private ProgressBar progressBar;
 
         public MyViewHolder(View view) {
             super(view);
-            studentName = view.findViewById(R.id.name);
+            studentName = view.findViewById(R.id.teacherName);
             studentRoll = view.findViewById(R.id.roll);
             studentClass = view.findViewById(R.id.classs);
             studentRFID = view.findViewById(R.id.rfid);
             thumbnail = view.findViewById(R.id.thumbnail);
             progressBar = view.findViewById(R.id.spin_kit);
-
-            view.setOnClickListener(view1 -> {
-                // send selected contact in callback
-                listener.onStudentSelected(studentListFiltered.get(getAdapterPosition()));
-            });
+            view.setOnClickListener( v -> listener.onStudentSelected(studentListFiltered.get(this.getAdapterPosition())));
         }
     }
 
 
-    public ReportAllStudentShowListAdapter(Context context, List<ReportAllStudentRowModel> studentList, ReportAllStudentShowListAdapterListener listener) {
+    ReportAllStudentShowListAdapter(Context context, List<ReportAllStudentRowModel> studentList, ReportAllStudentShowListAdapterListener listener) {
         this.context = context;
         this.listener = listener;
         this.studentList = studentList;
@@ -72,7 +65,7 @@ public class ReportAllStudentShowListAdapter extends RecyclerView.Adapter<Report
     }
 
     @Override
-    public void onBindViewHolder(@NonNull final MyViewHolder holder, final int position) {
+    public void onBindViewHolder(@NonNull MyViewHolder holder, final int position) {
         ReportAllStudentRowModel reportAllStudentRowModel = studentListFiltered.get(position);
         holder.studentName.setText("Name: "+reportAllStudentRowModel.getUserName());
         holder.studentRoll.setText("Roll: "+reportAllStudentRowModel.getRollNo());
@@ -91,23 +84,31 @@ public class ReportAllStudentShowListAdapter extends RecyclerView.Adapter<Report
         holder.studentClass.setText("Class: "+reportAllStudentRowModel.getClassName()+s+d);
         holder.studentRFID.setText("RFID: "+reportAllStudentRowModel.getRFID());
 
-        GlideApp.with(context)
-                .load(context.getString(R.string.baseUrl)+"/"+reportAllStudentRowModel.getImageUrl().replace("\\","/"))
-                .listener(new RequestListener<Drawable>() {
-                    @Override
-                    public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
-                        holder.progressBar.setVisibility(View.GONE);
-                        return false;
-                    }
+        try {
+            GlideApp.with(context)
+                    .asBitmap()
+                    .error(context.getResources().getDrawable(R.drawable.profileavater))
+                    .load(context.getString(R.string.baseUrl)+"/"+reportAllStudentRowModel.getImageUrl().replace("\\","/"))
+                    .apply(RequestOptions.circleCropTransform())
+                    .into(new SimpleTarget<Bitmap>() {
+                        @Override
+                        public void onResourceReady(@NonNull Bitmap resource, Transition<? super Bitmap> transition) {
+                            holder.progressBar.setVisibility(View.GONE);
+                            if(resource != null) {
+                                holder.thumbnail.setImageBitmap(resource);
+                            }
+                        }
+                        @Override
+                        public void onLoadFailed(Drawable errorDrawable) {
+                            super.onLoadFailed(errorDrawable);
+                            holder.thumbnail.setImageDrawable(errorDrawable);
+                            holder.progressBar.setVisibility(View.GONE);
+                        }
+                    });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-                    @Override
-                    public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
-                        holder.progressBar.setVisibility(View.GONE);
-                        return false;
-                    }
-                })
-                .apply(RequestOptions.circleCropTransform())
-                .into(holder.thumbnail);
     }
 
     @Override

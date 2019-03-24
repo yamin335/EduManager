@@ -23,6 +23,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Objects;
 
 import io.reactivex.Observable;
@@ -493,6 +494,8 @@ public class OtherResult extends Fragment {
 
     void parseSessionJsonData(String jsonString) {
         try {
+            String year = Integer.toString(Calendar.getInstance().get(Calendar.YEAR));
+            int yearIndex = 0;
             allSessionArrayList = new ArrayList<>();
             JSONArray sessionJsonArray = new JSONArray(jsonString);
             ArrayList<String> sessionArrayList = new ArrayList<>();
@@ -502,18 +505,20 @@ public class OtherResult extends Fragment {
                 SessionModel sessionModel = new SessionModel(sessionJsonObject.getString("SessionID"), sessionJsonObject.getString("SessionName"));
                 allSessionArrayList.add(sessionModel);
                 sessionArrayList.add(sessionModel.getSessionName());
+                if (year.equalsIgnoreCase(sessionModel.getSessionName())) {
+                    yearIndex = i;
+                }
             }
-//            if(allSessionArrayList.size() == 1){
-//                selectedSession = allSessionArrayList.get(0);
-//            }
             try {
                 String[] strings = new String[sessionArrayList.size()];
                 strings = sessionArrayList.toArray(strings);
-                ArrayAdapter<String> session_spinner_adapter = new ArrayAdapter<>(Objects.requireNonNull(getActivity()),R.layout.spinner_item, strings);
+                ArrayAdapter<String> session_spinner_adapter = new ArrayAdapter<>(getActivity(),R.layout.spinner_item, strings);
                 session_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinnerSession.setAdapter(session_spinner_adapter);
+                spinnerSession.setSelection(yearIndex+1);
+                selectedSession = allSessionArrayList.get(yearIndex);
             } catch (IndexOutOfBoundsException e) {
-                Toast.makeText(getActivity(),"No section found !!!",Toast.LENGTH_LONG).show();
+                Toast.makeText(getActivity(),"No session found !!!",Toast.LENGTH_LONG).show();
             }
         } catch (JSONException e) {
             Toast.makeText(getActivity(),""+e,Toast.LENGTH_LONG).show();
