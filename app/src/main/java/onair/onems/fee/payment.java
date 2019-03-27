@@ -8,10 +8,6 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.craftman.cardform.Card;
-import com.craftman.cardform.CardForm;
-import com.craftman.cardform.OnPayBtnClickListner;
-
 import onair.onems.R;
 
 public class payment extends AppCompatActivity {
@@ -19,19 +15,6 @@ public class payment extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.payment);
-        CardForm cardForm=(CardForm)findViewById(R.id.card);
-        TextView textdev=(TextView)findViewById(R.id.payment_amount);
-        Button btnpay=(Button)findViewById(R.id.btn_pay);
-        textdev.setText("$11172");
-        btnpay.setText(String.format("Payer %s",textdev.getText()));
-
-        cardForm.setPayBtnClickListner(new OnPayBtnClickListner() {
-            @Override
-            public void onClick(Card card) {
-                Toast.makeText(payment.this,"Transaction Complete",Toast.LENGTH_LONG).show();
-            }
-        });
-
     }
     // Back parent Page code
     public boolean onOptionsItemSelected(MenuItem item){

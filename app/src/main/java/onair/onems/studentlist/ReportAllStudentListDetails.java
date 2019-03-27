@@ -36,6 +36,7 @@ import onair.onems.R;
 import onair.onems.Services.GlideApp;
 import onair.onems.Services.RetrofitNetworkService;
 import onair.onems.Services.StaticHelperClass;
+import onair.onems.crm.FullScreenImageViewDialog;
 import onair.onems.mainactivities.CommonToolbarParentActivity;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
@@ -92,6 +93,37 @@ public class ReportAllStudentListDetails extends CommonToolbarParentActivity {
         RFID = intent.getStringExtra("RFID");
         studentImageUrl = intent.getStringExtra("ImageUrl");
         name.setText(intent.getStringExtra("UserName"));
+
+        imageProfile.setOnClickListener(view-> {
+            dialog.show();
+            try {
+                GlideApp.with(this)
+                        .asBitmap()
+                        .error(getResources().getDrawable(R.drawable.profileavater))
+                        .load(getString(R.string.baseUrl)+"/"+studentImageUrl.replace("\\","/"))
+                        .diskCacheStrategy(DiskCacheStrategy.NONE)
+                        .skipMemoryCache(true)
+                        .into(new SimpleTarget<Bitmap>() {
+                            @Override
+                            public void onResourceReady(@NonNull Bitmap resource, Transition<? super Bitmap> transition) {
+                                if(resource != null) {
+                                    FullScreenImageViewDialog fullScreenImageViewDialog = new FullScreenImageViewDialog(ReportAllStudentListDetails.this, ReportAllStudentListDetails.this, resource);
+                                    fullScreenImageViewDialog.setCancelable(true);
+                                    fullScreenImageViewDialog.show();
+                                    dialog.dismiss();
+                                }
+                            }
+                            @Override
+                            public void onLoadFailed(Drawable errorDrawable) {
+                                super.onLoadFailed(errorDrawable);
+                                dialog.dismiss();
+                                Toast.makeText(ReportAllStudentListDetails.this,"No image found!!!",Toast.LENGTH_LONG).show();
+                            }
+                        });
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
 
         try {
             GlideApp.with(this)

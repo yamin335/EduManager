@@ -3,7 +3,6 @@ package onair.onems.attendance;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -12,7 +11,9 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,12 +34,6 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Objects;
-
-import de.codecrafters.tableview.TableView;
-import de.codecrafters.tableview.model.TableColumnWeightModel;
-import de.codecrafters.tableview.toolkit.SimpleTableDataAdapter;
-import de.codecrafters.tableview.toolkit.SimpleTableHeaderAdapter;
-import de.codecrafters.tableview.toolkit.TableDataRowBackgroundProviders;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -56,13 +51,10 @@ import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.converter.scalars.ScalarsConverterFactory;
 
-public class SelfAttendanceReport extends Fragment {
-    private TableView tableView;
+public class SelfAttendanceReport extends Fragment implements DateWiseAttendanceAdapter.DateWiseAttendanceAdapterListener {
     private Spinner spinnerMonth;
     private String UserID="";
-    private Configuration config;
     private long SectionID, ClassID, ShiftID, MediumID, DepartmentID, InstituteID, SessionID;
-    private SimpleTableHeaderAdapter simpleTableHeaderAdapter;
     private ArrayList<MonthModel> allMonthArrayList;
     private String[] tempMonthArray = {"Select Month"};
     private MonthModel selectedMonth = null;
@@ -72,6 +64,9 @@ public class SelfAttendanceReport extends Fragment {
     private String ImageUrl = "";
     private CompositeDisposable finalDisposer = new CompositeDisposable();
     public CommonProgressDialog dialog;
+    private DateWiseAttendanceAdapter adapter;
+    private RecyclerView recyclerView;
+
     public SelfAttendanceReport() {
 
     }
@@ -97,14 +92,20 @@ public class SelfAttendanceReport extends Fragment {
         Objects.requireNonNull(dialog.getWindow()).setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         dialog.setCancelable(false);
 
-        tableView = rootView.findViewById(R.id.tableView);
         totalClass = rootView.findViewById(R.id.totalClass);
         totalPresent = rootView.findViewById(R.id.totalPresent);
+        recyclerView = rootView.findViewById(R.id.recycler);
         ImageView studentImage = rootView.findViewById(R.id.studentImage);
         TextView name = rootView.findViewById(R.id.teacherName);
         TextView roll = rootView.findViewById(R.id.roll);
         TextView id = rootView.findViewById(R.id.Id);
-        tableView.setColumnCount(4);
+
+        dailyAttendanceList = new ArrayList<>();
+        adapter = new DateWiseAttendanceAdapter(getContext(), dailyAttendanceList, this);
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getContext());
+        recyclerView.setLayoutManager(mLayoutManager);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.setAdapter(adapter);
 
         SharedPreferences sharedPre = PreferenceManager.getDefaultSharedPreferences(getActivity());
         int userTypeID = sharedPre.getInt("UserTypeID", 0);
@@ -207,38 +208,6 @@ public class SelfAttendanceReport extends Fragment {
         month_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerMonth.setAdapter(month_spinner_adapter);
 
-        simpleTableHeaderAdapter = new SimpleTableHeaderAdapter(getActivity(),"SI","Date","Present", "Late(min)");
-
-        simpleTableHeaderAdapter.setTextColor(ContextCompat.getColor(getActivity(), R.color.table_header_text ));
-        tableView.setHeaderAdapter(simpleTableHeaderAdapter);
-        config = getResources().getConfiguration();
-
-        if (config.smallestScreenWidthDp >320) {
-            simpleTableHeaderAdapter.setTextSize(14);
-        } else {
-            simpleTableHeaderAdapter.setTextSize(10);
-        }
-        int colorEvenRows = getResources().getColor(R.color.table_data_row_even);
-        int colorOddRows = getResources().getColor(R.color.table_data_row_odd);
-        tableView.setDataRowBackgroundProvider(TableDataRowBackgroundProviders.alternatingRowColors(colorEvenRows, colorOddRows));
-        TableColumnWeightModel columnModel = new TableColumnWeightModel(4);
-        columnModel.setColumnWeight(1, 2);
-        tableView.setColumnModel(columnModel);
-
-        tableView.addDataClickListener((rowIndex, clickedData) -> {
-            selectedDay = dailyAttendanceList.get(rowIndex);
-            Intent intent = new Intent(getActivity(), StudentSubjectWiseAttendance.class);
-            intent.putExtra("SessionID", SessionID);
-            intent.putExtra("UserID", UserID);
-            intent.putExtra("ShiftID", ShiftID);
-            intent.putExtra("MediumID", MediumID);
-            intent.putExtra("ClassID", ClassID);
-            intent.putExtra("DepartmentID", DepartmentID);
-            intent.putExtra("SectionID", SectionID);
-            intent.putExtra("Date", selectedDay.getDate());
-            startActivity(intent);
-        });
-
         MonthDataGetRequest();
 
         spinnerMonth.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -297,9 +266,8 @@ public class SelfAttendanceReport extends Fragment {
 
     void parseMonthlyAttendanceJsonData(String jsonString) {
         try {
-            dailyAttendanceList = new ArrayList<>();
+            dailyAttendanceList.clear();
             JSONArray dailyAttendanceJsonArray = new JSONArray(jsonString);
-            String[][] DATA_TO_SHOW = new String[dailyAttendanceJsonArray.length()][4];
             for(int i = 0; i < dailyAttendanceJsonArray.length(); ++i) {
                 JSONObject dailyAttendanceJsonObject = dailyAttendanceJsonArray.getJSONObject(i);
                 if(i == 0) {
@@ -316,21 +284,8 @@ public class SelfAttendanceReport extends Fragment {
                 }
                 perDayAttendance.setTotalClassDay(dailyAttendanceJsonObject.getString("TotalClassDay"));
                 perDayAttendance.setTotalPresent(dailyAttendanceJsonObject.getJSONArray("TotalPresent").optString(0));
-                DATA_TO_SHOW[i][0] = String.valueOf((i+1));
-                DATA_TO_SHOW [i][1] = perDayAttendance.getDate();
-                DATA_TO_SHOW[i][2] = perDayAttendance.getPresent() == 1 ? "YES" : "NO";
-                DATA_TO_SHOW [i][3] = Integer.toString(perDayAttendance.getLate());
                 dailyAttendanceList.add(perDayAttendance);
-            }
-
-            SimpleTableDataAdapter simpleTabledataAdapter = new SimpleTableDataAdapter(getActivity(),DATA_TO_SHOW);
-            tableView.setDataAdapter(simpleTabledataAdapter);
-            if (config.smallestScreenWidthDp >320) {
-                simpleTableHeaderAdapter.setTextSize(14);
-                simpleTabledataAdapter.setTextSize(12);
-            } else {
-                simpleTableHeaderAdapter.setTextSize(10);
-                simpleTabledataAdapter.setTextSize(10);
+                adapter.notifyDataSetChanged();
             }
         } catch (JSONException e) {
             Toast.makeText(getActivity(),""+e,Toast.LENGTH_LONG).show();
@@ -428,5 +383,20 @@ public class SelfAttendanceReport extends Fragment {
             Toast.makeText(getActivity(),"Please check your internet connection and select again!!! ",
                     Toast.LENGTH_LONG).show();
         }
+    }
+
+    @Override
+    public void onDateSelected(DailyAttendanceModel object) {
+        selectedDay = object;
+        Intent intent = new Intent(getActivity(), StudentSubjectWiseAttendance.class);
+        intent.putExtra("SessionID", SessionID);
+        intent.putExtra("UserID", UserID);
+        intent.putExtra("ShiftID", ShiftID);
+        intent.putExtra("MediumID", MediumID);
+        intent.putExtra("ClassID", ClassID);
+        intent.putExtra("DepartmentID", DepartmentID);
+        intent.putExtra("SectionID", SectionID);
+        intent.putExtra("Date", selectedDay.getDate());
+        startActivity(intent);
     }
 }

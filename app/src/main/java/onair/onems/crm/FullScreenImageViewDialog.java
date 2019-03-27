@@ -16,7 +16,7 @@ public class FullScreenImageViewDialog extends Dialog implements View.OnClickLis
     private Activity activity;
     private Context context;
 
-    FullScreenImageViewDialog(Context context, Activity activity, Bitmap bitmap) {
+    public FullScreenImageViewDialog(Context context, Activity activity, Bitmap bitmap) {
         super(activity, android.R.style.Theme_Black_NoTitleBar_Fullscreen);
         this.activity = activity;
         this.bitmap = bitmap;
