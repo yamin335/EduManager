@@ -868,7 +868,7 @@ public class StudentiCardDetailsEdit extends CommonToolbarParentActivity {
                         file
                 );
         // MultipartBody.Part is used to send also the actual file name
-        return MultipartBody.Part.createFormData("iCardPhoto", file.getName(), requestFile);
+        return MultipartBody.Part.createFormData("file", file.getName(), requestFile);
     }
 
     public class FileFromBitmap extends AsyncTask<Void, Integer, String> {
@@ -927,13 +927,13 @@ public class StudentiCardDetailsEdit extends CommonToolbarParentActivity {
                 Observable<String> photoObservable = retrofit
                         .create(RetrofitNetworkService.class)
                         .uploadSingleImage(prepareFilePart(file))
-                        .subscribeOn(Schedulers.newThread())
+                        .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .unsubscribeOn(Schedulers.io());
 
                 finalDisposer.add(photoObservable
-                        .observeOn(Schedulers.io())
-                        .subscribeOn(AndroidSchedulers.mainThread())
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
                         .unsubscribeOn(Schedulers.io())
                         .subscribeWith(new DisposableObserver<String>() {
                             @Override

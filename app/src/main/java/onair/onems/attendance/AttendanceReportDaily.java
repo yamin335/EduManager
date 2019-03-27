@@ -211,7 +211,8 @@ public class AttendanceReportDaily extends CommonToolbarParentActivity {
                     .observeOn(AndroidSchedulers.mainThread())
                     .unsubscribeOn(Schedulers.io());
 
-            finalDisposer.add( observable.subscribeOn(Schedulers.io())
+            finalDisposer.add( observable
+                    .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .unsubscribeOn(Schedulers.io())
                     .subscribeWith(new DisposableObserver<String>() {

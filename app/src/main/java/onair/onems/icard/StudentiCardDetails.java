@@ -261,18 +261,6 @@ public class StudentiCardDetails extends CommonToolbarParentActivity {
         });
     }
 
-    @NonNull
-    private MultipartBody.Part prepareFilePart(File file) {
-        // create RequestBody instance from file
-        RequestBody requestFile =
-                RequestBody.create(
-                        MediaType.parse("image/jpeg"),
-                        file
-                );
-        // MultipartBody.Part is used to send also the actual file name
-        return MultipartBody.Part.createFormData("iCardPhoto", file.getName(), requestFile);
-    }
-
     class FileFromBitmap extends AsyncTask<Void, Integer, String> {
 
         Context context;
@@ -309,6 +297,18 @@ public class StudentiCardDetails extends CommonToolbarParentActivity {
             dialog.dismiss();
         }
 
+        @NonNull
+        private MultipartBody.Part prepareFilePart(File file) {
+            // create RequestBody instance from file
+            RequestBody requestFile =
+                    RequestBody.create(
+                            MediaType.parse("image/jpeg"),
+                            file
+                    );
+            // MultipartBody.Part is used to send also the actual file name
+            return MultipartBody.Part.createFormData("file", file.getName(), requestFile);
+        }
+
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
@@ -329,13 +329,13 @@ public class StudentiCardDetails extends CommonToolbarParentActivity {
                 Observable<String> photoObservable = retrofit
                         .create(RetrofitNetworkService.class)
                         .uploadSingleImage(prepareFilePart(file))
-                        .subscribeOn(Schedulers.newThread())
+                        .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .unsubscribeOn(Schedulers.io());
 
                 finalDisposer.add(photoObservable
-                        .observeOn(Schedulers.io())
-                        .subscribeOn(AndroidSchedulers.mainThread())
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
                         .unsubscribeOn(Schedulers.io())
                         .subscribeWith(new DisposableObserver<String>() {
                             @Override

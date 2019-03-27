@@ -14,6 +14,10 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -156,13 +160,12 @@ public class AttendanceAdminDashboard extends SideNavigationMenuParentActivity {
 
             Observable<String> observable = retrofit
                     .create(RetrofitNetworkService.class)
-                    .getTotalStudentAndTotalAttendenceDashBoard(today, InstituteID, "3")
+                    .gethrmDeviceByParmsforStudent(0, 0, 0, 0, 0, today, 0, 0, InstituteID, 3, 0)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .unsubscribeOn(Schedulers.io());
 
-            finalDisposer.add( observable
-                    .subscribeOn(Schedulers.io())
+            finalDisposer.add( observable.subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .unsubscribeOn(Schedulers.io())
                     .subscribeWith(new DisposableObserver<String>() {
@@ -181,8 +184,7 @@ public class AttendanceAdminDashboard extends SideNavigationMenuParentActivity {
                         @Override
                         public void onError(Throwable e) {
                             dialog.dismiss();
-                            Toast.makeText(AttendanceAdminDashboard.this,"Error occurred!!! ",
-                                    Toast.LENGTH_LONG).show();
+                            Toast.makeText(AttendanceAdminDashboard.this,"Error: getting attendance data!!!",Toast.LENGTH_LONG).show();
                         }
                     }));
         } else {
@@ -216,29 +218,36 @@ public class AttendanceAdminDashboard extends SideNavigationMenuParentActivity {
         }
     }
 
-    void parseStudentAttendanceJsonData(String jsonString) {
-        try {
-            JSONObject studentAttendance = new JSONArray(jsonString).getJSONObject(0);
-            int total = studentAttendance.getInt("TotalStudent");
-            int present = studentAttendance.getInt("Present");
-            int absent = total - present;
-            double attendancePercentage = 0.0;
-            if(total!=0){
-                attendancePercentage = (double)(present*100)/total;
-                attendancePercentage = new BigDecimal(attendancePercentage).setScale(2, RoundingMode.HALF_UP).doubleValue();
+    void parseStudentAttendanceJsonData(String response) {
+
+        JsonParser parser = new JsonParser();
+        JsonArray jsonArray = parser.parse(response).getAsJsonArray();
+        int total = jsonArray.size(), present = 0, absent = 0;
+        for (JsonElement jsonObject : jsonArray) {
+            if (jsonObject.getAsJsonObject().get("APLStatus").getAsString().equalsIgnoreCase("P")) {
+                present++;
+            } else if (jsonObject.getAsJsonObject().get("APLStatus").getAsString().equalsIgnoreCase("A")) {
+                absent++;
+            } else if (jsonObject.getAsJsonObject().get("APLStatus").getAsString().equalsIgnoreCase("L")) {
+                present++;
             }
-            TextView totalStudent, presentStudent, absentStudent, percentageStudent;
-            totalStudent = findViewById(R.id.totalStudent);
-            presentStudent = findViewById(R.id.attendedStudent);
-            absentStudent = findViewById(R.id.absentStudent);
-            percentageStudent = findViewById(R.id.studentPercentage);
-            totalStudent.setText(Integer.toString(total));
-            presentStudent.setText(Integer.toString(present));
-            absentStudent.setText(Integer.toString(absent));
-            percentageStudent.setText(Double.toString(attendancePercentage)+"%");
-        } catch (JSONException e) {
-            Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
         }
+
+        double attendancePercentage = 0.0;
+        if(total!=0){
+            attendancePercentage = (double)(present*100)/total;
+            attendancePercentage = new BigDecimal(attendancePercentage).setScale(2, RoundingMode.HALF_UP).doubleValue();
+        }
+
+        TextView totalStudent, presentStudent, absentStudent, percentageStudent;
+        totalStudent = findViewById(R.id.totalStudent);
+        presentStudent = findViewById(R.id.attendedStudent);
+        absentStudent = findViewById(R.id.absentStudent);
+        percentageStudent = findViewById(R.id.studentPercentage);
+        totalStudent.setText(Integer.toString(total));
+        presentStudent.setText(Integer.toString(present));
+        absentStudent.setText(Integer.toString(absent));
+        percentageStudent.setText(Double.toString(attendancePercentage)+"%");
     }
 
     @Override
