@@ -32,7 +32,7 @@ public class TakeAttendanceAdapter extends RecyclerView.Adapter<TakeAttendanceAd
             super(view);
             name = view.findViewById(R.id.studentName);
             roll = view.findViewById(R.id.studentRoll);
-            present = view.findViewById(R.id.present);
+            present = view.findViewById(R.id.rfid);
             absent = view.findViewById(R.id.absent);
             late = view.findViewById(R.id.lateCheck);
             leave = view.findViewById(R.id.leave);

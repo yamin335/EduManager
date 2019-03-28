@@ -36,7 +36,7 @@ public class ClientListAdapter extends RecyclerView.Adapter<ClientListAdapter.My
             student = view.findViewById(R.id.student);
             teacher = view.findViewById(R.id.teacher);
             contact = view.findViewById(R.id.contact);
-            date = view.findViewById(R.id.date);
+            date = view.findViewById(R.id.name);
             instituteType = view.findViewById(R.id.textView11);
             priority = view.findViewById(R.id.textView9);
 

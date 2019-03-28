@@ -25,9 +25,9 @@ public class DateWiseAttendanceAdapter extends RecyclerView.Adapter<DateWiseAtte
         public MyViewHolder(View view) {
             super(view);
             serial = view.findViewById(R.id.serial);
-            date = view.findViewById(R.id.date);
-            present = view.findViewById(R.id.present);
-            late = view.findViewById(R.id.late);
+            date = view.findViewById(R.id.name);
+            present = view.findViewById(R.id.rfid);
+            late = view.findViewById(R.id.roll);
 
             view.setOnClickListener(view1 -> {
                 // send selected contact in callback

@@ -30,7 +30,7 @@ public class DetailListAdapter extends RecyclerView.Adapter<DetailListAdapter.My
 
         public MyViewHolder(View view) {
             super(view);
-            meetingDate = view.findViewById(R.id.date);
+            meetingDate = view.findViewById(R.id.name);
             nextMeetingDate = view.findViewById(R.id.textView14);
             detailPriority = view.findViewById(R.id.priority);
             detailMedium = view.findViewById(R.id.medium);

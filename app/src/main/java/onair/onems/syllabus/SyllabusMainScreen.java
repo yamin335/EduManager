@@ -102,7 +102,7 @@ public class SyllabusMainScreen extends SideNavigationMenuParentActivity impleme
         lessonError = findViewById(R.id.lessonEmpty);
         topicValue = findViewById(R.id.topicValue);
         detailValue = findViewById(R.id.detailsValue);
-        syllabusTime = findViewById(R.id.date);
+        syllabusTime = findViewById(R.id.name);
         RecyclerView recyclerView = findViewById(R.id.recycler);
         RecyclerView lessonRecyclerView = findViewById(R.id.lessonRecycler);
         shadow = findViewById(R.id.dim);

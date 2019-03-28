@@ -133,7 +133,7 @@ public class NewClientEntry extends SideNavigationMenuParentActivity implements 
         noOfTeacher = findViewById(R.id.teacherNo);
         instituteAddress = findViewById(R.id.address);
         comment = findViewById(R.id.comments);
-        FloatingActionButton datePicker = findViewById(R.id.date);
+        FloatingActionButton datePicker = findViewById(R.id.name);
         ShowDate = findViewById(R.id.showDate);
 
         Date date = Calendar.getInstance().getTime();

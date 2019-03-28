@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -43,7 +42,6 @@ import io.reactivex.schedulers.Schedulers;
 import onair.onems.R;
 import onair.onems.Services.RetrofitNetworkService;
 import onair.onems.Services.StaticHelperClass;
-import onair.onems.customised.MyDividerItemDecoration;
 import onair.onems.mainactivities.SideNavigationMenuParentActivity;
 import onair.onems.mainactivities.TeacherMainScreen;
 import onair.onems.models.BranchModel;
@@ -89,7 +87,7 @@ public class AttendanceTeacherDaily extends SideNavigationMenuParentActivity {
 
         spinnerBranch = findViewById(R.id.spinnerBranch);
         spinnerDepartment = findViewById(R.id.spinnerDepartment);
-        datePicker = findViewById(R.id.date);
+        datePicker = findViewById(R.id.name);
         show = findViewById(R.id.show);
         recyclerView = findViewById(R.id.recycler);
         totalTeacher = findViewById(R.id.totalTeacher);

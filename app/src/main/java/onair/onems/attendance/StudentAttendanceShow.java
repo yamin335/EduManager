@@ -3,10 +3,12 @@ package onair.onems.attendance;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -18,11 +20,6 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Objects;
 
-import de.codecrafters.tableview.TableView;
-import de.codecrafters.tableview.model.TableColumnWeightModel;
-import de.codecrafters.tableview.toolkit.SimpleTableDataAdapter;
-import de.codecrafters.tableview.toolkit.SimpleTableHeaderAdapter;
-import de.codecrafters.tableview.toolkit.TableDataRowBackgroundProviders;
 import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -33,20 +30,20 @@ import onair.onems.Services.RetrofitNetworkService;
 import onair.onems.Services.StaticHelperClass;
 import onair.onems.mainactivities.CommonToolbarParentActivity;
 import onair.onems.models.AllStudentAttendanceModel;
+import onair.onems.models.DailyAttendanceModel;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.converter.scalars.ScalarsConverterFactory;
 
-public class StudentAttendanceShow extends CommonToolbarParentActivity {
+public class StudentAttendanceShow extends CommonToolbarParentActivity implements AttendanceMonthlyStudentListAdapter.AttendanceMonthlyStudentListAdapterListener {
     private ArrayList<AllStudentAttendanceModel> studentList;
     private AllStudentAttendanceModel selectedStudent = null;
-    private TableView tableView;
-    private Configuration config;
     private int MonthID = 0;
-    private SimpleTableHeaderAdapter simpleTableHeaderAdapter;
     private Disposable disposable;
     private long instituteID, shiftID, mediumID, classID, departmentID, sectionID, SessionID;
+    private RecyclerView recyclerView;
+    private AttendanceMonthlyStudentListAdapter adapter;
 
     @Override
     protected void onDestroy() {
@@ -64,7 +61,7 @@ public class StudentAttendanceShow extends CommonToolbarParentActivity {
         LinearLayout parentActivityLayout = findViewById(R.id.contentMain);
         parentActivityLayout.addView(childActivityLayout, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
 
-        tableView = findViewById(R.id.tableView);
+        recyclerView = findViewById(R.id.recycler);
         SharedPreferences sharedPre = PreferenceManager.getDefaultSharedPreferences(this);
         instituteID = sharedPre.getLong("InstituteID", 0);
         Intent intent = getIntent();
@@ -76,44 +73,22 @@ public class StudentAttendanceShow extends CommonToolbarParentActivity {
         MonthID = intent.getIntExtra("MonthID", 0);
         SessionID = intent.getLongExtra("SessionID", 0);
 
-        simpleTableHeaderAdapter = new SimpleTableHeaderAdapter(this, "SI", "Student Name", "ID", "Roll");
-        simpleTableHeaderAdapter.setTextColor(ContextCompat.getColor(this, R.color.table_header_text));
-        tableView.setHeaderAdapter(simpleTableHeaderAdapter);
-        config = getResources().getConfiguration();
-        int colorEvenRows = getResources().getColor(R.color.table_data_row_even);
-        int colorOddRows = getResources().getColor(R.color.table_data_row_odd);
-        tableView.setDataRowBackgroundProvider(TableDataRowBackgroundProviders.alternatingRowColors(colorEvenRows, colorOddRows));
-        TableColumnWeightModel columnModel = new TableColumnWeightModel(4);
-        columnModel.setColumnWeight(1, 2);
-        tableView.setColumnModel(columnModel);
+        studentList = new ArrayList<>();
+        adapter = new AttendanceMonthlyStudentListAdapter(this, studentList, this);
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(mLayoutManager);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.setAdapter(adapter);
 
         AttendanceDataGetRequest();
-
-        tableView.addDataClickListener((rowIndex, clickedData) -> {
-            selectedStudent = studentList.get(rowIndex);
-            Intent intent1 = new Intent(StudentAttendanceShow.this, StudentAttendanceAllDays.class);
-            intent1.putExtra("UserID", selectedStudent.getUserID());
-            intent1.putExtra("UserFullName", selectedStudent.getUserFullName());
-            intent1.putExtra("RollNo", selectedStudent.getRollNo());
-            intent1.putExtra("RFID", selectedStudent.getRFID());
-            intent1.putExtra("ShiftID", selectedStudent.getShiftID());
-            intent1.putExtra("MediumID", selectedStudent.getMediumID());
-            intent1.putExtra("ClassID", selectedStudent.getClassID());
-            intent1.putExtra("DepartmentID", selectedStudent.getDepartmentID());
-            intent1.putExtra("SectionID", selectedStudent.getSectionID());
-            intent1.putExtra("MonthID", MonthID);
-            intent1.putExtra("ImageUrl", selectedStudent.getImageUrl());
-            intent1.putExtra("SessionID", SessionID);
-            startActivity(intent1);
-        });
 
     }
     void parseAllStudentShowJsonData(String jsonString) {
         try {
-            studentList = new ArrayList<>();
+            studentList.clear();
+            studentList.add(new AllStudentAttendanceModel());
             JSONArray studentListJsonArray = new JSONArray(jsonString);
             JSONArray jsonArray = new JSONArray(jsonString);
-            String[][] DATA_TO_SHOW = new String[jsonArray.length()][4];
             for(int i = 0; i < jsonArray.length(); ++i) {
                 JSONObject studentJsonObject = studentListJsonArray.getJSONObject(i);
                 AllStudentAttendanceModel singleStudent = new AllStudentAttendanceModel();
@@ -128,19 +103,7 @@ public class StudentAttendanceShow extends CommonToolbarParentActivity {
                 singleStudent.setSectionID(studentJsonObject.getString("SectionID"));
                 singleStudent.setImageUrl(studentJsonObject.getString("ImageUrl"));
                 studentList.add(singleStudent);
-                DATA_TO_SHOW[i][0]= String.valueOf((i+1));
-                DATA_TO_SHOW[i][1]= singleStudent.getUserFullName();
-                DATA_TO_SHOW[i][2]= singleStudent.getRFID();
-                DATA_TO_SHOW [i][3]= singleStudent.getRollNo();
-            }
-            SimpleTableDataAdapter simpleTabledataAdapter = new SimpleTableDataAdapter(this, DATA_TO_SHOW);
-            tableView.setDataAdapter(simpleTabledataAdapter);
-            if (config.smallestScreenWidthDp >320) {
-                simpleTableHeaderAdapter.setTextSize(14);
-                simpleTabledataAdapter.setTextSize(12);
-            } else {
-                simpleTableHeaderAdapter.setTextSize(10);
-                simpleTabledataAdapter.setTextSize(10);
+                adapter.notifyDataSetChanged();
             }
         } catch (JSONException e) {
             Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
@@ -201,5 +164,24 @@ public class StudentAttendanceShow extends CommonToolbarParentActivity {
         finish();
         return true;
 
+    }
+
+    @Override
+    public void onStudentSelected(AllStudentAttendanceModel object) {
+        selectedStudent = object;
+        Intent intent1 = new Intent(StudentAttendanceShow.this, StudentAttendanceAllDays.class);
+        intent1.putExtra("UserID", selectedStudent.getUserID());
+        intent1.putExtra("UserFullName", selectedStudent.getUserFullName());
+        intent1.putExtra("RollNo", selectedStudent.getRollNo());
+        intent1.putExtra("RFID", selectedStudent.getRFID());
+        intent1.putExtra("ShiftID", selectedStudent.getShiftID());
+        intent1.putExtra("MediumID", selectedStudent.getMediumID());
+        intent1.putExtra("ClassID", selectedStudent.getClassID());
+        intent1.putExtra("DepartmentID", selectedStudent.getDepartmentID());
+        intent1.putExtra("SectionID", selectedStudent.getSectionID());
+        intent1.putExtra("MonthID", MonthID);
+        intent1.putExtra("ImageUrl", selectedStudent.getImageUrl());
+        intent1.putExtra("SessionID", SessionID);
+        startActivity(intent1);
     }
 }

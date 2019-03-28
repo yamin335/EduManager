@@ -88,7 +88,7 @@ public class LessonPlanMainScreen extends SideNavigationMenuParentActivity imple
         LinearLayout parent = findViewById(R.id.contentMain);
         parent.addView(rowView, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
 
-        homeworkDate = findViewById(R.id.date);
+        homeworkDate = findViewById(R.id.name);
         datePicker = findViewById(R.id.pickDate);
         topicTitle = findViewById(R.id.topicValue);
         topicDetails = findViewById(R.id.detailsValue);

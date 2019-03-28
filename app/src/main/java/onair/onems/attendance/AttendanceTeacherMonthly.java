@@ -76,7 +76,7 @@ public class AttendanceTeacherMonthly extends SideNavigationMenuParentActivity {
 
         spinnerMonth = findViewById(R.id.spinnerMonth);
         Button show = findViewById(R.id.show);
-        fromDate = findViewById(R.id.date);
+        fromDate = findViewById(R.id.name);
         toDate = findViewById(R.id.toDate);
         tableLayout = findViewById(R.id.tableLayout);
 

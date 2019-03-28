@@ -267,6 +267,7 @@ public class SelfAttendanceReport extends Fragment implements DateWiseAttendance
     void parseMonthlyAttendanceJsonData(String jsonString) {
         try {
             dailyAttendanceList.clear();
+            dailyAttendanceList.add(new DailyAttendanceModel());
             JSONArray dailyAttendanceJsonArray = new JSONArray(jsonString);
             for(int i = 0; i < dailyAttendanceJsonArray.length(); ++i) {
                 JSONObject dailyAttendanceJsonObject = dailyAttendanceJsonArray.getJSONObject(i);

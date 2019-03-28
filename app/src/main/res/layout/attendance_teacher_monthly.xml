@@ -67,7 +67,7 @@
             app:layout_constraintVertical_bias="0.0" />
 
         <Button
-            android:id="@+id/date"
+            android:id="@+id/name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
@@ -85,7 +85,7 @@
             android:text="To"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="@+id/textView"
-            app:layout_constraintStart_toEndOf="@+id/date"
+            app:layout_constraintStart_toEndOf="@+id/name"
             app:layout_constraintTop_toTopOf="@+id/textView" />
 
         <Button
@@ -94,9 +94,9 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginLeft="16dp"
-            app:layout_constraintBottom_toBottomOf="@+id/date"
+            app:layout_constraintBottom_toBottomOf="@+id/name"
             app:layout_constraintStart_toEndOf="@+id/textView22"
-            app:layout_constraintTop_toTopOf="@+id/date" />
+            app:layout_constraintTop_toTopOf="@+id/name" />
 
         <HorizontalScrollView
             android:layout_width="wrap_content"

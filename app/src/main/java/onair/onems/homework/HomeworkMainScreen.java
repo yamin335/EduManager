@@ -92,7 +92,7 @@ public class HomeworkMainScreen extends SideNavigationMenuParentActivity impleme
 
         error = findViewById(R.id.homeworkEmpty);
         errorDigital = findViewById(R.id.empty);
-        homeworkDate = findViewById(R.id.date);
+        homeworkDate = findViewById(R.id.name);
         topic = findViewById(R.id.topicValue);
         details = findViewById(R.id.detailsValue);
 

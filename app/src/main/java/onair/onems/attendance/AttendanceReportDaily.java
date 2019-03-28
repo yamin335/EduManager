@@ -21,10 +21,8 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 import io.reactivex.Observable;
-import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.disposables.Disposable;
 import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
 import onair.onems.R;
@@ -76,7 +74,7 @@ public class AttendanceReportDaily extends CommonToolbarParentActivity {
         date = StudentSelection.getString("Date", "");
 
         recycler = findViewById(R.id.recycler);
-        CheckBox present = findViewById(R.id.present);
+        CheckBox present = findViewById(R.id.rfid);
         CheckBox absent = findViewById(R.id.absent);
         CheckBox late = findViewById(R.id.late);
         _totalStudent = findViewById(R.id.totalStudent);

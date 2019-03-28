@@ -3,13 +3,15 @@ package onair.onems.attendance;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -28,11 +30,6 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Objects;
 
-import de.codecrafters.tableview.TableView;
-import de.codecrafters.tableview.model.TableColumnWeightModel;
-import de.codecrafters.tableview.toolkit.SimpleTableDataAdapter;
-import de.codecrafters.tableview.toolkit.SimpleTableHeaderAdapter;
-import de.codecrafters.tableview.toolkit.TableDataRowBackgroundProviders;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -49,12 +46,9 @@ import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.converter.scalars.ScalarsConverterFactory;
 
-public class StudentAttendanceAllDays extends CommonToolbarParentActivity {
+public class StudentAttendanceAllDays extends CommonToolbarParentActivity implements DateWiseAttendanceAdapter.DateWiseAttendanceAdapterListener {
     private ArrayList<DailyAttendanceModel> dailyAttendanceList;
     private DailyAttendanceModel selectedDay;
-    private TableView tableView;
-    private SimpleTableHeaderAdapter simpleTableHeaderAdapter;
-    private Configuration config;
     private String UserID = "";
     private long SectionID=0;
     private long ClassID=0;
@@ -65,6 +59,8 @@ public class StudentAttendanceAllDays extends CommonToolbarParentActivity {
     private TextView totalClass, totalPresent;
     private int MonthID = 0;
     private CompositeDisposable finalDisposer = new CompositeDisposable();
+    private DateWiseAttendanceAdapter adapter;
+    private RecyclerView recyclerView;
 
     @Override
     protected void onDestroy() {
@@ -82,7 +78,7 @@ public class StudentAttendanceAllDays extends CommonToolbarParentActivity {
         LinearLayout parentActivityLayout = findViewById(R.id.contentMain);
         parentActivityLayout.addView(childActivityLayout, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
 
-        tableView = findViewById(R.id.tableView);
+        recyclerView = findViewById(R.id.recycler);
         totalClass = findViewById(R.id.totalClass);
         totalPresent = findViewById(R.id.totalPresent);
         ImageView studentImage = findViewById(R.id.studentImage);
@@ -92,6 +88,11 @@ public class StudentAttendanceAllDays extends CommonToolbarParentActivity {
 
         dailyAttendanceList = new ArrayList<>();
         selectedDay = new DailyAttendanceModel();
+        adapter = new DateWiseAttendanceAdapter(this, dailyAttendanceList, this);
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(mLayoutManager);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.setAdapter(adapter);
 
         SharedPreferences sharedPre = PreferenceManager.getDefaultSharedPreferences(this);
         InstituteID = sharedPre.getLong("InstituteID", 0);
@@ -140,62 +141,8 @@ public class StudentAttendanceAllDays extends CommonToolbarParentActivity {
         roll.setText("Roll: "+ rollNo);
         id.setText("ID: "+ RFID);
 
-        simpleTableHeaderAdapter = new SimpleTableHeaderAdapter(this, "SI","Date","Present", "Late(m)");
-        simpleTableHeaderAdapter.setTextColor(ContextCompat.getColor(this, R.color.table_header_text));
-        tableView.setHeaderAdapter(simpleTableHeaderAdapter);
-
-        // Header of The Table End
-
-        // Set colour of the Even and Odd row of the table
-        int colorEvenRows = getResources().getColor(R.color.table_data_row_even);
-        int colorOddRows = getResources().getColor(R.color.table_data_row_odd);
-        tableView.setDataRowBackgroundProvider(TableDataRowBackgroundProviders.alternatingRowColors(colorEvenRows, colorOddRows));
-
-        // colour of the Even and Odd row of the table End
-
-        // Fixed Weight of the Column
-        TableColumnWeightModel columnModel = new TableColumnWeightModel(4);
-
-        columnModel.setColumnWeight(1, 2);
-
-        tableView.setColumnModel(columnModel);
-
-        // Fixed Weight of the Column End
-
-        // Configure Size of different Mobile Device
-
-        config = getResources().getConfiguration();
-        if (config.smallestScreenWidthDp > 320) {
-            simpleTableHeaderAdapter.setTextSize(14);
-
-        } else {
-            simpleTableHeaderAdapter.setTextSize(10);
-
-        }
-
-        // Configure Size of different Mobile Device End
-
-       //Table View Click Event
-        tableView.addDataClickListener((rowIndex, clickedData) -> {
-            selectedDay = dailyAttendanceList.get(rowIndex);
-            Intent intent1 = new Intent(StudentAttendanceAllDays.this, StudentSubjectWiseAttendance.class);
-            intent1.putExtra("SessionID", SessionID);
-            intent1.putExtra("UserID", UserID);
-            intent1.putExtra("ShiftID", ShiftID);
-            intent1.putExtra("MediumID", MediumID);
-            intent1.putExtra("ClassID", ClassID);
-            intent1.putExtra("DepartmentID", DepartmentID);
-            intent1.putExtra("SectionID", SectionID);
-            intent1.putExtra("Date", selectedDay.getDate());
-            startActivity(intent1);
-        });
-        //Table View Click Event  End
-
         // Loding http Monthly Attendance string file using volley
-
         AttendanceDataGetRequest();
-
-        // Loding http Monthly Attendance string file using volley
 
     }
     // Back parent Page code
@@ -212,9 +159,9 @@ public class StudentAttendanceAllDays extends CommonToolbarParentActivity {
 
     void parseMonthlyAttendanceJsonData(String jsonString) {
         try {
-            dailyAttendanceList = new ArrayList<>();
+            dailyAttendanceList.clear();
+            dailyAttendanceList.add(new DailyAttendanceModel());
             JSONArray dailyAttendanceJsonArray = new JSONArray(jsonString);
-            String[][] DATA_TO_SHOW = new String[dailyAttendanceJsonArray.length()][4];
             for(int i = 0; i < dailyAttendanceJsonArray.length(); ++i) {
                 JSONObject dailyAttendanceJsonObject = dailyAttendanceJsonArray.getJSONObject(i);
                 if(i == 0) {
@@ -231,21 +178,8 @@ public class StudentAttendanceAllDays extends CommonToolbarParentActivity {
                 }
                 perDayAttendance.setTotalClassDay(dailyAttendanceJsonObject.getString("TotalClassDay"));
                 perDayAttendance.setTotalPresent(dailyAttendanceJsonObject.getJSONArray("TotalPresent").optString(0));
-                DATA_TO_SHOW[i][0] = String.valueOf((i+1));
-                DATA_TO_SHOW [i][1] = perDayAttendance.getDate();
-                DATA_TO_SHOW[i][2] = perDayAttendance.getPresent() == 1 ? "YES" : "NO";
-                DATA_TO_SHOW [i][3] = Integer.toString(perDayAttendance.getLate());
                 dailyAttendanceList.add(perDayAttendance);
-            }
-
-            SimpleTableDataAdapter simpleTabledataAdapter = new SimpleTableDataAdapter(this,DATA_TO_SHOW);
-            tableView.setDataAdapter(simpleTabledataAdapter);
-            if (config.smallestScreenWidthDp >320) {
-                simpleTableHeaderAdapter.setTextSize(14);
-                simpleTabledataAdapter.setTextSize(12);
-            } else {
-                simpleTableHeaderAdapter.setTextSize(10);
-                simpleTabledataAdapter.setTextSize(10);
+                adapter.notifyDataSetChanged();
             }
         } catch (JSONException e) {
             Toast.makeText(this,""+e,Toast.LENGTH_LONG).show();
@@ -295,6 +229,21 @@ public class StudentAttendanceAllDays extends CommonToolbarParentActivity {
             Toast.makeText(StudentAttendanceAllDays.this,"Please check your internet connection and select again!!! ",
                     Toast.LENGTH_LONG).show();
         }
+    }
+
+    @Override
+    public void onDateSelected(DailyAttendanceModel object) {
+        selectedDay = object;
+        Intent intent = new Intent(StudentAttendanceAllDays.this, StudentSubjectWiseAttendance.class);
+        intent.putExtra("SessionID", SessionID);
+        intent.putExtra("UserID", UserID);
+        intent.putExtra("ShiftID", ShiftID);
+        intent.putExtra("MediumID", MediumID);
+        intent.putExtra("ClassID", ClassID);
+        intent.putExtra("DepartmentID", DepartmentID);
+        intent.putExtra("SectionID", SectionID);
+        intent.putExtra("Date", selectedDay.getDate());
+        startActivity(intent);
     }
 
 }

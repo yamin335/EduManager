@@ -39,7 +39,7 @@
             </LinearLayout>
 
             <CheckBox
-                android:id="@+id/present"
+                android:id="@+id/rfid"
                 android:layout_toStartOf="@id/absent"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -52,18 +52,18 @@
 
             <CheckBox
                 android:id="@+id/absent"
-                android:layout_toStartOf="@id/late"
+                android:layout_toStartOf="@id/roll"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:layout_marginEnd="10dp"
                 android:scaleX="1.3"
                 android:scaleY="1.3"
-                android:layout_toLeftOf="@id/late"
+                android:layout_toLeftOf="@id/roll"
                 android:layout_marginRight="10dp" />
 
             <LinearLayout
-                android:id="@+id/late"
+                android:id="@+id/roll"
                 android:layout_width="70dp"
                 android:layout_height="wrap_content"
                 android:layout_toStartOf="@id/leave"

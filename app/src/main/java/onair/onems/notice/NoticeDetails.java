@@ -28,7 +28,7 @@ public class NoticeDetails extends CommonToolbarParentActivity {
 
         TextView title = findViewById(R.id.title);
         TextView detail = findViewById(R.id.detail);
-        TextView date = findViewById(R.id.date);
+        TextView date = findViewById(R.id.name);
 
         try {
             JSONObject notice = new JSONObject(getIntent().getStringExtra("notice"));

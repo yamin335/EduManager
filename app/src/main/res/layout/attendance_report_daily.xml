@@ -6,7 +6,7 @@
     android:layout_height="match_parent">
 
     <CheckBox
-        android:id="@+id/present"
+        android:id="@+id/rfid"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/present"
@@ -24,7 +24,7 @@
         android:text="@string/absent"
         app:layout_constraintEnd_toStartOf="@+id/late"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/present"
+        app:layout_constraintStart_toEndOf="@+id/rfid"
         app:layout_constraintTop_toTopOf="parent" />
 
     <CheckBox

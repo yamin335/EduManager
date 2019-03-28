@@ -312,7 +312,7 @@
             app:layout_constraintVertical_bias="1.0" />
 
         <android.support.design.widget.FloatingActionButton
-            android:id="@+id/date"
+            android:id="@+id/name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
@@ -339,9 +339,9 @@
             android:layout_marginTop="8dp"
             android:textColor="#3d3c3c"
             android:textSize="11sp"
-            app:layout_constraintBottom_toBottomOf="@+id/date"
-            app:layout_constraintEnd_toStartOf="@+id/date"
-            app:layout_constraintTop_toTopOf="@+id/date"
+            app:layout_constraintBottom_toBottomOf="@+id/name"
+            app:layout_constraintEnd_toStartOf="@+id/name"
+            app:layout_constraintTop_toTopOf="@+id/name"
             android:layout_marginRight="5dp" />
 
     </android.support.constraint.ConstraintLayout>

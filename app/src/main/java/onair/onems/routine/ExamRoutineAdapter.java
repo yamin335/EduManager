@@ -20,7 +20,7 @@ public class ExamRoutineAdapter extends RecyclerView.Adapter<ExamRoutineAdapter.
 
         MyViewHolder(View view) {
             super(view);
-            date = view.findViewById(R.id.date);
+            date = view.findViewById(R.id.name);
             subject = view.findViewById(R.id.subject);
         }
     }
