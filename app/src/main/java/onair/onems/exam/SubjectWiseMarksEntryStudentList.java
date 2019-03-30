@@ -143,6 +143,7 @@ public class SubjectWiseMarksEntryStudentList extends CommonToolbarParentActivit
         Intent otherIntent = new Intent(SubjectWiseMarksEntryStudentList.this, SubjectWiseMarksEntryInputs.class);
         otherIntent.putExtra("student", result.toString());
         otherIntent.putExtra("SubjectID", SubjectID);
+        otherIntent.putExtra("ExamID", intent.getLongExtra("ExamID", 0));
         startActivity(otherIntent);
     }
 }

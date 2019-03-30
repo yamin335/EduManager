@@ -105,7 +105,7 @@ public class SubjectWiseMarksEntryInputs extends CommonToolbarParentActivity {
                 jsonObject.put("Attendance", attendanceMark);
                 jsonObject.put("Total", totalMarks);
                 jsonObject.put("ExamMarkID", student.getString("ExamMarkID").equalsIgnoreCase("null")?"null":student.get("ExamMarkID"));
-                jsonObject.put("ExamID", student.getString("examID").equalsIgnoreCase("null")?"null":student.get("examID"));
+                jsonObject.put("ExamID", intent.getLongExtra("ExamID", 0));
                 jsonObject.put("SectionID", student.getString("SectionID").equalsIgnoreCase("null")?"null":student.get("SectionID"));
                 jsonObject.put("ShiftID", student.getString("ShiftID").equalsIgnoreCase("null")?"null":student.get("ShiftID"));
                 jsonObject.put("UserID", student.getString("UserID").equalsIgnoreCase("null")?"null":student.get("UserID"));
