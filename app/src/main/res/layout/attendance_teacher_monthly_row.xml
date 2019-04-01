@@ -82,5 +82,7 @@
         android:background="@drawable/table_cell_border_black"
         android:gravity="center"
         android:padding="5dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginEnd="16dp"
         android:textColor="#576475" />
 </TableRow>

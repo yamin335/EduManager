@@ -2,10 +2,8 @@ package onair.onems.fee;
 
 import android.app.ProgressDialog;
 import android.content.SharedPreferences;
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.widget.Spinner;
@@ -15,17 +13,10 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-import de.codecrafters.tableview.TableView;
-import de.codecrafters.tableview.toolkit.SimpleTableDataAdapter;
-import de.codecrafters.tableview.toolkit.SimpleTableHeaderAdapter;
 import onair.onems.R;
 
 public class FeesHistory extends AppCompatActivity {
-    TableView tableView,tableView1;
-    SimpleTableHeaderAdapter simpleTableHeaderAdapter, simpleTableHeaderAdapter1;
-    SimpleTableDataAdapter simpleTabledataAdapter;
     Spinner spinner,type_spinner;
-    Configuration config;
     String[][] DATA_TO_SHOW;
     String YearlyFeesDetailsUrl;
     long sectionID,classID,shiftID,mediumID,instituteID,depertmentID;
@@ -202,25 +193,6 @@ public class FeesHistory extends AppCompatActivity {
         catch (Exception e)
         {
             Toast.makeText(getApplicationContext(),""+e,Toast.LENGTH_LONG).show();
-        }
-        simpleTabledataAdapter = new SimpleTableDataAdapter(getApplicationContext(),DATA_TO_SHOW);
-        tableView.setDataAdapter(simpleTabledataAdapter);
-
-        tableView1 = (TableView) findViewById(R.id.tableView1);
-        simpleTableHeaderAdapter1 = new SimpleTableHeaderAdapter(this, "Total:",""+ total_fees_amount+" TK", ""+total_payment+" TK",total_balance+" TK");
-        simpleTableHeaderAdapter1.setTextColor(ContextCompat.getColor(this, R.color.table_header_text_total));
-        tableView1.setHeaderAdapter(simpleTableHeaderAdapter1);
-        if (config.smallestScreenWidthDp >320) {
-            simpleTableHeaderAdapter.setTextSize(14);
-            simpleTabledataAdapter.setTextSize(14);
-            simpleTableHeaderAdapter1.setTextSize(14);
-
-
-        } else {
-            simpleTableHeaderAdapter.setTextSize(12);
-            simpleTabledataAdapter.setTextSize(12);
-            simpleTableHeaderAdapter1.setTextSize(12);
-
         }
 
         dialog.dismiss();

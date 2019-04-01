@@ -28,33 +28,4 @@
             android:text="@string/select_year"
             android:layout_marginEnd="10dp" />
     </LinearLayout>
-    <LinearLayout
-    android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-    android:background="#FFFFFF" android:orientation="vertical"
-      android:layout_below="@+id/linearLayout"
-   >
-    <de.codecrafters.tableview.TableView
-        android:id="@+id/tableView"
-        android:layout_width="match_parent"
-        android:layout_height="420dp"
-        android:tooltipText="12"
-        table:tableView_headerColor="#80cbc4"
-        android:divider="#ECEFF1"
-        android:dividerHeight="1dip"
-        table:tableView_columnCount="4"
-        table:tableView_headerElevation="10" />
-        <de.codecrafters.tableview.TableView
-            android:id="@+id/tableView1"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:tooltipText="12"
-            table:tableView_headerColor="#26a69a"
-            android:divider="#ECEFF1"
-            android:dividerHeight="1dip"
-            table:tableView_columnCount="4"
-            table:tableView_headerElevation="10"
-            />
-    </LinearLayout>
-
 </RelativeLayout>

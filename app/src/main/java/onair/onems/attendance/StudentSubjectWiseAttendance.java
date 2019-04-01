@@ -6,22 +6,23 @@ import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.Toast;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
+import java.util.ArrayList;
 import java.util.Objects;
 
-import de.codecrafters.tableview.TableView;
-import de.codecrafters.tableview.model.TableColumnWeightModel;
-import de.codecrafters.tableview.toolkit.SimpleTableDataAdapter;
-import de.codecrafters.tableview.toolkit.SimpleTableHeaderAdapter;
-import de.codecrafters.tableview.toolkit.TableDataRowBackgroundProviders;
 import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -36,13 +37,14 @@ import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.converter.scalars.ScalarsConverterFactory;
 
-public class StudentSubjectWiseAttendance extends CommonToolbarParentActivity {
+public class StudentSubjectWiseAttendance extends CommonToolbarParentActivity implements AttendanceMonthlySubjectListAdapter.AttendanceMonthlySubjectListAdapterListener {
     private Configuration config;
-    private TableView tableView;
-    private SimpleTableHeaderAdapter simpleTableHeaderAdapter;
     private long InstituteID=0, SectionID=0, ClassID=0, MediumID=0, ShiftID=0, DepartmentID = 0, SessionID = 0;
     private Disposable disposable;
     private String UserID, Date;
+    private ArrayList<JsonObject> subjectList;
+    private RecyclerView recyclerView;
+    private AttendanceMonthlySubjectListAdapter adapter;
 
     @Override
     protected void onDestroy() {
@@ -60,14 +62,16 @@ public class StudentSubjectWiseAttendance extends CommonToolbarParentActivity {
         LinearLayout parentActivityLayout = findViewById(R.id.contentMain);
         parentActivityLayout.addView(childActivityLayout, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
 
+        recyclerView = findViewById(R.id.recycler);
+        subjectList = new ArrayList<>();
+        adapter = new AttendanceMonthlySubjectListAdapter(this, subjectList, this);
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(mLayoutManager);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.setAdapter(adapter);
+
         SharedPreferences sharedPre = PreferenceManager.getDefaultSharedPreferences(this);
         InstituteID = sharedPre.getLong("InstituteID", 0);
-
-        tableView = findViewById(R.id.tableView);
-
-        simpleTableHeaderAdapter = new SimpleTableHeaderAdapter(this, "Subject", "Code ", "Status", "Teacher");
-        simpleTableHeaderAdapter.setTextColor(ContextCompat.getColor(this, R.color.table_header_text));
-        tableView.setHeaderAdapter(simpleTableHeaderAdapter);
 
         //Loding show end code
         // get Internal Data using SharedPreferences
@@ -81,25 +85,6 @@ public class StudentSubjectWiseAttendance extends CommonToolbarParentActivity {
         Date = intent.getStringExtra("Date");
         SessionID = intent.getLongExtra("SessionID", 0);
 
-        int colorEvenRows = getResources().getColor(R.color.table_data_row_even);
-        int colorOddRows = getResources().getColor(R.color.table_data_row_odd);
-        tableView.setDataRowBackgroundProvider(TableDataRowBackgroundProviders.alternatingRowColors(colorEvenRows, colorOddRows));
-
-        TableColumnWeightModel columnModel = new TableColumnWeightModel(4);
-        columnModel.setColumnWeight(3, 5);
-        columnModel.setColumnWeight(1, 3);
-        columnModel.setColumnWeight(2, 4);
-        columnModel.setColumnWeight(0, 4);
-        tableView.setColumnModel(columnModel);
-
-        config = getResources().getConfiguration();
-        if (config.smallestScreenWidthDp > 320) {
-            simpleTableHeaderAdapter.setTextSize(14);
-
-        } else {
-            simpleTableHeaderAdapter.setTextSize(10);
-
-        }
         AttendanceDataGetRequest();
     }
 
@@ -112,45 +97,14 @@ public class StudentSubjectWiseAttendance extends CommonToolbarParentActivity {
 
     void parseSubjectWiseAttendanceJsonData(String jsonString) {
         try {
-            JSONArray subjectWiseAttendanceJsonArray = new JSONArray(jsonString);
-            String[][] DATA_TO_SHOW = new String[subjectWiseAttendanceJsonArray.length()][4];
-            for (int i = 0; i < subjectWiseAttendanceJsonArray.length(); ++i) {
-
-                JSONObject subjectWiseAttendanceJsonObject = subjectWiseAttendanceJsonArray.getJSONObject(i);
-                DATA_TO_SHOW[i][0] = subjectWiseAttendanceJsonObject.getString("Subject");
-                DATA_TO_SHOW[i][1] = String.valueOf(subjectWiseAttendanceJsonObject.getInt("SubjectID"));
-                int status = subjectWiseAttendanceJsonObject.getInt("Status");
-                if (status == 1) {
-                    DATA_TO_SHOW[i][2] = "Present";
-                } else if(status == 2) {
-                    DATA_TO_SHOW[i][2] = "Absent";
-                } else if(status == 3) {
-                    DATA_TO_SHOW[i][2] = "Late";
-                } else if(status == 0) {
-                    DATA_TO_SHOW[i][2] = "Leave";
-                }
-                DATA_TO_SHOW[i][3] = subjectWiseAttendanceJsonObject.getString("ClassTeacher");
+            subjectList.clear();
+            subjectList.add(new JsonObject());
+            JsonParser parser = new JsonParser();
+            JsonArray jsonArray = parser.parse(jsonString).getAsJsonArray();
+            for (JsonElement jsonElement : jsonArray) {
+                subjectList.add(jsonElement.getAsJsonObject());
             }
-
-            SimpleTableDataAdapter simpleTabledataAdapter = new SimpleTableDataAdapter(this, DATA_TO_SHOW);
-            tableView.setDataAdapter(simpleTabledataAdapter);
-            int colorEvenRows = getResources().getColor(R.color.table_data_row_even);
-            int colorOddRows = getResources().getColor(R.color.table_data_row_odd);
-            tableView.setDataRowBackgroundProvider(TableDataRowBackgroundProviders.alternatingRowColors(colorEvenRows, colorOddRows));
-            TableColumnWeightModel columnModel = new TableColumnWeightModel(4);
-            columnModel.setColumnWeight(3, 5);
-            columnModel.setColumnWeight(1, 3);
-            columnModel.setColumnWeight(2, 4);
-            columnModel.setColumnWeight(0, 4);
-            tableView.setColumnModel(columnModel);
-            if (config.smallestScreenWidthDp > 320) {
-                simpleTableHeaderAdapter.setTextSize(14);
-                simpleTabledataAdapter.setTextSize(12);
-            } else {
-                simpleTableHeaderAdapter.setTextSize(10);
-                simpleTabledataAdapter.setTextSize(10);
-            }
-
+            adapter.notifyDataSetChanged();
         } catch (Exception e) {
             Toast.makeText(this, "" + e, Toast.LENGTH_LONG).show();
         }
@@ -206,5 +160,10 @@ public class StudentSubjectWiseAttendance extends CommonToolbarParentActivity {
             Toast.makeText(StudentSubjectWiseAttendance.this,"Please check your internet connection and select again!!! ",
                     Toast.LENGTH_LONG).show();
         }
+    }
+
+    @Override
+    public void onSubjectSelected(JsonObject object) {
+
     }
 }

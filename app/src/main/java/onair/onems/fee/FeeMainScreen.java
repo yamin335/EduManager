@@ -18,13 +18,6 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
-
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -281,27 +274,6 @@ public class FeeMainScreen extends SideNavigationMenuParentActivity {
 
         monthScholarshipUrl = getString(R.string.baseUrl)+"/api/onEms/getScholarship/"+InstituteID+"/"+UserID+"/"+monthselectindex;
 
-        RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
-
-        StringRequest stringRequestScholarship = new StringRequest(Request.Method.GET,  monthScholarshipUrl ,
-                new Response.Listener<String>()
-                {
-                    @Override
-                    public void onResponse(String response)
-                    {
-                        parseMonthlyScholarshipJsonData(response);
-
-
-                    }
-                }, new Response.ErrorListener()
-        {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-
-            }
-        });
-
-        queue.add(stringRequestScholarship);
 
 
 
@@ -351,27 +323,7 @@ public class FeeMainScreen extends SideNavigationMenuParentActivity {
         cardModels.add(new CardModel("Scholarship:", scholarship+" TK"));
 
         monthFineDetailsUrl = getString(R.string.baseUrl)+"/api/onEms/getLateAndAbsent/"+InstituteID;
-        RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
 
-        StringRequest stringRequestfine = new StringRequest(Request.Method.GET,  monthFineDetailsUrl,
-                new Response.Listener<String>()
-                {
-                    @Override
-                    public void onResponse(String response)
-                    {
-                        parseMonthlyFineDetailsJsonData(response);
-
-
-                    }
-                }, new Response.ErrorListener()
-        {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-
-            }
-        });
-
-        queue.add(stringRequestfine);
 
 
     }
@@ -399,27 +351,7 @@ public class FeeMainScreen extends SideNavigationMenuParentActivity {
             monthDueDetailsUrl = getString(R.string.baseUrl)+"/api/onEms/getPreviousDue/"+
                     InstituteID+"/"+LoggedUserShiftID+"/"+LoggedUserDepartmentID+"/"+LoggedUserMediumID
                     +"/"+LoggedUserClassID+"/"+UserID+"/"+monthselectindex;
-            RequestQueue queue1 = Volley.newRequestQueue(getApplicationContext());
 
-            StringRequest stringRequestfine = new StringRequest(Request.Method.GET,   monthDueDetailsUrl,
-                    new Response.Listener<String>()
-                    {
-                        @Override
-                        public void onResponse(String response)
-                        {
-
-                            parseMonthlyDueJsonData(response);
-
-                        }
-                    }, new Response.ErrorListener()
-            {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-
-                }
-            });
-
-            queue1.add(stringRequestfine);
 
         }
         catch (Exception e)

@@ -1411,6 +1411,21 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
                 }
             }
 
+            if((i == 3) && (i1 == 5) && (l == 5)) {
+                if(activityName.equals(ShowAttendance.class.getName())){
+                    DrawerLayout drawer = findViewById(R.id.drawer_layout);
+                    if (drawer.isDrawerOpen(GravityCompat.START)) {
+                        drawer.closeDrawer(GravityCompat.START);
+                    }
+                } else {
+                    Intent intent = new Intent(getApplicationContext(), ShowAttendance.class);
+                    intent.putExtra("fromDashBoard", false);
+                    intent.putExtra("fromSideMenu", true);
+                    startActivity(intent);
+                    finish();
+                }
+            }
+
             if((i == 5) && (i1 == 0) && (l == 0)) {
                 if(activityName.equals(HomeworkMainScreenForAdmin.class.getName())){
                     DrawerLayout drawer = findViewById(R.id.drawer_layout);
