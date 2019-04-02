@@ -6,7 +6,7 @@
 
     <TextView
         android:id="@+id/inTime"
-        android:layout_width="0dp"
+        android:layout_width="75dp"
         android:layout_height="0dp"
         android:padding="5dp"
         android:textColor="#000000"
@@ -63,7 +63,7 @@
 
     <TextView
         android:id="@+id/serial"
-        android:layout_width="80dp"
+        android:layout_width="60dp"
         android:layout_height="0dp"
         android:padding="5dp"
         android:textColor="#000000"

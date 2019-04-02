@@ -41,9 +41,11 @@ import onair.onems.R;
 import onair.onems.Services.GlideApp;
 import onair.onems.Services.RetrofitNetworkService;
 import onair.onems.Services.StaticHelperClass;
+import onair.onems.crm.FullScreenImageViewDialog;
 import onair.onems.mainactivities.SideNavigationMenuParentActivity;
 import onair.onems.mainactivities.StudentMainScreen;
 import onair.onems.mainactivities.TeacherMainScreen;
+import onair.onems.studentlist.ReportAllStudentListDetails;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -126,6 +128,37 @@ public class Profile extends SideNavigationMenuParentActivity {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        imageProfile.setOnClickListener(view-> {
+            dialog.show();
+            try {
+                GlideApp.with(this)
+                        .asBitmap()
+                        .error(getResources().getDrawable(R.drawable.profileavater))
+                        .load(getString(R.string.baseUrl)+"/"+ImageUrl.replace("\\","/"))
+                        .diskCacheStrategy(DiskCacheStrategy.NONE)
+                        .skipMemoryCache(true)
+                        .into(new SimpleTarget<Bitmap>() {
+                            @Override
+                            public void onResourceReady(@NonNull Bitmap resource, Transition<? super Bitmap> transition) {
+                                if(resource != null) {
+                                    FullScreenImageViewDialog fullScreenImageViewDialog = new FullScreenImageViewDialog(Profile.this, Profile.this, resource);
+                                    fullScreenImageViewDialog.setCancelable(true);
+                                    fullScreenImageViewDialog.show();
+                                    dialog.dismiss();
+                                }
+                            }
+                            @Override
+                            public void onLoadFailed(Drawable errorDrawable) {
+                                super.onLoadFailed(errorDrawable);
+                                dialog.dismiss();
+                                Toast.makeText(Profile.this,"No image found!!!",Toast.LENGTH_LONG).show();
+                            }
+                        });
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
 
         cover.setImageDrawable(getResources().getDrawable(R.drawable.cover));
 

@@ -201,6 +201,10 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        if (activityName.equalsIgnoreCase(StudentMainScreen.class.getName()) || activityName.equalsIgnoreCase(TeacherMainScreen.class.getName())) {
+            getSupportActionBar().hide();
+        }
+
         notificationCounter = findViewById(R.id.notificationCounter);
         int i = getSharedPreferences("UNSEEN_NOTIFICATIONS", Context.MODE_PRIVATE)
                 .getInt("unseen", 0);
@@ -222,6 +226,12 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
         textProfile = findViewById(R.id.textProfile);
         textNotification = findViewById(R.id.textNotification);
         textContacts = findViewById(R.id.textContact);
+
+        if(activityName.equalsIgnoreCase(TeacherMainScreen.class.getName()) || activityName.equalsIgnoreCase(StudentMainScreen.class.getName())){
+            dashboard.setBackgroundColor(Color.parseColor("#f9f7f7"));
+            iconDashboard.setColorFilter(Color.parseColor("#0550b7"));
+            textDashboard.setTextColor(Color.parseColor("#0550b7"));
+        }
 
         if(activityName.equalsIgnoreCase(Profile.class.getName())){
             profile.setBackgroundColor(Color.parseColor("#f9f7f7"));
@@ -248,25 +258,35 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
             textDashboard.setTextColor(Color.parseColor("#0550b7"));
 
             if(UserTypeID == 1) {
-                Intent mainIntent = new Intent(getApplicationContext(),TeacherMainScreen.class);
-                startActivity(mainIntent);
-                finish();
+                if(!activityName.equalsIgnoreCase(TeacherMainScreen.class.getName())){
+                    Intent mainIntent = new Intent(getApplicationContext(), TeacherMainScreen.class);
+                    startActivity(mainIntent);
+                    finish();
+                }
             } else if(UserTypeID == 2) {
-                Intent mainIntent = new Intent(getApplicationContext(),TeacherMainScreen.class);
-                startActivity(mainIntent);
-                finish();
+                if(!activityName.equalsIgnoreCase(TeacherMainScreen.class.getName())){
+                    Intent mainIntent = new Intent(getApplicationContext(), TeacherMainScreen.class);
+                    startActivity(mainIntent);
+                    finish();
+                }
             } else if(UserTypeID == 3) {
-                Intent mainIntent = new Intent(getApplicationContext(),StudentMainScreen.class);
-                startActivity(mainIntent);
-                finish();
+                if(!activityName.equalsIgnoreCase(StudentMainScreen.class.getName())){
+                    Intent mainIntent = new Intent(getApplicationContext(), StudentMainScreen.class);
+                    startActivity(mainIntent);
+                    finish();
+                }
             } else if(UserTypeID == 4) {
-                Intent mainIntent = new Intent(getApplicationContext(),TeacherMainScreen.class);
-                startActivity(mainIntent);
-                finish();
+                if(!activityName.equalsIgnoreCase(TeacherMainScreen.class.getName())){
+                    Intent mainIntent = new Intent(getApplicationContext(), TeacherMainScreen.class);
+                    startActivity(mainIntent);
+                    finish();
+                }
             } else if(UserTypeID == 5) {
-                Intent mainIntent = new Intent(getApplicationContext(),StudentMainScreen.class);
-                startActivity(mainIntent);
-                finish();
+                if(!activityName.equalsIgnoreCase(StudentMainScreen.class.getName())){
+                    Intent mainIntent = new Intent(getApplicationContext(), StudentMainScreen.class);
+                    startActivity(mainIntent);
+                    finish();
+                }
             }
         });
 
@@ -771,9 +791,16 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
 //                Log.d("DEBUG", "heading clicked"+i+"--"+l);
 
             if((i == 0) && (l == 0)) {
-                Intent intent = new Intent(getApplicationContext(), TeacherMainScreen.class);
-                startActivity(intent);
-                finish();
+                if(activityName.equals(TeacherMainScreen.class.getName())){
+                    DrawerLayout drawer = findViewById(R.id.drawer_layout);
+                    if (drawer.isDrawerOpen(GravityCompat.START)) {
+                        drawer.closeDrawer(GravityCompat.START);
+                    }
+                } else {
+                    Intent intent = new Intent(getApplicationContext(), TeacherMainScreen.class);
+                    startActivity(intent);
+                    finish();
+                }
             }
 
             if((i == 1) && (l == 1)) {
@@ -1257,9 +1284,16 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
 //                Log.d("DEBUG", "heading clicked"+i+"--"+l);
 
             if((i == 0) && (l == 0)) {
-                Intent intent = new Intent(getApplicationContext(), TeacherMainScreen.class);
-                startActivity(intent);
-                finish();
+                if(activityName.equals(TeacherMainScreen.class.getName())){
+                    DrawerLayout drawer = findViewById(R.id.drawer_layout);
+                    if (drawer.isDrawerOpen(GravityCompat.START)) {
+                        drawer.closeDrawer(GravityCompat.START);
+                    }
+                } else {
+                    Intent intent = new Intent(getApplicationContext(), TeacherMainScreen.class);
+                    startActivity(intent);
+                    finish();
+                }
             }
 
             if((i == 1) && (l == 1)) {
@@ -1739,9 +1773,16 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
 //                Log.d("DEBUG", "heading clicked"+i+"--"+l);
 
             if((i == 0) && (l == 0)) {
-                Intent intent = new Intent(getApplicationContext(), TeacherMainScreen.class);
-                startActivity(intent);
-                finish();
+                if(activityName.equals(TeacherMainScreen.class.getName())){
+                    DrawerLayout drawer = findViewById(R.id.drawer_layout);
+                    if (drawer.isDrawerOpen(GravityCompat.START)) {
+                        drawer.closeDrawer(GravityCompat.START);
+                    }
+                } else {
+                    Intent intent = new Intent(getApplicationContext(), TeacherMainScreen.class);
+                    startActivity(intent);
+                    finish();
+                }
             }
 
             if((i == 1) && (l == 1)) {
@@ -2133,9 +2174,16 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
 //                Log.d("DEBUG", "heading clicked"+i+"--"+l);
 
             if((i == 0) && (l == 0)) {
-                Intent intent = new Intent(getApplicationContext(), StudentMainScreen.class);
-                startActivity(intent);
-                finish();
+                if(activityName.equals(StudentMainScreen.class.getName())){
+                    DrawerLayout drawer = findViewById(R.id.drawer_layout);
+                    if (drawer.isDrawerOpen(GravityCompat.START)) {
+                        drawer.closeDrawer(GravityCompat.START);
+                    }
+                } else {
+                    Intent intent = new Intent(getApplicationContext(), StudentMainScreen.class);
+                    startActivity(intent);
+                    finish();
+                }
             }
 
             if((i == 1) && (l == 1)) {
@@ -2404,9 +2452,16 @@ public class SideNavigationMenuParentActivity extends AppCompatActivity implemen
 //                Log.d("DEBUG", "heading clicked"+i+"--"+l);
 
             if((i == 0) && (l == 0)) {
-                Intent intent = new Intent(getApplicationContext(), StudentMainScreen.class);
-                startActivity(intent);
-                finish();
+                if(activityName.equals(StudentMainScreen.class.getName())){
+                    DrawerLayout drawer = findViewById(R.id.drawer_layout);
+                    if (drawer.isDrawerOpen(GravityCompat.START)) {
+                        drawer.closeDrawer(GravityCompat.START);
+                    }
+                } else {
+                    Intent intent = new Intent(getApplicationContext(), StudentMainScreen.class);
+                    startActivity(intent);
+                    finish();
+                }
             }
 
             if((i == 1) && (l == 1)) {
