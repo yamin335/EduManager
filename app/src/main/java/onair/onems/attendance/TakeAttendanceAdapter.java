@@ -65,7 +65,8 @@ public class TakeAttendanceAdapter extends RecyclerView.Adapter<TakeAttendanceAd
             holder.present.setChecked(false);
         }
 
-        if(attendanceStudentModel.getIsAbsent() == 1) {
+        if(attendanceStudentModel.getIsAbsent() == 1 && attendanceStudentModel.getIslate() != 1
+                && attendanceStudentModel.getIsLeave() != 1 && attendanceStudentModel.getIsPresent() != 1) {
             holder.absent.setChecked(true);
         } else {
             holder.absent.setChecked(false);

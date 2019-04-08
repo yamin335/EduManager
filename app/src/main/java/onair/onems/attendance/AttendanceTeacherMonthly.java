@@ -12,6 +12,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TableLayout;
 import android.widget.TextView;
@@ -305,10 +306,12 @@ public class AttendanceTeacherMonthly extends SideNavigationMenuParentActivity {
                 JsonParser parser = new JsonParser();
                 JsonArray jsonArray = parser.parse(response).getAsJsonArray();
                 if (jsonArray.size() > 0) {
+                    LayoutInflater inflater = (LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                    View headerView = Objects.requireNonNull(inflater).inflate(R.layout.attendance_teacher_monthly_header, null);
+                    tableLayout.addView(headerView);
                     for (int i=0; i<jsonArray.size(); i++) {
                         int classes = 0, present = 0;
-                        LayoutInflater inflater = (LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                        final View rowView = Objects.requireNonNull(inflater).inflate(R.layout.attendance_teacher_monthly_row, null);
+                        View rowView = Objects.requireNonNull(inflater).inflate(R.layout.attendance_teacher_monthly_row, null);
                         TextView serial = rowView.findViewById(R.id.serial);
                         serial.setText(Integer.toString(i+1));
                         JsonObject jsonObject = jsonArray.get(i).getAsJsonObject();
@@ -342,6 +345,7 @@ public class AttendanceTeacherMonthly extends SideNavigationMenuParentActivity {
                             TextView totalLeave = rowView.findViewById(R.id.totalLeave);
                             totalLeave.setText(jsonObject.get("TotalLeave").getAsString());
                         }
+
                         tableLayout.addView(rowView, i+1);
                     }
                 }

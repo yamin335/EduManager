@@ -63,7 +63,8 @@ public interface RetrofitNetworkService {
 
     @Headers("Authorization: Request_From_onEMS_Android_app")
     @GET("/api/onEms/getClassWiseInsExame/{InstituteID}/{MediumID}/{ClassID}")
-    Observable<String> getClassWiseInsExame(@Path("InstituteID") long InstituteID, @Path("MediumID") long MediumID, @Path("ClassID") long ClassID);
+    Observable<String> getClassWiseInsExame(@Path("InstituteID") long InstituteID,
+                                            @Path("MediumID") long MediumID, @Path("ClassID") long ClassID);
 
     @Headers("Authorization: Request_From_onEMS_Android_app")
     @GET("/api/onEms/ClassWiseDepartmentDDL/{InstituteID}/{ClassID}/{MediumID}")
@@ -255,10 +256,11 @@ public interface RetrofitNetworkService {
                                                           @Path("ExamID") String ExamID);
 
     @Headers("Authorization: Request_From_onEMS_Android_app")
-    @GET("/api/onEms/spGetCommonClassExamRoutine/{InstituteID}/{ExamID}/{MediumID}/{ClassID}/{DepartmentID}/{SessionID}")
+    @GET("/api/onEms/spGetCommonClassExamRoutine/{InstituteID}/{ExamID}/{MediumID}/{ClassID}/{DepartmentID}/{SessionID}/{isViva}")
     Observable<String> spGetCommonClassExamRoutine(@Path("InstituteID") long InstituteID, @Path("ExamID") long ExamID,
                                                    @Path("MediumID") long MediumID, @Path("ClassID") long ClassID,
-                                                   @Path("DepartmentID") long DepartmentID, @Path("SessionID") long SessionID);
+                                                   @Path("DepartmentID") long DepartmentID, @Path("SessionID") long SessionID,
+                                                   @Path("isViva") boolean isViva);
 
     @Headers("Authorization: Request_From_onEMS_Android_app")
     @GET("/api/onEms/spGetDashClassRoutine/{ShiftID}/{MediumID}/{ClassID}/{SectionID}/{DepartmentID}/{DayID}/{InstituteID}")

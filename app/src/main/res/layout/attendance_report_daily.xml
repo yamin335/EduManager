@@ -1,290 +1,285 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+<android.support.v4.widget.NestedScrollView
+    android:layout_height="match_parent"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-    <CheckBox
-        android:id="@+id/rfid"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/present"
-        app:layout_constraintBottom_toBottomOf="@+id/absent"
-        app:layout_constraintEnd_toStartOf="@+id/absent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/absent" />
-
-    <CheckBox
-        android:id="@+id/absent"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="@string/absent"
-        app:layout_constraintEnd_toStartOf="@+id/late"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/rfid"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <CheckBox
-        android:id="@+id/late"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/late"
-        app:layout_constraintBottom_toBottomOf="@+id/absent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/absent"
-        app:layout_constraintTop_toTopOf="@+id/absent" />
-
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/recycler"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginBottom="8dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/constraintLayout3" />
-
-    <TableLayout
-        android:id="@+id/tableLayout"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginRight="8dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/absent">
-
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="#333333">
-
-            <TextView
-                android:id="@+id/textView23"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:padding="5dp"
-                android:text="Total Student"
-                android:textColor="#ffffff"
-                android:background="@drawable/table_cell_border_black"/>
-
-            <TextView
-                android:id="@+id/textView24"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:padding="5dp"
-                android:text="Margin Time"
-                android:textColor="#ffffff"
-                android:background="@drawable/table_cell_border_black"/>
-        </TableRow>
-
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="#2196F3">
-
-            <TextView
-                android:id="@+id/totalStudent"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:padding="5dp"
-                android:textColor="#ffffff"
-                android:background="@drawable/table_cell_border_black"/>
-
-            <TextView
-                android:id="@+id/marginTime"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:padding="5dp"
-                android:textColor="#ffffff"
-                android:background="@drawable/table_cell_border_black"/>
-        </TableRow>
-
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="#333333">
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:background="@drawable/table_cell_border_black"
-                android:gravity="center"
-                android:padding="5dp"
-                android:text="Total Present"
-                android:textColor="#ffffff" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:background="@drawable/table_cell_border_black"
-                android:gravity="center"
-                android:padding="5dp"
-                android:text="Total Absent"
-                android:textColor="#ffffff" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:background="@drawable/table_cell_border_black"
-                android:gravity="center"
-                android:padding="5dp"
-                android:text="Total Late"
-                android:textColor="#ffffff" />
-        </TableRow>
-
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="#2196F3">
-
-            <TextView
-                android:id="@+id/totalPresent"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:padding="5dp"
-                android:textColor="#ffffff"
-                android:background="@drawable/table_cell_border_black"/>
-
-            <TextView
-                android:id="@+id/totalAbsent"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:padding="5dp"
-                android:textColor="#ffffff"
-                android:background="@drawable/table_cell_border_black"/>
-
-            <TextView
-                android:id="@+id/totalLate"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:padding="5dp"
-                android:textColor="#ffffff"
-                android:background="@drawable/table_cell_border_black"/>
-        </TableRow>
-    </TableLayout>
-
+    android:overScrollMode="always"
+    xmlns:android="http://schemas.android.com/apk/res/android">
     <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/constraintLayout3"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginBottom="8dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tableLayout"
-        app:layout_constraintVertical_bias="0.0">
+        android:layout_height="match_parent">
 
-        <TextView
-            android:id="@+id/inTime"
-            android:layout_width="75dp"
-            android:layout_height="0dp"
-            android:background="@drawable/table_header_blue"
-            android:padding="5dp"
-            android:text="IN TIME"
-            android:textColor="#ffffff"
-            app:layout_constraintBottom_toBottomOf="@+id/status"
+        <CheckBox
+            android:id="@+id/rfid"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/present"
+            app:layout_constraintBottom_toBottomOf="@+id/absent"
+            app:layout_constraintEnd_toStartOf="@+id/absent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/absent" />
+
+        <CheckBox
+            android:id="@+id/absent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/absent"
+            app:layout_constraintEnd_toStartOf="@+id/late"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/rfid"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <CheckBox
+            android:id="@+id/late"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/late"
+            app:layout_constraintBottom_toBottomOf="@+id/absent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintHorizontal_weight="1"
-            app:layout_constraintStart_toEndOf="@+id/status"
-            app:layout_constraintTop_toTopOf="@+id/status" />
+            app:layout_constraintStart_toEndOf="@+id/absent"
+            app:layout_constraintTop_toTopOf="@+id/absent" />
 
-        <TextView
-            android:id="@+id/status"
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recycler"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:background="@drawable/table_header_blue"
-            android:padding="5dp"
-            android:text="STATUS"
-            android:textColor="#ffffff"
-            app:layout_constraintBottom_toBottomOf="@+id/roll"
-            app:layout_constraintEnd_toStartOf="@+id/inTime"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintHorizontal_weight="1"
-            app:layout_constraintStart_toEndOf="@+id/roll"
-            app:layout_constraintTop_toTopOf="@+id/roll" />
+            android:layout_marginBottom="8dp"
+            android:clipToPadding="false"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/constraintLayout3" />
 
-        <TextView
-            android:id="@+id/roll"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:background="@drawable/table_header_blue"
-            android:padding="5dp"
-            android:text="ROLL"
-            android:textColor="#ffffff"
-            app:layout_constraintBottom_toBottomOf="@+id/teacherName"
-            app:layout_constraintEnd_toStartOf="@+id/status"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintHorizontal_weight="1"
-            app:layout_constraintStart_toEndOf="@+id/teacherName"
-            app:layout_constraintTop_toTopOf="@+id/teacherName" />
-
-        <TextView
-            android:id="@+id/teacherName"
+        <TableLayout
+            android:id="@+id/tableLayout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:background="@drawable/table_header_blue"
-            android:padding="5dp"
-            android:text="STUDENT NAME"
-            android:textColor="#ffffff"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/roll"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintHorizontal_weight="2.2"
-            app:layout_constraintStart_toEndOf="@+id/serial"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.0" />
-
-        <TextView
-            android:id="@+id/serial"
-            android:layout_width="60dp"
-            android:layout_height="0dp"
-            android:background="@drawable/table_header_blue"
-            android:padding="5dp"
-            android:text="SL"
-            android:textColor="#ffffff"
-            app:layout_constraintBottom_toBottomOf="@+id/teacherName"
-            app:layout_constraintEnd_toStartOf="@+id/teacherName"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintHorizontal_chainStyle="spread_inside"
+            android:layout_marginTop="8dp"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/teacherName"
-            app:layout_constraintVertical_bias="0.0" />
-    </android.support.constraint.ConstraintLayout>
+            app:layout_constraintTop_toBottomOf="@+id/absent">
 
-</android.support.constraint.ConstraintLayout>
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#333333">
+
+                <TextView
+                    android:id="@+id/textView23"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:padding="5dp"
+                    android:text="Total Student"
+                    android:textColor="#ffffff"
+                    android:background="@drawable/table_cell_border_black"/>
+
+                <TextView
+                    android:id="@+id/textView24"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:padding="5dp"
+                    android:text="Margin Time"
+                    android:textColor="#ffffff"
+                    android:background="@drawable/table_cell_border_black"/>
+            </TableRow>
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#2196F3">
+
+                <TextView
+                    android:id="@+id/totalStudent"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:padding="5dp"
+                    android:textColor="#ffffff"
+                    android:background="@drawable/table_cell_border_black"/>
+
+                <TextView
+                    android:id="@+id/marginTime"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:padding="5dp"
+                    android:textColor="#ffffff"
+                    android:background="@drawable/table_cell_border_black"/>
+            </TableRow>
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#333333">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@drawable/table_cell_border_black"
+                    android:gravity="center"
+                    android:padding="5dp"
+                    android:text="Total Present"
+                    android:textColor="#ffffff" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@drawable/table_cell_border_black"
+                    android:gravity="center"
+                    android:padding="5dp"
+                    android:text="Total Absent"
+                    android:textColor="#ffffff" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@drawable/table_cell_border_black"
+                    android:gravity="center"
+                    android:padding="5dp"
+                    android:text="Total Late"
+                    android:textColor="#ffffff" />
+            </TableRow>
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#2196F3">
+
+                <TextView
+                    android:id="@+id/totalPresent"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:padding="5dp"
+                    android:textColor="#ffffff"
+                    android:background="@drawable/table_cell_border_black"/>
+
+                <TextView
+                    android:id="@+id/totalAbsent"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:padding="5dp"
+                    android:textColor="#ffffff"
+                    android:background="@drawable/table_cell_border_black"/>
+
+                <TextView
+                    android:id="@+id/totalLate"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:padding="5dp"
+                    android:textColor="#ffffff"
+                    android:background="@drawable/table_cell_border_black"/>
+            </TableRow>
+        </TableLayout>
+
+        <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/constraintLayout3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tableLayout"
+            app:layout_constraintVertical_bias="0.0">
+
+            <TextView
+                android:id="@+id/inTime"
+                android:layout_width="75dp"
+                android:layout_height="0dp"
+                android:background="@drawable/table_header_blue"
+                android:padding="5dp"
+                android:text="IN TIME"
+                android:textColor="#ffffff"
+                app:layout_constraintBottom_toBottomOf="@+id/status"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintHorizontal_weight="1"
+                app:layout_constraintStart_toEndOf="@+id/status"
+                app:layout_constraintTop_toTopOf="@+id/status" />
+
+            <TextView
+                android:id="@+id/status"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:background="@drawable/table_header_blue"
+                android:padding="5dp"
+                android:text="STATUS"
+                android:textColor="#ffffff"
+                app:layout_constraintBottom_toBottomOf="@+id/roll"
+                app:layout_constraintEnd_toStartOf="@+id/inTime"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintHorizontal_weight="1"
+                app:layout_constraintStart_toEndOf="@+id/roll"
+                app:layout_constraintTop_toTopOf="@+id/roll" />
+
+            <TextView
+                android:id="@+id/roll"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:background="@drawable/table_header_blue"
+                android:padding="5dp"
+                android:text="ROLL"
+                android:textColor="#ffffff"
+                app:layout_constraintBottom_toBottomOf="@+id/teacherName"
+                app:layout_constraintEnd_toStartOf="@+id/status"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintHorizontal_weight="1"
+                app:layout_constraintStart_toEndOf="@+id/teacherName"
+                app:layout_constraintTop_toTopOf="@+id/teacherName" />
+
+            <TextView
+                android:id="@+id/teacherName"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/table_header_blue"
+                android:padding="5dp"
+                android:text="STUDENT NAME"
+                android:textColor="#ffffff"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/roll"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintHorizontal_weight="2.2"
+                app:layout_constraintStart_toEndOf="@+id/serial"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.0" />
+
+            <TextView
+                android:id="@+id/serial"
+                android:layout_width="60dp"
+                android:layout_height="0dp"
+                android:background="@drawable/table_header_blue"
+                android:padding="5dp"
+                android:text="SL"
+                android:textColor="#ffffff"
+                app:layout_constraintBottom_toBottomOf="@+id/teacherName"
+                app:layout_constraintEnd_toStartOf="@+id/teacherName"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintHorizontal_chainStyle="spread_inside"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/teacherName"
+                app:layout_constraintVertical_bias="0.0" />
+        </android.support.constraint.ConstraintLayout>
+
+    </android.support.constraint.ConstraintLayout>
+</android.support.v4.widget.NestedScrollView>
+

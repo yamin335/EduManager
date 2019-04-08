@@ -15,8 +15,10 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -52,6 +54,10 @@ import retrofit2.converter.scalars.ScalarsConverterFactory;
 public class ExamRoutineMainScreen extends SideNavigationMenuParentActivity {
     private Spinner spinnerSession, spinnerMedium, spinnerClass, spinnerExam;
 
+    private Button show;
+
+    private Switch isViva;
+
     private ArrayList<SessionModel> allSessionArrayList;
     private ArrayList<MediumModel> allMediumArrayList;
     private ArrayList<ClassModel> allClassArrayList;
@@ -72,6 +78,9 @@ public class ExamRoutineMainScreen extends SideNavigationMenuParentActivity {
     private TextView className;
 
     private long MediumID = 0, ClassID = 0, SessionID = 0, ExamID = 0;
+
+    private boolean isVivaActive = false;
+
     private CompositeDisposable finalDisposer = new CompositeDisposable();
 
     @Override
@@ -108,6 +117,8 @@ public class ExamRoutineMainScreen extends SideNavigationMenuParentActivity {
         spinnerExam = findViewById(R.id.spinnerExam);
         recyclerView = findViewById(R.id.routineClasses);
         className = findViewById(R.id.className);
+        isViva = findViewById(R.id.isViva);
+        show = findViewById(R.id.show);
 
         ArrayAdapter<String> session_spinner_adapter = new ArrayAdapter<>(this, R.layout.spinner_item, tempSessionArray);
         session_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -124,6 +135,31 @@ public class ExamRoutineMainScreen extends SideNavigationMenuParentActivity {
         ArrayAdapter<String> exam_spinner_adapter = new ArrayAdapter<>(this, R.layout.spinner_item, tempExamArray);
         exam_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerExam.setAdapter(exam_spinner_adapter);
+
+        show.setOnClickListener(view -> {
+            if(StaticHelperClass.isNetworkAvailable(ExamRoutineMainScreen.this)) {
+                if(allSessionArrayList.size()>0 && selectedSession.getSessionID() == 0){
+                    Toast.makeText(ExamRoutineMainScreen.this,"Please select session!!! ",
+                            Toast.LENGTH_LONG).show();
+                } else if(allMediumArrayList.size()>0 && (selectedMedium.getMediumID() == -2 || selectedMedium.getMediumID() == 0) && UserTypeID != 3 && UserTypeID != 5) {
+                    Toast.makeText(ExamRoutineMainScreen.this,"Please select medium!!! ",
+                            Toast.LENGTH_LONG).show();
+                } else if(allClassArrayList.size()>0 && (selectedClass.getClassID() == -2 || selectedClass.getClassID() == 0) && UserTypeID != 3 && UserTypeID != 5) {
+                    Toast.makeText(ExamRoutineMainScreen.this,"Please select class!!! ",
+                            Toast.LENGTH_LONG).show();
+                } else if(allExamArrayList.size()>0 && selectedExam.getExamID() == 0) {
+                    Toast.makeText(ExamRoutineMainScreen.this,"Please select exam!!! ",
+                            Toast.LENGTH_LONG).show();
+                } else {
+                    ExamRoutineDataGetRequest();
+                }
+            } else {
+                Toast.makeText(ExamRoutineMainScreen.this,"Please check your internet connection and select again!!! ",
+                        Toast.LENGTH_LONG).show();
+            }
+        });
+
+        isViva.setOnCheckedChangeListener((compoundButton, bChecked) -> isVivaActive = bChecked);
 
         if (UserTypeID == 1 || UserTypeID == 2 || UserTypeID == 4) {
             SessionDataGetRequest();
@@ -241,28 +277,6 @@ public class ExamRoutineMainScreen extends SideNavigationMenuParentActivity {
                     try {
                         selectedExam = allExamArrayList.get(position-1);
                         ExamID = selectedExam.getExamID();
-
-                        if(StaticHelperClass.isNetworkAvailable(ExamRoutineMainScreen.this)) {
-                            if(allSessionArrayList.size()>0 && selectedSession.getSessionID() == 0){
-                                Toast.makeText(ExamRoutineMainScreen.this,"Please select session!!! ",
-                                        Toast.LENGTH_LONG).show();
-                            } else if(allMediumArrayList.size()>0 && (selectedMedium.getMediumID() == -2 || selectedMedium.getMediumID() == 0) && UserTypeID != 3 && UserTypeID != 5) {
-                                Toast.makeText(ExamRoutineMainScreen.this,"Please select medium!!! ",
-                                        Toast.LENGTH_LONG).show();
-                            } else if(allClassArrayList.size()>0 && (selectedClass.getClassID() == -2 || selectedClass.getClassID() == 0) && UserTypeID != 3 && UserTypeID != 5) {
-                                Toast.makeText(ExamRoutineMainScreen.this,"Please select class!!! ",
-                                        Toast.LENGTH_LONG).show();
-                            } else if(allExamArrayList.size()>0 && selectedExam.getExamID() == 0) {
-                                Toast.makeText(ExamRoutineMainScreen.this,"Please select exam!!! ",
-                                        Toast.LENGTH_LONG).show();
-                            } else {
-                                ExamRoutineDataGetRequest();
-                            }
-                        } else {
-                            Toast.makeText(ExamRoutineMainScreen.this,"Please check your internet connection and select again!!! ",
-                                    Toast.LENGTH_LONG).show();
-                        }
-
                     } catch (IndexOutOfBoundsException e) {
                         Toast.makeText(ExamRoutineMainScreen.this,"No Exam found !!!",Toast.LENGTH_LONG).show();
                     }
@@ -598,7 +612,7 @@ public class ExamRoutineMainScreen extends SideNavigationMenuParentActivity {
 
             Observable<String> observable = retrofit
                     .create(RetrofitNetworkService.class)
-                    .spGetCommonClassExamRoutine(InstituteID, ExamID, MediumID, ClassID, 0, SessionID)
+                    .spGetCommonClassExamRoutine(InstituteID, ExamID, MediumID, ClassID, 0, SessionID, isVivaActive)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .unsubscribeOn(Schedulers.io());
