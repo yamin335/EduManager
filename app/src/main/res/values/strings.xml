@@ -182,7 +182,7 @@
     <string name="subject">Subject</string>
     <string name="mark">Mark</string>
     <string name="grade_point">Grade Point</string>
-    <string name="copyright">Copyright © 2018, onAir International Ltd.</string>
+    <string name="copyright">Copyright © 2019, onAir International Ltd.</string>
     <string name="select_exam">Select Exam</string>
     <string name="select_date">Select Date</string>
     <string name="no_syllabus_digital_content_found">No syllabus digital content found</string>
@@ -202,4 +202,5 @@
     <string name="select_shift">Select Shift</string>
     <string name="select_subject">Select Subject</string>
     <string name="teacher1">Teacher</string>
+    <string name="syllabus_not_found">Syllabus not found</string>
 </resources>

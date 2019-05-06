@@ -68,9 +68,6 @@ public class SyllabusMainScreenForAdmin extends SideNavigationMenuParentActivity
     private SectionModel selectedSection;
     private SubjectModel selectedSubject;
     private ExamModel selectedExam;
-
-    private String selectedDate = "";
-    private DatePickerDialog datePickerDialog;
     private boolean hasDepartment = false;
     private CompositeDisposable finalDisposer = new CompositeDisposable();
 
@@ -113,7 +110,6 @@ public class SyllabusMainScreenForAdmin extends SideNavigationMenuParentActivity
         spinnerSubject = findViewById(R.id.spinnerSubject);
         spinnerExam = findViewById(R.id.spinnerExam);
 
-        Button datePicker = findViewById(R.id.pickDate);
         Button showSyllabus = findViewById(R.id.showSyllabus);
 
         ArrayAdapter<String> medium_spinner_adapter = new ArrayAdapter<>(this, R.layout.spinner_item, tempMediumArray);
@@ -139,25 +135,6 @@ public class SyllabusMainScreenForAdmin extends SideNavigationMenuParentActivity
         ArrayAdapter<String> exam_spinner_adapter = new ArrayAdapter<>(this, R.layout.spinner_item, tempExamArray);
         exam_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerExam.setAdapter(exam_spinner_adapter);
-
-        datePicker.setOnClickListener(v -> {
-            // calender class's instance and get current date , month and year from calender
-            final Calendar c = Calendar.getInstance();
-            int mYear = c.get(Calendar.YEAR); // current year
-            int mMonth = c.get(Calendar.MONTH); // current month
-            int mDay = c.get(Calendar.DAY_OF_MONTH); // current day
-            // date picker dialog
-            datePickerDialog = new DatePickerDialog(SyllabusMainScreenForAdmin.this,
-                    (view, year, monthOfYear, dayOfMonth) -> {
-                        // set day of month , month and year value in the edit text
-//                                selectedDate = dayOfMonth + "/" + (monthOfYear + 1) + "/" + year;
-//                                selectedDate = year + "-" + (monthOfYear + 1) + "-" + dayOfMonth;
-                        selectedDate = (monthOfYear + 1) + "-" + dayOfMonth + "-" + year;
-                        datePicker.setText(selectedDate);
-
-                    }, mYear, mMonth, mDay);
-            datePickerDialog.show();
-        });
 
         MediumDataGetRequest();
 
@@ -350,7 +327,6 @@ public class SyllabusMainScreenForAdmin extends SideNavigationMenuParentActivity
                     intent.putExtra("SectionID", selectedSection.getSectionID());
                     intent.putExtra("SubjectID", selectedSubject.getSubjectID());
                     intent.putExtra("ExamID", selectedExam.getExamID());
-                    intent.putExtra("Date", selectedDate);
                     startActivity(intent);
                     finish();
                 }

@@ -139,9 +139,9 @@ public class SubjectWiseMarksEntryStudentList extends CommonToolbarParentActivit
     }
 
     @Override
-    public void onStudentSelected(JSONObject result) {
+    public void onStudentSelected(JSONObject student) {
         Intent otherIntent = new Intent(SubjectWiseMarksEntryStudentList.this, SubjectWiseMarksEntryInputs.class);
-        otherIntent.putExtra("student", result.toString());
+        otherIntent.putExtra("student", student.toString());
         otherIntent.putExtra("SubjectID", SubjectID);
         otherIntent.putExtra("ExamID", intent.getLongExtra("ExamID", 0));
         startActivity(otherIntent);

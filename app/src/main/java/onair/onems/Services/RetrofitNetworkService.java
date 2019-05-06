@@ -67,6 +67,11 @@ public interface RetrofitNetworkService {
                                             @Path("MediumID") long MediumID, @Path("ClassID") long ClassID);
 
     @Headers("Authorization: Request_From_onEMS_Android_app")
+    @GET("/api/onEms/getClassWiseInsExame/{InstituteID}/{MediumID}/{ClassID}")
+    Observable<String> getClassWiseInsExameForSyllabus(@Path("InstituteID") long InstituteID,
+                                            @Path("MediumID") String MediumID, @Path("ClassID") String ClassID);
+
+    @Headers("Authorization: Request_From_onEMS_Android_app")
     @GET("/api/onEms/ClassWiseDepartmentDDL/{InstituteID}/{ClassID}/{MediumID}")
     Observable<String> ClassWiseDepartmentDDL(@Path("InstituteID") long InstituteID, @Path("ClassID") long ClassID, @Path("MediumID") long MediumID);
 
@@ -136,9 +141,15 @@ public interface RetrofitNetworkService {
                                         @Path("TeacherID") String TeacherID);
 
     @Headers("Authorization: Request_From_onEMS_Android_app")
+    @GET("/api/onEms/getSubjectByParms/{InstituteID}/{SectionID}/{DepartmentID}/{MediumID}/{ClassID}")
+    Observable<String> getSubjectByParams(@Path("InstituteID") long InstituteID, @Path("SectionID") String SectionID,
+                                          @Path("DepartmentID") String DepartmentID, @Path("MediumID") String MediumID,
+                                          @Path("ClassID") String ClassID);
+
+    @Headers("Authorization: Request_From_onEMS_Android_app")
     @GET("/api/onEms/getInsSubject/{InstituteID}/{DepartmentID}/{MediumID}/{ClassID}")
     Observable<String> getInsSubject(@Path("InstituteID") long InstituteID, @Path("DepartmentID") long DepartmentID,
-                                              @Path("MediumID") long MediumID, @Path("ClassID") long ClassID);
+                                     @Path("MediumID") long MediumID, @Path("ClassID") long ClassID);
 
     @Headers("Authorization: Request_From_onEMS_Android_app")
     @GET("/api/onEms/getSubjectWiseMarks/{UserID}/{InstituteID}/{ClassID}/{SectionID}/{DepartmentID}/{MediumID}/{ShiftID}/{SubjectID}/{ExamID}/{SessionID}")
@@ -198,6 +209,16 @@ public interface RetrofitNetworkService {
                                                         @Path("ExamID") String ExamID,
                                                         @Path("fromDate") String fromDate,
                                                         @Path("toDate") String toDate);
+
+    @Headers("Authorization: Request_From_onEMS_Android_app")
+    @GET("/api/onEms/getSyllabusmaster/{MediumID}/{DepartmentID}/{ClassID}/{SectionID}/{SubjectID}/{ExamID}/{InstituteID}")
+    Observable<String> getSyllabusmaster(@Path("MediumID") String MediumID,
+                                         @Path("DepartmentID") String DepartmentID,
+                                         @Path("ClassID") String ClassID,
+                                         @Path("SectionID") String SectionID,
+                                         @Path("SubjectID") String SubjectID,
+                                         @Path("ExamID") String ExamID,
+                                         @Path("InstituteID") long InstituteID);
 
     @Headers("Authorization: Request_From_onEMS_Android_app")
     @GET("/api/onEms/getUrlMasterByID/{SyllabusID}")

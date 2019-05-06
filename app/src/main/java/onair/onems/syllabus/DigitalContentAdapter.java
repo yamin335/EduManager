@@ -19,6 +19,7 @@ public class DigitalContentAdapter extends RecyclerView.Adapter<RecyclerView.Vie
     private Context context;
     private ArrayList<JSONObject> contentList;
     private AddFileToDownloader downloader;
+    private ViewImageInFullScreen viewImageInFullScreen;
     private static final int IMAGE_TYPE = 1;
     private static final int FILE_TYPE = 2;
     private static final int AUDIO_TYPE = 3;
@@ -39,11 +40,12 @@ public class DigitalContentAdapter extends RecyclerView.Adapter<RecyclerView.Vie
     }
 
 
-    public DigitalContentAdapter(Context context, AddFileToDownloader downloader, ArrayList<JSONObject> contentList, ContentType contentType) {
+    public DigitalContentAdapter(Context context, AddFileToDownloader downloader, ViewImageInFullScreen viewImageInFullScreen, ArrayList<JSONObject> contentList, ContentType contentType) {
         this.contentType = contentType;
         this.context = context;
         this.contentList = contentList;
         this.downloader = downloader;
+        this.viewImageInFullScreen = viewImageInFullScreen;
     }
 
     @NonNull
@@ -57,6 +59,7 @@ public class DigitalContentAdapter extends RecyclerView.Adapter<RecyclerView.Vie
         if(viewType == IMAGE_TYPE){
             image.setImageResource(R.drawable.image_icon);
             play.setImageResource(R.drawable.preview_icon);
+            play.setClickable(true);
             download.setImageResource(R.drawable.download_icon);
             return new MyViewHolder(itemView);
         } else if(viewType == AUDIO_TYPE) {
@@ -71,7 +74,7 @@ public class DigitalContentAdapter extends RecyclerView.Adapter<RecyclerView.Vie
             return new MyViewHolder(itemView);
         } else if(viewType == FILE_TYPE) {
             image.setImageResource(R.drawable.file_icon);
-            play.setImageResource(R.drawable.preview_icon);
+//            play.setImageResource(R.drawable.preview_icon);
             download.setImageResource(R.drawable.download_icon);
             return new MyViewHolder(itemView);
         } else {
@@ -104,21 +107,20 @@ public class DigitalContentAdapter extends RecyclerView.Adapter<RecyclerView.Vie
         if(holder.getItemViewType() == IMAGE_TYPE) {
             MyViewHolder viewHolder = (MyViewHolder)holder;
             viewHolder.contentName.setText(title);
-            viewHolder.play.setOnClickListener(v -> {
-
-            });
             final String finalUrl = url;
             viewHolder.download.setOnClickListener(v -> {
                 if(!finalUrl.equalsIgnoreCase("null")){
                     downloader.downloadFile(finalUrl);
                 }
             });
+            viewHolder.play.setOnClickListener(v -> {
+                if(!finalUrl.equalsIgnoreCase("null")){
+                    viewImageInFullScreen.onViewPressed(finalUrl);
+                }
+            });
         } else if(holder.getItemViewType() == AUDIO_TYPE) {
             MyViewHolder viewHolder = (MyViewHolder)holder;
             viewHolder.contentName.setText(title);
-            viewHolder.play.setOnClickListener(v -> {
-
-            });
             final String finalUrl = url;
             viewHolder.download.setOnClickListener(v -> {
                 if(!finalUrl.equalsIgnoreCase("null")){
@@ -128,9 +130,6 @@ public class DigitalContentAdapter extends RecyclerView.Adapter<RecyclerView.Vie
         } else if(holder.getItemViewType() == VIDEO_TYPE) {
             MyViewHolder viewHolder = (MyViewHolder)holder;
             viewHolder.contentName.setText(title);
-            viewHolder.play.setOnClickListener(v -> {
-
-            });
             final String finalUrl = url;
             viewHolder.download.setOnClickListener(v -> {
                 if(!finalUrl.equalsIgnoreCase("null")){
@@ -140,9 +139,6 @@ public class DigitalContentAdapter extends RecyclerView.Adapter<RecyclerView.Vie
         } else if(holder.getItemViewType() == FILE_TYPE) {
             MyViewHolder viewHolder = (MyViewHolder)holder;
             viewHolder.contentName.setText(title);
-            viewHolder.play.setOnClickListener(v -> {
-
-            });
             final String finalUrl = url;
             viewHolder.download.setOnClickListener(v -> {
                 if(!finalUrl.equalsIgnoreCase("null")){
@@ -221,6 +217,10 @@ public class DigitalContentAdapter extends RecyclerView.Adapter<RecyclerView.Vie
 
     public interface AddFileToDownloader {
         void downloadFile(String url);
+    }
+
+    public interface ViewImageInFullScreen {
+        void onViewPressed(String url);
     }
 
 }

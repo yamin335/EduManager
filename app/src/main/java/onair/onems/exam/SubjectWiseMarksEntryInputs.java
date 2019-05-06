@@ -94,6 +94,31 @@ public class SubjectWiseMarksEntryInputs extends CommonToolbarParentActivity {
             }
         });
 
+        try {
+            if (!student.getString("PassMCQ").equalsIgnoreCase("null") && !student.getString("PassMCQ").equalsIgnoreCase("0")) {
+                mcq.setEnabled(true);
+            } else {
+                mcq.setEnabled(false);
+            }
+            if (!student.getString("PassWritten").equalsIgnoreCase("null") && !student.getString("PassWritten").equalsIgnoreCase("0")) {
+                written.setEnabled(true);
+            } else {
+                written.setEnabled(false);
+            }
+            if (!student.getString("PassPrecticle").equalsIgnoreCase("null") && !student.getString("PassPrecticle").equalsIgnoreCase("0")) {
+                practical.setEnabled(true);
+            } else {
+                practical.setEnabled(false);
+            }
+            if (!student.getString("PassAttendance").equalsIgnoreCase("null") && !student.getString("PassAttendance").equalsIgnoreCase("0")) {
+                attendance.setEnabled(true);
+            } else {
+                attendance.setEnabled(false);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
         Button save = findViewById(R.id.show);
         save.setOnClickListener(view -> {
 

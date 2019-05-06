@@ -10,6 +10,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
@@ -29,6 +31,10 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.transition.Transition;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -45,8 +51,11 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
 import onair.onems.R;
+import onair.onems.Services.GlideApp;
 import onair.onems.Services.RetrofitNetworkService;
 import onair.onems.Services.StaticHelperClass;
+import onair.onems.crm.FullScreenImageViewDialog;
+import onair.onems.lesson_plan.LessonPlanMainScreen;
 import onair.onems.mainactivities.SideNavigationMenuParentActivity;
 import onair.onems.mainactivities.StudentMainScreen;
 import onair.onems.syllabus.DigitalContentAdapter;
@@ -58,7 +67,7 @@ import retrofit2.converter.scalars.ScalarsConverterFactory;
 import static onair.onems.Services.StaticHelperClass.isNetworkAvailable;
 
 public class HomeworkMainScreen extends SideNavigationMenuParentActivity implements HomeworkAdapter.HomeworkAdapterListener,
-        DigitalContentAdapter.AddFileToDownloader{
+        DigitalContentAdapter.AddFileToDownloader, DigitalContentAdapter.ViewImageInFullScreen{
 
     private ArrayList<JSONObject> homeworkList;
     private ArrayList<JSONObject> digitalContentList;
@@ -133,7 +142,7 @@ public class HomeworkMainScreen extends SideNavigationMenuParentActivity impleme
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(mAdapter);
 
-        mDigitalAdapter = new DigitalContentAdapter(this, this, digitalContentList, DigitalContentAdapter.ContentType.HOMEWORK);
+        mDigitalAdapter = new DigitalContentAdapter(this, this, this, digitalContentList, DigitalContentAdapter.ContentType.HOMEWORK);
         RecyclerView recycler = findViewById(R.id.recycler);
         RecyclerView.LayoutManager mDigitalLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
         recycler.setLayoutManager(mDigitalLayoutManager);
@@ -514,6 +523,36 @@ public class HomeworkMainScreen extends SideNavigationMenuParentActivity impleme
             return ".pdf";
         } else {
             return "UnknownFileType";
+        }
+    }
+
+    @Override
+    public void onViewPressed(String url) {
+        try {
+            GlideApp.with(this)
+                    .asBitmap()
+                    .load(getString(R.string.baseUrl)+"/"+url.replace("\\","/"))
+                    .diskCacheStrategy(DiskCacheStrategy.NONE)
+                    .skipMemoryCache(true)
+                    .into(new SimpleTarget<Bitmap>() {
+                        @Override
+                        public void onResourceReady(@NonNull Bitmap resource, Transition<? super Bitmap> transition) {
+                            if(resource != null) {
+                                FullScreenImageViewDialog fullScreenImageViewDialog = new FullScreenImageViewDialog(HomeworkMainScreen.this, HomeworkMainScreen.this, resource);
+                                fullScreenImageViewDialog.setCancelable(true);
+                                fullScreenImageViewDialog.show();
+                                dialog.dismiss();
+                            }
+                        }
+                        @Override
+                        public void onLoadFailed(Drawable errorDrawable) {
+                            super.onLoadFailed(errorDrawable);
+                            dialog.dismiss();
+                            Toast.makeText(HomeworkMainScreen.this,"No image found!!!",Toast.LENGTH_LONG).show();
+                        }
+                    });
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }

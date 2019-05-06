@@ -10,6 +10,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
@@ -29,6 +31,10 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.transition.Transition;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -45,11 +51,14 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
 import onair.onems.R;
+import onair.onems.Services.GlideApp;
 import onair.onems.Services.RetrofitNetworkService;
 import onair.onems.Services.StaticHelperClass;
+import onair.onems.crm.FullScreenImageViewDialog;
 import onair.onems.mainactivities.SideNavigationMenuParentActivity;
 import onair.onems.mainactivities.StudentMainScreen;
 import onair.onems.syllabus.DigitalContentAdapter;
+import onair.onems.syllabus.SyllabusMainScreen;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -58,7 +67,7 @@ import retrofit2.converter.scalars.ScalarsConverterFactory;
 import static onair.onems.Services.StaticHelperClass.isNetworkAvailable;
 
 public class LessonPlanMainScreen extends SideNavigationMenuParentActivity implements LessonPlanAdapter.LessonPlanAdapterListener,
-        DigitalContentAdapter.AddFileToDownloader{
+        DigitalContentAdapter.AddFileToDownloader, DigitalContentAdapter.ViewImageInFullScreen{
 
     private Button datePicker;
     private TextView topicTitle, topicDetails, lessonDigitalEmpty, lessonPlanEmpty, digitalContentEmpty, homeworkDate;
@@ -111,14 +120,14 @@ public class LessonPlanMainScreen extends SideNavigationMenuParentActivity imple
         lessonPlanRecycler.setItemAnimator(new DefaultItemAnimator());
         lessonPlanRecycler.setAdapter(mAdapter);
 
-        mDigitalAdapter = new DigitalContentAdapter(this, this, digitalContentList, DigitalContentAdapter.ContentType.SYLLABUS);
+        mDigitalAdapter = new DigitalContentAdapter(this, this, this, digitalContentList, DigitalContentAdapter.ContentType.SYLLABUS);
         RecyclerView digitalContentRecycler = findViewById(R.id.digitalContentRecycler);
         RecyclerView.LayoutManager mDigitalLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
         digitalContentRecycler.setLayoutManager(mDigitalLayoutManager);
         digitalContentRecycler.setItemAnimator(new DefaultItemAnimator());
         digitalContentRecycler.setAdapter(mDigitalAdapter);
 
-        mLessonPlanDigitalAdapter = new DigitalContentAdapter(this, this, lessonPlanDigitalContentList, DigitalContentAdapter.ContentType.LESSON);
+        mLessonPlanDigitalAdapter = new DigitalContentAdapter(this, this, this, lessonPlanDigitalContentList, DigitalContentAdapter.ContentType.LESSON);
         RecyclerView lessonPlanDigitalContentRecycler = findViewById(R.id.lessonDigitalRecycler);
         RecyclerView.LayoutManager mLessonDigitalLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
         lessonPlanDigitalContentRecycler.setLayoutManager(mLessonDigitalLayoutManager);
@@ -604,6 +613,36 @@ public class LessonPlanMainScreen extends SideNavigationMenuParentActivity imple
             return ".pdf";
         } else {
             return "UnknownFileType";
+        }
+    }
+
+    @Override
+    public void onViewPressed(String url) {
+        try {
+            GlideApp.with(this)
+                    .asBitmap()
+                    .load(getString(R.string.baseUrl)+"/"+url.replace("\\","/"))
+                    .diskCacheStrategy(DiskCacheStrategy.NONE)
+                    .skipMemoryCache(true)
+                    .into(new SimpleTarget<Bitmap>() {
+                        @Override
+                        public void onResourceReady(@NonNull Bitmap resource, Transition<? super Bitmap> transition) {
+                            if(resource != null) {
+                                FullScreenImageViewDialog fullScreenImageViewDialog = new FullScreenImageViewDialog(LessonPlanMainScreen.this, LessonPlanMainScreen.this, resource);
+                                fullScreenImageViewDialog.setCancelable(true);
+                                fullScreenImageViewDialog.show();
+                                dialog.dismiss();
+                            }
+                        }
+                        @Override
+                        public void onLoadFailed(Drawable errorDrawable) {
+                            super.onLoadFailed(errorDrawable);
+                            dialog.dismiss();
+                            Toast.makeText(LessonPlanMainScreen.this,"No image found!!!",Toast.LENGTH_LONG).show();
+                        }
+                    });
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }
