@@ -34,7 +34,6 @@
             android:id="@+id/show"
             android:layout_width="wrap_content"
             android:layout_height="37dp"
-            android:layout_below="@id/layout6"
             android:layout_centerHorizontal="true"
             android:layout_marginEnd="8dp"
             android:layout_marginRight="8dp"
