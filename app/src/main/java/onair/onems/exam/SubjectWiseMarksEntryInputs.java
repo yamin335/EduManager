@@ -23,6 +23,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Objects;
+import java.util.regex.Pattern;
 
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -41,7 +42,7 @@ import retrofit2.converter.scalars.ScalarsConverterFactory;
 public class SubjectWiseMarksEntryInputs extends CommonToolbarParentActivity {
 
     private JSONObject student;
-    private int totalMarks = 0, mcqMark = 0, writtenMark = 0, attendanceMark = 0, practicalMark = 0;
+    private double totalMarks = 0, mcqMark = 0, writtenMark = 0, attendanceMark = 0, practicalMark = 0;
     private long SubjectID;
     private CompositeDisposable finalDisposer = new CompositeDisposable();
 
@@ -159,11 +160,11 @@ public class SubjectWiseMarksEntryInputs extends CommonToolbarParentActivity {
             practical.setText(student.getString("Precticle"));
             attendance.setText(student.getString("Attendance"));
             total.setText(student.getString("Total"));
-            mcqMark = student.getInt("MCQ");
-            writtenMark = student.getInt("Written");
-            practicalMark = student.getInt("Precticle");
-            attendanceMark = student.getInt("Attendance");
-            totalMarks = student.getInt("Total");
+            mcqMark = student.getDouble("MCQ");
+            writtenMark = student.getDouble("Written");
+            practicalMark = student.getDouble("Precticle");
+            attendanceMark = student.getDouble("Attendance");
+            totalMarks = student.getDouble("Total");
             if(student.getString("IsAbsent").equalsIgnoreCase("0")) {
                 absent.setChecked(false);
             } else if(student.getString("IsAbsent").equalsIgnoreCase("1")) {
@@ -181,13 +182,13 @@ public class SubjectWiseMarksEntryInputs extends CommonToolbarParentActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if(!s.toString().equalsIgnoreCase("")){
-                    mcqMark = Integer.parseInt(mcq.getText().toString());
+                if(!s.toString().equalsIgnoreCase("") && !Pattern.matches("/*/.", s)){
+                    mcqMark = Double.parseDouble(mcq.getText().toString());
                 } else {
                     mcqMark = 0;
                 }
                 totalMarks = mcqMark+ writtenMark+ practicalMark+ attendanceMark;
-                total.setText(Integer.toString(totalMarks));
+                total.setText(Double.toString(totalMarks));
             }
 
             @Override
@@ -204,13 +205,13 @@ public class SubjectWiseMarksEntryInputs extends CommonToolbarParentActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if(!s.toString().equalsIgnoreCase("")){
-                    writtenMark = Integer.parseInt(written.getText().toString());
+                if(!s.toString().equalsIgnoreCase("") && !Pattern.matches("/*/.", s)){
+                    writtenMark = Double.parseDouble(written.getText().toString());
                 } else {
                     writtenMark = 0;
                 }
                 totalMarks = mcqMark+ writtenMark+ practicalMark+ attendanceMark;
-                total.setText(Integer.toString(totalMarks));
+                total.setText(Double.toString(totalMarks));
             }
 
             @Override
@@ -227,13 +228,13 @@ public class SubjectWiseMarksEntryInputs extends CommonToolbarParentActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if(!s.toString().equalsIgnoreCase("")){
-                    practicalMark = Integer.parseInt(practical.getText().toString());
+                if(!s.toString().equalsIgnoreCase("") && !Pattern.matches("/*/.", s)){
+                    practicalMark = Double.parseDouble(practical.getText().toString());
                 } else {
                     practicalMark = 0;
                 }
                 totalMarks = mcqMark+ writtenMark+ practicalMark+ attendanceMark;
-                total.setText(Integer.toString(totalMarks));
+                total.setText(Double.toString(totalMarks));
             }
 
             @Override
@@ -250,13 +251,13 @@ public class SubjectWiseMarksEntryInputs extends CommonToolbarParentActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if(!s.toString().equalsIgnoreCase("")){
-                    attendanceMark = Integer.parseInt(attendance.getText().toString());
+                if(!s.toString().equalsIgnoreCase("") && !Pattern.matches("/*/.", s)){
+                    attendanceMark = Double.parseDouble(attendance.getText().toString());
                 } else {
                     attendanceMark = 0;
                 }
                 totalMarks = mcqMark+ writtenMark+ practicalMark+ attendanceMark;
-                total.setText(Integer.toString(totalMarks));
+                total.setText(Double.toString(totalMarks));
             }
 
             @Override
