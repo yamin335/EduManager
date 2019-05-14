@@ -167,7 +167,7 @@ public class AttendanceReportDailyMain extends SideNavigationMenuParentActivity 
                 if(allSessionArrayList.size()>0 && selectedSession.getSessionID() == 0){
                     Toast.makeText(AttendanceReportDailyMain.this,"Please select session!!! ",
                             Toast.LENGTH_LONG).show();
-                } else if((selectedClass.getClassID() != -2)&&(!selectedDate.isEmpty())) {
+                } else if(!selectedDate.isEmpty()) {
                     CheckSelectedData();
                     Bundle bundle = new Bundle();
                     bundle.putLong("InstituteID", InstituteID);
@@ -182,8 +182,6 @@ public class AttendanceReportDailyMain extends SideNavigationMenuParentActivity 
                     Intent tempIntent = new Intent(AttendanceReportDailyMain.this, AttendanceReportDaily.class);
                     tempIntent.putExtras(bundle);
                     startActivity(tempIntent);
-                } else if(selectedClass.getClassID() == -2) {
-                    Toast.makeText(AttendanceReportDailyMain.this,"Please select a class !!! ",Toast.LENGTH_LONG).show();
                 } else if(selectedDate.isEmpty()) {
                     Toast.makeText(AttendanceReportDailyMain.this,"Please select a date !!! ",Toast.LENGTH_LONG).show();
                 }

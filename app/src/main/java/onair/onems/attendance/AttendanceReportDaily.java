@@ -74,6 +74,12 @@ public class AttendanceReportDaily extends CommonToolbarParentActivity {
         date = StudentSelection.getString("Date", "");
 
         recycler = findViewById(R.id.recycler);
+        mAdapter = new AttendanceReportDailyAdapter(this, attendanceList, isPresent, isAbsent, isLate);
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
+        recycler.setLayoutManager(mLayoutManager);
+        recycler.setItemAnimator(new DefaultItemAnimator());
+        recycler.setAdapter(mAdapter);
+
         CheckBox present = findViewById(R.id.rfid);
         CheckBox absent = findViewById(R.id.absent);
         CheckBox late = findViewById(R.id.late);
@@ -94,10 +100,6 @@ public class AttendanceReportDaily extends CommonToolbarParentActivity {
         if (late.isChecked()) {
             isLate = "L";
         }
-
-        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
-        recycler.setLayoutManager(mLayoutManager);
-        recycler.setItemAnimator(new DefaultItemAnimator());
 
         present.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
@@ -145,51 +147,6 @@ public class AttendanceReportDaily extends CommonToolbarParentActivity {
         });
 
         attendanceDataGetRequest();
-        totalAttendanceDataGetRequest();
-    }
-
-    private void totalAttendanceDataGetRequest() {
-        if (StaticHelperClass.isNetworkAvailable(this)) {
-            dialog.show();
-            Retrofit retrofit = new Retrofit.Builder()
-                    .baseUrl(getString(R.string.baseUrl))
-                    .addConverterFactory(ScalarsConverterFactory.create())
-                    .addConverterFactory(GsonConverterFactory.create())
-                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                    .build();
-
-            Observable<String> observable = retrofit
-                    .create(RetrofitNetworkService.class)
-                    .getHrmTotalStudentAttendance(ShiftID, MediumID, ClassID, SectionID, DepartmentID, date, InstituteID, 3)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .unsubscribeOn(Schedulers.io());
-
-            finalDisposer.add( observable.subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .unsubscribeOn(Schedulers.io())
-                    .subscribeWith(new DisposableObserver<String>() {
-
-                        @Override
-                        public void onNext(String response) {
-                            dialog.dismiss();
-                        }
-
-                        @Override
-                        public void onComplete() {
-
-                        }
-
-                        @Override
-                        public void onError(Throwable e) {
-                            dialog.dismiss();
-                            Toast.makeText(AttendanceReportDaily.this,"Error: getting total attendance!!!",Toast.LENGTH_LONG).show();
-                        }
-                    }));
-        } else {
-            Toast.makeText(AttendanceReportDaily.this,"Please check your internet connection and select again!!! ",
-                    Toast.LENGTH_LONG).show();
-        }
     }
 
     private void attendanceDataGetRequest() {
@@ -260,7 +217,6 @@ public class AttendanceReportDaily extends CommonToolbarParentActivity {
         _totalAbsent.setText(Integer.toString(totalAbsent));
         _totalLate.setText(Integer.toString(totalLate));
         _marginTime.setText(marginTime);
-        mAdapter = new AttendanceReportDailyAdapter(this, attendanceList, isPresent, isAbsent, isLate);
-        recycler.setAdapter(mAdapter);
+        mAdapter.notifyDataSetChanged();
     }
 }
