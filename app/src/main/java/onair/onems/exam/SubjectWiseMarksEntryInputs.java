@@ -45,6 +45,7 @@ public class SubjectWiseMarksEntryInputs extends CommonToolbarParentActivity {
     private double totalMarks = 0, mcqMark = 0, writtenMark = 0, attendanceMark = 0, practicalMark = 0;
     private long SubjectID;
     private CompositeDisposable finalDisposer = new CompositeDisposable();
+    private double validMCQ = 0.0, validWritten = 0.0, validAttendance = 0.0, validPractical = 0.0;
 
     @Override
     protected void onDestroy() {
@@ -98,21 +99,25 @@ public class SubjectWiseMarksEntryInputs extends CommonToolbarParentActivity {
         try {
             if (!student.getString("PassMCQ").equalsIgnoreCase("null") && !student.getString("PassMCQ").equalsIgnoreCase("0")) {
                 mcq.setEnabled(true);
+                validMCQ = student.getDouble("PassMCQ");
             } else {
                 mcq.setEnabled(false);
             }
             if (!student.getString("PassWritten").equalsIgnoreCase("null") && !student.getString("PassWritten").equalsIgnoreCase("0")) {
                 written.setEnabled(true);
+                validWritten = student.getDouble("PassWritten");
             } else {
                 written.setEnabled(false);
             }
             if (!student.getString("PassPrecticle").equalsIgnoreCase("null") && !student.getString("PassPrecticle").equalsIgnoreCase("0")) {
                 practical.setEnabled(true);
+                validPractical = student.getDouble("PassPrecticle");
             } else {
                 practical.setEnabled(false);
             }
             if (!student.getString("PassAttendance").equalsIgnoreCase("null") && !student.getString("PassAttendance").equalsIgnoreCase("0")) {
                 attendance.setEnabled(true);
+                validAttendance = student.getDouble("PassAttendance");
             } else {
                 attendance.setEnabled(false);
             }
@@ -183,7 +188,13 @@ public class SubjectWiseMarksEntryInputs extends CommonToolbarParentActivity {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if(!s.toString().equalsIgnoreCase("") && !Pattern.matches("/*/.", s)){
-                    mcqMark = Double.parseDouble(mcq.getText().toString());
+                    if (Double.parseDouble(s.toString())>validMCQ) {
+                        mcq.setText("");
+                        mcq.requestFocus();
+                        mcq.setError("Mark is too large!!!");
+                    } else {
+                        mcqMark = Double.parseDouble(mcq.getText().toString());
+                    }
                 } else {
                     mcqMark = 0;
                 }
@@ -206,7 +217,13 @@ public class SubjectWiseMarksEntryInputs extends CommonToolbarParentActivity {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if(!s.toString().equalsIgnoreCase("") && !Pattern.matches("/*/.", s)){
-                    writtenMark = Double.parseDouble(written.getText().toString());
+                    if (Double.parseDouble(s.toString())>validWritten) {
+                        written.setText("");
+                        written.requestFocus();
+                        written.setError("Mark is too large!!!");
+                    } else {
+                        writtenMark = Double.parseDouble(written.getText().toString());
+                    }
                 } else {
                     writtenMark = 0;
                 }
@@ -229,7 +246,13 @@ public class SubjectWiseMarksEntryInputs extends CommonToolbarParentActivity {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if(!s.toString().equalsIgnoreCase("") && !Pattern.matches("/*/.", s)){
-                    practicalMark = Double.parseDouble(practical.getText().toString());
+                    if (Double.parseDouble(s.toString())>validPractical) {
+                        practical.setText("");
+                        practical.requestFocus();
+                        practical.setError("Mark is too large!!!");
+                    } else {
+                        practicalMark = Double.parseDouble(practical.getText().toString());
+                    }
                 } else {
                     practicalMark = 0;
                 }
@@ -252,7 +275,13 @@ public class SubjectWiseMarksEntryInputs extends CommonToolbarParentActivity {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if(!s.toString().equalsIgnoreCase("") && !Pattern.matches("/*/.", s)){
-                    attendanceMark = Double.parseDouble(attendance.getText().toString());
+                    if (Double.parseDouble(s.toString())>validAttendance) {
+                        attendance.setText("");
+                        attendance.requestFocus();
+                        attendance.setError("Mark is too large!!!");
+                    } else {
+                        attendanceMark = Double.parseDouble(attendance.getText().toString());
+                    }
                 } else {
                     attendanceMark = 0;
                 }
